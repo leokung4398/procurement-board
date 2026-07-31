@@ -1,0 +1,35 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 1. 佈告欄集合 (Bulletins)
+    match /bulletins/{bulletinId} {
+      // 允許所有使用者讀取佈告欄資訊 (包含 index.html 與 admin.html 初始載入)
+      allow read: if true;
+      
+      // 寫入權限：理想狀態下應限制為管理員 (request.auth != null)，
+      // 由於目前系統採用無密碼或前端自訂密碼驗證，為確保開發與轉移順利，暫時開放寫入。
+      // 若正式上線，強烈建議導入 Firebase Auth，並將此改為 `allow write: if request.auth != null;`
+      allow write: if true;
+
+      // 1-1. 已讀紀錄子集合 (Read Receipts)
+      match /readReceipts/{userId} {
+        // 允許任何人寫入與讀取已讀紀錄 (供 index.html 登記與 admin.html 統計)
+        allow read, write: if true;
+      }
+    }
+
+    // 2. 使用者身分集合 (Users)
+    match /users/{userId} {
+      // 允許一般使用者登記個人資訊
+      allow read, write: if true;
+    }
+
+    // 3. 系統設定集合 (System Config)
+    match /systemConfig/{doc} {
+      // 系統設定 (如自訂密碼等機密資訊) 絕對不可開放前端任意讀取。
+      // 存取此集合應透過後端或具有 Firebase Admin 權限的環境。
+      allow read, write: if false; 
+    }
+  }
+}
