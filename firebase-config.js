@@ -13,7 +13,7 @@ var firebaseConfig = {
 
 // EmailJS Configuration
 var emailjsConfig = {
-  publicKey: '7eTbBIlRmkkEM-uS3',
-  serviceId: 'service_68zzgfe',
-  templateId: 'template_8rlsz1f'
+  publicKey: '2t362RXj6NgjA66UH',
+  serviceId: 'service_oqhh8oa',
+  templateId: 'template_8g30jtz'
 };

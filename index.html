@@ -497,13 +497,13 @@
         // 渲染重點公告清單
         const itemsHtml = sec.items && sec.items.length > 0
           ? `
-            <div class="space-y-3 mb-4">
+            <div class="space-y-2 mb-3">
               ${sec.items.map((item, itemIdx) => {
                 const isHigh = item.priority === 'high';
                 const borderClass = isHigh ? 'border-red-500 bg-red-50 text-red-900' : 'border-blue-500 bg-blue-50/50 text-slate-800';
                 const highlightBadge = isHigh ? `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-red-100 text-red-800 mr-2">緊急</span>` : '';
                 return `
-                  <div class="p-4 border-l-4 rounded-r-lg shadow-sm transition-all hover:shadow-md ${borderClass}">
+                  <div class="px-4 py-2.5 border-l-4 rounded-r-lg shadow-sm transition-all hover:shadow-md ${borderClass}">
                     <div ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].items[${itemIdx}].content" class="text-sm font-medium leading-relaxed outline-none whitespace-pre-wrap ql-editor !p-0">
                       ${highlightBadge}${item.content}
                     </div>
@@ -519,12 +519,12 @@
           ? sec.subsections.map((sub, subIdx) => {
               const subItemsHtml = sub.items && sub.items.length > 0
                 ? `
-                  <div class="space-y-2 mb-4">
+                  <div class="space-y-1.5 mb-3">
                     ${sub.items.map((item, itemIdx) => {
                       const isHigh = item.priority === 'high';
                       const borderClass = isHigh ? 'border-red-400 bg-red-50/30' : 'border-slate-300 bg-slate-50';
                       return `
-                        <div class="p-3 border-l-2 rounded-r bg-white text-slate-700 text-sm leading-relaxed border-l-4 ${borderClass}">
+                        <div class="px-3 py-1.5 border-l-2 rounded-r bg-white text-slate-700 text-sm leading-relaxed border-l-4 ${borderClass}">
                           <div ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].subsections[${subIdx}].items[${itemIdx}].content" class="outline-none whitespace-pre-wrap ql-editor !p-0">
                             ${item.content}
                           </div>
@@ -551,9 +551,9 @@
         // 渲染附件
         const filesHtml = (sec.files && sec.files.length > 0) || state.isEditMode
           ? `
-            <div class="mt-4 bg-slate-50 p-4 rounded-lg border border-slate-100">
+            <div class="mt-2 bg-slate-50 px-3 py-2.5 rounded-lg border border-slate-100">
               <h5 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">附件下載</h5>
-              <ul class="space-y-2 mb-3">
+              <ul class="space-y-1.5">
                 ${(sec.files || []).map((file, fileIdx) => `
                   <li class="flex items-center justify-between text-sm bg-white p-2 rounded border border-slate-100 shadow-sm">
                     <div class="flex items-center gap-2">
