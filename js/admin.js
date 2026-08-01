@@ -666,6 +666,7 @@ let tempKw = [];
     }
 
 let tempWL = [];
+let editWLIndex = null;
 const DEFAULT_WL = "JunWei Wu 吳俊緯 <JunWeiWu@youbike.com.tw>; Jiyu Gu 顧致宇 <JiyuGu@youbike.com.tw>; Lucas Wang 王文樺 <LucasWang@youbike.com.tw>; Mars Lin 林瑋泰 <MarsLin@youbike.com.tw>; George Chen 陳俊帆 <GeorgeChen@youbike.com.tw>; Sherry Lu 呂淑意 <SherryLu@youbike.com.tw>; Jane Chuang 莊佳誼 <JaneChuang@youbike.com.tw>; Beichen Ren 任北辰 <BeichenRen@youbike.com.tw>; Ruby Chen 陳恩柔 <RubyChen2@youbike.com.tw>; Wei Wan 萬偉 <WeiWan@youbike.com.tw>; Sinan Lin 林信安 <SinanLin@youbike.com.tw>; Tank Lin 林育民 <TankLin@youbike.com.tw>; Clon Huang 黃龍輝 <ClonHuang@youbike.com.tw>; HsuWei Chu 朱栩葳 <HsuWeiChu@youbike.com.tw>; XinRay Hung 洪訢睿 <XinRayHung@youbike.com.tw>; Shuni NI 倪順一 <ShuniNI@youbike.com.tw>; Chiahsiu Li 李嘉修 <ChiahsiuLi@youbike.com.tw>; Boa Chen 陳漢全 <BoaChen@youbike.com.tw>; YiMin Chiu 邱宜敏 <YiMinChiu@youbike.com.tw>; Bruce Lin 林渝軒 <BruceLin@youbike.com.tw>; RuXuan Zhang 張挐瑄 <RuXuanZhang@youbike.com.tw>; Cola Wu 吳建穎 <ColaWu@youbike.com.tw>; JianDe Liu 劉建德 <JianDeLiu@youbike.com.tw>; Sam Huang 黃聖育 <SamHuang@youbike.com.tw>; ZihYue Li 李子岳 <ZihYueLi@youbike.com.tw>; Zoey Lin 林言柔 <ZoeyLin@youbike.com.tw>; ShuChi Lu 呂淑綺 <ShuChiLu@youbike.com.tw>; Colin Tang 唐仕伀 <ColinTang@youbike.com.tw>; Hanley Fu 傅涵立 <HanleyFu@youbike.com.tw>; Ringka Huang 黃仁瑱 <RingkaHuang@youbike.com.tw>; Kevin Chang 張浩 <KevinChang@youbike.com.tw>; Aidpan Chen 陳麒任 <AidpanChen@youbike.com.tw>; Jerry Hsu 徐嘉鴻 <JHsu@youbike.com.tw>; Wendy Lu 盧瑞云 <WendyLu@youbike.com.tw>; Ruowei Wang 王若維 <RuoweiWang@youbike.com.tw>; Yun Chen 陳韻欣 <YunChen@youbike.com.tw>; Ryan Peng 彭上維 <RyanPeng@youbike.com.tw>; Michael Chien 簡榮德 <MichaelChien@youbike.com.tw>; Hank Tsai 蔡瀚緯 <HankTsai@youbike.com.tw>; MingXiao Lin 林明孝 <MingXiaoLin@youbike.com.tw>; Chenlong Pai 白正隆 <ChenlongPai@youbike.com.tw>; QiZhong Huang 黃啟中 <QiZhongHuang@youbike.com.tw>".split('; ').map(s => {
   const m = s.match(/(.+)\s<(.+)>/);
   return m ? { name: m[1].trim(), email: m[2].trim() } : null;
@@ -677,15 +678,30 @@ async function initWL() {
   else { tempWL = [...DEFAULT_WL]; saveWL(); }
 }
 function saveWL() { localStorage.setItem('youbike_wl', JSON.stringify(tempWL)); }
-function showWL() { initWL(); document.getElementById('wl-modal').classList.remove('hidden'); renderWL(); }
+function showWL() { initWL(); document.getElementById('wl-modal').classList.remove('hidden'); editWLIndex = null; document.getElementById('wl-btn').innerText = '新增'; document.getElementById('wl-name').value = ''; document.getElementById('wl-email').value = ''; renderWL(); }
 function hideWL() { document.getElementById('wl-modal').classList.add('hidden'); }
 function addWL() {
   const n = document.getElementById('wl-name').value.trim();
   const e = document.getElementById('wl-email').value.trim();
   if(!n || !e) return toast('姓名與信箱必填', 'er');
-  tempWL.push({name: n, email: e}); saveWL(); renderWL();
+  if (editWLIndex !== null) {
+    tempWL[editWLIndex] = {name: n, email: e};
+    editWLIndex = null;
+    document.getElementById('wl-btn').innerText = '新增';
+    toast('已更新白名單', 'ok');
+  } else {
+    tempWL.push({name: n, email: e});
+    toast('已新增至白名單', 'ok');
+  }
+  saveWL(); renderWL();
   document.getElementById('wl-name').value=''; document.getElementById('wl-email').value='';
-  toast('已新增至白名單', 'ok');
+}
+function editWL(idx) {
+  editWLIndex = idx;
+  document.getElementById('wl-name').value = tempWL[idx].name;
+  document.getElementById('wl-email').value = tempWL[idx].email;
+  document.getElementById('wl-btn').innerText = '儲存';
+  document.getElementById('wl-name').focus();
 }
 function rmWL(idx) { 
   if(!confirm(`確定要刪除 ${tempWL[idx].name} 嗎？`)) return;
@@ -694,12 +710,15 @@ function rmWL(idx) {
 function renderWL() {
   const c = document.getElementById('wl-list');
   c.innerHTML = tempWL.map((w, i) => `
-    <div class="flex items-center justify-between p-3 mb-2 bg-white rounded-lg border border-slate-200">
+    <div class="flex items-center justify-between p-3 mb-2 bg-white rounded-lg border border-slate-200 hover:border-blue-200 transition-colors">
       <div>
         <div class="font-medium text-slate-800 text-sm">${w.name}</div>
         <div class="text-xs text-slate-500">${w.email}</div>
       </div>
-      <button onclick="rmWL(${i})" class="text-red-500 hover:bg-red-50 p-1.5 rounded"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+      <div class="flex gap-1">
+        <button onclick="editWL(${i})" class="text-blue-500 hover:bg-blue-50 p-1.5 rounded" title="修改"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg></button>
+        <button onclick="rmWL(${i})" class="text-red-500 hover:bg-red-50 p-1.5 rounded" title="刪除"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+      </div>
     </div>
   `).join('');
 }
