@@ -536,8 +536,8 @@
                 : '';
 
               return `
-                <div class="mb-6 pl-4 border-l border-slate-100">
-                  <h4 class="text-md font-bold text-slate-700 mb-3 flex items-center gap-2">
+                <div class="mb-3 pl-3 border-l border-slate-100">
+                  <h4 class="text-md font-bold text-slate-700 mb-1.5 flex items-center gap-2">
                     <span>${e(sub.subsectionNumber)}.</span>
                     <span ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].subsections[${subIdx}].title" class="outline-none">${e(sub.title)}</span>
                   </h4>
@@ -580,8 +580,8 @@
           : '';
 
         return `
-          <section class="bg-white rounded-lg p-6 border border-slate-200/60 shadow-sm space-y-4">
-            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2 pb-3 border-b border-slate-100">
+          <section class="bg-white rounded-xl shadow-sm border border-slate-100 p-4">
+            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2 pb-2 mb-3 border-b border-slate-100">
               <span class="text-xl">${e(sec.icon)}</span>
               <span class="text-blue-600">${e(sec.sectionNumber)}、</span>
               <span ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].title" class="outline-none">${e(sec.title)}</span>
