@@ -792,10 +792,10 @@ async function loadHandoverConfig() {
     if(snap.exists) {
       const data = snap.data();
       document.getElementById('ho-pwd').value = data.secretCode || 'sunny';
-      document.getElementById('ho-name').value = data.contact?.name || 'Sunny Ting 丁美云';
-      document.getElementById('ho-tel').value = data.contact?.tel || '+886-2-8978-5094';
-      document.getElementById('ho-email').value = data.contact?.email || 'sunnyting@youbike.com.tw';
-      document.getElementById('ho-addr').value = data.contact?.address || '105403 台北市松山區民生東路三段138號10樓';
+      document.getElementById('ho-name').value = (data.contact && data.contact.name) || 'Sunny Ting 丁美云';
+      document.getElementById('ho-tel').value = (data.contact && data.contact.tel) || '+886-2-8978-5094';
+      document.getElementById('ho-email').value = (data.contact && data.contact.email) || 'sunnyting@youbike.com.tw';
+      document.getElementById('ho-addr').value = (data.contact && data.contact.address) || '105403 台北市松山區民生東路三段138號10樓';
     } else {
       document.getElementById('ho-pwd').value = 'sunny';
       document.getElementById('ho-name').value = 'Sunny Ting 丁美云';
