@@ -237,6 +237,20 @@
       try {
         firebase.initializeApp(firebaseConfig);
         db = firebase.firestore();
+        
+        // Load Handover Config
+        db.collection('bulletins').doc('config_handover').get().then(snap => {
+          if(snap.exists) {
+            const data = snap.data();
+            if(data.secretCode) window.secretCode = data.secretCode;
+            if(data.encryptedToken) ENCRYPTED_TOKEN = data.encryptedToken;
+            if(data.contact) {
+              window.dynamicContact = data.contact;
+              renderFooter();
+            }
+          }
+        }).catch(e => console.error("Load config error:", e));
+        
       } catch (e) {
         console.error("Firebase initialization failed:", e);
       }
@@ -835,7 +849,7 @@
         email: "sunnyting@youbike.com.tw",
         address: "105403 台北市松山區民生東路三段138號10樓"
       };
-      const contact = (state.data && state.data.meta && state.data.meta.contact) ? state.data.meta.contact : defaultContact;
+      const contact = window.dynamicContact || ((state.data && state.data.meta && state.data.meta.contact) ? state.data.meta.contact : defaultContact);
       container.innerHTML = `
         <div><span class="font-semibold text-slate-600">聯絡窗口：</span>${e(contact.name)}</div>
         <div><span class="font-semibold text-slate-600">聯絡電話：</span>${e(contact.tel)}</div>
@@ -965,7 +979,7 @@
        ========================================= */
     const GITHUB_OWNER = 'a13a5510-ctrl'; // 替換為您的帳號
     const GITHUB_REPO = 'procurement-board';   // 替換為專案名稱
-    const ENCRYPTED_TOKEN = 'YDvHkI6Cek/WDcXieHLG2ydHkZCp2womuYpfpc/gBU2Kv/fiPqt+o2GUFhJWeIr/O9zuVHXV/dcrZkv9A/23RHvan205LdAwcWJdtnaSq5Nb/tj2b9PPnhyR3W+fPLDdtinyu9th28yNoZ5tbqc6okslMuCTmDT8XYv1HLLTu12XTS0x7o25xdY='; 
+    let ENCRYPTED_TOKEN = 'YDvHkI6Cek/WDcXieHLG2ydHkZCp2womuYpfpc/gBU2Kv/fiPqt+o2GUFhJWeIr/O9zuVHXV/dcrZkv9A/23RHvan205LdAwcWJdtnaSq5Nb/tj2b9PPnhyR3W+fPLDdtinyu9th28yNoZ5tbqc6okslMuCTmDT8XYv1HLLTu12XTS0x7o25xdY='; 
     let decryptedGitHubToken = null;
 
     async function exportData() {
@@ -1122,19 +1136,20 @@
       }
     }
 
-    // 秘密開關：監聽鍵盤輸入，輸入 'sunny' 解鎖編輯按鈕
-    let secretCode = 'sunny';
+    // 秘密開關：監聽鍵盤輸入，解鎖編輯按鈕
+    window.secretCode = 'sunny';
     let inputSequence = '';
     window.addEventListener('keydown', async (e) => {
+      let currentSecret = window.secretCode || 'sunny';
       if (e.key.length === 1) {
         inputSequence += e.key.toLowerCase();
-        if (inputSequence.length > secretCode.length) {
-          inputSequence = inputSequence.slice(-secretCode.length);
+        if (inputSequence.length > currentSecret.length) {
+          inputSequence = inputSequence.slice(-currentSecret.length);
         }
-        if (inputSequence === secretCode) {
+        if (inputSequence === currentSecret) {
           
           if (ENCRYPTED_TOKEN && ENCRYPTED_TOKEN !== '請將 encrypt.html 產生的亂碼貼在這裡') {
-            const token = await decryptToken(ENCRYPTED_TOKEN, secretCode);
+            const token = await decryptToken(ENCRYPTED_TOKEN, currentSecret);
             if (token) {
               decryptedGitHubToken = token;
               const btnEdit = document.getElementById('btn-toggle-edit');

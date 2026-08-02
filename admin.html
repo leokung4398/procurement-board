@@ -104,11 +104,14 @@
       <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-2 mb-2">歷史歸檔</p>
       <div id="sbm"><div class="text-center py-8 text-slate-400 text-sm">載入中...</div></div>
     </nav>
-    <div class="px-5 py-4 border-t border-slate-100">
+    <div class="px-5 py-4 border-t border-slate-100 flex items-center justify-between">
       <div class="flex items-center gap-2">
         <div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center"><span class="text-xs font-bold text-blue-600">A</span></div>
         <div><p class="text-xs font-semibold text-slate-700">採購管理員</p><p class="text-[11px] text-slate-400">admin</p></div>
       </div>
+      <button onclick="showHandover()" class="text-slate-400 hover:text-amber-500 transition-colors" title="系統交接設定">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      </button>
     </div>
   </aside>
   <main id="main-content" class="flex-1 bg-slate-50">
@@ -618,7 +621,47 @@
 
     </div>
   </div>
+<div id="handover-modal" class="hidden fixed inset-0 z-[200] flex justify-center bg-slate-900/50 backdrop-blur-sm transition-all duration-300" style="align-items: center;">
+  <div class="w-full max-w-lg bg-white rounded-2xl shadow-2xl flex flex-col m-4 max-h-[90vh]">
+    <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 rounded-t-2xl">
+      <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">⚙️ 系統交接設定</h3>
+      <button onclick="hideHandover()" class="text-slate-400 hover:bg-slate-200 p-1.5 rounded-lg transition-colors"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="p-6 overflow-y-auto space-y-4">
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-1">隱藏解鎖密碼 (前台使用)</label>
+        <input id="ho-pwd" type="text" class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" placeholder="輸入新密碼 (預設: sunny)">
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-1">GitHub API Token (必填)</label>
+        <input id="ho-token" type="password" class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+        <p class="text-xs text-slate-500 mt-1">※ 更換密碼時必須重新輸入 Token，系統將自動以此新密碼加密 Token。</p>
+      </div>
+      <hr class="border-slate-100 my-4">
+      <h4 class="text-md font-bold text-slate-800">前台底部聯絡資訊</h4>
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-1">聯絡窗口姓名</label>
+        <input id="ho-name" type="text" class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" placeholder="例如: Sunny Ting 丁美云">
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-1">聯絡電話</label>
+        <input id="ho-tel" type="text" class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" placeholder="例如: +886-2-8978-5094">
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-1">電子郵件</label>
+        <input id="ho-email" type="text" class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" placeholder="例如: sunnyting@youbike.com.tw">
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-1">聯絡地址</label>
+        <input id="ho-addr" type="text" class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" placeholder="例如: 105403 台北市松山區民生東路三段138號10樓">
+      </div>
+    </div>
+    <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 rounded-b-2xl flex justify-end gap-2">
+      <button onclick="hideHandover()" class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 rounded transition-colors">取消</button>
+      <button id="btn-save-ho" onclick="saveHandover()" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors flex items-center gap-2">儲存設定</button>
+    </div>
+  </div>
 </div>
-  <script src="js/admin.js?v=20260801"></script>
+  <script src="js/admin.js?v=20260802"></script>
 </body>
 </html>

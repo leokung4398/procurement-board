@@ -785,3 +785,90 @@ function hideGuide() {
   document.getElementById('guide-modal').classList.add('hidden');
 }
 
+// --- Handover Settings ---
+async function loadHandoverConfig() {
+  try {
+    const snap = await db.collection('bulletins').doc('config_handover').get();
+    if(snap.exists) {
+      const data = snap.data();
+      document.getElementById('ho-pwd').value = data.secretCode || 'sunny';
+      document.getElementById('ho-name').value = data.contact?.name || 'Sunny Ting 丁美云';
+      document.getElementById('ho-tel').value = data.contact?.tel || '+886-2-8978-5094';
+      document.getElementById('ho-email').value = data.contact?.email || 'sunnyting@youbike.com.tw';
+      document.getElementById('ho-addr').value = data.contact?.address || '105403 台北市松山區民生東路三段138號10樓';
+    } else {
+      document.getElementById('ho-pwd').value = 'sunny';
+      document.getElementById('ho-name').value = 'Sunny Ting 丁美云';
+      document.getElementById('ho-tel').value = '+886-2-8978-5094';
+      document.getElementById('ho-email').value = 'sunnyting@youbike.com.tw';
+      document.getElementById('ho-addr').value = '105403 台北市松山區民生東路三段138號10樓';
+    }
+  } catch(e) { console.error('Load config error', e); }
+}
+
+async function showHandover() {
+  await loadHandoverConfig();
+  document.getElementById('ho-token').value = '';
+  document.getElementById('handover-modal').classList.remove('hidden');
+}
+
+function hideHandover() {
+  document.getElementById('handover-modal').classList.add('hidden');
+}
+
+async function deriveKey(passwordStr, salt) {
+  const enc = new TextEncoder();
+  const keyMaterial = await window.crypto.subtle.importKey("raw", enc.encode(passwordStr), { name: "PBKDF2" }, false, ["deriveBits", "deriveKey"]);
+  return window.crypto.subtle.deriveKey({ name: "PBKDF2", salt: salt, iterations: 100000, hash: "SHA-256" }, keyMaterial, { name: "AES-GCM", length: 256 }, true, ["encrypt", "decrypt"]);
+}
+
+async function saveHandover() {
+  const pwd = document.getElementById('ho-pwd').value.trim() || 'sunny';
+  const token = document.getElementById('ho-token').value.trim();
+  const contact = {
+    name: document.getElementById('ho-name').value.trim() || 'Sunny Ting 丁美云',
+    tel: document.getElementById('ho-tel').value.trim() || '+886-2-8978-5094',
+    email: document.getElementById('ho-email').value.trim() || 'sunnyting@youbike.com.tw',
+    address: document.getElementById('ho-addr').value.trim() || '105403 台北市松山區民生東路三段138號10樓'
+  };
+
+  const btn = document.getElementById('btn-save-ho');
+  btn.disabled = true;
+  btn.textContent = '儲存中...';
+
+  try {
+    let encryptedToken = null;
+    if(token) {
+      const enc = new TextEncoder();
+      const salt = window.crypto.getRandomValues(new Uint8Array(16));
+      const iv = window.crypto.getRandomValues(new Uint8Array(12));
+      const key = await deriveKey(pwd, salt);
+      const encryptedContent = await window.crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, enc.encode(token));
+      const encryptedContentArr = new Uint8Array(encryptedContent);
+      const combined = new Uint8Array(salt.length + iv.length + encryptedContentArr.length);
+      combined.set(salt, 0);
+      combined.set(iv, salt.length);
+      combined.set(encryptedContentArr, salt.length + iv.length);
+      encryptedToken = btoa(String.fromCharCode.apply(null, combined));
+    }
+
+    const payload = {
+      status: 'deleted',
+      secretCode: pwd,
+      contact: contact
+    };
+    if(encryptedToken) {
+      payload.encryptedToken = encryptedToken;
+    }
+
+    await db.collection('bulletins').doc('config_handover').set(payload, { merge: true });
+    toast('交接設定已儲存', 'ok');
+    hideHandover();
+  } catch(e) {
+    toast('儲存失敗: ' + e.message, 'er');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '儲存設定';
+  }
+}
+
