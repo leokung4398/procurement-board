@@ -807,9 +807,9 @@ async function loadHandoverConfig() {
 }
 
 async function showHandover() {
-  await loadHandoverConfig();
   document.getElementById('ho-token').value = '';
   document.getElementById('handover-modal').classList.remove('hidden');
+  await loadHandoverConfig();
 }
 
 function hideHandover() {
