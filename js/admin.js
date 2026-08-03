@@ -117,6 +117,27 @@ const DS = {
       console.error(e);
     }
   },
+  async getAdmins() {
+    if (!this.isConfigured()) return [];
+    try {
+      const snap = await db.collection('systemConfig').doc('admins').get();
+      if (snap.exists) {
+        return snap.data().list || [];
+      }
+      return [];
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
+  },
+  async saveAdmins(list) {
+    if (!this.isConfigured()) return;
+    try {
+      await db.collection('systemConfig').doc('admins').set({ list: list }, { merge: true });
+    } catch (e) {
+      console.error(e);
+    }
+  },
   async getKeywords() {
     if (!this.isConfigured()) return [];
     try {
@@ -268,14 +289,23 @@ if (DS.isConfigured()) {
   }
 }
 
-const S={cur:null,dirty:false,fbs:[],tpls:[],keywords:[],mmap:{},amon:null,users:[]};
+const S = {
+  tpls: [],
+  keywords: [],
+  users: [],
+  admins: [],
+  mmap: {},
+  cur: null,
+  dirty: false
+};
 async function init(){
   S.tpls=await DS.getTpls();
   S.keywords=await DS.getKeywords();
   S.users=await DS.getUsers();
+  S.admins=await DS.getAdmins();
   S.mmap=await DS.getMonths();
   
-  // 載入過濾用的月份選單
+  // 載入月份選單過濾用的月份選單
   const mArr = Object.keys(S.mmap).sort().reverse();
   const smEl = document.getElementById('admin-search-month');
   if(smEl) {
@@ -309,12 +339,22 @@ async function adminGoogleLogin() {
     const result = await firebase.auth().signInWithPopup(provider);
     const user = result.user;
     if (user.email.endsWith('@youbike.com.tw') || ADMIN_EMAILS.includes(user.email)) {
-      document.getElementById('lo').style.display = 'none';
-      await init();
-      toast('歡迎回來，採購管理員 👋', 'in');
+      const adminList = await DS.getAdmins();
+      if (adminList.some(a => a.email === user.email) || ADMIN_EMAILS.includes(user.email)) {
+        document.getElementById('lo').style.display = 'none';
+        await init();
+        toast('歡迎回來，採購管理員 👋', 'in');
+      } else {
+        await firebase.auth().signOut();
+        const e = document.getElementById('le');
+        e.innerText = '無後台登入權限，請確認是否已被加入管理員名單。';
+        e.classList.remove('hidden');
+        setTimeout(() => e.classList.add('hidden'), 3000);
+      }
     } else {
       await firebase.auth().signOut();
       const e = document.getElementById('le');
+      e.innerText = '無登入權限，請使用 @youbike.com.tw 帳號。';
       e.classList.remove('hidden');
       setTimeout(() => e.classList.add('hidden'), 3000);
     }
@@ -523,6 +563,46 @@ async function delUM(i) {
   S.users.splice(i, 1);
   await DS.saveUsers(S.users);
   renderUM();
+  toast('已刪除', 'ok');
+}
+
+function showAdminList() { 
+  document.getElementById('admin-modal').classList.remove('hidden'); 
+  renderAdminList(); 
+}
+function hideAdminList() { document.getElementById('admin-modal').classList.add('hidden'); }
+function renderAdminList() {
+  const c = document.getElementById('am-list');
+  if (S.admins.length === 0) {
+    c.innerHTML = '<tr><td colspan="3" class="px-3 py-4 text-center text-slate-400">目前尚無管理員，請新增</td></tr>';
+    return;
+  }
+  c.innerHTML = S.admins.map((u, i) => `
+    <tr>
+      <td class="px-3 py-2 text-slate-700 font-medium">${xe(u.name)}</td>
+      <td class="px-3 py-2 text-slate-500">${xe(u.email)}</td>
+      <td class="px-3 py-2 text-center">
+        <button onclick="delAdmin(${i})" class="text-rose-500 hover:text-rose-700"><svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+      </td>
+    </tr>
+  `).join('');
+}
+async function addAdmin() {
+  const n = document.getElementById('am-name').value.trim();
+  const e = document.getElementById('am-email').value.trim();
+  if(!n || !e) return toast('姓名與信箱必填', 'er');
+  S.admins.push({ name: n, email: e });
+  await DS.saveAdmins(S.admins);
+  document.getElementById('am-name').value = '';
+  document.getElementById('am-email').value = '';
+  renderAdminList();
+  toast('已新增管理員', 'ok');
+}
+async function delAdmin(i) {
+  if(!confirm('確定刪除嗎？')) return;
+  S.admins.splice(i, 1);
+  await DS.saveAdmins(S.admins);
+  renderAdminList();
   toast('已刪除', 'ok');
 }
 
@@ -874,8 +954,14 @@ async function saveHandover() {
 window.addEventListener('DOMContentLoaded', () => {
   firebase.auth().onAuthStateChanged(async (user) => {
     if (user && (user.email.endsWith('@youbike.com.tw') || ADMIN_EMAILS.includes(user.email))) {
-      document.getElementById('lo').style.display = 'none';
-      await init();
+      const snap = await db.collection('systemConfig').doc('admins').get();
+      const adminList = snap.exists ? (snap.data().list || []) : [];
+      if (adminList.some(a => a.email === user.email) || ADMIN_EMAILS.includes(user.email)) {
+        document.getElementById('lo').style.display = 'none';
+        await init();
+      } else {
+        document.getElementById('lo').style.display = 'flex';
+      }
     } else {
       document.getElementById('lo').style.display = 'flex';
     }

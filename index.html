@@ -341,7 +341,19 @@
         const result = await firebase.auth().signInWithPopup(provider);
         const user = result.user;
         if (user.email.endsWith('@youbike.com.tw') || user.email === 'a13a5510@gmail.com') {
-          // Valid domain
+          // Check whitelist
+          const snap = await db.collection('systemConfig').doc('users').get();
+          const allowedUsers = snap.exists ? (snap.data().list || []) : [];
+          
+          if (!allowedUsers.some(u => u.email === user.email) && user.email !== 'a13a5510@gmail.com') {
+            await firebase.auth().signOut();
+            const e = document.getElementById('user-le');
+            e.innerText = '無瀏覽權限，請確認是否已被加入白名單。';
+            e.classList.remove('hidden');
+            return;
+          }
+
+          // Valid domain and whitelisted
           document.getElementById('user-modal').classList.add('hidden');
           
           pendingUser = {
@@ -367,6 +379,7 @@
         } else {
           await firebase.auth().signOut();
           const e = document.getElementById('user-le');
+          e.innerText = '無權限，請使用 @youbike.com.tw 帳號。';
           e.classList.remove('hidden');
         }
       } catch (error) {

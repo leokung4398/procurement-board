@@ -246,6 +246,29 @@
   </div>
 </div>
 
+<div id="admin-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[150] hidden flex items-center justify-center p-4" onclick="if(event.target===this)hideAdminList()">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
+    <div class="px-6 py-5 border-b border-rose-100 bg-rose-50 rounded-t-2xl flex items-center justify-between">
+      <h3 class="text-base font-semibold text-rose-800">🛡️ 管理員白名單</h3>
+      <button onclick="hideAdminList()" class="bic"><svg class="w-5 h-5 text-rose-400 hover:text-rose-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="p-5">
+      <p class="text-xs text-rose-600 mb-4 bg-rose-50 p-2 rounded-lg">設定能夠登入此後台的帳號。系統預設的超級管理員 a13a5510@gmail.com 不會顯示於此，但永遠具有登入權限。</p>
+      <div class="flex items-center gap-2 mb-4">
+        <input id="am-name" type="text" class="form-input text-sm flex-1" placeholder="姓名...">
+        <input id="am-email" type="email" class="form-input text-sm flex-1" placeholder="信箱 (@youbike.com.tw)">
+        <button onclick="addAdmin()" class="btn-p bg-rose-600 hover:bg-rose-700 focus:ring-rose-200 border-rose-600 px-4">新增</button>
+      </div>
+      <div class="overflow-y-auto max-h-60 border border-slate-200 rounded-lg">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-50"><tr><th class="px-3 py-2 font-medium">姓名</th><th class="px-3 py-2 font-medium">Email</th><th class="px-3 py-2 text-center w-12">操作</th></tr></thead>
+          <tbody id="am-list" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
 
   <!-- 專案開發成果展示 (Achievements Modal) -->
   <div id="am" class="hidden fixed inset-0 z-[100] flex justify-end bg-slate-900/40 transition-all duration-300">
