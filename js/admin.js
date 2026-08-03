@@ -299,33 +299,29 @@ async function init(){
   }
 }
 
-async function checkPassword(pwd) {
-  if (pwd === 'sunny') return true;
-  if (DS.isConfigured()) {
-    try {
-      const snap = await db.collection('systemConfig').doc('settings').get();
-      if (snap.exists && snap.data().adminPassword === pwd) {
-        return true;
-      }
-    } catch (e) {}
-  }
-  return false;
-}
+const ADMIN_EMAILS = [
+  'a13a5510@gmail.com'
+];
 
-async function unlock(){
-  const p=document.getElementById('lp').value,e=document.getElementById('le');
-  const isMatch = await checkPassword(p);
-  if(isMatch){
-    document.getElementById('lo').style.display='none';
-    await init();
-    toast('歡迎回來，採購管理員 👋','in');
-  }else{
-    e.classList.remove('hidden');
-    setTimeout(()=>e.classList.add('hidden'),3000);
+async function adminGoogleLogin() {
+  const provider = new firebase.auth.GoogleAuthProvider();
+  try {
+    const result = await firebase.auth().signInWithPopup(provider);
+    const user = result.user;
+    if (user.email.endsWith('@youbike.com.tw') || ADMIN_EMAILS.includes(user.email)) {
+      document.getElementById('lo').style.display = 'none';
+      await init();
+      toast('歡迎回來，採購管理員 👋', 'in');
+    } else {
+      await firebase.auth().signOut();
+      const e = document.getElementById('le');
+      e.classList.remove('hidden');
+      setTimeout(() => e.classList.add('hidden'), 3000);
+    }
+  } catch (error) {
+    console.error('Login failed', error);
   }
 }
-
-document.getElementById('lp').addEventListener('keydown',e=>{if(e.key==='Enter')unlock();});
 
 let adminSearchMonth = '';
 let adminSearchParent = '';
@@ -753,6 +749,10 @@ async function confirmPubBulletin() {
   btn.disabled=true; btn.textContent='發布中...';
   try {
     const d={...S.cur, status:'published', feedbackLog:S.fbs};
+    
+    // Save authorizedEmails for access control
+    d.authorizedEmails = selectedEmails;
+    
     await DS.save(d.id,d);
     
     // 自訂發送名單
@@ -833,7 +833,6 @@ async function loadHandoverConfig() {
 }
 
 async function showHandover() {
-  document.getElementById('ho-token').value = '';
   document.getElementById('handover-modal').classList.remove('hidden');
   await loadHandoverConfig();
 }
@@ -842,15 +841,7 @@ function hideHandover() {
   document.getElementById('handover-modal').classList.add('hidden');
 }
 
-async function deriveKey(passwordStr, salt) {
-  const enc = new TextEncoder();
-  const keyMaterial = await window.crypto.subtle.importKey("raw", enc.encode(passwordStr), { name: "PBKDF2" }, false, ["deriveBits", "deriveKey"]);
-  return window.crypto.subtle.deriveKey({ name: "PBKDF2", salt: salt, iterations: 100000, hash: "SHA-256" }, keyMaterial, { name: "AES-GCM", length: 256 }, true, ["encrypt", "decrypt"]);
-}
-
 async function saveHandover() {
-  const pwd = document.getElementById('ho-pwd').value.trim() || 'sunny';
-  const token = document.getElementById('ho-token').value.trim();
   const contact = {
     name: document.getElementById('ho-name').value.trim() || 'Sunny Ting 丁美云',
     tel: document.getElementById('ho-tel').value.trim() || '+886-2-8978-5094',
@@ -863,29 +854,10 @@ async function saveHandover() {
   btn.textContent = '儲存中...';
 
   try {
-    let encryptedToken = null;
-    if(token) {
-      const enc = new TextEncoder();
-      const salt = window.crypto.getRandomValues(new Uint8Array(16));
-      const iv = window.crypto.getRandomValues(new Uint8Array(12));
-      const key = await deriveKey(pwd, salt);
-      const encryptedContent = await window.crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, enc.encode(token));
-      const encryptedContentArr = new Uint8Array(encryptedContent);
-      const combined = new Uint8Array(salt.length + iv.length + encryptedContentArr.length);
-      combined.set(salt, 0);
-      combined.set(iv, salt.length);
-      combined.set(encryptedContentArr, salt.length + iv.length);
-      encryptedToken = btoa(String.fromCharCode.apply(null, combined));
-    }
-
     const payload = {
       status: 'deleted',
-      secretCode: pwd,
       contact: contact
     };
-    if(encryptedToken) {
-      payload.encryptedToken = encryptedToken;
-    }
 
     await db.collection('bulletins').doc('config_handover').set(payload, { merge: true });
     toast('交接設定已儲存', 'ok');
