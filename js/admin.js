@@ -758,11 +758,37 @@ async function confirmPubBulletin() {
     // 自訂發送名單
     if (selectedEmails.length > 0 && typeof emailjs !== 'undefined') {
       const toList = selectedEmails.join(',');
+      
+      // 處理必讀公告
+      let mustReadText = '';
+      const mustReadCb = document.getElementById('pub-must-read');
+      if (mustReadCb && mustReadCb.checked) {
+        let importantItems = [];
+        (d.sections || []).forEach(sec => {
+          (sec.items || []).forEach(item => {
+            if (item.priority === 'high' && item.content) {
+              importantItems.push(item.content);
+            }
+          });
+          (sec.subsections || []).forEach(sub => {
+            (sub.items || []).forEach(item => {
+              if (item.priority === 'high' && item.content) {
+                importantItems.push(item.content);
+              }
+            });
+          });
+        });
+        if (importantItems.length > 0) {
+          mustReadText = '⭐ 【本週必讀重點】\n\n' + importantItems.map(i => '• ' + i).join('\n\n');
+        }
+      }
+
       await emailjs.send(emailjsConfig.serviceId, emailjsConfig.templateId, {
         to_email: toList,
         subject: '【採購週報上線】' + d.title,
         message: '新版採購週報已上線，請點擊連結查看。',
-        link: window.location.href.replace('admin.html', 'index.html') + '?id=' + d.id
+        link: window.location.href.replace('admin.html', 'index.html') + '?id=' + d.id,
+        must_read_text: mustReadText
       });
     }
     
