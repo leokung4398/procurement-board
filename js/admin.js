@@ -320,6 +320,7 @@ async function adminGoogleLogin() {
     }
   } catch (error) {
     console.error('Login failed', error);
+    alert('登入失敗，請確認 Firebase 後台是否已啟用 Google 登入，或是否阻擋了彈出視窗。\n錯誤訊息：' + error.message);
   }
 }
 
@@ -870,3 +871,13 @@ async function saveHandover() {
   }
 }
 
+window.addEventListener('DOMContentLoaded', () => {
+  firebase.auth().onAuthStateChanged(async (user) => {
+    if (user && (user.email.endsWith('@youbike.com.tw') || ADMIN_EMAILS.includes(user.email))) {
+      document.getElementById('lo').style.display = 'none';
+      await init();
+    } else {
+      document.getElementById('lo').style.display = 'block';
+    }
+  });
+});
