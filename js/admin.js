@@ -877,7 +877,7 @@ window.addEventListener('DOMContentLoaded', () => {
       document.getElementById('lo').style.display = 'none';
       await init();
     } else {
-      document.getElementById('lo').style.display = 'block';
+      document.getElementById('lo').style.display = 'flex';
     }
   });
 });
