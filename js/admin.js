@@ -330,7 +330,7 @@ async function init(){
 }
 
 const ADMIN_EMAILS = [
-  'a13a5510@gmail.com'
+  'leokung@youbike.com.tw'
 ];
 
 async function adminGoogleLogin() {

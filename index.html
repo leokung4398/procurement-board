@@ -340,12 +340,12 @@
       try {
         const result = await firebase.auth().signInWithPopup(provider);
         const user = result.user;
-        if (user.email.endsWith('@youbike.com.tw') || user.email === 'a13a5510@gmail.com') {
+        if (user.email.endsWith('@youbike.com.tw') || user.email === 'leokung@youbike.com.tw') {
           // Check whitelist
           const snap = await db.collection('systemConfig').doc('users').get();
           const allowedUsers = snap.exists ? (snap.data().list || []) : [];
           
-          if (!allowedUsers.some(u => u.email === user.email) && user.email !== 'a13a5510@gmail.com') {
+          if (!allowedUsers.some(u => u.email === user.email) && user.email !== 'leokung@youbike.com.tw') {
             await firebase.auth().signOut();
             const e = document.getElementById('user-le');
             e.innerText = '無瀏覽權限，請確認是否已被加入白名單。';
@@ -558,7 +558,7 @@
           const user = JSON.parse(userStr);
           // If authorizedEmails contains emails, check if the user is in it.
           // Allow admins or test accounts as well if needed.
-          if (!bulletin.authorizedEmails.includes(user.email) && user.email !== 'a13a5510@gmail.com') {
+          if (!bulletin.authorizedEmails.includes(user.email) && user.email !== 'leokung@youbike.com.tw') {
             isAuthorized = false;
           }
         }
