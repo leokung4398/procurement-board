@@ -516,6 +516,53 @@
           </div>
         </div>
       </div>
+
+        <!-- 成就 11 -->
+        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden mt-6">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1">十一、信件必讀公告與緊急提示</h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">最新需求：</span><br>
+                • 發送週報信件時，將標記為「緊急」的項目特別抓出。<br>
+                • 在信件內文最上方直接顯示，確保主管不會漏看重要事項。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
+                ✨ <span class="font-bold">實作成果：</span>於寄信確認介面新增「附加必讀公告」選項。系統會自動掃描全篇週報的紅字緊急標籤，並於信件開頭彙整出「🚨 緊急：必讀公告」，大幅提升資訊傳達效率！
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 成就 12 -->
+        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden mt-6">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1">十二、多層次防護與管理員白名單</h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">最新需求：</span><br>
+                • 前台系統需建立嚴密的存取控制，僅限有權限的人員進入。<br>
+                • 後台必須擁有獨立的管理員白名單，確保編輯權限不外洩，且方便交接。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
+                ✨ <span class="font-bold">實作成果：</span>建立三道防線：網域限制 (@youbike.com.tw)、前台郵件白名單連動、後台專屬管理員白名單介面。讓系統安全性滴水不漏，又能透過視覺化介面輕鬆管理人員異動。
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -653,6 +700,12 @@
         <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">9</span>信件必讀公告，重點直達主管信箱</h4>
         <p class="text-sm leading-relaxed mb-2 text-slate-600">當主管很忙沒空點進網站看公告怎麼辦？</p>
         <p class="text-sm leading-relaxed text-slate-600">發布週報時，只要打勾「附加必讀公告」，系統就會自動把這份週報裡所有標記為 <strong>「緊急」</strong> 的項目，整理成文字直接貼在信件內容裡！重點訊息不漏接！</p>
+      </div>
+
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-300 transition-colors">
+        <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">10</span>後台專屬的最高防護：管理員白名單</h4>
+        <p class="text-sm leading-relaxed mb-2 text-slate-600">後台不是任何人都能進來的！為了保護採購資料的安全性，系統特別設立了「管理員白名單」。</p>
+        <p class="text-sm leading-relaxed text-slate-600">您可以從左側選單的「🛡️ 管理員白名單」隨時新增或移除管理員。當有新人報到或同仁交接時，只要在這裡輸入他的 Email，他就能立刻獲得發布與修改週報的最高權限！</p>
       </div>
 
     </div>
