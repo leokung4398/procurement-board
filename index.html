@@ -331,11 +331,18 @@
           smEl.appendChild(opt);
         });
 
+        // 自動鎖定並過濾為最新月份
+        if (mArr.length > 0) {
+          smEl.value = mArr[0];
+          state.searchMonth = mArr[0];
+        }
+
         if (bulletins.length > 0) {
           state.activeBulletinId = bulletins[0].id;
         }
         
         renderApp();
+        handleSearch();
         checkUserIdentity();
       } catch (err) {
         console.error('Failed to load data:', err);
@@ -544,8 +551,17 @@
         return true;
       });
       
-      renderTabs(filtered);
-    }
+        // 確保目前選中的週報仍在篩選結果內，否則預設選取篩選後的第一筆
+        if (filtered.length > 0) {
+          const stillExists = filtered.find(b => b.id === state.activeBulletinId);
+          if (!stillExists) {
+            state.activeBulletinId = filtered[0].id;
+          }
+        }
+        
+        renderTabs(filtered);
+        renderActiveBulletin();
+      }
 
     function renderTabs(filteredBulletins = null) {
       const container = document.getElementById('tabs-container');
