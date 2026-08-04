@@ -477,13 +477,15 @@ async function renderReadReceipts(id) {
   
   if (!DS.isConfigured()) {
     container.innerHTML = '<p class="text-slate-400 text-center py-2">本地測試模式：不支援已讀追蹤</p>';
-    countEl.textContent = '已讀: 0 人';
+    countEl.innerHTML = `
+      <span class="text-xs bg-indigo-50 text-indigo-600 px-2.5 py-1 rounded-full font-semibold border border-indigo-100">已讀: 0 人</span>
+      <span class="text-xs bg-slate-50 text-slate-500 px-2.5 py-1 rounded-full font-medium border border-slate-200">未讀: 0 人</span>
+    `;
     return;
   }
   
   try {
     const { total, readers } = await DS.getReadReceipts(id);
-    countEl.textContent = `已讀: ${total} 人`;
     
     // 計算未讀名單
     const b = S.data.bulletins.find(x => x.id === id);
@@ -495,6 +497,11 @@ async function renderReadReceipts(id) {
       targetEmails.includes(u.email) && 
       !readers.find(r => r.email === u.email || r.displayName === u.name)
     );
+
+    countEl.innerHTML = `
+      <span class="text-xs bg-indigo-50 text-indigo-600 px-2.5 py-1 rounded-full font-semibold border border-indigo-100">已讀: ${total} 人</span>
+      <span class="text-xs bg-slate-50 text-slate-500 px-2.5 py-1 rounded-full font-medium border border-slate-200">未讀: ${unread.length} 人</span>
+    `;
     
     if (readers.length === 0 && unread.length === 0) {
       container.innerHTML = '<p class="text-slate-400 text-center py-2">目前尚無閱讀紀錄，且未設定名冊</p>';

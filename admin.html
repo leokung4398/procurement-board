@@ -195,7 +195,10 @@
             <h2 class="text-sm font-semibold text-slate-700 flex items-center gap-2">
               <span class="w-5 h-5 bg-indigo-100 rounded text-indigo-600 flex items-center justify-center text-xs font-bold">C</span>已讀狀態追蹤
             </h2>
-            <span id="read-count" class="text-xs bg-indigo-50 text-indigo-600 px-2.5 py-1 rounded-full font-semibold">已讀: 0 人</span>
+            <div id="read-count" class="flex items-center gap-2">
+              <span class="text-xs bg-indigo-50 text-indigo-600 px-2.5 py-1 rounded-full font-semibold border border-indigo-100">已讀: 0 人</span>
+              <span class="text-xs bg-slate-50 text-slate-500 px-2.5 py-1 rounded-full font-medium border border-slate-200">未讀: 0 人</span>
+            </div>
           </div>
           <div class="p-5">
             <div id="read-list" class="text-xs text-slate-500 max-h-48 overflow-y-auto space-y-2">
@@ -485,7 +488,7 @@
         <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
           <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">12</span>已讀追蹤與智慧防干擾</h4>
           <p class="text-sm leading-relaxed mb-2 text-slate-600">想知道誰還沒看過緊急公告？</p>
-          <p class="text-sm leading-relaxed text-slate-600">後台的「已讀人數」面板已升級為「閱讀狀態追蹤儀表板」，可清晰比對出「已讀」與「未讀」人員名單！且閱讀過的人員再次登入時，系統會啟動防干擾機制，不會再重複彈出新公告提醒視窗。</p>
+          <p class="text-sm leading-relaxed text-slate-600">後台的「閱讀狀態追蹤儀表板」除了顯示已讀與未讀名單，更新增了「已讀 / 未讀人數」統計標籤！同時，閱讀過的人員再次登入時，系統會啟動防干擾機制，不會再重複彈出新公告提醒視窗。</p>
         </div>
         <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
           <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">13</span>發送與更新時間精準顯示</h4>
@@ -511,10 +514,11 @@
               <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
                 <span class="font-semibold text-slate-600">採購需求：</span><br>
                 1. 每則公告需顯示具有閱讀權限人員的閱讀狀態(已讀)<br>
-                2. 閱讀公告的人員，再次登入系統後不再重複顯示該公告,避免干擾。
+                2. 閱讀公告的人員，再次登入系統後不再重複顯示該公告,避免干擾。<br>
+                3. 新增「已讀人數」及「未讀人數」統計，作為效益分析依據。
               </p>
               <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
-                💡 <span class="font-bold">專案成果：</span>運用 Firebase Subcollection 技術實作分散式讀取紀錄（無併發寫入衝突）。後台動態比對發佈名單與讀取紀錄，產生「已讀/未讀」視覺化儀表板；前台匯入智慧防干擾判定，新公告僅針對未讀者進行彈窗提示，閱讀後即默默歸檔於側邊欄。
+                💡 <span class="font-bold">專案成果：</span>運用 Firebase Subcollection 技術實作分散式讀取紀錄（無併發寫入衝突）。後台動態比對發佈名單與讀取紀錄，產生名單與「已讀 / 未讀人數 Data Pills」視覺化統計標籤；前台匯入智慧防干擾判定，新公告僅針對未讀者進行彈窗提示，閱讀後默默歸檔。
               </p>
             </div>
           </div>
