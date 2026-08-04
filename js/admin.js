@@ -117,18 +117,34 @@ const DS = {
       console.error(e);
     }
   },
+  async getWhitelist() {
+    if (!this.isConfigured()) return [];
+    try {
+      const snap = await db.collection('systemConfig').doc('whitelist').get();
+      return snap.exists ? (snap.data().list || []) : [];
+    } catch(e) { console.error(e); return []; }
+  },
+  async saveWhitelist(list) {
+    if (!this.isConfigured()) return;
+    try { await db.collection('systemConfig').doc('whitelist').set({ list }, { merge: true }); } catch(e) { console.error(e); }
+  },
+  async getMailGroups() {
+    if (!this.isConfigured()) return [];
+    try {
+      const snap = await db.collection('systemConfig').doc('mailGroups').get();
+      return snap.exists ? (snap.data().list || []) : [];
+    } catch(e) { console.error(e); return []; }
+  },
+  async saveMailGroups(list) {
+    if (!this.isConfigured()) return;
+    try { await db.collection('systemConfig').doc('mailGroups').set({ list }, { merge: true }); } catch(e) { console.error(e); }
+  },
   async getAdmins() {
     if (!this.isConfigured()) return [];
     try {
       const snap = await db.collection('systemConfig').doc('admins').get();
-      if (snap.exists) {
-        return snap.data().list || [];
-      }
-      return [];
-    } catch (e) {
-      console.error(e);
-      return [];
-    }
+      return snap.exists ? (snap.data().list || []) : [];
+    } catch(e) { console.error(e); return []; }
   },
   async saveAdmins(list) {
     if (!this.isConfigured()) return;
@@ -294,6 +310,8 @@ const S = {
   keywords: [],
   users: [],
   admins: [],
+  whitelist: [],
+  mailGroups: [],
   mmap: {},
   cur: null,
   dirty: false
@@ -303,6 +321,14 @@ async function init(){
   S.keywords=await DS.getKeywords();
   S.users=await DS.getUsers();
   S.admins=await DS.getAdmins();
+  S.whitelist=await DS.getWhitelist();
+  S.mailGroups=await DS.getMailGroups();
+  
+  if (S.whitelist.length === 0) {
+    S.whitelist = "JunWei Wu 吳俊緯 <JunWeiWu@youbike.com.tw>; Jiyu Gu 顧致宇 <JiyuGu@youbike.com.tw>; Lucas Wang 王文樺 <LucasWang@youbike.com.tw>; Mars Lin 林瑋泰 <MarsLin@youbike.com.tw>; George Chen 陳俊帆 <GeorgeChen@youbike.com.tw>; Sherry Lu 呂淑意 <SherryLu@youbike.com.tw>; Jane Chuang 莊佳誼 <JaneChuang@youbike.com.tw>; Beichen Ren 任北辰 <BeichenRen@youbike.com.tw>; Ruby Chen 陳恩柔 <RubyChen2@youbike.com.tw>; Wei Wan 萬偉 <WeiWan@youbike.com.tw>; Sinan Lin 林信安 <SinanLin@youbike.com.tw>; Tank Lin 林育民 <TankLin@youbike.com.tw>; Clon Huang 黃龍輝 <ClonHuang@youbike.com.tw>; HsuWei Chu 朱栩葳 <HsuWeiChu@youbike.com.tw>; XinRay Hung 洪訢睿 <XinRayHung@youbike.com.tw>; Shuni NI 倪順一 <ShuniNI@youbike.com.tw>; Chiahsiu Li 李嘉修 <ChiahsiuLi@youbike.com.tw>; Boa Chen 陳漢全 <BoaChen@youbike.com.tw>; YiMin Chiu 邱宜敏 <YiMinChiu@youbike.com.tw>; Bruce Lin 林渝軒 <BruceLin@youbike.com.tw>; RuXuan Zhang 張挐瑄 <RuXuanZhang@youbike.com.tw>; Cola Wu 吳建穎 <ColaWu@youbike.com.tw>; JianDe Liu 劉建德 <JianDeLiu@youbike.com.tw>; Sam Huang 黃聖育 <SamHuang@youbike.com.tw>; ZihYue Li 李子岳 <ZihYueLi@youbike.com.tw>; Zoey Lin 林言柔 <ZoeyLin@youbike.com.tw>; ShuChi Lu 呂淑綺 <ShuChiLu@youbike.com.tw>; Colin Tang 唐仕伀 <ColinTang@youbike.com.tw>; Hanley Fu 傅涵立 <HanleyFu@youbike.com.tw>; Ringka Huang 黃仁瑱 <RingkaHuang@youbike.com.tw>; Kevin Chang 張浩 <KevinChang@youbike.com.tw>; Aidpan Chen 陳麒任 <AidpanChen@youbike.com.tw>; Jerry Hsu 徐嘉鴻 <JHsu@youbike.com.tw>; Wendy Lu 盧瑞云 <WendyLu@youbike.com.tw>; Ruowei Wang 王若維 <RuoweiWang@youbike.com.tw>; Yun Chen 陳韻欣 <YunChen@youbike.com.tw>; Ryan Peng 彭上維 <RyanPeng@youbike.com.tw>; Michael Chien 簡榮德 <MichaelChien@youbike.com.tw>; Hank Tsai 蔡瀚緯 <HankTsai@youbike.com.tw>; MingXiao Lin 林明孝 <MingXiaoLin@youbike.com.tw>; Chenlong Pai 白正隆 <ChenlongPai@youbike.com.tw>; QiZhong Huang 黃啟中 <QiZhongHuang@youbike.com.tw>".split('; ').map(s => { const m = s.match(/(.+)\s<(.+)>/); return m ? { name: m[1].trim(), email: m[2].trim() } : null; }).filter(Boolean);
+    await DS.saveWhitelist(S.whitelist);
+  }
+
   S.mmap=await DS.getMonths();
   
   // 載入月份選單過濾用的月份選單
@@ -526,6 +552,105 @@ async function renderAuditLogs(id) {
   }
 }
 
+function openSettingsModal() { document.getElementById('settings-modal').classList.remove('hidden'); switchSettingsTab('tab-frontend'); }
+function closeSettingsModal() { document.getElementById('settings-modal').classList.add('hidden'); }
+function switchSettingsTab(t) {
+  document.querySelectorAll('.settings-tab-pane').forEach(el => el.classList.add('hidden'));
+  document.querySelectorAll('[id^="btn-tab-"]').forEach(el => el.classList.remove('bg-blue-50', 'text-blue-700', 'font-bold'));
+  const tEl = document.getElementById(t), bEl = document.getElementById('btn-'+t);
+  if (tEl) tEl.classList.remove('hidden');
+  if (bEl) bEl.classList.add('bg-blue-50', 'text-blue-700', 'font-bold');
+  if(t==='tab-frontend')renderUM(); if(t==='tab-whitelist')renderWL(); if(t==='tab-groups')renderGroupList(); if(t==='tab-admin')renderAdminList(); if(t==='tab-keywords'){tempKw=JSON.parse(JSON.stringify(S.keywords));renderKMCats();} if(t==='tab-handover')loadHandoverConfig();
+}
+function openAboutModal() { document.getElementById('about-modal').classList.remove('hidden'); switchAboutTab('tab-guide'); }
+function closeAboutModal() { document.getElementById('about-modal').classList.add('hidden'); }
+function switchAboutTab(t) {
+  document.querySelectorAll('.about-tab-pane').forEach(el => el.classList.add('hidden'));
+  document.querySelectorAll('[id^="btn-tab-"]').forEach(el => {
+    if(el.id==='btn-tab-guide'||el.id==='btn-tab-achievements') { el.classList.remove('text-amber-600','border-amber-500'); el.classList.add('text-slate-500','border-transparent'); }
+  });
+  const tEl = document.getElementById(t), bEl = document.getElementById('btn-'+t);
+  if (tEl) tEl.classList.remove('hidden');
+  if (bEl) { bEl.classList.remove('text-slate-500','border-transparent'); bEl.classList.add('text-amber-600','border-amber-500'); }
+}
+
+let currentGroupId = null;
+async function addGroup() {
+  const name = document.getElementById('grp-name').value.trim();
+  if (!name) return toast('請輸入群組名稱', 'er');
+  S.mailGroups.push({ id: 'grp_'+Date.now(), name, emails: [] });
+  await DS.saveMailGroups(S.mailGroups);
+  document.getElementById('grp-name').value = '';
+  renderGroupList();
+  toast('已建立群組', 'ok');
+}
+async function delGroup(id) {
+  if (!confirm('確定刪除此群組？')) return;
+  S.mailGroups = S.mailGroups.filter(g => g.id !== id);
+  await DS.saveMailGroups(S.mailGroups);
+  if (currentGroupId === id) {
+    currentGroupId = null;
+    const t = document.getElementById('group-detail-title'), m = document.getElementById('group-members');
+    if (t) t.textContent = '請選擇左側群組';
+    if (m) m.innerHTML = '<div class="text-center text-slate-400 mt-10 text-sm">請選擇左側群組以編輯成員</div>';
+  }
+  renderGroupList();
+}
+function renderGroupList() {
+  const c = document.getElementById('group-list');
+  if (!c) return;
+  if (S.mailGroups.length === 0) {
+    c.innerHTML = '<div class="text-center text-slate-400 mt-5 text-sm">尚無群組</div>';
+    return;
+  }
+  c.innerHTML = S.mailGroups.map(g => `
+    <div onclick="selectGroup('${g.id}')" class="p-3 mb-1.5 rounded-lg cursor-pointer transition-colors border ${g.id === currentGroupId ? 'bg-blue-50 border-blue-200 text-blue-700 shadow-sm font-semibold' : 'bg-white border-transparent text-slate-600 hover:bg-slate-100'} flex items-center justify-between text-sm">
+      <span class="truncate">${xe(g.name)}</span>
+      <div class="flex items-center gap-2">
+        <span class="text-xs bg-white px-2 py-0.5 rounded-full shadow-sm text-slate-500">${g.emails.length}</span>
+        <button onclick="event.stopPropagation(); delGroup('${g.id}')" class="text-red-400 hover:text-red-600">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+function selectGroup(id) {
+  currentGroupId = id;
+  renderGroupList();
+  const g = S.mailGroups.find(x => x.id === id);
+  if (!g) return;
+  const t = document.getElementById('group-detail-title');
+  if (t) t.textContent = g.name + ' - 成員管理';
+  renderGroupMembers();
+}
+function renderGroupMembers() {
+  const c = document.getElementById('group-members');
+  if (!c) return;
+  const g = S.mailGroups.find(x => x.id === currentGroupId);
+  if (!g) return;
+  
+  if (S.whitelist.length === 0) {
+    c.innerHTML = '<div class="text-center text-slate-400 mt-10 text-sm">請先在「郵件通訊錄」新增名單</div>';
+    return;
+  }
+  c.innerHTML = S.whitelist.map(w => {
+    const isMember = g.emails.includes(w.email);
+    return `
+      <label class="flex items-center gap-3 p-3 mb-1.5 rounded-lg border ${isMember ? 'border-blue-200 bg-blue-50/30' : 'border-slate-100 bg-white hover:bg-slate-50'} cursor-pointer transition-colors">
+        <input type="checkbox" class="w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500" ${isMember ? 'checked' : ''} onchange="toggleGroupMember('${w.email}', this.checked)">
+        <div class="flex flex-col"><span class="text-sm font-semibold text-slate-700">${xe(w.name)}</span><span class="text-xs text-slate-400">${xe(w.email)}</span></div>
+      </label>
+    `;
+  }).join('');
+}
+async function toggleGroupMember(email, isChecked) {
+  const g = S.mailGroups.find(x => x.id === currentGroupId);
+  if (!g) return;
+  if (isChecked) { if (!g.emails.includes(email)) g.emails.push(email); }
+  else { g.emails = g.emails.filter(e => e !== email); }
+  await DS.saveMailGroups(S.mailGroups);
+  renderGroupList();
+}
+
 function showUM() { 
   document.getElementById('um').classList.remove('hidden'); 
   renderUM(); 
@@ -742,51 +867,37 @@ let tempKw = [];
       } catch(e) { toast('儲存失敗', 'er'); }
     }
 
-let tempWL = [];
 let editWLIndex = null;
-const DEFAULT_WL = "JunWei Wu 吳俊緯 <JunWeiWu@youbike.com.tw>; Jiyu Gu 顧致宇 <JiyuGu@youbike.com.tw>; Lucas Wang 王文樺 <LucasWang@youbike.com.tw>; Mars Lin 林瑋泰 <MarsLin@youbike.com.tw>; George Chen 陳俊帆 <GeorgeChen@youbike.com.tw>; Sherry Lu 呂淑意 <SherryLu@youbike.com.tw>; Jane Chuang 莊佳誼 <JaneChuang@youbike.com.tw>; Beichen Ren 任北辰 <BeichenRen@youbike.com.tw>; Ruby Chen 陳恩柔 <RubyChen2@youbike.com.tw>; Wei Wan 萬偉 <WeiWan@youbike.com.tw>; Sinan Lin 林信安 <SinanLin@youbike.com.tw>; Tank Lin 林育民 <TankLin@youbike.com.tw>; Clon Huang 黃龍輝 <ClonHuang@youbike.com.tw>; HsuWei Chu 朱栩葳 <HsuWeiChu@youbike.com.tw>; XinRay Hung 洪訢睿 <XinRayHung@youbike.com.tw>; Shuni NI 倪順一 <ShuniNI@youbike.com.tw>; Chiahsiu Li 李嘉修 <ChiahsiuLi@youbike.com.tw>; Boa Chen 陳漢全 <BoaChen@youbike.com.tw>; YiMin Chiu 邱宜敏 <YiMinChiu@youbike.com.tw>; Bruce Lin 林渝軒 <BruceLin@youbike.com.tw>; RuXuan Zhang 張挐瑄 <RuXuanZhang@youbike.com.tw>; Cola Wu 吳建穎 <ColaWu@youbike.com.tw>; JianDe Liu 劉建德 <JianDeLiu@youbike.com.tw>; Sam Huang 黃聖育 <SamHuang@youbike.com.tw>; ZihYue Li 李子岳 <ZihYueLi@youbike.com.tw>; Zoey Lin 林言柔 <ZoeyLin@youbike.com.tw>; ShuChi Lu 呂淑綺 <ShuChiLu@youbike.com.tw>; Colin Tang 唐仕伀 <ColinTang@youbike.com.tw>; Hanley Fu 傅涵立 <HanleyFu@youbike.com.tw>; Ringka Huang 黃仁瑱 <RingkaHuang@youbike.com.tw>; Kevin Chang 張浩 <KevinChang@youbike.com.tw>; Aidpan Chen 陳麒任 <AidpanChen@youbike.com.tw>; Jerry Hsu 徐嘉鴻 <JHsu@youbike.com.tw>; Wendy Lu 盧瑞云 <WendyLu@youbike.com.tw>; Ruowei Wang 王若維 <RuoweiWang@youbike.com.tw>; Yun Chen 陳韻欣 <YunChen@youbike.com.tw>; Ryan Peng 彭上維 <RyanPeng@youbike.com.tw>; Michael Chien 簡榮德 <MichaelChien@youbike.com.tw>; Hank Tsai 蔡瀚緯 <HankTsai@youbike.com.tw>; MingXiao Lin 林明孝 <MingXiaoLin@youbike.com.tw>; Chenlong Pai 白正隆 <ChenlongPai@youbike.com.tw>; QiZhong Huang 黃啟中 <QiZhongHuang@youbike.com.tw>".split('; ').map(s => {
-  const m = s.match(/(.+)\s<(.+)>/);
-  return m ? { name: m[1].trim(), email: m[2].trim() } : null;
-}).filter(Boolean);
-
-async function initWL() {
-  let saved = localStorage.getItem('youbike_wl');
-  if (saved) { tempWL = JSON.parse(saved); }
-  else { tempWL = [...DEFAULT_WL]; saveWL(); }
-}
-function saveWL() { localStorage.setItem('youbike_wl', JSON.stringify(tempWL)); }
-function showWL() { initWL(); document.getElementById('wl-modal').classList.remove('hidden'); editWLIndex = null; document.getElementById('wl-btn').innerText = '新增'; document.getElementById('wl-name').value = ''; document.getElementById('wl-email').value = ''; renderWL(); }
-function hideWL() { document.getElementById('wl-modal').classList.add('hidden'); }
-function addWL() {
+async function addWL() {
   const n = document.getElementById('wl-name').value.trim();
   const e = document.getElementById('wl-email').value.trim();
   if(!n || !e) return toast('姓名與信箱必填', 'er');
   if (editWLIndex !== null) {
-    tempWL[editWLIndex] = {name: n, email: e};
+    S.whitelist[editWLIndex] = {name: n, email: e};
     editWLIndex = null;
     document.getElementById('wl-btn').innerText = '新增';
     toast('已更新白名單', 'ok');
   } else {
-    tempWL.push({name: n, email: e});
+    S.whitelist.push({name: n, email: e});
     toast('已新增至白名單', 'ok');
   }
-  saveWL(); renderWL();
+  await DS.saveWhitelist(S.whitelist); renderWL();
   document.getElementById('wl-name').value=''; document.getElementById('wl-email').value='';
 }
 function editWL(idx) {
   editWLIndex = idx;
-  document.getElementById('wl-name').value = tempWL[idx].name;
-  document.getElementById('wl-email').value = tempWL[idx].email;
+  document.getElementById('wl-name').value = S.whitelist[idx].name;
+  document.getElementById('wl-email').value = S.whitelist[idx].email;
   document.getElementById('wl-btn').innerText = '儲存';
   document.getElementById('wl-name').focus();
 }
-function rmWL(idx) { 
-  if(!confirm(`確定要刪除 ${tempWL[idx].name} 嗎？`)) return;
-  tempWL.splice(idx, 1); saveWL(); renderWL(); 
+async function rmWL(idx) { 
+  if(!confirm(`確定要刪除 ${S.whitelist[idx].name} 嗎？`)) return;
+  S.whitelist.splice(idx, 1); await DS.saveWhitelist(S.whitelist); renderWL(); 
 }
 function renderWL() {
   const c = document.getElementById('wl-list');
-  c.innerHTML = tempWL.map((w, i) => `
+  c.innerHTML = S.whitelist.map((w, i) => `
     <div class="flex items-center justify-between p-3 mb-2 bg-white rounded-lg border border-slate-200 hover:border-blue-200 transition-colors">
       <div>
         <div class="font-medium text-slate-800 text-sm">${w.name}</div>
@@ -803,17 +914,39 @@ function renderWL() {
 // Override original pubBulletin to show modal instead
 async function pubBulletin() {
   if(!S.cur) return;
-  initWL();
   document.getElementById('pub-modal').classList.remove('hidden');
+
+  // Render group buttons
+  const gb = document.getElementById('pub-group-buttons');
+  if (gb) {
+    if (S.mailGroups.length > 0) {
+      gb.innerHTML = '<span class="text-xs font-semibold text-blue-800 mr-2">群組快選：</span>' + S.mailGroups.map(g => `
+        <button onclick="selectPubGroup('${g.id}')" class="px-2.5 py-1 bg-white border border-blue-200 text-blue-600 text-xs rounded hover:bg-blue-50 font-medium transition-colors mb-1 mr-1 shadow-sm">${xe(g.name)}</button>
+      `).join('');
+    } else {
+      gb.innerHTML = '<span class="text-xs font-semibold text-slate-400">目前尚無群組，可於設定中心建立</span>';
+    }
+  }
+
   document.getElementById('pub-wl-all').checked = true;
   const c = document.getElementById('pub-wl-list');
-  c.innerHTML = tempWL.map((w, i) => `
+  c.innerHTML = S.whitelist.map((w, i) => `
     <label class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 cursor-pointer border border-slate-100 transition-colors">
-      <input type="checkbox" class="pub-wl-cb w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500" value="${w.email}" checked>
+      <input type="checkbox" class="pub-wl-cb w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500" value="${w.email}" checked data-email="${w.email}">
       <div class="flex flex-col"><span class="text-sm font-semibold text-slate-700">${w.name}</span><span class="text-xs text-slate-400 mt-0.5">${w.email}</span></div>
     </label>
   `).join('');
 }
+
+function selectPubGroup(groupId) {
+  const g = S.mailGroups.find(x => x.id === groupId);
+  if (!g) return;
+  document.querySelectorAll('.pub-wl-cb').forEach(cb => {
+    cb.checked = g.emails.includes(cb.dataset.email);
+  });
+  document.getElementById('pub-wl-all').checked = false;
+}
+
 function hidePubModal() { document.getElementById('pub-modal').classList.add('hidden'); }
 function toggleAllWL(checked) {
   document.querySelectorAll('.pub-wl-cb').forEach(cb => cb.checked = checked);
