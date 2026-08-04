@@ -479,7 +479,15 @@ async function renderReadReceipts(id) {
     countEl.textContent = `已讀: ${total} 人`;
     
     // 計算未讀名單
-    const unread = S.users.filter(u => !readers.find(r => r.displayName === u.name));
+    const b = S.data.bulletins.find(x => x.id === id);
+    const targetEmails = (b && b.authorizedEmails && b.authorizedEmails.length > 0) 
+      ? b.authorizedEmails 
+      : (S.whitelist || []).map(u => u.email);
+    
+    const unread = (S.whitelist || []).filter(u => 
+      targetEmails.includes(u.email) && 
+      !readers.find(r => r.email === u.email || r.displayName === u.name)
+    );
     
     if (readers.length === 0 && unread.length === 0) {
       container.innerHTML = '<p class="text-slate-400 text-center py-2">目前尚無閱讀紀錄，且未設定名冊</p>';
