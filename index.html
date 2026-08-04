@@ -719,19 +719,46 @@
         `;
       }).join('');
 
-      container.innerHTML = `
-        <div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white rounded-lg p-6 shadow-md">
-          <div class="flex items-center gap-3">
-            ${bulletin.isPinned ? `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500 text-white animate-pulse">重要置頂</span>` : ''}
-            <h2 ${editableAttr} data-path="${bulletin.id}.title" class="text-xl font-bold outline-none">${e(bulletin.title)}</h2>
+      let publishTimeHtml = `<div>發布日期: <span ${editableAttr} data-path="${bulletin.id}.publishDate" class="font-semibold outline-none">${e(bulletin.publishDate)}</span></div>`;
+      if (bulletin.meta && bulletin.meta.publishedAt) {
+        const pDate = new Date(bulletin.meta.publishedAt);
+        const pAt = `${pDate.getFullYear()}/${String(pDate.getMonth()+1).padStart(2, '0')}/${String(pDate.getDate()).padStart(2, '0')} ${String(pDate.getHours()).padStart(2, '0')}:${String(pDate.getMinutes()).padStart(2, '0')}:${String(pDate.getSeconds()).padStart(2, '0')}`;
+        
+        let updateText = '';
+        if (bulletin.meta.lastUpdated) {
+           const uDate = new Date(bulletin.meta.lastUpdated);
+           // Only show update text if it's been updated after publishing
+           if (uDate.getTime() - pDate.getTime() > 60000) {
+             const uAt = `${String(uDate.getMonth()+1).padStart(2, '0')}/${String(uDate.getDate()).padStart(2, '0')} ${String(uDate.getHours()).padStart(2, '0')}:${String(uDate.getMinutes()).padStart(2, '0')}`;
+             updateText = ` <span class="opacity-75 text-xs font-normal ml-1">(最後更新：${uAt})</span>`;
+           }
+        }
+        publishTimeHtml = `
+          <div class="flex items-center gap-2 text-sm text-white bg-white/15 px-3 py-1.5 rounded-full border border-white/20 backdrop-blur-sm shadow-inner transition-colors hover:bg-white/20 cursor-default">
+            <span class="text-base leading-none">🕒</span>
+            <span class="font-medium tracking-wide">發布時間：${pAt}</span>
+            ${updateText}
           </div>
-          <div class="mt-3 flex flex-wrap gap-x-6 gap-y-2 text-sm text-blue-100">
-            <div>期數 ID: <span class="font-semibold">${e(bulletin.id)}</span></div>
-            <div>發布日期: <span ${editableAttr} data-path="${bulletin.id}.publishDate" class="font-semibold outline-none">${e(bulletin.publishDate)}</span></div>
-            <div>統計期間: <span class="font-semibold">${e(bulletin.periodStart)} 至 ${e(bulletin.periodEnd)}</span></div>
+        `;
+      }
+
+      container.innerHTML = `
+        <div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white rounded-lg p-6 shadow-md relative overflow-hidden">
+          <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
+          <div class="flex items-center gap-3 relative z-10">
+            ${bulletin.isPinned ? `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500 text-white shadow-sm flex items-center gap-1.5"><span class="animate-pulse">🚨</span> 緊急</span>` : ''}
+            <h2 ${editableAttr} data-path="${bulletin.id}.title" class="text-xl font-bold outline-none leading-snug">${e(bulletin.title)}</h2>
+          </div>
+          <div class="mt-4 flex flex-wrap items-center gap-x-5 gap-y-3 relative z-10">
+            ${publishTimeHtml}
+            <div class="flex items-center gap-4 text-sm text-blue-200/90 pl-1 border-l border-white/20">
+              <div>期數 ID: <span class="font-semibold text-blue-50">${e(bulletin.id)}</span></div>
+              <div class="w-1 h-1 bg-blue-400 rounded-full"></div>
+              <div>統計期間: <span class="font-semibold text-blue-50">${e(bulletin.periodStart)} 至 ${e(bulletin.periodEnd)}</span></div>
+            </div>
           </div>
         </div>
-        <div class="space-y-6">
+        <div class="space-y-6 mt-6">
           ${sectionsHtml}
           ${(() => {
             const fbs = bulletin.feedbackLog || [];

@@ -23,6 +23,32 @@
       }
     })();
   </script>
+  <style>
+    /* 滑順捲動與美化捲軸 (Custom Scrollbar) */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 8px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+      border-radius: 10px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 10px;
+      border: 2px solid transparent;
+      background-clip: content-box;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+      background-clip: content-box;
+    }
+    /* 使平滑捲動與無邊界回彈(overscroll-behavior) 更舒適 */
+    .smooth-scroll-pane {
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: contain;
+      scroll-behavior: smooth;
+    }
+  </style>
   <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
@@ -402,7 +428,7 @@
       </div>
 
       <!-- 操作指南內容 -->
-      <div id="tab-guide" class="about-tab-pane flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/30">
+      <div id="tab-guide" class="about-tab-pane flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/30 custom-scrollbar smooth-scroll-pane">
         <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
           <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">1</span>發布錯誤沒關係，一鍵撤回與重發</h4>
           <p class="text-sm leading-relaxed mb-2 text-slate-600">發現公告有錯字或少傳附件？點擊右上角「撤回發布」，週報就會立刻從前台下架，變成草稿狀態。</p>
@@ -461,10 +487,15 @@
           <p class="text-sm leading-relaxed mb-2 text-slate-600">想知道誰還沒看過緊急公告？</p>
           <p class="text-sm leading-relaxed text-slate-600">後台的「已讀人數」面板已升級為「閱讀狀態追蹤儀表板」，可清晰比對出「已讀」與「未讀」人員名單！且閱讀過的人員再次登入時，系統會啟動防干擾機制，不會再重複彈出新公告提醒視窗。</p>
         </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
+          <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">13</span>發送與更新時間精準顯示</h4>
+          <p class="text-sm leading-relaxed mb-2 text-slate-600">想知道這篇公告是何時發布或更新的嗎？</p>
+          <p class="text-sm leading-relaxed text-slate-600">系統會在每篇公告的標題下方，以精美的時間膠囊顯示「🕒 發布時間」。如果您後續有對內容進行編輯，系統也會智慧地在後方補充顯示「(最後更新時間)」，讓資訊時效性一目了然。</p>
+        </div>
       </div>
 
       <!-- 專案開發成果內容 -->
-      <div id="tab-achievements" class="about-tab-pane hidden flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/30">
+      <div id="tab-achievements" class="about-tab-pane hidden flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/30 custom-scrollbar smooth-scroll-pane">
         <p class="text-sm text-slate-500 mb-4 font-medium tracking-wide">採購需求增補 & 專案成就</p>
         
         <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
@@ -757,6 +788,26 @@
               </p>
               <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
                 ✨ <span class="font-bold">實作成果：</span>將原本多達 6 個獨立設定視窗，完美重構成具備現代感的「Tab 頁籤式系統設定中心」。不但畫面乾淨清爽，更導入了自訂發信群組架構，並將原本存在本地端的白名單全面搬遷至 Firebase 雲端，讓所有管理員無縫共用設定！
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1">十四、發佈與更新時間顯示設計</h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">最新需求：</span><br>
+                公告發布後，於公告資訊中顯示實際發送時間（日期及時間）,方便收件人確認資訊發布時點。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
+                ✨ <span class="font-bold">實作成果：</span>以前台「深藍色漸層主視覺區塊」為基礎，打造帶有微透視玻璃質感（Glassmorphism）的圓角標籤：🕒 發布時間。並具備「智慧隱藏更新時間」邏輯：有更新時才會淡淡地補上最後更新時間，排版極致整潔好看美觀！
               </p>
             </div>
           </div>

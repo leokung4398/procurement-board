@@ -66,12 +66,19 @@ const DS = {
       if (docSnap.exists) {
         const existing = docSnap.data();
         d.version = (existing.version || 1) + 1;
+        if (existing.meta && existing.meta.publishedAt) {
+          if (!d.meta) d.meta = {};
+          d.meta.publishedAt = existing.meta.publishedAt;
+        }
       } else {
         d.version = 1;
       }
       d.monthKey = (d.publishDate || '').slice(0, 7) || '';
       if (!d.meta) d.meta = {};
       d.meta.lastUpdated = new Date().toISOString();
+      if (d.status === 'published' && !d.meta.publishedAt) {
+        d.meta.publishedAt = d.meta.lastUpdated;
+      }
       await docRef.set(d, { merge: true });
       return { success: true };
     } catch (e) {
