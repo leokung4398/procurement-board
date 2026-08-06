@@ -104,39 +104,39 @@
       </ul>
     </div>
 
-    <!-- 週別切換 Tab 與搜尋框 -->
-    <div class="mb-6 flex flex-col xl:flex-row xl:items-end justify-between gap-4">
-      <div class="border-b border-slate-200 flex-1 overflow-x-auto">
-        <nav id="tabs-container" class="-mb-px flex space-x-8 min-w-max" aria-label="Tabs">
-          <!-- JS 動態渲染 Tabs -->
-        </nav>
-      </div>
-      <div class="flex-shrink-0 flex flex-wrap gap-2 items-center bg-white p-2 rounded-lg border border-slate-200 shadow-sm">
-        <select id="search-month" onchange="handleSearch()" class="form-input text-xs py-1.5 px-2 w-28 bg-slate-50">
-          <option value="">全部月份</option>
-        </select>
-        <select id="search-parent" onchange="handleSearch()" class="form-input text-xs py-1.5 px-2 w-36 bg-slate-50">
-          <option value="">全部類別</option>
-          <option value="採購作業進度">採購作業進度</option>
-          <option value="詢價／報價作業">詢價／報價作業</option>
-          <option value="訂單異動作業">訂單異動作業</option>
-          <option value="供應商管理作業">供應商管理作業</option>
-          <option value="交貨管理作業">交貨管理作業</option>
-          <option value="品質異常作業">品質異常作業</option>
-          <option value="工程變更作業">工程變更作業</option>
-          <option value="採購通知公告">採購通知公告</option>
-          <option value="其他異動作業">其他異動作業</option>
-          <option value="附件文件">附件文件</option>
-          <option value="供應商通知">供應商通知</option>
-          <option value="系統公告">系統公告</option>
-        </select>
-        <input type="text" id="search-keyword" oninput="handleSearch()" class="form-input text-xs py-1.5 px-2 w-48 bg-slate-50" placeholder="搜尋標題、料號、廠商...">
-        <button onclick="handleSearch()" class="bg-blue-600 text-white rounded px-3 py-1.5 text-xs font-semibold hover:bg-blue-700 shadow-sm transition-colors">搜尋</button>
-        <button onclick="refreshData()" class="bg-emerald-600 text-white rounded px-3 py-1.5 text-xs font-semibold hover:bg-emerald-700 shadow-sm transition-colors flex items-center gap-1" title="無需重整頁面，立即接收最新布告">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-          接收最新
-        </button>
-      </div>
+    <!-- 搜尋框與過濾工具列 -->
+    <div class="mb-4 flex flex-wrap justify-end gap-2 items-center bg-white p-2 rounded-lg border border-slate-200 shadow-sm">
+      <select id="search-month" onchange="handleSearch()" class="form-input text-xs py-1.5 px-2 w-28 bg-slate-50">
+        <option value="">全部月份</option>
+      </select>
+      <select id="search-parent" onchange="handleSearch()" class="form-input text-xs py-1.5 px-2 w-36 bg-slate-50">
+        <option value="">全部類別</option>
+        <option value="採購作業進度">採購作業進度</option>
+        <option value="詢價／報價作業">詢價／報價作業</option>
+        <option value="訂單異動作業">訂單異動作業</option>
+        <option value="供應商管理作業">供應商管理作業</option>
+        <option value="交貨管理作業">交貨管理作業</option>
+        <option value="品質異常作業">品質異常作業</option>
+        <option value="工程變更作業">工程變更作業</option>
+        <option value="採購通知公告">採購通知公告</option>
+        <option value="其他異動作業">其他異動作業</option>
+        <option value="附件文件">附件文件</option>
+        <option value="供應商通知">供應商通知</option>
+        <option value="系統公告">系統公告</option>
+      </select>
+      <input type="text" id="search-keyword" oninput="handleSearch()" class="form-input text-xs py-1.5 px-2 w-48 bg-slate-50" placeholder="搜尋標題、料號、廠商...">
+      <button onclick="handleSearch()" class="bg-blue-600 text-white rounded px-3 py-1.5 text-xs font-semibold hover:bg-blue-700 shadow-sm transition-colors">搜尋</button>
+      <button onclick="refreshData()" class="bg-emerald-600 text-white rounded px-3 py-1.5 text-xs font-semibold hover:bg-emerald-700 shadow-sm transition-colors flex items-center gap-1" title="無需重整頁面，立即接收最新布告">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        接收最新
+      </button>
+    </div>
+
+    <!-- 週別切換 Tab -->
+    <div class="mb-6 border-b border-slate-200 w-full overflow-x-auto">
+      <nav id="tabs-container" class="-mb-px flex space-x-8 min-w-max" aria-label="Tabs">
+        <!-- JS 動態渲染 Tabs -->
+      </nav>
     </div>
 
     <!-- 主要佈告欄內容 -->

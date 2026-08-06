@@ -258,8 +258,10 @@ const DS = {
   async addAuditLog(bulletinId, actionDesc) {
     if (!this.isConfigured()) return;
     try {
+      const senderInfo = (firebase.auth().currentUser && firebase.auth().currentUser.email) ? (firebase.auth().currentUser.displayName || firebase.auth().currentUser.email) : '系統';
       await db.collection('bulletins').doc(bulletinId).collection('audit_logs').add({
         action: actionDesc,
+        sender: senderInfo,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       });
     } catch (e) { console.error('Audit Log Error:', e); }
@@ -563,12 +565,28 @@ async function renderAuditLogs(id) {
       container.innerHTML = '<p class="text-slate-400 text-center py-2">尚無發送或操作紀錄</p>';
       return;
     }
-    container.innerHTML = logs.map(l => `
-      <div class="flex items-start gap-3 py-2 border-b border-slate-50 last:border-0">
-        <span class="text-slate-400 whitespace-nowrap">${l.time}</span>
-        <span class="text-slate-700 font-medium">${xe(l.msg)}</span>
-      </div>
-    `).join('');
+    container.innerHTML = logs.map(l => {
+      let timeStr = '時間未知';
+      if (l.timestamp && l.timestamp.toDate) {
+        const d = l.timestamp.toDate();
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const dd = String(d.getDate()).padStart(2, '0');
+        const hh = String(d.getHours()).padStart(2, '0');
+        const min = String(d.getMinutes()).padStart(2, '0');
+        timeStr = `${yyyy}/${mm}/${dd} ${hh}:${min}`;
+      }
+      const sender = l.sender || '系統';
+      return `
+        <div class="flex flex-col gap-1 py-3 border-b border-slate-100 last:border-0">
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-semibold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">${xe(sender)}</span>
+            <span class="text-xs text-slate-400">${timeStr}</span>
+          </div>
+          <span class="text-sm text-slate-700 font-medium pl-1">${xe(l.action)}</span>
+        </div>
+      `;
+    }).join('');
   } catch(e) {
     container.innerHTML = '<p class="text-red-400 text-center py-2">載入紀錄失敗</p>';
   }
@@ -917,20 +935,130 @@ async function rmWL(idx) {
   if(!confirm(`確定要刪除 ${S.whitelist[idx].name} 嗎？`)) return;
   S.whitelist.splice(idx, 1); await DS.saveWhitelist(S.whitelist); renderWL(); 
 }
+let isBatchMode = false;
+let selectedWL = [];
+
+function toggleBatchMode() {
+  isBatchMode = !isBatchMode;
+  selectedWL = [];
+  const btn = document.getElementById('btn-batch-mode');
+  const acts = document.getElementById('batch-actions');
+  if(isBatchMode) {
+    btn.classList.replace('bg-slate-100', 'bg-blue-600');
+    btn.classList.replace('text-slate-600', 'text-white');
+    btn.classList.replace('hover:bg-slate-200', 'hover:bg-blue-700');
+    if(acts) acts.classList.remove('hidden');
+  } else {
+    btn.classList.replace('bg-blue-600', 'bg-slate-100');
+    btn.classList.replace('text-white', 'text-slate-600');
+    btn.classList.replace('hover:bg-blue-700', 'hover:bg-slate-200');
+    if(acts) acts.classList.add('hidden');
+  }
+  renderWL();
+}
+
+function toggleWLCb(email, checked) {
+  if (checked) {
+    if(!selectedWL.includes(email)) selectedWL.push(email);
+  } else {
+    selectedWL = selectedWL.filter(e => e !== email);
+  }
+}
+
+async function batchDeleteWL() {
+  if(selectedWL.length === 0) return toast('請先勾選名單', 'er');
+  if(!confirm(`確定要刪除選取的 ${selectedWL.length} 筆名單嗎？`)) return;
+  S.whitelist = S.whitelist.filter(w => !selectedWL.includes(w.email));
+  await DS.saveWhitelist(S.whitelist);
+  selectedWL = [];
+  renderWL();
+  toast('已批次刪除', 'ok');
+}
+
+function openBatchGroupModal() {
+  if(selectedWL.length === 0) return toast('請先勾選名單', 'er');
+  document.getElementById('batch-group-modal').classList.remove('hidden');
+  const c = document.getElementById('batch-group-list');
+  if(S.mailGroups.length === 0) {
+    c.innerHTML = '<p class="text-sm text-slate-500">目前尚無任何群組，請先到「發信群組管理」建立。</p>';
+    return;
+  }
+  c.innerHTML = S.mailGroups.map(g => `
+    <label class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 cursor-pointer border border-slate-100 transition-colors">
+      <input type="checkbox" class="batch-grp-cb w-4 h-4 rounded text-indigo-600 border-slate-300 focus:ring-indigo-500" value="${g.id}">
+      <span class="text-sm font-semibold text-slate-700">${g.name} <span class="text-xs text-slate-400 font-normal ml-1">(${g.emails.length} 人)</span></span>
+    </label>
+  `).join('');
+}
+
+function closeBatchGroupModal() {
+  document.getElementById('batch-group-modal').classList.add('hidden');
+}
+
+async function confirmBatchAddGroup() {
+  const cbs = document.querySelectorAll('.batch-grp-cb:checked');
+  if(cbs.length === 0) return toast('請勾選至少一個群組', 'er');
+  
+  const targetGroupIds = Array.from(cbs).map(cb => cb.value);
+  let changed = false;
+  
+  S.mailGroups.forEach(g => {
+    if (targetGroupIds.includes(g.id)) {
+      selectedWL.forEach(email => {
+        if(!g.emails.includes(email)) {
+          g.emails.push(email);
+          changed = true;
+        }
+      });
+    }
+  });
+  
+  if (changed) {
+    await DS.saveMailGroups(S.mailGroups);
+    toast(`成功將 ${selectedWL.length} 人加入到 ${targetGroupIds.length} 個群組！`, 'ok');
+  } else {
+    toast('選取的人員皆已在目標群組中', 'in');
+  }
+  
+  closeBatchGroupModal();
+  toggleBatchMode(); // exit batch mode
+}
+
 function renderWL() {
   const c = document.getElementById('wl-list');
-  c.innerHTML = S.whitelist.map((w, i) => `
-    <div class="flex items-center justify-between p-3 mb-2 bg-white rounded-lg border border-slate-200 hover:border-blue-200 transition-colors">
-      <div>
-        <div class="font-medium text-slate-800 text-sm">${w.name}</div>
-        <div class="text-xs text-slate-500">${w.email}</div>
+  const searchEl = document.getElementById('wl-search');
+  const kw = searchEl ? searchEl.value.trim().toLowerCase() : '';
+  
+  let list = S.whitelist;
+  if(kw) {
+    list = list.filter(w => w.name.toLowerCase().includes(kw) || w.email.toLowerCase().includes(kw));
+  }
+  
+  if (list.length === 0) {
+    c.innerHTML = '<div class="text-center text-slate-400 mt-10 text-sm">找不到符合條件的名單</div>';
+    return;
+  }
+  
+  c.innerHTML = list.map((w) => {
+    const origIdx = S.whitelist.findIndex(x => x.email === w.email);
+    return `
+      <div class="flex items-center gap-3 p-3 mb-2 bg-white rounded-lg border border-slate-200 hover:border-blue-200 transition-colors">
+        ${isBatchMode ? `
+          <input type="checkbox" onchange="toggleWLCb('${w.email}', this.checked)" class="w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500" ${selectedWL.includes(w.email) ? 'checked' : ''}>
+        ` : ''}
+        <div class="flex-1 min-w-0">
+          <div class="font-medium text-slate-800 text-sm truncate">${w.name}</div>
+          <div class="text-xs text-slate-500 truncate">${w.email}</div>
+        </div>
+        ${!isBatchMode ? `
+          <div class="flex gap-1 flex-shrink-0">
+            <button onclick="editWL(${origIdx})" class="text-blue-500 hover:bg-blue-50 p-1.5 rounded" title="修改"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg></button>
+            <button onclick="rmWL(${origIdx})" class="text-red-500 hover:bg-red-50 p-1.5 rounded" title="刪除"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+          </div>
+        ` : ''}
       </div>
-      <div class="flex gap-1">
-        <button onclick="editWL(${i})" class="text-blue-500 hover:bg-blue-50 p-1.5 rounded" title="修改"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg></button>
-        <button onclick="rmWL(${i})" class="text-red-500 hover:bg-red-50 p-1.5 rounded" title="刪除"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
-      </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 // Override original pubBulletin to show modal instead
