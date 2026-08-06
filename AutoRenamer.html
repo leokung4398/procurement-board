@@ -1680,6 +1680,14 @@
           if (failedCount > 0) {
             addConsoleLine(`[系統] 所有照片處理完畢。成功: ${totalCount - failedCount} 張，失敗: ${failedCount} 張。`, 'warning');
             alert(`有 ${failedCount} 張照片失敗，請手動確認處理`);
+            
+            // 整理失敗名單並發送 Discord 報表
+            const failedItems = fileQueue.filter(i => i.status === 'failed');
+            let errorDetails = failedItems.map(i => `- **${i.name}**: ${i.errorMsg}`).join('\n');
+            if (errorDetails.length > 1500) {
+              errorDetails = errorDetails.substring(0, 1500) + '\n... (以下省略)';
+            }
+            sendDiscordError(`⚠️ **【批次處理完畢 - 部分失敗】** ⚠️\n本次共處理 ${totalCount} 張照片，其中 **${failedCount} 張辨識失敗**。\n\n**失敗清單與原因：**\n${errorDetails}`);
           } else {
             addConsoleLine(`[系統] 所有照片處理完畢！成功率 100% (${totalCount}/${totalCount})`, 'success');
             alert('所有照片處理完畢！');
@@ -1764,11 +1772,21 @@
             errorData = await response.json();
           } catch(e) {}
           
+          if (response.status === 503) {
+            // 伺服器短暫超載，視同 Rate Limit 讓它進入 15 秒冷卻後重試
+            throw new Error('RATE_LIMIT_EXCEEDED');
+          }
+          
           if (response.status === 429) {
             const msg = (errorData.error?.message || '').toLowerCase();
-            if (msg.includes('quota') || msg.includes('exhausted')) {
+            // Gemini 的 15 RPM 限制通常回傳: "resource has been exhausted (e.g. check quota)."
+            // 每日 1500 上限通常包含: "per day" 或 "quota exceeded"
+            if (msg.includes('resource has been exhausted')) {
+              throw new Error('RATE_LIMIT_EXCEEDED');
+            } else if (msg.includes('per day') || msg.includes('quota exceeded')) {
               throw new Error('QUOTA_EXHAUSTED');
             }
+            // 無法確定的 429 錯誤，保守起見一律先用 15 秒冷卻重試
             throw new Error('RATE_LIMIT_EXCEEDED');
           }
           throw new Error(errorData.error?.message || `API 伺服器回傳異常錯誤: ${response.status}`);
