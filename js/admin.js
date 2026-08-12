@@ -79,7 +79,11 @@ const DS = {
       if (d.status === 'published' && !d.meta.publishedAt) {
         d.meta.publishedAt = d.meta.lastUpdated;
       }
-      await docRef.set(d, { merge: true });
+      
+      // 移除可能存在的 undefined 屬性 (Firestore 不支援 undefined)
+      const cleanData = JSON.parse(JSON.stringify(d));
+      
+      await docRef.set(cleanData, { merge: true });
       return { success: true };
     } catch (e) {
       console.error(e);

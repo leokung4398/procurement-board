@@ -324,6 +324,7 @@
         });
         const mArr = Array.from(mSet).sort().reverse();
         const smEl = document.getElementById('search-month');
+        smEl.innerHTML = '<option value="">全部月份</option>';
         mArr.forEach(m => {
           const opt = document.createElement('option');
           opt.value = m;
