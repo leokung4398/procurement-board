@@ -494,7 +494,7 @@ async function renderReadReceipts(id) {
     const { total, readers } = await DS.getReadReceipts(id);
     
     // 計算未讀名單
-    const b = S.data.bulletins.find(x => x.id === id);
+    const b = S.cur && S.cur.id === id ? S.cur : await DS.getById(id);
     const targetEmails = (b && b.authorizedEmails && b.authorizedEmails.length > 0) 
       ? b.authorizedEmails 
       : (S.whitelist || []).map(u => u.email);
