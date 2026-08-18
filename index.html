@@ -642,11 +642,14 @@
               ${sec.items.map((item, itemIdx) => {
                 const isHigh = item.priority === 'high';
                 const borderClass = isHigh ? 'border-red-500 bg-red-50 text-red-900' : 'border-blue-500 bg-blue-50/50 text-slate-800';
-                const highlightBadge = isHigh ? `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-red-100 text-red-800 mr-2">緊急</span>` : '';
+                const highlightBadge = isHigh ? `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-red-100 text-red-800">緊急</span>` : '';
                 return `
                   <div class="px-3 py-1 border-l-4 rounded-r-lg shadow-sm transition-all hover:shadow-md ${borderClass}">
-                    <div ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].items[${itemIdx}].content" class="text-sm font-medium leading-relaxed outline-none whitespace-pre-wrap ql-editor !p-0">
-                      ${highlightBadge}${item.content}
+                    <div class="flex items-start gap-2">
+                      ${isHigh ? `<div class="mt-1 flex-shrink-0">${highlightBadge}</div>` : ''}
+                      <div ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].items[${itemIdx}].content" class="text-sm font-medium leading-relaxed outline-none whitespace-pre-wrap ql-editor !p-0 flex-1">
+                        ${item.content}
+                      </div>
                     </div>
                   </div>
                 `;
@@ -722,10 +725,13 @@
 
         return `
           <section class="bg-white rounded-xl shadow-sm border border-slate-100 p-4">
-            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2 pb-2 mb-3 border-b border-slate-100">
-              <span class="text-xl">${e(sec.icon)}</span>
-              <span class="text-blue-600">${e(sec.sectionNumber)}、</span>
-              <span ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].title" class="outline-none">${e(sec.title)}</span>
+            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2 pb-2 mb-3 border-b border-slate-100 flex-wrap">
+              <div class="flex items-center gap-2">
+                <span class="text-xl">${e(sec.icon)}</span>
+                <span class="text-blue-600">${e(sec.sectionNumber)}、</span>
+                <span ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].title" class="outline-none">${e(sec.title)}</span>
+              </div>
+              ${sec.subtitle ? `<span class="text-sm font-medium text-slate-500 px-2 py-0.5 bg-slate-100 rounded-md border border-slate-200">${e(sec.subtitle)}</span>` : ''}
             </h3>
             
             ${itemsHtml}
