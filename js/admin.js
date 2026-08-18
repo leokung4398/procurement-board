@@ -779,7 +779,22 @@ function newBulletin(){if(S.dirty&&!confirm('有未儲存的修改，確定繼�
 function wk(d){const j=new Date(d.getFullYear(),0,1);return Math.ceil((((d-j)/86400000)+j.getDay()+1)/7);}
 async function unpubBulletin(){if(!S.cur)return;if(!confirm('確定要撤回發布？撤回後前台將無法看見此週報。'))return;const pt=document.getElementById('pub-txt'),btn=document.getElementById('btn-unpub');btn.disabled=true;pt.textContent='撤回中...';try{const d={...S.cur,status:'draft',feedbackLog:S.fbs};await DS.save(d.id,d);await DS.addAuditLog(d.id, `管理員撤回了週報。`);S.dirty=false;const sb=document.getElementById('tb-status');sb.className='bdg-dft';sb.textContent='草稿';toast('週報已撤回發布！','ok');S.mmap=await DS.getMonths();renderSB();renderAuditLogs(d.id);renderEd();}catch(e){toast('撤回失敗：'+e.message,'er');}finally{btn.disabled=false;pt.textContent='正式發布';}}
 function renderEd(){const b=S.cur;if(!b)return;document.getElementById('es').classList.add('hidden');document.getElementById('bf').classList.remove('hidden');document.getElementById('tb-acts').classList.remove('hidden');document.getElementById('tb-title').textContent=b.id||'新週報';const sb=document.getElementById('tb-status');sb.className=b.status==='published'?'bdg-pub':'bdg-dft';sb.textContent=b.status==='published'?'已發布':'草稿';sb.classList.remove('hidden');if(b.status==='published'){document.getElementById('btn-unpub').classList.remove('hidden');document.getElementById('btn-pub').classList.add('hidden');}else{document.getElementById('btn-unpub').classList.add('hidden');document.getElementById('btn-pub').classList.remove('hidden');}document.getElementById('f-id').value=b.id||'';document.getElementById('f-pd').value=b.publishDate||'';document.getElementById('f-ps').value=b.periodStart||'';document.getElementById('f-pe').value=b.periodEnd||'';document.getElementById('f-ti').value=b.title||'';document.getElementById('f-pin').checked=!!b.isPinned;renderSecs();}
-function renderSecs(){const c=document.getElementById('sc');const b=S.cur;const ptl=document.getElementById('toolbar-portal');if(ptl)ptl.innerHTML='';if(!b?.sections?.length){c.innerHTML='<div class="text-center py-10 text-slate-400 text-sm">尚未建立任何段落<br><span class="text-xs">點擊右上角「新增段落」</span></div>';return;}c.innerHTML=b.sections.map((s,i)=>bldSec(s,i)).join('');setTimeout(()=>{document.querySelectorAll('.quill-editor').forEach(el=>{if(el.__quill)return;const q=new Quill(el,{theme:'snow',modules:{toolbar:[['bold','italic','underline'],[{'color':[]},{'background':[]}],[{'size':['small',false,'large','huge']}]]}});el.__quill=q;const tb=el.previousElementSibling;if(tb&&tb.classList.contains('ql-toolbar')){tb.style.display='none';if(ptl)ptl.appendChild(tb);const focusFn=()=>{if(ptl){Array.from(ptl.children).forEach(ch=>ch.style.display='none');tb.style.display='flex';const hint=document.getElementById('toolbar-hint');if(hint)hint.style.display='none';}};q.root.addEventListener('focus',focusFn);tb.addEventListener('mousedown',(e)=>{e.preventDefault();focusFn();});}q.on('text-change',()=>{let obj=S.cur;const p=el.getAttribute('data-path').split(/[.\[\]]/).filter(Boolean);for(let i=0;i<p.length-1;i++)obj=obj[p[i]];obj[p[p.length-1]]=q.root.innerHTML;S.dirty=true;});});},10);}
+function renderSecs(){const c=document.getElementById('sc');const b=S.cur;const ptl=document.getElementById('toolbar-portal');if(ptl)ptl.innerHTML='';if(!b?.sections?.length){c.innerHTML='<div class="text-center py-10 text-slate-400 text-sm">尚未建立任何段落<br><span class="text-xs">點擊右上角「新增段落」</span></div>';return;}c.innerHTML=b.sections.map((s,i)=>bldSec(s,i)).join('');setTimeout(()=>{document.querySelectorAll('.quill-editor').forEach(el=>{if(el.__quill)return;const q=new Quill(el,{theme:'snow',modules:{toolbar:[['bold','italic','underline'],[{'color':[]},{'background':[]}],[{'size':['small',false,'large','huge']}]]}});el.__quill=q;q.root.addEventListener('paste', async (e) => {
+const file = e.clipboardData?.files?.[0];
+if (file && file.type.startsWith('image/')) {
+e.preventDefault();
+const range = q.getSelection(true);
+q.insertText(range.index, '⏳ 圖片上傳中...', 'user');
+try {
+const res = await DS.uploadAttachment(S.cur.id || 'temp', file);
+q.deleteText(range.index, '⏳ 圖片上傳中...'.length);
+q.insertEmbed(range.index, 'image', res.url, 'user');
+} catch(err) {
+q.deleteText(range.index, '⏳ 圖片上傳中...'.length);
+toast('圖片上傳失敗', 'er');
+}
+}
+});const tb=el.previousElementSibling;if(tb&&tb.classList.contains('ql-toolbar')){tb.style.display='none';if(ptl)ptl.appendChild(tb);const focusFn=()=>{if(ptl){Array.from(ptl.children).forEach(ch=>ch.style.display='none');tb.style.display='flex';const hint=document.getElementById('toolbar-hint');if(hint)hint.style.display='none';}};q.root.addEventListener('focus',focusFn);tb.addEventListener('mousedown',(e)=>{e.preventDefault();focusFn();});}q.on('text-change',()=>{let obj=S.cur;const p=el.getAttribute('data-path').split(/[.\[\]]/).filter(Boolean);for(let i=0;i<p.length-1;i++)obj=obj[p[i]];obj[p[p.length-1]]=q.root.innerHTML;S.dirty=true;});});},10);}
 const NUMS=['一','二','三','四','五','六','七','八','九','十'];const ICONS=['📋','📦','🔧','💰','📈','📎','⚙️','📊','📝','🏭'];function bldSec(sec,si){const isCust=!S.keywords.find(c=>c.name===sec.title);
 const curCat = S.keywords.find(c=>c.name===sec.title) || (S.keywords.length ? S.keywords[0] : null);
 const dlHTML = curCat ? `<datalist id="dl-${si}">${(curCat.keywords||[]).filter(k=>k.isActive!==false).sort((a,b)=>a.order-b.order).map(k=>`<option value="${k.text}">`).join('')}</datalist>` : '';
@@ -1122,6 +1137,7 @@ async function confirmPubBulletin() {
     d.authorizedEmails = selectedEmails;
     
     await DS.save(d.id,d);
+    await DS.addAuditLog(d.id, '管理員正式發布了週報（並發送郵件通知）。');
     
     // 自訂發送名單
     if (selectedEmails.length > 0 && typeof emailjs !== 'undefined') {
@@ -1135,13 +1151,15 @@ async function confirmPubBulletin() {
         (d.sections || []).forEach(sec => {
           (sec.items || []).forEach(item => {
             if (item.priority === 'high' && item.content) {
-              importantItems.push(item.content);
+              let plain = item.content.replace(/<\/(p|div|h[1-6])>/gi, '\n').replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '').trim();
+              if(plain) importantItems.push(plain);
             }
           });
           (sec.subsections || []).forEach(sub => {
             (sub.items || []).forEach(item => {
               if (item.priority === 'high' && item.content) {
-                importantItems.push(item.content);
+                let plain = item.content.replace(/<\/(p|div|h[1-6])>/gi, '\n').replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '').trim();
+                if(plain) importantItems.push(plain);
               }
             });
           });
