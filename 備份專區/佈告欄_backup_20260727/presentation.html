@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>專案開發歷程與技術亮點報告</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans TC', sans-serif; }
+        .snap-container {
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+        .snap-section {
+            height: 100vh;
+            scroll-snap-align: start;
+            position: relative;
+            overflow: hidden;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f5f9; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+        }
+        
+        /* Custom Reveal Animations */
+        .reveal-up { opacity: 0; transform: translateY(40px); transition: all 1s cubic-bezier(0.16, 1, 0.3, 1); }
+        .reveal-right { opacity: 0; transform: translateX(-40px); transition: all 1s cubic-bezier(0.16, 1, 0.3, 1); }
+        .reveal-left { opacity: 0; transform: translateX(40px); transition: all 1s cubic-bezier(0.16, 1, 0.3, 1); }
+        .reveal-zoom { opacity: 0; transform: scale(0.9); transition: all 1s cubic-bezier(0.16, 1, 0.3, 1); }
+        
+        .reveal-up.is-visible, .reveal-right.is-visible, .reveal-left.is-visible, .reveal-zoom.is-visible {
+            opacity: 1;
+            transform: translate(0) scale(1);
+        }
+    </style>
+</head>
+<body class="bg-slate-900 m-0 p-0 text-slate-800 antialiased">
+
+<div class="snap-container relative">
+
+    <!-- Scroll Indicator -->
+    <div id="scroll-indicator" class="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center animate-bounce pointer-events-none transition-opacity duration-500">
+        <span class="text-white/70 text-xs font-semibold tracking-widest mb-2 shadow-sm" style="text-shadow: 0 2px 4px rgba(0,0,0,0.8);">往下捲動</span>
+        <svg class="w-6 h-6 text-white" style="filter: drop-shadow(0 2px 4px rgba(0,0,0,0.8));" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path></svg>
+    </div>
+
+    <!-- Slide 1: Introduction -->
+    <section class="snap-section bg-cover bg-center" style="background-image: url('assets/slide1_cover_1785063984366.jpg');">
+        <div class="absolute inset-0 bg-gradient-to-r from-slate-900/90 via-slate-900/70 to-transparent"></div>
+        <div class="absolute inset-0 flex items-center px-16 lg:px-32">
+            <div class="max-w-2xl reveal-right">
+                <span class="inline-block py-1 px-3 rounded-full bg-blue-500/20 text-blue-300 font-bold text-sm tracking-wider mb-6 border border-blue-500/30">PROJECT MILESTONE</span>
+                <h1 class="text-5xl lg:text-7xl font-black text-white leading-tight mb-6 tracking-tight">從零到一<br><span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-300">次世代採購週報系統</span></h1>
+                <p class="text-xl text-slate-300 font-medium leading-relaxed mb-10">將繁雜的傳統紙本與靜態表單，轉型為高度自動化、資料不遺失的智慧雲端平台。為採購團隊量身打造的極致體驗。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 2: The Challenge -->
+    <section class="snap-section flex flex-col lg:flex-row bg-slate-50">
+        <div class="w-full lg:w-1/2 h-1/2 lg:h-full bg-cover bg-center order-2 lg:order-1" style="background-image: url('assets/slide2_challenge_1785063997757.jpg');"></div>
+        <div class="w-full lg:w-1/2 h-1/2 lg:h-full flex items-center justify-center p-12 lg:p-24 order-1 lg:order-2 bg-white relative">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-rose-100 rounded-full mix-blend-multiply filter blur-3xl opacity-70 -translate-y-1/2 translate-x-1/2"></div>
+            <div class="relative z-10 reveal-up">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-xl bg-rose-100 flex items-center justify-center text-rose-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    </div>
+                    <h2 class="text-3xl lg:text-4xl font-black text-slate-800">一、面臨的過去挑戰與痛點</h2>
+                </div>
+                <h3 class="text-xl font-bold text-slate-700 mb-4">資料混亂、缺乏追蹤的過去</h3>
+                <ul class="space-y-4">
+                    <li class="flex items-start gap-3">
+                        <span class="mt-1 text-rose-500">❌</span>
+                        <p class="text-slate-600 leading-relaxed"><strong class="text-slate-800">難以擴充的靜態表單：</strong> 過去採購人員無法隨心所欲地增刪欄位與調整排序，系統極度僵化。</p>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="mt-1 text-rose-500">❌</span>
+                        <p class="text-slate-600 leading-relaxed"><strong class="text-slate-800">資料覆蓋與遺失風險：</strong> 缺乏版本控制，新增資料經常不小心覆蓋舊資料，歷史歸檔極度困難。</p>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="mt-1 text-rose-500">❌</span>
+                        <p class="text-slate-600 leading-relaxed"><strong class="text-slate-800">發送後如石沉大海：</strong> 報告寄出後，無從得知長官與相關同仁是否已經閱讀，追蹤成本極高。</p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 3: Simplifying procedures (NEW) -->
+    <section class="snap-section relative bg-cover bg-center" style="background-image: url('assets/slide3_simplify_1785075649553.jpg');">
+        <div class="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"></div>
+        <div class="absolute inset-0 flex items-center justify-center px-12 lg:px-24">
+            <div class="glass-panel p-10 lg:p-14 rounded-3xl max-w-2xl reveal-zoom text-center">
+                <div class="flex flex-col items-center gap-4 mb-6">
+                    <div class="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 shadow-inner">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                    </div>
+                    <h2 class="text-3xl font-black text-slate-800">二、繁雜手續，化繁為簡</h2>
+                </div>
+                <h3 class="text-xl font-bold text-emerald-600 mb-6">告別複製貼上與格式錯亂的惡夢</h3>
+                <p class="text-slate-600 text-lg leading-relaxed mb-6 font-medium text-left">過去，採購人員為了產出一份週報，需要經歷痛苦的「排版地獄」。<br>手動對齊表格、把舊資料複製貼上、調整字體大小，這些不僅耗時，還容易出錯。</p>
+                <div class="bg-white/60 p-5 rounded-2xl border border-slate-200 text-left">
+                    <p class="text-slate-700 leading-relaxed"><strong class="text-emerald-700">突破：</strong> 現在，只需點擊 **「一鍵複製」**，系統自動為您完美帶入上週格式與內容。搭配 **「草稿自動儲存」**，隨時中斷工作也不怕心血白費。所有的排版邏輯，交給系統代勞！</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 4: Cloud & DB Transition -->
+    <section class="snap-section flex flex-col lg:flex-row bg-slate-900">
+        <div class="w-full lg:w-1/2 h-1/2 lg:h-full flex items-center justify-center p-12 lg:p-24 relative overflow-hidden order-1">
+            <div class="absolute inset-0 bg-gradient-to-br from-blue-900/40 to-slate-900"></div>
+            <div class="relative z-10 reveal-right">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    </div>
+                    <h2 class="text-3xl lg:text-4xl font-black text-white">三、雲端化與彈性架構規劃</h2>
+                </div>
+                <h3 class="text-2xl font-bold text-blue-300 mb-6 tracking-wide">無縫銜接公司內部資料庫</h3>
+                <div class="space-y-6 text-slate-300">
+                    <p class="leading-relaxed text-lg">系統全面導入自動化的「樹狀歷史歸檔機制」，找尋歷史紀錄輕而易舉。</p>
+                    <div class="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-sm border-l-4 border-l-blue-500">
+                        <h4 class="text-white font-bold mb-2">架構前瞻性 (Architecture Vision)</h4>
+                        <p class="text-sm leading-relaxed text-blue-100">本專案前期以 **Firebase 實時雲端資料庫** 進行高敏捷開發與概念驗證 (PoC)，確保產品快速迭代並貼近使用者需求。</p>
+                        <p class="text-sm leading-relaxed text-blue-100 mt-2">我們在程式碼底層設計了「資料庫抽象層 (Data Access Layer)」，**在專案正式上線營運時，可以極低成本無縫切換儲存伺服器，將資料 100% 落地於公司內部的 On-Premise 資料庫**，完美兼顧開發效率與企業最高級別別資安規範。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="w-full lg:w-1/2 h-1/2 lg:h-full bg-cover bg-center order-2" style="background-image: url('assets/slide3_cloud_1785064010320.jpg');"></div>
+    </section>
+
+    <!-- Slide 5: No-Code UI -->
+    <section class="snap-section relative bg-cover bg-center" style="background-image: url('assets/slide4_nocode_1785064022865.jpg');">
+        <div class="absolute inset-0 bg-slate-900/30"></div>
+        <div class="absolute inset-0 flex items-center justify-start px-12 lg:px-24">
+            <div class="glass-panel p-10 lg:p-14 rounded-3xl max-w-xl reveal-up">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-xl bg-amber-100 flex items-center justify-center text-amber-600 shadow-inner">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path></svg>
+                    </div>
+                    <h2 class="text-3xl font-black text-slate-800">四、動態模板與無程式碼</h2>
+                </div>
+                <h3 class="text-xl font-bold text-amber-600 mb-6">Drag-and-Drop 賦予極大彈性</h3>
+                <p class="text-slate-600 text-lg leading-relaxed mb-6 font-medium">採購業務瞬息萬變，表單絕不能被寫死。</p>
+                <ul class="space-y-4">
+                    <li class="flex items-start gap-3">
+                        <span class="mt-1 text-amber-500">✓</span>
+                        <p class="text-slate-700 leading-relaxed"><strong>積木式編輯 (No-Code)：</strong> 我們讓採購人員只需透過滑鼠「拖曳」，就能自由排序段落與表格項目。內建 12 種母標題子標題，點擊即可一秒套用。</p>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="mt-1 text-amber-500">✓</span>
+                        <p class="text-slate-700 leading-relaxed"><strong>幕後魔法：</strong> 系統在背後自動將這些複雜的表格結構轉化為極度乾淨的 JSON 數據，確保歷史資料在任何裝置上都能完美無缺地渲染。</p>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 6: Productivity (NEW) -->
+    <section class="snap-section flex flex-col lg:flex-row bg-slate-50">
+        <div class="w-full lg:w-1/2 h-1/2 lg:h-full bg-cover bg-center order-2 lg:order-1" style="background-image: url('assets/slide6_productivity_1785075660395.jpg');"></div>
+        <div class="w-full lg:w-1/2 h-1/2 lg:h-full flex items-center justify-center p-12 lg:p-24 order-1 lg:order-2 bg-gradient-to-br from-indigo-50 to-white relative">
+            <div class="relative z-10 reveal-left">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-xl bg-indigo-100 flex items-center justify-center text-indigo-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    </div>
+                    <h2 class="text-3xl lg:text-4xl font-black text-slate-800">五、工時銳減，價值躍升</h2>
+                </div>
+                <h3 class="text-2xl font-bold text-indigo-600 mb-4">這不僅是系統升級，更是「生產力革命」</h3>
+                <p class="text-slate-600 leading-relaxed mb-6 text-lg">系統導入後，為組織帶來最真實的 ROI (投資回報率)：</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-indigo-100">
+                        <div class="text-3xl mb-2">📉</div>
+                        <h4 class="font-bold text-slate-800 mb-1">行政庶務極小化</h4>
+                        <p class="text-sm text-slate-500 leading-relaxed">不再浪費生命在手動調整 Word/Excel 欄位寬度、催交報告、尋找遺失檔案上。縮減超過 60% 的報告製作時間。</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-indigo-100">
+                        <div class="text-3xl mb-2">📈</div>
+                        <h4 class="font-bold text-slate-800 mb-1">專注力重回高價值事務</h4>
+                        <p class="text-sm text-slate-500 leading-relaxed">擠出的寶貴時間，讓採購團隊得以全力專注於「供應商深度議價」、「全球料件趨勢分析」等能為公司創造實質利潤的戰略任務。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 7: Tracking & Read Receipts -->
+    <section class="snap-section flex flex-col lg:flex-row bg-slate-900">
+        <div class="w-full lg:w-1/2 h-1/2 lg:h-full flex items-center justify-center p-12 lg:p-24 relative overflow-hidden order-2 lg:order-1 border-r border-slate-800">
+            <div class="relative z-10 reveal-right">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-xl bg-cyan-900/50 border border-cyan-500/30 flex items-center justify-center text-cyan-400 shadow-[0_0_15px_rgba(34,211,238,0.2)]">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
+                    </div>
+                    <h2 class="text-3xl lg:text-4xl font-black text-white">六、智慧追蹤機制</h2>
+                </div>
+                <h3 class="text-2xl font-bold text-cyan-400 mb-6">告別盲目發布，精準掌握數據</h3>
+                <div class="bg-slate-800/50 rounded-2xl p-6 border border-slate-700/50 hover:border-cyan-500/30 transition-colors">
+                    <h4 class="text-white font-bold mb-3 flex items-center gap-2">👀 突破「已讀不回」黑洞</h4>
+                    <p class="text-slate-400 leading-relaxed mb-4">傳統發送信件最大的問題是無法追蹤。我們實作了「身分驗證攔截器」，所有長官與同仁必須登記身分才能閱讀週報。</p>
+                    <p class="text-slate-400 leading-relaxed">系統會在背景自動寫入<strong>閱讀時間戳記 (Timestamp)</strong>，誰讀了、誰沒讀、什麼時候讀的，後台統整為精美圖表一目了然。</p>
+                </div>
+            </div>
+        </div>
+        <div class="w-full lg:w-1/2 h-1/2 lg:h-full bg-cover bg-center order-1 lg:order-2" style="background-image: url('assets/slide5_tracking_1785064035967.jpg');"></div>
+    </section>
+
+    <!-- Slide 8: Attachments (NEW) -->
+    <section class="snap-section relative bg-cover bg-center" style="background-image: url('assets/slide8_attachments_1785075670762.jpg');">
+        <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-[1px]"></div>
+        <div class="absolute inset-0 flex items-center justify-end px-12 lg:px-24">
+            <div class="glass-panel p-10 lg:p-14 rounded-3xl max-w-xl reveal-left">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-xl bg-purple-100 flex items-center justify-center text-purple-600 shadow-inner">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
+                    </div>
+                    <h2 class="text-3xl font-black text-slate-800">七、集中化雲端附件庫</h2>
+                </div>
+                <h3 class="text-xl font-bold text-purple-600 mb-4">報價單與規格書的完美歸宿</h3>
+                <p class="text-slate-600 text-lg leading-relaxed mb-6 font-medium">所有的重要文件，現在都乖乖躺在它們該在的地方。</p>
+                <div class="bg-white/60 p-5 rounded-2xl border border-slate-200">
+                    <p class="text-slate-700 leading-relaxed mb-3"><strong>段落級別的精準附件：</strong> 過去附件散落四處，如今採購人員可以在「每一個獨立段落 (例如：RFQ詢價作業)」中直接上傳對應的 PDF、Excel 或圖片。</p>
+                    <p class="text-slate-700 leading-relaxed">長官在前台閱讀週報時，只需一鍵點擊，即可流暢預覽或下載原檔，徹底消除會議中的資訊落差。</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 9: Guardrails & RWD (NEW) -->
+    <section class="snap-section flex flex-col lg:flex-row bg-slate-50">
+        <div class="w-full lg:w-1/2 h-1/2 lg:h-full bg-cover bg-center order-2 lg:order-1" style="background-image: url('assets/slide9_guardrails_1785075683032.jpg');"></div>
+        <div class="w-full lg:w-1/2 h-1/2 lg:h-full flex items-center justify-center p-12 lg:p-24 order-1 lg:order-2 bg-white relative">
+            <div class="relative z-10 reveal-up">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.95 11.95 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                    </div>
+                    <h2 class="text-3xl lg:text-4xl font-black text-slate-800">八、堅若磐石的防護機制</h2>
+                </div>
+                <h3 class="text-xl font-bold text-orange-600 mb-6">防呆安全網 ＆ RWD 跨裝置體驗</h3>
+                
+                <div class="space-y-4">
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 hover:border-orange-200 transition-colors">
+                        <h4 class="font-bold text-slate-700 mb-1">🛡️ 多層防呆系統</h4>
+                        <p class="text-sm text-slate-600">未儲存直接離開網頁時，系統會跳出強烈警告；執行任何資料刪除時，均需通過雙重確認機制，將人為手誤的機率降至零。</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-slate-50 border border-slate-100 hover:border-orange-200 transition-colors">
+                        <h4 class="font-bold text-slate-700 mb-1">📱 行動辦公零死角 (RWD)</h4>
+                        <p class="text-sm text-slate-600">重新設計了響應式網格 (CSS Flexbox/Grid)，無論長官是在會議室用電腦，還是在高鐵上用手機查看週報，排版皆能完美自適應。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 10: Conclusion -->
+    <section class="snap-section relative flex items-center justify-center bg-slate-900 bg-cover bg-center" style="background-image: url('assets/slide6_future_1785064051108.jpg');" id="final-slide">
+        <div class="absolute inset-0 bg-slate-900/70 backdrop-blur-[2px]"></div>
+        <div class="relative z-10 text-center px-6 max-w-4xl reveal-zoom">
+            <span class="inline-block py-1.5 px-4 rounded-full bg-gradient-to-r from-purple-600 to-pink-500 text-white font-bold text-sm tracking-widest mb-6 shadow-lg shadow-purple-500/30">VISION ACCELERATED</span>
+            <h2 class="text-5xl lg:text-7xl font-black text-white mb-8 leading-tight">科技驅動管理<br>團隊效能的終極進化</h2>
+            <p class="text-xl text-slate-200 font-medium leading-relaxed mb-12 max-w-2xl mx-auto">這不僅僅是一個「佈告欄系統」，而是採購團隊工作模式的全面升級。我們將持續優化體驗，作為團隊征戰商場最堅實的數位後盾！</p>
+            
+            <a href="admin.html" class="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-white text-slate-900 font-bold text-lg hover:bg-slate-100 hover:scale-105 transition-all shadow-xl shadow-white/10 group">
+                返回管理後台
+                <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+            </a>
+        </div>
+    </section>
+
+</div>
+
+<script>
+    // Intersection Observer for scroll animations
+    const observerOptions = {
+        root: document.querySelector('.snap-container'),
+        rootMargin: '0px',
+        threshold: 0.4
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+            } else {
+                entry.target.classList.remove('is-visible');
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.reveal-up, .reveal-right, .reveal-left, .reveal-zoom').forEach(el => {
+        observer.observe(el);
+    });
+
+    // Intersection Observer to hide Scroll Indicator on last slide
+    const indicator = document.getElementById('scroll-indicator');
+    const finalSlide = document.getElementById('final-slide');
+    
+    const endObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                indicator.style.opacity = '0'; // Hide
+            } else {
+                indicator.style.opacity = '1'; // Show
+            }
+        });
+    }, {
+        root: document.querySelector('.snap-container'),
+        rootMargin: '0px',
+        threshold: 0.1
+    });
+
+    if(finalSlide) {
+        endObserver.observe(finalSlide);
+    }
+</script>
+</body>
+</html>

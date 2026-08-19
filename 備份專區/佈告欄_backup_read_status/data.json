@@ -1,0 +1,1084 @@
+{
+  "meta": {
+    "siteName": "經營TEAM採購｜佈告欄",
+    "company": "微笑單車股份有限公司",
+    "contact": {
+      "name": "Sunny Ting 丁美云",
+      "tel": "+886-2-8978-5094",
+      "email": "sunnyting@youbike.com.tw",
+      "address": "105403 台北市松山區民生東路三段138號10樓",
+      "taxId": "42670234"
+    },
+    "lastUpdated": "2026-07-21T08:58:12+08:00"
+  },
+  "bulletins": [
+    {
+      "id": "2026-W29",
+      "publishDate": "2026-07-17",
+      "title": "經營TEAM採購｜本週重點摘要",
+      "periodStart": "2026-07-13",
+      "periodEnd": "2026-07-17",
+      "isPinned": true,
+      "sections": [
+        {
+          "id": "s1-procurement-progress",
+          "sectionNumber": "一",
+          "title": "採購作業進度",
+          "icon": "📋",
+          "items": [
+            {
+              "id": "w29-item-001",
+              "content": "因目前全台庫存週轉天數偏高，為有效控管庫存，7 月底維修預測採購將暫停一次。",
+              "priority": "high",
+              "tags": ["維修物料", "庫存控管"],
+              "highlight": true
+            }
+          ]
+        },
+        {
+          "id": "s2-delivery-changes",
+          "sectionNumber": "二",
+          "title": "交期異動作業",
+          "icon": "📦",
+          "subsections": [
+            {
+              "id": "w29-dc-001",
+              "subsectionNumber": "1",
+              "title": "台螺金屬-新竹維修物料變更結案通知",
+              "items": [
+                {
+                  "id": "w29-dc-item-001",
+                  "content": "台螺金屬訂單 3310-20260527002_J0080000014421，因供應商庫存僅剩 304 PCS，無法供應尾數 196 PCS，故該數量予以取消。",
+                  "supplier": "台螺金屬",
+                  "priority": "high"
+                },
+                {
+                  "id": "w29-dc-item-002",
+                  "content": "我司將針對此內部訂單辦理結案。若新竹營運單位後續仍有需求，請再重新提出採購申請。",
+                  "supplier": "台螺金屬",
+                  "priority": "normal"
+                }
+              ],
+              "affectedOrders": [
+                {
+                  "supplier": "U05095",
+                  "supplierName": "台螺金屬",
+                  "purchaseDate": "2026-05-27",
+                  "poNumber": "3310-20260527002",
+                  "lineNumber": "0011",
+                  "originalDelivery": "2026-06-27",
+                  "newDelivery": "結案",
+                  "itemName": "M8一字型機動扳手",
+                  "partNumber": "J0080000014421",
+                  "quantity": 500,
+                  "warehouseCode": "HC001",
+                  "warehouseName": "新竹自行車維修物料總倉",
+                  "receivedQty": 304,
+                  "outstandingQty": 196,
+                  "remark": "因廠商庫存已用罄，剩餘尾數 196 PCS 已取消"
+                }
+              ]
+            },
+            {
+              "id": "w29-dc-002",
+              "subsectionNumber": "2",
+              "title": "維格工業交期變更通知",
+              "items": [
+                {
+                  "id": "w29-dc-item-003",
+                  "content": "6/23採購已發文通知各營運單位，維格工業應因應物料價格持續上漲，自 6 月起之訂單需待與 GTM 確認最終價格後，方可進行備料作業，因此交期可能受到影響。",
+                  "supplier": "維格工業",
+                  "priority": "normal"
+                },
+                {
+                  "id": "w29-dc-item-004",
+                  "content": "目前相關價格已完成確認，並已與維格工業重新確認交期。",
+                  "supplier": "維格工業",
+                  "priority": "normal"
+                }
+              ],
+              "affectedOrders": [
+                {
+                  "supplier": "U14200",
+                  "supplierName": "維格工業",
+                  "purchaseDate": "2026-05-27",
+                  "poNumber": "3310-20260527026",
+                  "lineNumber": "0001",
+                  "originalDelivery": "2026-06-27",
+                  "newDelivery": "2026-07-22",
+                  "itemName": "油封腳踏",
+                  "partNumber": "1261-C169DU-0001",
+                  "quantity": 5000,
+                  "warehouseCode": "TP001",
+                  "warehouseName": "雙北自行車維修物料總倉",
+                  "outstandingQty": 2000
+                },
+                {
+                  "supplier": "U14200",
+                  "supplierName": "維格工業",
+                  "purchaseDate": "2026-05-27",
+                  "poNumber": "3310-20260527026",
+                  "lineNumber": "0001",
+                  "originalDelivery": "2026-06-27",
+                  "newDelivery": "2026-08-10",
+                  "itemName": "油封腳踏",
+                  "partNumber": "1261-C169DU-0001",
+                  "quantity": 5000,
+                  "warehouseCode": "TP001",
+                  "warehouseName": "雙北自行車維修物料總倉",
+                  "outstandingQty": 3000
+                },
+                {
+                  "supplier": "U14200",
+                  "supplierName": "維格工業",
+                  "purchaseDate": "2026-05-27",
+                  "poNumber": "3310-20260527026",
+                  "lineNumber": "0002",
+                  "originalDelivery": "2026-06-27",
+                  "newDelivery": "2026-07-22",
+                  "itemName": "油封腳踏",
+                  "partNumber": "1261-C169DU-0001",
+                  "quantity": 200,
+                  "warehouseCode": "TC001",
+                  "warehouseName": "台中自行車維修物料總倉",
+                  "outstandingQty": 200
+                },
+                {
+                  "supplier": "U14200",
+                  "supplierName": "維格工業",
+                  "purchaseDate": "2026-06-29",
+                  "poNumber": "3310-20260629019",
+                  "lineNumber": "0001",
+                  "originalDelivery": "2026-08-01",
+                  "newDelivery": "2026-08-18",
+                  "itemName": "油封腳踏",
+                  "partNumber": "1261-C169DU-0001",
+                  "quantity": 300,
+                  "warehouseCode": "CY001",
+                  "warehouseName": "嘉義自行車維修物料總倉",
+                  "outstandingQty": 300
+                },
+                {
+                  "supplier": "U14200",
+                  "supplierName": "維格工業",
+                  "purchaseDate": "2026-06-29",
+                  "poNumber": "3310-20260629019",
+                  "lineNumber": "0002",
+                  "originalDelivery": "2026-08-01",
+                  "newDelivery": "2026-08-18",
+                  "itemName": "油封腳踏",
+                  "partNumber": "1261-C169DU-0001",
+                  "quantity": 500,
+                  "warehouseCode": "HC001",
+                  "warehouseName": "新竹自行車維修物料總倉",
+                  "outstandingQty": 500
+                },
+                {
+                  "supplier": "U14200",
+                  "supplierName": "維格工業",
+                  "purchaseDate": "2026-06-29",
+                  "poNumber": "3310-20260629019",
+                  "lineNumber": "0003",
+                  "originalDelivery": "2026-08-01",
+                  "newDelivery": "2026-08-18",
+                  "itemName": "油封腳踏",
+                  "partNumber": "1261-C169DU-0001",
+                  "quantity": 250,
+                  "warehouseCode": "KH001",
+                  "warehouseName": "高雄自行車維修物料總倉",
+                  "outstandingQty": 250
+                },
+                {
+                  "supplier": "U14200",
+                  "supplierName": "維格工業",
+                  "purchaseDate": "2026-06-29",
+                  "poNumber": "3310-20260629019",
+                  "lineNumber": "0004",
+                  "originalDelivery": "2026-08-01",
+                  "newDelivery": "2026-08-18",
+                  "itemName": "油封腳踏",
+                  "partNumber": "1261-C169DU-0001",
+                  "quantity": 250,
+                  "warehouseCode": "TC001",
+                  "warehouseName": "台中自行車維修物料總倉",
+                  "outstandingQty": 250
+                },
+                {
+                  "supplier": "U14200",
+                  "supplierName": "維格工業",
+                  "purchaseDate": "2026-06-29",
+                  "poNumber": "3310-20260629019",
+                  "lineNumber": "0005",
+                  "originalDelivery": "2026-08-01",
+                  "newDelivery": "2026-08-18",
+                  "itemName": "油封腳踏",
+                  "partNumber": "1261-C169DU-0001",
+                  "quantity": 750,
+                  "warehouseCode": "TY001",
+                  "warehouseName": "桃園自行車維修物料總倉",
+                  "outstandingQty": 750
+                },
+                {
+                  "supplier": "U14200",
+                  "supplierName": "維格工業",
+                  "purchaseDate": "2026-06-29",
+                  "poNumber": "3310-20260629019",
+                  "lineNumber": "0006",
+                  "originalDelivery": "2026-08-01",
+                  "newDelivery": "2026-08-31",
+                  "itemName": "油封腳踏",
+                  "partNumber": "1261-C169DU-0001",
+                  "quantity": 5000,
+                  "warehouseCode": "TP001",
+                  "warehouseName": "雙北自行車維修物料總倉",
+                  "outstandingQty": 5000
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "s3-abnormal-repair",
+          "sectionNumber": "三",
+          "title": "物料異常(返修)作業",
+          "icon": "🔧",
+          "items": [
+            {
+              "id": "w29-ar-001",
+              "content": "台南已將 Y1003004 發光上蓋內部機殼受潮異常之不良品，共計 50 PCS，於 7/13 寄送予廠商（沛能國際）。",
+              "supplier": "沛能國際",
+              "priority": "normal"
+            },
+            {
+              "id": "w29-ar-002",
+              "content": "待廠商收到後，將進一步進行檢測與異常原因分析。",
+              "supplier": "沛能國際",
+              "priority": "normal"
+            }
+          ],
+          "repairRecords": [
+            {
+              "supplierCode": "U07081",
+              "supplierName": "沛能國際",
+              "repairUnit": "台南營運",
+              "repairDate": "2026-07-13",
+              "trackingNumber": "5830-7752-8841",
+              "faultType": "機台受潮出現水漬",
+              "faultModel": "Y1003004 發光上蓋",
+              "quantity": 50,
+              "remark": "受天災影響，場內Y1003004 發光上蓋 內部機殼因淹水導致受潮，出現水漬情形。"
+            }
+          ]
+        },
+        {
+          "id": "s4-attachments",
+          "sectionNumber": "四",
+          "title": "附件",
+          "icon": "📎",
+          "files": []
+        }
+      ]
+    },
+    {
+      "id": "2026-W28",
+      "publishDate": "2026-07-10",
+      "title": "經營TEAM採購｜本週重點摘要",
+      "periodStart": "2026-07-06",
+      "periodEnd": "2026-07-10",
+      "isPinned": false,
+      "sections": [
+        {
+          "id": "s1-procurement-progress",
+          "sectionNumber": "一",
+          "title": "採購作業進度",
+          "icon": "📋",
+          "items": [
+            {
+              "id": "w28-item-001",
+              "content": "6月份【工程物料】預測 已全數完成採購作業，採購進度已達成預定目標。",
+              "priority": "normal",
+              "tags": ["工程物料", "預測"],
+              "highlight": false
+            }
+          ]
+        },
+        {
+          "id": "s2-delivery-changes",
+          "sectionNumber": "二",
+          "title": "交期異動及更新通知",
+          "icon": "📦",
+          "subsections": [
+            {
+              "id": "w28-dc-001",
+              "subsectionNumber": "1",
+              "title": "政伸企業交期延誤",
+              "items": [
+                {
+                  "id": "w28-dc-item-001",
+                  "content": "因政伸企業廠內製程作業壅塞，影響生產進度，致使本月原定陸續交貨之訂單無法依原定交期完成出貨，交期將有所延誤。",
+                  "supplier": "政伸企業",
+                  "priority": "high"
+                }
+              ],
+              "affectedOrders": [
+                {
+                  "supplier": "U09002",
+                  "supplierName": "政伸企業",
+                  "purchaseDate": "2026-05-27",
+                  "poNumber": "3310-20260527016",
+                  "lineNumber": "0004",
+                  "originalDelivery": "2026-06-27",
+                  "newDelivery": "2026-07-29",
+                  "itemName": "2.0E 桃園置物籃內側貼(北北桃) V3",
+                  "partNumber": "3YB-1T00029",
+                  "quantity": 200,
+                  "warehouseCode": "TP001",
+                  "warehouseName": "雙北自行車維修物料總倉",
+                  "outstandingQty": 200
+                },
+                {
+                  "supplier": "U09002",
+                  "supplierName": "政伸企業",
+                  "purchaseDate": "2026-05-27",
+                  "poNumber": "3310-20260527016",
+                  "lineNumber": "0005",
+                  "originalDelivery": "2026-06-27",
+                  "newDelivery": "2026-07-22",
+                  "itemName": "2.0 桃園置物籃內側貼(北北桃) V3",
+                  "partNumber": "3YB-1T00030",
+                  "quantity": 1000,
+                  "warehouseCode": "TP001",
+                  "warehouseName": "雙北自行車維修物料總倉",
+                  "outstandingQty": 1000
+                },
+                {
+                  "supplier": "U09002",
+                  "supplierName": "政伸企業",
+                  "purchaseDate": "2026-05-27",
+                  "poNumber": "3310-20260527016",
+                  "lineNumber": "0006",
+                  "originalDelivery": "2026-06-27",
+                  "newDelivery": "2026-07-17",
+                  "itemName": "2.0 台中市置物籃內側貼 V2",
+                  "partNumber": "3YB-1T00034",
+                  "quantity": 1500,
+                  "warehouseCode": "TC001",
+                  "warehouseName": "台中自行車維修物料總倉",
+                  "outstandingQty": 1500
+                },
+                {
+                  "supplier": "U09002",
+                  "supplierName": "政伸企業",
+                  "purchaseDate": "2026-05-27",
+                  "poNumber": "3310-20260527016",
+                  "lineNumber": "0007",
+                  "originalDelivery": "2026-06-27",
+                  "newDelivery": "2026-07-24",
+                  "itemName": "2.0 嘉義縣置物籃內側貼 V1",
+                  "partNumber": "3YB-1T00050",
+                  "quantity": 1000,
+                  "warehouseCode": "CY001",
+                  "warehouseName": "嘉義自行車維修物料總倉",
+                  "outstandingQty": 1000
+                },
+                {
+                  "supplier": "U09002",
+                  "supplierName": "政伸企業",
+                  "purchaseDate": "2026-05-27",
+                  "poNumber": "3310-20260527016",
+                  "lineNumber": "0008",
+                  "originalDelivery": "2026-06-27",
+                  "newDelivery": "2026-07-28",
+                  "itemName": "2.0E 嘉義縣置物籃內側貼 V1",
+                  "partNumber": "3YB-1T00052",
+                  "quantity": 1000,
+                  "warehouseCode": "CY001",
+                  "warehouseName": "嘉義自行車維修物料總倉",
+                  "outstandingQty": 1000
+                },
+                {
+                  "supplier": "U09002",
+                  "supplierName": "政伸企業",
+                  "purchaseDate": "2026-06-05",
+                  "poNumber": "3310-20260605001",
+                  "lineNumber": "0001",
+                  "originalDelivery": "2026-07-03",
+                  "newDelivery": "2026-07-15",
+                  "itemName": "2.0 高雄市置物籃內側貼 V3",
+                  "partNumber": "3YB-1T00040",
+                  "quantity": 1000,
+                  "warehouseCode": "KH001",
+                  "warehouseName": "高雄自行車維修物料總倉",
+                  "outstandingQty": 1000
+                },
+                {
+                  "supplier": "U09002",
+                  "supplierName": "政伸企業",
+                  "purchaseDate": "2026-07-01",
+                  "poNumber": "3310-20260701001",
+                  "lineNumber": "0001",
+                  "originalDelivery": "2026-07-20",
+                  "newDelivery": "2026-07-31",
+                  "itemName": "2.0E 屏東縣置物籃內側貼 V2",
+                  "partNumber": "3YB-1T00049",
+                  "quantity": 800,
+                  "warehouseCode": "PD001",
+                  "warehouseName": "屏東自行車維修物料總倉",
+                  "outstandingQty": 800
+                }
+              ]
+            },
+            {
+              "id": "w28-dc-002",
+              "subsectionNumber": "2",
+              "title": "甲陳工業交期調整與訂單取消",
+              "items": [
+                {
+                  "id": "w28-dc-item-002",
+                  "content": "因甲陳物料 Y1013001 於各廠區庫存水位偏高，為進行庫存調整，麒任已與廠商協調，自 8 月起，該物料之出貨時程將順延約 1.5 個月。",
+                  "supplier": "甲陳工業",
+                  "priority": "high"
+                },
+                {
+                  "id": "w28-dc-item-003",
+                  "content": "同時，已發送郵件通知工程單位，請後續依實際需求進行評估，並優先消耗內部庫存。",
+                  "supplier": "甲陳工業",
+                  "priority": "normal"
+                },
+                {
+                  "id": "w28-dc-item-004",
+                  "content": "由於目前庫存水位仍偏高，本月份預測採購單 3320-20260706004 將予以刪除，取消本次採購。",
+                  "supplier": "甲陳工業",
+                  "priority": "high"
+                }
+              ],
+              "affectedOrders": [
+                {
+                  "supplier": "U05100",
+                  "supplierName": "甲陳工業",
+                  "purchaseDate": "2026-06-04",
+                  "poNumber": "3320-20260604008",
+                  "lineNumber": "0001",
+                  "originalDelivery": "2026-08-04",
+                  "newDelivery": "2026-09-15",
+                  "itemName": "導引座",
+                  "partNumber": "Y1013001",
+                  "quantity": 900,
+                  "warehouseCode": "SCY01",
+                  "warehouseName": "嘉義場站物料倉",
+                  "outstandingQty": 900
+                },
+                {
+                  "supplier": "U05100",
+                  "supplierName": "甲陳工業",
+                  "purchaseDate": "2026-06-04",
+                  "poNumber": "3320-20260604008",
+                  "lineNumber": "0002",
+                  "originalDelivery": "2026-08-04",
+                  "newDelivery": "2026-09-15",
+                  "itemName": "導引座",
+                  "partNumber": "Y1013001",
+                  "quantity": 2000,
+                  "warehouseCode": "SHC01",
+                  "warehouseName": "新竹場站物料倉",
+                  "outstandingQty": 2000
+                },
+                {
+                  "supplier": "U05100",
+                  "supplierName": "甲陳工業",
+                  "purchaseDate": "2026-06-04",
+                  "poNumber": "3320-20260604008",
+                  "lineNumber": "0003",
+                  "originalDelivery": "2026-08-04",
+                  "newDelivery": "2026-09-15",
+                  "itemName": "導引座",
+                  "partNumber": "Y1013001",
+                  "quantity": 800,
+                  "warehouseCode": "SKH01",
+                  "warehouseName": "高雄場站物料倉",
+                  "outstandingQty": 800
+                },
+                {
+                  "supplier": "U05100",
+                  "supplierName": "甲陳工業",
+                  "purchaseDate": "2026-06-04",
+                  "poNumber": "3320-20260604008",
+                  "lineNumber": "0004",
+                  "originalDelivery": "2026-08-04",
+                  "newDelivery": "2026-09-15",
+                  "itemName": "導引座",
+                  "partNumber": "Y1013001",
+                  "quantity": 500,
+                  "warehouseCode": "SML01",
+                  "warehouseName": "苗栗場站物料倉",
+                  "outstandingQty": 500
+                },
+                {
+                  "supplier": "U05100",
+                  "supplierName": "甲陳工業",
+                  "purchaseDate": "2026-06-04",
+                  "poNumber": "3320-20260604008",
+                  "lineNumber": "0005",
+                  "originalDelivery": "2026-08-04",
+                  "newDelivery": "2026-09-15",
+                  "itemName": "導引座",
+                  "partNumber": "Y1013001",
+                  "quantity": 300,
+                  "warehouseCode": "SPD01",
+                  "warehouseName": "屏東場站物料倉",
+                  "outstandingQty": 300
+                },
+                {
+                  "supplier": "U05100",
+                  "supplierName": "甲陳工業",
+                  "purchaseDate": "2026-06-04",
+                  "poNumber": "3320-20260604008",
+                  "lineNumber": "0006",
+                  "originalDelivery": "2026-08-04",
+                  "newDelivery": "2026-09-15",
+                  "itemName": "導引座",
+                  "partNumber": "Y1013001",
+                  "quantity": 800,
+                  "warehouseCode": "STC01",
+                  "warehouseName": "台中場站物料倉",
+                  "outstandingQty": 800
+                },
+                {
+                  "supplier": "U05100",
+                  "supplierName": "甲陳工業",
+                  "purchaseDate": "2026-06-04",
+                  "poNumber": "3320-20260604008",
+                  "lineNumber": "0007",
+                  "originalDelivery": "2026-08-04",
+                  "newDelivery": "2026-09-15",
+                  "itemName": "導引座",
+                  "partNumber": "Y1013001",
+                  "quantity": 1500,
+                  "warehouseCode": "STD01",
+                  "warehouseName": "台東場站物料倉",
+                  "outstandingQty": 1500
+                },
+                {
+                  "supplier": "U05100",
+                  "supplierName": "甲陳工業",
+                  "purchaseDate": "2026-06-04",
+                  "poNumber": "3320-20260604008",
+                  "lineNumber": "0008",
+                  "originalDelivery": "2026-08-04",
+                  "newDelivery": "2026-09-15",
+                  "itemName": "導引座",
+                  "partNumber": "Y1013001",
+                  "quantity": 800,
+                  "warehouseCode": "STN01",
+                  "warehouseName": "台南場站物料倉",
+                  "outstandingQty": 800
+                },
+                {
+                  "supplier": "U05100",
+                  "supplierName": "甲陳工業",
+                  "purchaseDate": "2026-06-04",
+                  "poNumber": "3320-20260604008",
+                  "lineNumber": "0009",
+                  "originalDelivery": "2026-08-04",
+                  "newDelivery": "2026-09-15",
+                  "itemName": "導引座",
+                  "partNumber": "Y1013001",
+                  "quantity": 1600,
+                  "warehouseCode": "STP03",
+                  "warehouseName": "北區場站物料倉2.0(總倉庫存)",
+                  "outstandingQty": 1600
+                },
+                {
+                  "supplier": "U05100",
+                  "supplierName": "甲陳工業",
+                  "purchaseDate": "2026-06-04",
+                  "poNumber": "3320-20260604008",
+                  "lineNumber": "0010",
+                  "originalDelivery": "2026-08-04",
+                  "newDelivery": "2026-09-15",
+                  "itemName": "導引座",
+                  "partNumber": "Y1013001",
+                  "quantity": 1000,
+                  "warehouseCode": "STY01",
+                  "warehouseName": "桃園場站物料倉",
+                  "outstandingQty": 1000
+                }
+              ],
+              "cancelledOrders": [
+                {
+                  "supplier": "U05100",
+                  "supplierName": "甲陳工業",
+                  "purchaseDate": "2026-07-06",
+                  "poNumber": "3320-20260706004",
+                  "lineNumber": "0001",
+                  "originalDelivery": "2026-09-06",
+                  "newDelivery": "取消訂單",
+                  "itemName": "導引座",
+                  "partNumber": "Y1013001",
+                  "quantity": 400,
+                  "warehouseCode": "SCY01",
+                  "warehouseName": "嘉義場站物料倉",
+                  "outstandingQty": 400
+                },
+                {
+                  "supplier": "U05100",
+                  "supplierName": "甲陳工業",
+                  "purchaseDate": "2026-07-06",
+                  "poNumber": "3320-20260706004",
+                  "lineNumber": "0002",
+                  "originalDelivery": "2026-09-06",
+                  "newDelivery": "取消訂單",
+                  "itemName": "導引座",
+                  "partNumber": "Y1013001",
+                  "quantity": 1800,
+                  "warehouseCode": "SHC01",
+                  "warehouseName": "新竹場站物料倉",
+                  "outstandingQty": 1800
+                },
+                {
+                  "supplier": "U05100",
+                  "supplierName": "甲陳工業",
+                  "purchaseDate": "2026-07-06",
+                  "poNumber": "3320-20260706004",
+                  "lineNumber": "0003",
+                  "originalDelivery": "2026-09-06",
+                  "newDelivery": "取消訂單",
+                  "itemName": "導引座",
+                  "partNumber": "Y1013001",
+                  "quantity": 500,
+                  "warehouseCode": "SKH01",
+                  "warehouseName": "高雄場站物料倉",
+                  "outstandingQty": 500
+                },
+                {
+                  "supplier": "U05100",
+                  "supplierName": "甲陳工業",
+                  "purchaseDate": "2026-07-06",
+                  "poNumber": "3320-20260706004",
+                  "lineNumber": "0004",
+                  "originalDelivery": "2026-09-06",
+                  "newDelivery": "取消訂單",
+                  "itemName": "導引座",
+                  "partNumber": "Y1013001",
+                  "quantity": 500,
+                  "warehouseCode": "SML01",
+                  "warehouseName": "苗栗場站物料倉",
+                  "outstandingQty": 500
+                },
+                {
+                  "supplier": "U05100",
+                  "supplierName": "甲陳工業",
+                  "purchaseDate": "2026-07-06",
+                  "poNumber": "3320-20260706004",
+                  "lineNumber": "0005",
+                  "originalDelivery": "2026-09-06",
+                  "newDelivery": "取消訂單",
+                  "itemName": "導引座",
+                  "partNumber": "Y1013001",
+                  "quantity": 200,
+                  "warehouseCode": "SPD01",
+                  "warehouseName": "屏東場站物料倉",
+                  "outstandingQty": 200
+                },
+                {
+                  "supplier": "U05100",
+                  "supplierName": "甲陳工業",
+                  "purchaseDate": "2026-07-06",
+                  "poNumber": "3320-20260706004",
+                  "lineNumber": "0006",
+                  "originalDelivery": "2026-09-06",
+                  "newDelivery": "取消訂單",
+                  "itemName": "導引座",
+                  "partNumber": "Y1013001",
+                  "quantity": 900,
+                  "warehouseCode": "STC01",
+                  "warehouseName": "台中場站物料倉",
+                  "outstandingQty": 900
+                },
+                {
+                  "supplier": "U05100",
+                  "supplierName": "甲陳工業",
+                  "purchaseDate": "2026-07-06",
+                  "poNumber": "3320-20260706004",
+                  "lineNumber": "0007",
+                  "originalDelivery": "2026-09-06",
+                  "newDelivery": "取消訂單",
+                  "itemName": "導引座",
+                  "partNumber": "Y1013001",
+                  "quantity": 800,
+                  "warehouseCode": "STN01",
+                  "warehouseName": "台南場站物料倉",
+                  "outstandingQty": 800
+                },
+                {
+                  "supplier": "U05100",
+                  "supplierName": "甲陳工業",
+                  "purchaseDate": "2026-07-06",
+                  "poNumber": "3320-20260706004",
+                  "lineNumber": "0008",
+                  "originalDelivery": "2026-09-06",
+                  "newDelivery": "取消訂單",
+                  "itemName": "導引座",
+                  "partNumber": "Y1013001",
+                  "quantity": 1600,
+                  "warehouseCode": "STP03",
+                  "warehouseName": "北區場站物料倉2.0(總倉庫存)",
+                  "outstandingQty": 1600
+                },
+                {
+                  "supplier": "U05100",
+                  "supplierName": "甲陳工業",
+                  "purchaseDate": "2026-07-06",
+                  "poNumber": "3320-20260706004",
+                  "lineNumber": "0009",
+                  "originalDelivery": "2026-09-06",
+                  "newDelivery": "取消訂單",
+                  "itemName": "導引座",
+                  "partNumber": "Y1013001",
+                  "quantity": 1000,
+                  "warehouseCode": "STY01",
+                  "warehouseName": "桃園場站物料倉",
+                  "outstandingQty": 1000
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "s3-supplier-inquiry",
+          "sectionNumber": "三",
+          "title": "對外供應商詢價作業",
+          "icon": "💰",
+          "subsections": [
+            {
+              "id": "w28-inq-001",
+              "subsectionNumber": "1",
+              "title": "維修項目需求詢價",
+              "items": [
+                {
+                  "id": "w28-inq-item-001",
+                  "content": "新竹營運處針對 173-TD135A-901 2.0 後燈線材維修更換需求，已請採購進行預先詢價作業。",
+                  "priority": "normal"
+                },
+                {
+                  "id": "w28-inq-item-002",
+                  "content": "採購單位已於 2026/7/6 向供應商提出詢價，並於 2026/7/7 取得報價單。",
+                  "priority": "normal"
+                },
+                {
+                  "id": "w28-inq-item-003",
+                  "content": "但因苗栗尚有庫存可調撥給新竹，暫時先不予採購，後續如有實際需求，將與苗栗營運處一併訂購。",
+                  "priority": "normal"
+                }
+              ],
+              "inquiryRecords": [
+                {
+                  "supplierCode": "U07081",
+                  "supplierName": "沛能國際股份有限公司",
+                  "inquiryDate": "2026-07-06",
+                  "item": "001",
+                  "ybProduct": "HD-136_CABLE_ACCESSARY",
+                  "description": "CABLE, AWG#22, 紅黑皮, 有膠熱縮套管",
+                  "remark": "173-TD135A-901 2.0後燈線材需求。L/T: 有庫存:1 Week, 無庫存: 6 Weeks。未達MOQ1000，運費另計(單一地址/箱)。約$100"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "s4-abnormal-repair",
+          "sectionNumber": "四",
+          "title": "物料異常返修事件說明",
+          "icon": "🔧",
+          "items": [
+            {
+              "id": "w28-ar-001",
+              "content": "因近期台南地區受天災影響，導致場內 Y1003004 發光上蓋之內部機殼因淹水受潮，並發現有水漬異常情形。",
+              "priority": "high"
+            },
+            {
+              "id": "w28-ar-002",
+              "content": "目前已與供應商沛能進行溝通，沛能建議我司先提供 50 PCS 寄回其廠內進行檢測，並進一步評估產品是否具備修復可行性。",
+              "priority": "normal"
+            },
+            {
+              "id": "w28-ar-003",
+              "content": "後續將待沛能初步評估後，依結果進行後續處理方案。",
+              "priority": "normal"
+            }
+          ],
+          "repairRecords": [
+            {
+              "supplierCode": "U07081",
+              "supplierName": "沛能國際",
+              "repairUnit": "台南營運",
+              "faultType": "機台受潮出現水漬",
+              "faultModel": "Y1003004 發光上蓋",
+              "quantity": null,
+              "remark": "受天災影響，場內Y1003004 發光上蓋 內部機殼因淹水導致受潮，出現水漬情形。"
+            }
+          ]
+        },
+        {
+          "id": "s5-price-increase",
+          "sectionNumber": "五",
+          "title": "供應商物料漲價",
+          "icon": "📈",
+          "items": [
+            {
+              "id": "w28-pi-001",
+              "content": "佳承精工於 2026/7/8 通知，由於環保電鍍、線材及運輸等相關成本已多次調漲，現行價格已無法反映實際成本，擬自 2026 年 9 月起調整售價。",
+              "supplier": "佳承精工",
+              "priority": "high"
+            },
+            {
+              "id": "w28-pi-002",
+              "content": "供應商提出之物料調漲，由採購企劃（麒任）負責與供應商協商最終調整價格，並依公司內部核准程序完成審核；待核准後，將依核定之新價格正式執行。",
+              "supplier": "佳承精工",
+              "priority": "normal"
+            }
+          ],
+          "priceChangeItems": [
+            {
+              "supplierCode": "U08186",
+              "supplierName": "佳承精工",
+              "item": "001",
+              "partNumber": "Y2001011",
+              "description": "螺絲(1000pcs/箱)"
+            },
+            {
+              "supplierCode": "U08186",
+              "supplierName": "佳承精工",
+              "item": "002",
+              "partNumber": "Y2001021",
+              "description": "螺絲 (4000pcs/箱)"
+            },
+            {
+              "supplierCode": "U08186",
+              "supplierName": "佳承精工",
+              "item": "003",
+              "partNumber": "Y2002005",
+              "description": "平華司 (5000pcs/箱)"
+            },
+            {
+              "supplierCode": "U08186",
+              "supplierName": "佳承精工",
+              "item": "004",
+              "partNumber": "Y2003004",
+              "description": "彈簧墊圈 (10000pcs/箱)"
+            }
+          ]
+        },
+        {
+          "id": "s6-attachments",
+          "sectionNumber": "六",
+          "title": "附件",
+          "icon": "📎",
+          "files": [
+            {
+              "id": "w28-att-001",
+              "fileName": "2026_06_全台｜預測明細[工程].xlsx",
+              "fileType": "xlsx",
+              "url": "attachments/2026_06_全台_預測明細_工程.xlsx"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2026-W27",
+      "publishDate": "2026-07-02",
+      "title": "經營TEAM採購｜本週重點摘要",
+      "periodStart": "2026-06-29",
+      "periodEnd": "2026-07-02",
+      "isPinned": false,
+      "sections": [
+        {
+          "id": "s1-procurement-progress",
+          "sectionNumber": "一",
+          "title": "採購作業進度",
+          "icon": "📋",
+          "items": [
+            {
+              "id": "w27-item-001",
+              "content": "6月份[維修物料]預測 已全數完成採購作業，列管物料採購例外申請，亦已完成簽核，相關作業依計畫推進。",
+              "priority": "normal",
+              "tags": ["維修物料", "預測"],
+              "highlight": false
+            },
+            {
+              "id": "w27-item-002",
+              "content": "6月份[工程物料]預測 請於7/2起提出申請，並於7/6 (17:30) 前完成簽核，以利後續採購作業順利進行。",
+              "priority": "high",
+              "tags": ["工程物料", "預測", "deadline"],
+              "highlight": true,
+              "deadline": "2026-07-06T17:30:00+08:00"
+            },
+            {
+              "id": "w27-item-003",
+              "content": "6 月份全台各營運處共收進廠商送貨單 363 張，整體準時提供達成率為98%。（含 1–2 天延遲容許）。",
+              "priority": "normal",
+              "tags": ["送貨達成率"],
+              "highlight": false
+            },
+            {
+              "id": "w27-item-004",
+              "content": "7月份廠商關帳通知已發送完成，各廠商最後進貨日為7/20。惟 巨大、良豐、超寶 三家廠商之最後進貨日延長至 7/24，敬請相關同仁留意時程，並務必於期限內完成進貨作業。",
+              "priority": "high",
+              "tags": ["關帳", "deadline"],
+              "highlight": true,
+              "deadline": "2026-07-20T00:00:00+08:00"
+            }
+          ]
+        },
+        {
+          "id": "s2-delivery-changes",
+          "sectionNumber": "二",
+          "title": "交期異動及更新通知",
+          "icon": "📦",
+          "subsections": [
+            {
+              "id": "w27-du-001",
+              "subsectionNumber": "1",
+              "title": "供應商交期更新",
+              "items": [
+                {
+                  "id": "w27-du-item-001",
+                  "content": "6 月份 GTM 最新交期已完成更新，請參閱附件。",
+                  "supplier": "GTM",
+                  "priority": "normal"
+                },
+                {
+                  "id": "w27-du-item-002",
+                  "content": "6 月份 沛能國際 最新交期已完成更新，請參閱附件。",
+                  "supplier": "沛能國際",
+                  "priority": "normal"
+                },
+                {
+                  "id": "w27-du-item-003",
+                  "content": "6 月份 鎰鑫企業 最新交期已完成更新，請參閱附件。",
+                  "supplier": "鎰鑫企業",
+                  "priority": "normal"
+                }
+              ]
+            },
+            {
+              "id": "w27-dc-001",
+              "subsectionNumber": "2",
+              "title": "供應商交期異動",
+              "items": [
+                {
+                  "id": "w27-dc-item-001",
+                  "content": "微程式於 7/1 通知，近期因連接線（料號：1EIM-0118000041）供應狀況不穩定，且須優先支應GTM成車出貨需求，故以下三筆原訂於 7 月出貨之訂單，將順延至 9 月出貨，敬請相關單位預先因應。",
+                  "supplier": "微程式",
+                  "priority": "high"
+                },
+                {
+                  "id": "w27-dc-item-002",
+                  "content": "安大科技於 7月2日通知，料號 75507500 因外購廠商生產進度未能配合原訂排程，致原訂 7月交期無法如期交貨，該料號交期將順延至 8月12日，請相關單位依最新交期調整相關作業規劃。",
+                  "supplier": "安大科技",
+                  "priority": "high"
+                }
+              ],
+              "affectedOrders": [
+                {
+                  "supplier": "安大科技",
+                  "supplierName": "安大科技",
+                  "purchaseDate": "2026-04-28",
+                  "poNumber": "3310-20260428012",
+                  "lineNumber": "0008",
+                  "originalDelivery": "2026-07-10",
+                  "newDelivery": "2026-08-12",
+                  "itemName": "伸縮座墊桿 TG208N M6xP1.0側蓋螺絲",
+                  "partNumber": "75507500",
+                  "quantity": 500,
+                  "warehouseCode": "TP001",
+                  "warehouseName": "雙北自行車維修物料總倉"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "s3-other-changes",
+          "sectionNumber": "三",
+          "title": "其他作業異動",
+          "icon": "⚙️",
+          "subsections": [
+            {
+              "id": "w27-oc-001",
+              "subsectionNumber": "1",
+              "title": "維修預測作業調整",
+              "items": [
+                {
+                  "id": "w27-oc-item-001",
+                  "content": "自7月份起：採購單位將於每月公布當月「維修預測」列管物料清單，各營運單位應於收到採購通知後，再行提出預測申請。",
+                  "priority": "high"
+                },
+                {
+                  "id": "w27-oc-item-002",
+                  "content": "ERP預測流程調整說明：各單位於提出申請時，應先以「暫存草稿（僅存檔，暫不送出）」方式建立單據，並與採購單位逐案確認內容無誤後，再行送出簽核，以避免退件及重複修正情形。",
+                  "priority": "normal"
+                }
+              ]
+            },
+            {
+              "id": "w27-oc-002",
+              "subsectionNumber": "2",
+              "title": "列管物料採購例外申請機制",
+              "items": [
+                {
+                  "id": "w27-oc-item-003",
+                  "content": "當月已列管之物料若仍有採購必要，須另行提出申請，並填寫《暫停採購物料｜例外申請單》。",
+                  "priority": "high"
+                },
+                {
+                  "id": "w27-oc-item-004",
+                  "content": "該申請需經單位主管及最高主管簽核同意後回傳採購單位。",
+                  "priority": "normal"
+                },
+                {
+                  "id": "w27-oc-item-005",
+                  "content": "採購單位應補充填寫審核意見，經確認無疑義後，始得進行後續採購作業。",
+                  "priority": "normal"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "s4-attachments",
+          "sectionNumber": "四",
+          "title": "附件",
+          "icon": "📎",
+          "files": [
+            {
+              "id": "w27-att-001",
+              "fileName": "2026_06_GTM｜交期更新表.xlsx",
+              "fileType": "xlsx",
+              "url": "attachments/2026_06_GTM_交期更新表.xlsx"
+            },
+            {
+              "id": "w27-att-002",
+              "fileName": "2026_06_全台｜預測總量.xlsx",
+              "fileType": "xlsx",
+              "url": "attachments/2026_06_全台_預測總量.xlsx"
+            },
+            {
+              "id": "w27-att-003",
+              "fileName": "2026_06_沛能｜交期更新表.xlsx",
+              "fileType": "xlsx",
+              "url": "attachments/2026_06_沛能_交期更新表.xlsx"
+            },
+            {
+              "id": "w27-att-004",
+              "fileName": "2026_06_鎰鑫｜交期更新表.xlsx",
+              "fileType": "xlsx",
+              "url": "attachments/2026_06_鎰鑫_交期更新表.xlsx"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

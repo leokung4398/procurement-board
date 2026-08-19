@@ -1,0 +1,15 @@
+/* 編輯模式下的特定樣式 */
+    .edit-active [contenteditable="true"] {
+      outline: 2px dashed #f59e0b; /* amber-500 */
+      outline-offset: 3px;
+      border-radius: 2px;
+      cursor: text;
+    }
+    .edit-active [contenteditable="true"]:hover {
+      background-color: rgba(245, 158, 11, 0.05);
+    }
+    .edit-active [contenteditable="true"]:focus {
+      outline: 2px solid #3b82f6; /* blue-500 */
+      background-color: #ffffff;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+    }
