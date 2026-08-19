@@ -729,7 +729,7 @@
               <div class="flex items-center gap-2">
                 <span class="text-xl">${e(sec.icon)}</span>
                 <span class="text-blue-600">${e(sec.sectionNumber)}、</span>
-                <span ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].title" class="outline-none">${e(sec.title)}</span>
+                <span ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].title" class="outline-none">${e(sec.title.replace(/^[一二三四五六七八九十]+、\s*/, ''))}</span>
               </div>
               ${sec.subtitle ? `<span class="text-sm font-medium text-slate-500 px-2 py-0.5 bg-slate-100 rounded-md border border-slate-200">${e(sec.subtitle)}</span>` : ''}
             </h3>
