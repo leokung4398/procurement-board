@@ -1155,27 +1155,29 @@ async function confirmPubBulletin() {
         (d.sections || []).forEach(sec => {
           (sec.items || []).forEach(item => {
             if (item.priority === 'high' && item.content) {
-              let plain = item.content.replace(/<img[^>]+src="([^">]+)"[^>]*>/gi, '\n[圖片: $1]\n').replace(/<\/(p|div|h[1-6])>/gi, '\n').replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '').trim();
+              let plain = item.content.replace(/<\/(p|div|h[1-6])>/gi, '<br>').replace(/<img[^>]+src="([^">]+)"[^>]*>/gi, '|||IMG_$1|||').replace(/<br\s*\/?>/gi, '|||BR|||').replace(/<[^>]+>/g, '').replace(/\|\|\|IMG_([^|]+)\|\|\|/g, '<br><img src="$1" style="max-width: 100%; max-height: 400px; display: block; margin: 10px 0; border-radius: 4px;"><br>').replace(/\|\|\|BR\|\|\|/g, '<br>').trim();
               if(plain) importantItems.push(plain);
             }
           });
           (sec.subsections || []).forEach(sub => {
             (sub.items || []).forEach(item => {
               if (item.priority === 'high' && item.content) {
-                let plain = item.content.replace(/<img[^>]+src="([^">]+)"[^>]*>/gi, '\n[圖片: $1]\n').replace(/<\/(p|div|h[1-6])>/gi, '\n').replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '').trim();
+                let plain = item.content.replace(/<\/(p|div|h[1-6])>/gi, '<br>').replace(/<img[^>]+src="([^">]+)"[^>]*>/gi, '|||IMG_$1|||').replace(/<br\s*\/?>/gi, '|||BR|||').replace(/<[^>]+>/g, '').replace(/\|\|\|IMG_([^|]+)\|\|\|/g, '<br><img src="$1" style="max-width: 100%; max-height: 400px; display: block; margin: 10px 0; border-radius: 4px;"><br>').replace(/\|\|\|BR\|\|\|/g, '<br>').trim();
                 if(plain) importantItems.push(plain);
               }
             });
           });
         });
         if (importantItems.length > 0) {
-          mustReadText = '⭐ 【本週必讀重點】\n\n' + importantItems.map(i => '• ' + i).join('\n\n');
+          mustReadText = '⭐ 【本週必讀重點】<br><br>' + importantItems.map(i => '• ' + i).join('<br><br>');
         }
       }
 
       await emailjs.send(emailjsConfig.serviceId, emailjsConfig.templateId, {
         to_email: toList,
         subject: '【採購週報上線】' + d.title,
+        bulletin_title: d.title || '無標題',
+        publish_date: d.publishDate || '',
         message: '新版採購週報已上線，請點擊連結查看。',
         link: window.location.href.replace('admin.html', 'index.html') + '?id=' + d.id,
         must_read_text: mustReadText
