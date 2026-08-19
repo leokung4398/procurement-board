@@ -96,7 +96,11 @@ const DS = {
       return { success: false };
     }
     try {
-      await db.collection('bulletins').doc(id).update({ status: 'deleted' });
+      const docRef = db.collection('bulletins').doc(id);
+      const docSnap = await docRef.get();
+      if (docSnap.exists) {
+        await docRef.update({ status: 'deleted' });
+      }
       return { success: true };
     } catch (e) {
       console.error(e);
@@ -1151,14 +1155,14 @@ async function confirmPubBulletin() {
         (d.sections || []).forEach(sec => {
           (sec.items || []).forEach(item => {
             if (item.priority === 'high' && item.content) {
-              let plain = item.content.replace(/<\/(p|div|h[1-6])>/gi, '\n').replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '').trim();
+              let plain = item.content.replace(/<img[^>]+src="([^">]+)"[^>]*>/gi, '\n[圖片: $1]\n').replace(/<\/(p|div|h[1-6])>/gi, '\n').replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '').trim();
               if(plain) importantItems.push(plain);
             }
           });
           (sec.subsections || []).forEach(sub => {
             (sub.items || []).forEach(item => {
               if (item.priority === 'high' && item.content) {
-                let plain = item.content.replace(/<\/(p|div|h[1-6])>/gi, '\n').replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '').trim();
+                let plain = item.content.replace(/<img[^>]+src="([^">]+)"[^>]*>/gi, '\n[圖片: $1]\n').replace(/<\/(p|div|h[1-6])>/gi, '\n').replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]+>/g, '').trim();
                 if(plain) importantItems.push(plain);
               }
             });
