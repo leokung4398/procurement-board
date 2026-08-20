@@ -892,23 +892,30 @@ let editWLIndex = null;
 async function addWL() {
   const n = document.getElementById('wl-name').value.trim();
   const e = document.getElementById('wl-email').value.trim();
+  const region = document.getElementById('wl-region').value;
+  const receiveEmail = document.getElementById('wl-receive').checked;
   if(!n || !e) return toast('姓名與信箱必填', 'er');
   if (editWLIndex !== null) {
-    S.whitelist[editWLIndex] = {name: n, email: e};
+    S.whitelist[editWLIndex] = {name: n, email: e, region, receiveEmail};
     editWLIndex = null;
     document.getElementById('wl-btn').innerText = '新增';
-    toast('已更新白名單', 'ok');
+    toast('已更新名單', 'ok');
   } else {
-    S.whitelist.push({name: n, email: e});
-    toast('已新增至白名單', 'ok');
+    S.whitelist.push({name: n, email: e, region, receiveEmail});
+    toast('已新增名單', 'ok');
   }
   await DS.saveWhitelist(S.whitelist); renderWL();
-  document.getElementById('wl-name').value=''; document.getElementById('wl-email').value='';
+  document.getElementById('wl-name').value=''; 
+  document.getElementById('wl-email').value='';
+  document.getElementById('wl-region').value='';
+  document.getElementById('wl-receive').checked=true;
 }
 function editWL(idx) {
   editWLIndex = idx;
-  document.getElementById('wl-name').value = S.whitelist[idx].name;
-  document.getElementById('wl-email').value = S.whitelist[idx].email;
+  document.getElementById('wl-name').value = S.whitelist[idx].name || '';
+  document.getElementById('wl-email').value = S.whitelist[idx].email || '';
+  document.getElementById('wl-region').value = S.whitelist[idx].region || '';
+  document.getElementById('wl-receive').checked = (S.whitelist[idx].receiveEmail !== false);
   document.getElementById('wl-btn').innerText = '儲存';
   document.getElementById('wl-name').focus();
 }
@@ -1022,13 +1029,15 @@ function renderWL() {
   
   c.innerHTML = list.map((w) => {
     const origIdx = S.whitelist.findIndex(x => x.email === w.email);
+    const regionBadge = w.region ? `<span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-600 border border-slate-200">${w.region}</span>` : '';
+    const receiveBadge = (w.receiveEmail !== false) ? `<span class="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-green-50 text-green-600 border border-green-100">✉️</span>` : `<span class="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-50 text-slate-400 border border-slate-100" title="不收信">🔕</span>`;
     return `
       <div class="flex items-center gap-3 p-3 mb-2 bg-white rounded-lg border border-slate-200 hover:border-blue-200 transition-colors">
         ${isBatchMode ? `
           <input type="checkbox" onchange="toggleWLCb('${w.email}', this.checked)" class="w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500" ${selectedWL.includes(w.email) ? 'checked' : ''}>
         ` : ''}
         <div class="flex-1 min-w-0">
-          <div class="font-medium text-slate-800 text-sm truncate">${w.name}</div>
+          <div class="font-medium text-slate-800 text-sm truncate flex items-center">${w.name}${regionBadge}${receiveBadge}</div>
           <div class="text-xs text-slate-500 truncate">${w.email}</div>
         </div>
         ${!isBatchMode ? `
@@ -1078,6 +1087,19 @@ function selectPubGroup(groupId) {
   document.getElementById('pub-wl-all').checked = false;
 }
 
+function renderPubWLList() {
+  const q = document.getElementById('pub-search-input')?.value.trim().toLowerCase() || '';
+  const labels = document.querySelectorAll('#pub-wl-list label');
+  labels.forEach(lbl => {
+    const text = lbl.innerText.toLowerCase();
+    if (text.includes(q)) {
+      lbl.style.display = 'flex';
+    } else {
+      lbl.style.display = 'none';
+    }
+  });
+}
+
 function hidePubModal() { document.getElementById('pub-modal').classList.add('hidden'); }
 function toggleAllWL(checked) {
   document.querySelectorAll('.pub-wl-cb').forEach(cb => cb.checked = checked);
@@ -1103,7 +1125,11 @@ async function confirmPubBulletin() {
     
     // 自訂發送名單
     if (selectedEmails.length > 0 && typeof emailjs !== 'undefined') {
-      const toList = selectedEmails.join(',');
+      const emailRecipients = selectedEmails.filter(email => {
+        const w = S.whitelist.find(x => x.email === email);
+        return !w || w.receiveEmail !== false;
+      });
+      const toList = emailRecipients.join(',');
       
       // 處理必讀公告
       let mustReadText = '';
@@ -1131,8 +1157,9 @@ async function confirmPubBulletin() {
         }
       }
 
-      await emailjs.send(emailjsConfig.serviceId, emailjsConfig.templateId, {
-        to_email: toList,
+      if (toList) {
+        await emailjs.send(emailjsConfig.serviceId, emailjsConfig.templateId, {
+          to_email: toList,
         subject: '【採購週報上線】' + d.title,
         bulletin_title: d.title || '無標題',
         publish_date: d.publishDate || '',

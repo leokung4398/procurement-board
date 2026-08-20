@@ -273,18 +273,7 @@
 
       <!-- 右側內容 -->
       <div class="w-3/4 bg-white relative flex flex-col overflow-hidden">
-        
-            </div>
-          </div>
-          <div class="flex-1 overflow-y-auto p-5">
-            <div class="border border-slate-200 rounded-lg">
-              <table class="w-full text-left text-xs">
-                <thead class="bg-slate-50 sticky top-0"><tr><th class="px-3 py-2 font-medium">姓名</th><th class="px-3 py-2 font-medium">Email</th><th class="px-3 py-2 text-center w-12">操作</th></tr></thead>
-                <tbody id="um-list" class="divide-y divide-slate-100"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
+
 
         <!-- 郵件通訊錄 -->
         <div id="tab-whitelist" class="settings-tab-pane hidden flex-1 flex flex-col h-full">
@@ -295,9 +284,26 @@
             </div>
             <p class="text-xs text-slate-500 mb-4">在此建立採購相關的所有收件人名單。這些名單可用於發布週報，也可供加入群組。</p>
             <div class="flex items-center gap-2 mb-3">
-              <input type="text" id="wl-name" placeholder="姓名 (例: 吳俊緯)" class="form-input flex-1">
-              <input type="email" id="wl-email" placeholder="信箱 (@youbike.com.tw)" class="form-input flex-1">
-              <button onclick="addWL()" id="wl-btn" class="btn-p">新增</button>
+              <select id="wl-region" class="form-input flex-1 max-w-[100px] text-sm px-2">
+                <option value="">(無)</option>
+                <option value="台北">台北</option>
+                <option value="新北">新北</option>
+                <option value="桃園">桃園</option>
+                <option value="新竹">新竹</option>
+                <option value="苗栗">苗栗</option>
+                <option value="台中">台中</option>
+                <option value="嘉義">嘉義</option>
+                <option value="台南">台南</option>
+                <option value="高雄">高雄</option>
+                <option value="屏東">屏東</option>
+              </select>
+              <input type="text" id="wl-name" placeholder="姓名" class="form-input flex-1 text-sm">
+              <input type="email" id="wl-email" placeholder="信箱 (@youbike.com.tw)" class="form-input flex-[2] text-sm">
+              <label class="flex items-center gap-1 cursor-pointer text-xs font-medium text-slate-600 whitespace-nowrap">
+                 <input type="checkbox" id="wl-receive" class="rounded w-3.5 h-3.5 text-blue-600" checked>
+                 接收信件
+              </label>
+              <button onclick="addWL()" id="wl-btn" class="btn-p ml-1">新增</button>
             </div>
             <!-- 搜尋與批次操作列 -->
             <div class="flex items-center gap-2 pt-3 border-t border-slate-100">
@@ -917,16 +923,16 @@
     <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 rounded-t-2xl flex justify-between items-center">
       <div>
         <h3 class="text-lg font-bold text-slate-800">✅ 選擇發送對象</h3>
-        <p class="text-xs text-slate-500 mt-1">請勾選要收到此週報通知信的人員</p>
+        <p class="text-xs text-slate-500 mt-1">請勾選收到此週報通知信的人員</p>
       </div>
-      <button onclick="hidePubModal()" class="text-slate-500 hover:bg-slate-200 p-1.5 rounded-lg"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
-    </div>
-    <div class="px-4 py-3 bg-blue-50 border-b border-blue-100 flex flex-col gap-2">
-        <!-- 快速群組按鈕區 -->
-        <div class="flex items-center gap-2 flex-wrap mb-1" id="pub-group-buttons">
-          <span class="text-xs font-semibold text-blue-800 mr-2">群組快選：</span>
-          <!-- 動態載入群組按鈕 -->
+      <div class="flex items-center gap-4">
+        <div class="relative">
+          <input type="text" id="pub-search-input" oninput="renderPubWLList()" placeholder="搜尋聯絡人..." class="form-input text-sm w-48 pl-8 py-1.5 rounded-lg border-slate-300">
+          <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
         </div>
+        <button onclick="hidePubModal()" class="text-slate-500 hover:bg-slate-200 p-1.5 rounded-lg"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+      </div>
+    </div>
         <label class="flex items-center gap-2 cursor-pointer text-sm font-medium text-blue-800 border-t border-blue-200/50 pt-2">
             <input type="checkbox" id="pub-wl-all" class="rounded text-blue-600" checked onchange="toggleAllWL(this.checked)"> 全選 / 取消全選
         </label>
