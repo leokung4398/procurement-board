@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🔐 金鑰加密工具</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 p-8 flex justify-center">
+  <div class="bg-white p-6 rounded-lg shadow-md max-w-2xl w-full">
+    <h2 class="text-2xl font-bold mb-4">🔐 GitHub 金鑰加密工具</h2>
+    <p class="text-sm text-slate-600 mb-6">此工具完全在您的瀏覽器本地執行，保證安全。加密後產出的亂碼將被貼入 <code>index.html</code> 中。</p>
+    
+    <div class="space-y-4">
+      <div>
+        <label class="block font-semibold mb-1">步驟 1：輸入您申請的 GitHub 金鑰 (PAT)</label>
+        <input type="password" id="input-token" class="w-full border p-2 rounded" placeholder="github_pat_...">
+      </div>
+      <div>
+        <label class="block font-semibold mb-1">步驟 2：輸入解鎖密碼</label>
+        <input type="text" id="input-password" class="w-full border p-2 rounded bg-slate-100 text-slate-500" value="sunny" readonly>
+        <p class="text-xs text-slate-400 mt-1">此專案固定為 sunny，不需修改。</p>
+      </div>
+      <button onclick="encryptToken()" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 w-full font-bold">產生加密亂碼</button>
+      
+      <div class="mt-6 border-t pt-4">
+        <label class="block font-semibold mb-1 text-green-700">步驟 3：請將下方這串亂碼，複製並貼入 index.html 裡的 ENCRYPTED_TOKEN 變數中</label>
+        <textarea id="output-cipher" class="w-full border p-2 rounded font-mono text-sm bg-slate-100 h-32 break-all" readonly></textarea>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 使用 Web Crypto API 進行密碼雜湊與 AES-GCM 加密
+    async function deriveKey(passwordStr, salt) {
+      const enc = new TextEncoder();
+      const keyMaterial = await window.crypto.subtle.importKey(
+        "raw",
+        enc.encode(passwordStr),
+        { name: "PBKDF2" },
+        false,
+        ["deriveBits", "deriveKey"]
+      );
+      return window.crypto.subtle.deriveKey(
+        {
+          name: "PBKDF2",
+          salt: salt,
+          iterations: 100000,
+          hash: "SHA-256"
+        },
+        keyMaterial,
+        { name: "AES-GCM", length: 256 },
+        true,
+        ["encrypt", "decrypt"]
+      );
+    }
+
+    async function encryptToken() {
+      const token = document.getElementById('input-token').value.trim();
+      const password = document.getElementById('input-password').value;
+      
+      if (!token) {
+        alert("請輸入 GitHub 金鑰");
+        return;
+      }
+      
+      try {
+        const enc = new TextEncoder();
+        const salt = window.crypto.getRandomValues(new Uint8Array(16));
+        const iv = window.crypto.getRandomValues(new Uint8Array(12));
+        
+        const key = await deriveKey(password, salt);
+        const encryptedContent = await window.crypto.subtle.encrypt(
+          { name: "AES-GCM", iv: iv },
+          key,
+          enc.encode(token)
+        );
+        
+        const encryptedContentArr = new Uint8Array(encryptedContent);
+        
+        // 組合: salt(16) + iv(12) + ciphertext
+        const combined = new Uint8Array(salt.length + iv.length + encryptedContentArr.length);
+        combined.set(salt, 0);
+        combined.set(iv, salt.length);
+        combined.set(encryptedContentArr, salt.length + iv.length);
+        
+        // 轉 Base64
+        const base64String = btoa(String.fromCharCode.apply(null, combined));
+        document.getElementById('output-cipher').value = base64String;
+      } catch (err) {
+        console.error(err);
+        alert("加密失敗：" + err.message);
+      }
+    }
+  </script>
+</body>
+</html>

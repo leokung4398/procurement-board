@@ -1,0 +1,19 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /attachments/{bulletinId}/{fileName} {
+      // 允許任何人讀取附件 (供 index.html 下載)
+      allow read: if true;
+      
+      // 寫入與刪除權限：暫時開放以配合無密碼的前端架構
+      // 正式環境強烈建議搭配 Firebase Auth: `allow write: if request.auth != null;`
+      // 且可限制檔案大小： `&& request.resource.size < 20 * 1024 * 1024`
+      allow write: if true;
+    }
+    
+    // 阻擋其餘未授權的路徑存取
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -66,24 +66,13 @@ const DS = {
       if (docSnap.exists) {
         const existing = docSnap.data();
         d.version = (existing.version || 1) + 1;
-        if (existing.meta && existing.meta.publishedAt) {
-          if (!d.meta) d.meta = {};
-          d.meta.publishedAt = existing.meta.publishedAt;
-        }
       } else {
         d.version = 1;
       }
       d.monthKey = (d.publishDate || '').slice(0, 7) || '';
       if (!d.meta) d.meta = {};
       d.meta.lastUpdated = new Date().toISOString();
-      if (d.status === 'published' && !d.meta.publishedAt) {
-        d.meta.publishedAt = d.meta.lastUpdated;
-      }
-      
-      // 移除可能存在的 undefined 屬性 (Firestore 不支援 undefined)
-      const cleanData = JSON.parse(JSON.stringify(d));
-      
-      await docRef.set(cleanData, { merge: true });
+      await docRef.set(d, { merge: true });
       return { success: true };
     } catch (e) {
       console.error(e);
@@ -96,11 +85,7 @@ const DS = {
       return { success: false };
     }
     try {
-      const docRef = db.collection('bulletins').doc(id);
-      const docSnap = await docRef.get();
-      if (docSnap.exists) {
-        await docRef.update({ status: 'deleted' });
-      }
+      await db.collection('bulletins').doc(id).update({ status: 'deleted' });
       return { success: true };
     } catch (e) {
       console.error(e);
@@ -111,7 +96,27 @@ const DS = {
     const b = await this.getById(id);
     return b ? b.feedbackLog || [] : [];
   },
-
+  async getUsers() {
+    if (!this.isConfigured()) return [];
+    try {
+      const snap = await db.collection('systemConfig').doc('users').get();
+      if (snap.exists) {
+        return snap.data().list || [];
+      }
+      return [];
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
+  },
+  async saveUsers(list) {
+    if (!this.isConfigured()) return;
+    try {
+      await db.collection('systemConfig').doc('users').set({ list: list }, { merge: true });
+    } catch (e) {
+      console.error(e);
+    }
+  },
   async getWhitelist() {
     if (!this.isConfigured()) return [];
     try {
@@ -246,10 +251,8 @@ const DS = {
   async addAuditLog(bulletinId, actionDesc) {
     if (!this.isConfigured()) return;
     try {
-      const senderInfo = (firebase.auth().currentUser && firebase.auth().currentUser.email) ? (firebase.auth().currentUser.displayName || firebase.auth().currentUser.email) : '系統';
       await db.collection('bulletins').doc(bulletinId).collection('audit_logs').add({
         action: actionDesc,
-        sender: senderInfo,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       });
     } catch (e) { console.error('Audit Log Error:', e); }
@@ -305,7 +308,7 @@ if (DS.isConfigured()) {
 const S = {
   tpls: [],
   keywords: [],
-  
+  users: [],
   admins: [],
   whitelist: [],
   mailGroups: [],
@@ -316,7 +319,8 @@ const S = {
 async function init(){
   S.tpls=await DS.getTpls();
   S.keywords=await DS.getKeywords();
-    S.admins=await DS.getAdmins();
+  S.users=await DS.getUsers();
+  S.admins=await DS.getAdmins();
   S.whitelist=await DS.getWhitelist();
   S.mailGroups=await DS.getMailGroups();
   
@@ -466,32 +470,16 @@ async function renderReadReceipts(id) {
   
   if (!DS.isConfigured()) {
     container.innerHTML = '<p class="text-slate-400 text-center py-2">本地測試模式：不支援已讀追蹤</p>';
-    countEl.innerHTML = `
-      <span class="text-xs bg-indigo-50 text-indigo-600 px-2.5 py-1 rounded-full font-semibold border border-indigo-100">已讀: 0 人</span>
-      <span class="text-xs bg-slate-50 text-slate-500 px-2.5 py-1 rounded-full font-medium border border-slate-200">未讀: 0 人</span>
-    `;
+    countEl.textContent = '已讀: 0 人';
     return;
   }
   
   try {
     const { total, readers } = await DS.getReadReceipts(id);
+    countEl.textContent = `已讀: ${total} 人`;
     
-    const allUsers = S.whitelist || [];
-
-    const b = S.cur && S.cur.id === id ? S.cur : await DS.getById(id);
-    const targetEmails = (b && b.authorizedEmails && b.authorizedEmails.length > 0) 
-      ? b.authorizedEmails 
-      : allUsers.map(u => u.email);
-    
-    const unread = allUsers.filter(u => 
-      targetEmails.includes(u.email) && 
-      !readers.find(r => r.email === u.email || r.displayName === u.name)
-    );
-
-    countEl.innerHTML = `
-      <span class="text-xs bg-indigo-50 text-indigo-600 px-2.5 py-1 rounded-full font-semibold border border-indigo-100">已讀: ${total} 人</span>
-      <span class="text-xs bg-slate-50 text-slate-500 px-2.5 py-1 rounded-full font-medium border border-slate-200">未讀: ${unread.length} 人</span>
-    `;
+    // 計算未讀名單
+    const unread = S.users.filter(u => !readers.find(r => r.displayName === u.name));
     
     if (readers.length === 0 && unread.length === 0) {
       container.innerHTML = '<p class="text-slate-400 text-center py-2">目前尚無閱讀紀錄，且未設定名冊</p>';
@@ -553,28 +541,12 @@ async function renderAuditLogs(id) {
       container.innerHTML = '<p class="text-slate-400 text-center py-2">尚無發送或操作紀錄</p>';
       return;
     }
-    container.innerHTML = logs.map(l => {
-      let timeStr = '時間未知';
-      if (l.timestamp && l.timestamp.toDate) {
-        const d = l.timestamp.toDate();
-        const yyyy = d.getFullYear();
-        const mm = String(d.getMonth() + 1).padStart(2, '0');
-        const dd = String(d.getDate()).padStart(2, '0');
-        const hh = String(d.getHours()).padStart(2, '0');
-        const min = String(d.getMinutes()).padStart(2, '0');
-        timeStr = `${yyyy}/${mm}/${dd} ${hh}:${min}`;
-      }
-      const sender = l.sender || '系統';
-      return `
-        <div class="flex flex-col gap-1 py-3 border-b border-slate-100 last:border-0">
-          <div class="flex items-center gap-2">
-            <span class="text-xs font-semibold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">${xe(sender)}</span>
-            <span class="text-xs text-slate-400">${timeStr}</span>
-          </div>
-          <span class="text-sm text-slate-700 font-medium pl-1">${xe(l.action)}</span>
-        </div>
-      `;
-    }).join('');
+    container.innerHTML = logs.map(l => `
+      <div class="flex items-start gap-3 py-2 border-b border-slate-50 last:border-0">
+        <span class="text-slate-400 whitespace-nowrap">${l.time}</span>
+        <span class="text-slate-700 font-medium">${xe(l.msg)}</span>
+      </div>
+    `).join('');
   } catch(e) {
     container.innerHTML = '<p class="text-red-400 text-center py-2">載入紀錄失敗</p>';
   }
@@ -588,7 +560,7 @@ function switchSettingsTab(t) {
   const tEl = document.getElementById(t), bEl = document.getElementById('btn-'+t);
   if (tEl) tEl.classList.remove('hidden');
   if (bEl) bEl.classList.add('bg-blue-50', 'text-blue-700', 'font-bold');
-  if(t==='tab-whitelist')renderWL(); if(t==='tab-groups')renderGroupList(); if(t==='tab-admin')renderAdminList(); if(t==='tab-keywords'){tempKw=JSON.parse(JSON.stringify(S.keywords));renderKMCats();} if(t==='tab-handover')loadHandoverConfig();
+  if(t==='tab-frontend')renderUM(); if(t==='tab-whitelist')renderWL(); if(t==='tab-groups')renderGroupList(); if(t==='tab-admin')renderAdminList(); if(t==='tab-keywords'){tempKw=JSON.parse(JSON.stringify(S.keywords));renderKMCats();} if(t==='tab-handover')loadHandoverConfig();
 }
 function openAboutModal() { document.getElementById('about-modal').classList.remove('hidden'); switchAboutTab('tab-guide'); }
 function closeAboutModal() { document.getElementById('about-modal').classList.add('hidden'); }
@@ -656,19 +628,11 @@ function renderGroupMembers() {
   const g = S.mailGroups.find(x => x.id === currentGroupId);
   if (!g) return;
   
-  const searchEl = document.getElementById('grp-search');
-  const kw = searchEl ? searchEl.value.trim().toLowerCase() : '';
-  
-  let list = S.whitelist;
-  if(kw) {
-    list = list.filter(w => w.name.toLowerCase().includes(kw) || w.email.toLowerCase().includes(kw));
-  }
-
-  if (list.length === 0) {
-    c.innerHTML = '<div class="text-center text-slate-400 mt-10 text-sm">無符合條件的名單</div>';
+  if (S.whitelist.length === 0) {
+    c.innerHTML = '<div class="text-center text-slate-400 mt-10 text-sm">請先在「郵件通訊錄」新增名單</div>';
     return;
   }
-  c.innerHTML = list.map(w => {
+  c.innerHTML = S.whitelist.map(w => {
     const isMember = g.emails.includes(w.email);
     return `
       <label class="flex items-center gap-3 p-3 mb-1.5 rounded-lg border ${isMember ? 'border-blue-200 bg-blue-50/30' : 'border-slate-100 bg-white hover:bg-slate-50'} cursor-pointer transition-colors">
@@ -687,13 +651,45 @@ async function toggleGroupMember(email, isChecked) {
   renderGroupList();
 }
 
-
-
-
-
-
-
-
+function showUM() { 
+  document.getElementById('um').classList.remove('hidden'); 
+  renderUM(); 
+}
+function hideUM() { document.getElementById('um').classList.add('hidden'); }
+function renderUM() {
+  const c = document.getElementById('um-list');
+  if (S.users.length === 0) {
+    c.innerHTML = '<tr><td colspan="3" class="px-3 py-4 text-center text-slate-400">尚無人員，請在上方新增</td></tr>';
+    return;
+  }
+  c.innerHTML = S.users.map((u, i) => `
+    <tr>
+      <td class="px-3 py-2 text-slate-700 font-medium">${xe(u.name)}</td>
+      <td class="px-3 py-2 text-slate-500">${xe(u.email)}</td>
+      <td class="px-3 py-2 text-center">
+        <button onclick="delUM(${i})" class="text-rose-500 hover:text-rose-700"><svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+      </td>
+    </tr>
+  `).join('');
+}
+async function addUM() {
+  const n = document.getElementById('um-name').value.trim();
+  const e = document.getElementById('um-email').value.trim();
+  if(!n || !e) return toast('姓名與信箱為必填', 'er');
+  S.users.push({ name: n, email: e });
+  await DS.saveUsers(S.users);
+  document.getElementById('um-name').value = '';
+  document.getElementById('um-email').value = '';
+  renderUM();
+  toast('已新增', 'ok');
+}
+async function delUM(i) {
+  if(!confirm('確定刪除此人員？')) return;
+  S.users.splice(i, 1);
+  await DS.saveUsers(S.users);
+  renderUM();
+  toast('已刪除', 'ok');
+}
 
 function showAdminList() { 
   document.getElementById('admin-modal').classList.remove('hidden'); 
@@ -739,22 +735,7 @@ function newBulletin(){if(S.dirty&&!confirm('有未儲存的修改，確定繼�
 function wk(d){const j=new Date(d.getFullYear(),0,1);return Math.ceil((((d-j)/86400000)+j.getDay()+1)/7);}
 async function unpubBulletin(){if(!S.cur)return;if(!confirm('確定要撤回發布？撤回後前台將無法看見此週報。'))return;const pt=document.getElementById('pub-txt'),btn=document.getElementById('btn-unpub');btn.disabled=true;pt.textContent='撤回中...';try{const d={...S.cur,status:'draft',feedbackLog:S.fbs};await DS.save(d.id,d);await DS.addAuditLog(d.id, `管理員撤回了週報。`);S.dirty=false;const sb=document.getElementById('tb-status');sb.className='bdg-dft';sb.textContent='草稿';toast('週報已撤回發布！','ok');S.mmap=await DS.getMonths();renderSB();renderAuditLogs(d.id);renderEd();}catch(e){toast('撤回失敗：'+e.message,'er');}finally{btn.disabled=false;pt.textContent='正式發布';}}
 function renderEd(){const b=S.cur;if(!b)return;document.getElementById('es').classList.add('hidden');document.getElementById('bf').classList.remove('hidden');document.getElementById('tb-acts').classList.remove('hidden');document.getElementById('tb-title').textContent=b.id||'新週報';const sb=document.getElementById('tb-status');sb.className=b.status==='published'?'bdg-pub':'bdg-dft';sb.textContent=b.status==='published'?'已發布':'草稿';sb.classList.remove('hidden');if(b.status==='published'){document.getElementById('btn-unpub').classList.remove('hidden');document.getElementById('btn-pub').classList.add('hidden');}else{document.getElementById('btn-unpub').classList.add('hidden');document.getElementById('btn-pub').classList.remove('hidden');}document.getElementById('f-id').value=b.id||'';document.getElementById('f-pd').value=b.publishDate||'';document.getElementById('f-ps').value=b.periodStart||'';document.getElementById('f-pe').value=b.periodEnd||'';document.getElementById('f-ti').value=b.title||'';document.getElementById('f-pin').checked=!!b.isPinned;renderSecs();}
-function renderSecs(){const c=document.getElementById('sc');const b=S.cur;const ptl=document.getElementById('toolbar-portal');if(ptl)ptl.innerHTML='';if(!b?.sections?.length){c.innerHTML='<div class="text-center py-10 text-slate-400 text-sm">尚未建立任何段落<br><span class="text-xs">點擊右上角「新增段落」</span></div>';return;}c.innerHTML=b.sections.map((s,i)=>bldSec(s,i)).join('');setTimeout(()=>{document.querySelectorAll('.quill-editor').forEach(el=>{if(el.__quill)return;const q=new Quill(el,{theme:'snow',modules:{toolbar:[['bold','italic','underline'],[{'color':[]},{'background':[]}],[{'size':['small',false,'large','huge']}]]}});el.__quill=q;q.root.addEventListener('paste', async (e) => {
-const file = e.clipboardData?.files?.[0];
-if (file && file.type.startsWith('image/')) {
-e.preventDefault();
-const range = q.getSelection(true);
-q.insertText(range.index, '⏳ 圖片上傳中...', 'user');
-try {
-const res = await DS.uploadAttachment(S.cur.id || 'temp', file);
-q.deleteText(range.index, '⏳ 圖片上傳中...'.length);
-q.insertEmbed(range.index, 'image', res.url, 'user');
-} catch(err) {
-q.deleteText(range.index, '⏳ 圖片上傳中...'.length);
-toast('圖片上傳失敗', 'er');
-}
-}
-});const tb=el.previousElementSibling;if(tb&&tb.classList.contains('ql-toolbar')){tb.style.display='none';if(ptl)ptl.appendChild(tb);const focusFn=()=>{if(ptl){Array.from(ptl.children).forEach(ch=>ch.style.display='none');tb.style.display='flex';const hint=document.getElementById('toolbar-hint');if(hint)hint.style.display='none';}};q.root.addEventListener('focus',focusFn);tb.addEventListener('mousedown',(e)=>{e.preventDefault();focusFn();});}q.on('text-change',()=>{let obj=S.cur;const p=el.getAttribute('data-path').split(/[.\[\]]/).filter(Boolean);for(let i=0;i<p.length-1;i++)obj=obj[p[i]];obj[p[p.length-1]]=q.root.innerHTML;S.dirty=true;});});},10);}
+function renderSecs(){const c=document.getElementById('sc');const b=S.cur;const ptl=document.getElementById('toolbar-portal');if(ptl)ptl.innerHTML='';if(!b?.sections?.length){c.innerHTML='<div class="text-center py-10 text-slate-400 text-sm">尚未建立任何段落<br><span class="text-xs">點擊右上角「新增段落」</span></div>';return;}c.innerHTML=b.sections.map((s,i)=>bldSec(s,i)).join('');setTimeout(()=>{document.querySelectorAll('.quill-editor').forEach(el=>{if(el.__quill)return;const q=new Quill(el,{theme:'snow',modules:{toolbar:[['bold','italic','underline'],[{'color':[]},{'background':[]}],[{'size':['small',false,'large','huge']}]]}});el.__quill=q;const tb=el.previousElementSibling;if(tb&&tb.classList.contains('ql-toolbar')){tb.style.display='none';if(ptl)ptl.appendChild(tb);const focusFn=()=>{if(ptl){Array.from(ptl.children).forEach(ch=>ch.style.display='none');tb.style.display='flex';const hint=document.getElementById('toolbar-hint');if(hint)hint.style.display='none';}};q.root.addEventListener('focus',focusFn);tb.addEventListener('mousedown',(e)=>{e.preventDefault();focusFn();});}q.on('text-change',()=>{let obj=S.cur;const p=el.getAttribute('data-path').split(/[.\[\]]/).filter(Boolean);for(let i=0;i<p.length-1;i++)obj=obj[p[i]];obj[p[p.length-1]]=q.root.innerHTML;S.dirty=true;});});},10);}
 const NUMS=['一','二','三','四','五','六','七','八','九','十'];const ICONS=['📋','📦','🔧','💰','📈','📎','⚙️','📊','📝','🏭'];function bldSec(sec,si){const isCust=!S.keywords.find(c=>c.name===sec.title);
 const curCat = S.keywords.find(c=>c.name===sec.title) || (S.keywords.length ? S.keywords[0] : null);
 const dlHTML = curCat ? `<datalist id="dl-${si}">${(curCat.keywords||[]).filter(k=>k.isActive!==false).sort((a,b)=>a.order-b.order).map(k=>`<option value="${k.text}">`).join('')}</datalist>` : '';
@@ -914,130 +895,20 @@ async function rmWL(idx) {
   if(!confirm(`確定要刪除 ${S.whitelist[idx].name} 嗎？`)) return;
   S.whitelist.splice(idx, 1); await DS.saveWhitelist(S.whitelist); renderWL(); 
 }
-let isBatchMode = false;
-let selectedWL = [];
-
-function toggleBatchMode() {
-  isBatchMode = !isBatchMode;
-  selectedWL = [];
-  const btn = document.getElementById('btn-batch-mode');
-  const acts = document.getElementById('batch-actions');
-  if(isBatchMode) {
-    btn.classList.replace('bg-slate-100', 'bg-blue-600');
-    btn.classList.replace('text-slate-600', 'text-white');
-    btn.classList.replace('hover:bg-slate-200', 'hover:bg-blue-700');
-    if(acts) acts.classList.remove('hidden');
-  } else {
-    btn.classList.replace('bg-blue-600', 'bg-slate-100');
-    btn.classList.replace('text-white', 'text-slate-600');
-    btn.classList.replace('hover:bg-blue-700', 'hover:bg-slate-200');
-    if(acts) acts.classList.add('hidden');
-  }
-  renderWL();
-}
-
-function toggleWLCb(email, checked) {
-  if (checked) {
-    if(!selectedWL.includes(email)) selectedWL.push(email);
-  } else {
-    selectedWL = selectedWL.filter(e => e !== email);
-  }
-}
-
-async function batchDeleteWL() {
-  if(selectedWL.length === 0) return toast('請先勾選名單', 'er');
-  if(!confirm(`確定要刪除選取的 ${selectedWL.length} 筆名單嗎？`)) return;
-  S.whitelist = S.whitelist.filter(w => !selectedWL.includes(w.email));
-  await DS.saveWhitelist(S.whitelist);
-  selectedWL = [];
-  renderWL();
-  toast('已批次刪除', 'ok');
-}
-
-function openBatchGroupModal() {
-  if(selectedWL.length === 0) return toast('請先勾選名單', 'er');
-  document.getElementById('batch-group-modal').classList.remove('hidden');
-  const c = document.getElementById('batch-group-list');
-  if(S.mailGroups.length === 0) {
-    c.innerHTML = '<p class="text-sm text-slate-500">目前尚無任何群組，請先到「發信群組管理」建立。</p>';
-    return;
-  }
-  c.innerHTML = S.mailGroups.map(g => `
-    <label class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 cursor-pointer border border-slate-100 transition-colors">
-      <input type="checkbox" class="batch-grp-cb w-4 h-4 rounded text-indigo-600 border-slate-300 focus:ring-indigo-500" value="${g.id}">
-      <span class="text-sm font-semibold text-slate-700">${g.name} <span class="text-xs text-slate-400 font-normal ml-1">(${g.emails.length} 人)</span></span>
-    </label>
-  `).join('');
-}
-
-function closeBatchGroupModal() {
-  document.getElementById('batch-group-modal').classList.add('hidden');
-}
-
-async function confirmBatchAddGroup() {
-  const cbs = document.querySelectorAll('.batch-grp-cb:checked');
-  if(cbs.length === 0) return toast('請勾選至少一個群組', 'er');
-  
-  const targetGroupIds = Array.from(cbs).map(cb => cb.value);
-  let changed = false;
-  
-  S.mailGroups.forEach(g => {
-    if (targetGroupIds.includes(g.id)) {
-      selectedWL.forEach(email => {
-        if(!g.emails.includes(email)) {
-          g.emails.push(email);
-          changed = true;
-        }
-      });
-    }
-  });
-  
-  if (changed) {
-    await DS.saveMailGroups(S.mailGroups);
-    toast(`成功將 ${selectedWL.length} 人加入到 ${targetGroupIds.length} 個群組！`, 'ok');
-  } else {
-    toast('選取的人員皆已在目標群組中', 'in');
-  }
-  
-  closeBatchGroupModal();
-  toggleBatchMode(); // exit batch mode
-}
-
 function renderWL() {
   const c = document.getElementById('wl-list');
-  const searchEl = document.getElementById('wl-search');
-  const kw = searchEl ? searchEl.value.trim().toLowerCase() : '';
-  
-  let list = S.whitelist;
-  if(kw) {
-    list = list.filter(w => w.name.toLowerCase().includes(kw) || w.email.toLowerCase().includes(kw));
-  }
-  
-  if (list.length === 0) {
-    c.innerHTML = '<div class="text-center text-slate-400 mt-10 text-sm">找不到符合條件的名單</div>';
-    return;
-  }
-  
-  c.innerHTML = list.map((w) => {
-    const origIdx = S.whitelist.findIndex(x => x.email === w.email);
-    return `
-      <div class="flex items-center gap-3 p-3 mb-2 bg-white rounded-lg border border-slate-200 hover:border-blue-200 transition-colors">
-        ${isBatchMode ? `
-          <input type="checkbox" onchange="toggleWLCb('${w.email}', this.checked)" class="w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500" ${selectedWL.includes(w.email) ? 'checked' : ''}>
-        ` : ''}
-        <div class="flex-1 min-w-0">
-          <div class="font-medium text-slate-800 text-sm truncate">${w.name}</div>
-          <div class="text-xs text-slate-500 truncate">${w.email}</div>
-        </div>
-        ${!isBatchMode ? `
-          <div class="flex gap-1 flex-shrink-0">
-            <button onclick="editWL(${origIdx})" class="text-blue-500 hover:bg-blue-50 p-1.5 rounded" title="修改"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg></button>
-            <button onclick="rmWL(${origIdx})" class="text-red-500 hover:bg-red-50 p-1.5 rounded" title="刪除"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
-          </div>
-        ` : ''}
+  c.innerHTML = S.whitelist.map((w, i) => `
+    <div class="flex items-center justify-between p-3 mb-2 bg-white rounded-lg border border-slate-200 hover:border-blue-200 transition-colors">
+      <div>
+        <div class="font-medium text-slate-800 text-sm">${w.name}</div>
+        <div class="text-xs text-slate-500">${w.email}</div>
       </div>
-    `;
-  }).join('');
+      <div class="flex gap-1">
+        <button onclick="editWL(${i})" class="text-blue-500 hover:bg-blue-50 p-1.5 rounded" title="修改"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg></button>
+        <button onclick="rmWL(${i})" class="text-red-500 hover:bg-red-50 p-1.5 rounded" title="刪除"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+      </div>
+    </div>
+  `).join('');
 }
 
 // Override original pubBulletin to show modal instead
@@ -1097,7 +968,6 @@ async function confirmPubBulletin() {
     d.authorizedEmails = selectedEmails;
     
     await DS.save(d.id,d);
-    await DS.addAuditLog(d.id, '管理員正式發布了週報（並發送郵件通知）。');
     
     // 自訂發送名單
     if (selectedEmails.length > 0 && typeof emailjs !== 'undefined') {
@@ -1111,29 +981,25 @@ async function confirmPubBulletin() {
         (d.sections || []).forEach(sec => {
           (sec.items || []).forEach(item => {
             if (item.priority === 'high' && item.content) {
-              let plain = item.content.replace(/<\/(p|div|h[1-6])>/gi, '<br>').replace(/<img[^>]+src="([^">]+)"[^>]*>/gi, '|||IMG_$1|||').replace(/<br\s*\/?>/gi, '|||BR|||').replace(/<[^>]+>/g, '').replace(/\|\|\|IMG_([^|]+)\|\|\|/g, '<br><img src="$1" style="max-width: 100%; max-height: 400px; display: block; margin: 10px 0; border-radius: 4px;"><br>').replace(/\|\|\|BR\|\|\|/g, '<br>').trim();
-              if(plain) importantItems.push(plain);
+              importantItems.push(item.content);
             }
           });
           (sec.subsections || []).forEach(sub => {
             (sub.items || []).forEach(item => {
               if (item.priority === 'high' && item.content) {
-                let plain = item.content.replace(/<\/(p|div|h[1-6])>/gi, '<br>').replace(/<img[^>]+src="([^">]+)"[^>]*>/gi, '|||IMG_$1|||').replace(/<br\s*\/?>/gi, '|||BR|||').replace(/<[^>]+>/g, '').replace(/\|\|\|IMG_([^|]+)\|\|\|/g, '<br><img src="$1" style="max-width: 100%; max-height: 400px; display: block; margin: 10px 0; border-radius: 4px;"><br>').replace(/\|\|\|BR\|\|\|/g, '<br>').trim();
-                if(plain) importantItems.push(plain);
+                importantItems.push(item.content);
               }
             });
           });
         });
         if (importantItems.length > 0) {
-          mustReadText = '⭐ 【本週必讀重點】<br><br>' + importantItems.map(i => '• ' + i).join('<br><br>');
+          mustReadText = '⭐ 【本週必讀重點】\n\n' + importantItems.map(i => '• ' + i).join('\n\n');
         }
       }
 
       await emailjs.send(emailjsConfig.serviceId, emailjsConfig.templateId, {
         to_email: toList,
         subject: '【採購週報上線】' + d.title,
-        bulletin_title: d.title || '無標題',
-        publish_date: d.publishDate || '',
         message: '新版採購週報已上線，請點擊連結查看。',
         link: window.location.href.replace('admin.html', 'index.html') + '?id=' + d.id,
         must_read_text: mustReadText

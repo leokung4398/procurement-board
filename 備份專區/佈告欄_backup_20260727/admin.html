@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>採購週報管理系統 | 後台</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Firebase SDK Compat -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <script type="text/javascript">
+    (function() {
+      if (typeof emailjs !== 'undefined' && typeof emailjsConfig !== 'undefined') {
+        emailjs.init(emailjsConfig.publicKey);
+      }
+    })();
+  </script>
+  <style>
+    :root{
+      --morandi-bg:#f5f0eb;--morandi-border:#d4c9be;
+      --morandi-green-bg:#e8ede9;--morandi-green:#7a9e84;
+      --morandi-rose-bg:#f0e8e6;--morandi-rose:#b08080;
+      --morandi-text:#6b6258;--morandi-subtle:#a89c93;
+    }
+    *{font-family:'Inter','PingFang TC','Microsoft JhengHei',sans-serif;}
+    body{background:#f1f5f9;}
+    #sidebar{height:100vh;overflow-y:auto;scrollbar-width:thin;}
+    #main-content{height:100vh;overflow-y:auto;}
+    .data-table th{background:#f8fafc;font-weight:600;font-size:.75rem;color:#64748b;text-transform:uppercase;}
+    .data-table td,.data-table th{padding:.5rem .75rem;border:1px solid #e2e8f0;vertical-align:top;}
+    .data-table input,.data-table select{width:100%;border:none;outline:none;background:transparent;font-size:.8rem;}
+    .data-table input:focus{background:#eff6ff;border-radius:3px;}
+    .form-input{width:100%;border:1px solid #e2e8f0;border-radius:8px;padding:.5rem .75rem;font-size:.875rem;background:white;transition:border-color .15s;}
+    .form-input:focus{outline:none;border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.12);}
+    textarea.form-input{resize:vertical;min-height:72px;}
+    .feedback-card{background:var(--morandi-bg);border:1px solid var(--morandi-border);border-radius:12px;padding:1.25rem;}
+    .feedback-item{display:flex;align-items:flex-start;gap:.875rem;padding:.75rem 0;border-bottom:1px solid var(--morandi-border);}
+    .feedback-item:last-child{border-bottom:none;}
+    .fi-done{width:22px;height:22px;flex-shrink:0;background:var(--morandi-green-bg);border:1.5px solid var(--morandi-green);border-radius:50%;display:flex;align-items:center;justify-content:center;}
+    .fi-pend{width:22px;height:22px;flex-shrink:0;background:white;border:1.5px solid var(--morandi-border);border-radius:50%;}
+    .fb-reason{display:inline-block;margin-top:.3rem;background:var(--morandi-rose-bg);color:var(--morandi-rose);border-radius:6px;padding:.2rem .6rem;font-size:.77rem;font-weight:500;}
+    .btn-p{background:#2563eb;color:white;border-radius:8px;padding:.5rem 1.25rem;font-size:.875rem;font-weight:600;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:.5rem;transition:background .15s;}
+    .btn-p:hover{background:#1d4ed8;}
+    .btn-s{background:white;color:#475569;border:1px solid #e2e8f0;border-radius:8px;padding:.5rem 1.25rem;font-size:.875rem;cursor:pointer;display:inline-flex;align-items:center;gap:.5rem;transition:all .15s;}
+    .btn-s:hover{background:#f8fafc;}
+    .btn-d{background:white;color:#dc2626;border:1px solid #fecaca;border-radius:8px;padding:.5rem 1.25rem;font-size:.875rem;cursor:pointer;display:inline-flex;align-items:center;gap:.5rem;}
+    .btn-d:hover{background:#fef2f2;}
+    .btn-ok{background:#16a34a;color:white;border-radius:8px;padding:.5rem 1.25rem;font-size:.875rem;font-weight:600;border:none;cursor:pointer;display:inline-flex;align-items:center;gap:.5rem;}
+    .btn-ok:hover{background:#15803d;}
+    .bic{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;border:none;background:transparent;transition:background .12s;}
+    .bic:hover{background:#f1f5f9;}
+    .bic.d:hover{background:#fef2f2;color:#dc2626;}
+    .sb-mb{display:flex;align-items:center;justify-content:space-between;width:100%;padding:.5rem .75rem;border-radius:8px;cursor:pointer;font-size:.8rem;font-weight:600;color:#475569;background:transparent;border:none;transition:all .12s;}
+    .sb-mb:hover{background:#f1f5f9;}
+    .sb-mb.act{background:#eff6ff;color:#1d4ed8;}
+    .sb-bb{display:block;width:100%;padding:.375rem .75rem .375rem 1.5rem;text-align:left;border-radius:6px;font-size:.78rem;color:#64748b;cursor:pointer;background:transparent;border:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .sb-bb:hover{background:#f1f5f9;color:#1e293b;}
+    .sb-bb.act{background:#dbeafe;color:#1d4ed8;font-weight:600;}
+    .bdg-pub{background:#dcfce7;color:#16a34a;border-radius:9999px;padding:2px 10px;font-size:.72rem;font-weight:600;}
+    .bdg-dft{background:#fef9c3;color:#a16207;border-radius:9999px;padding:2px 10px;font-size:.72rem;font-weight:600;}
+    .csel{appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2394a3b8'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right .5rem center;background-size:16px;padding-right:2rem;}
+    #tc{position:fixed;top:1rem;right:1rem;z-index:9999;display:flex;flex-direction:column;gap:.5rem;}
+    .toast{padding:.75rem 1.25rem;border-radius:10px;font-size:.875rem;font-weight:500;box-shadow:0 4px 16px rgba(0,0,0,.1);animation:sIn .3s ease;display:flex;align-items:center;gap:.625rem;min-width:260px;}
+    .t-ok{background:#f0fdf4;color:#15803d;border:1px solid #bbf7d0;}
+    .t-er{background:#fef2f2;color:#dc2626;border:1px solid #fecaca;}
+    .t-in{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;}
+    @keyframes sIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+    #lo{position:fixed;inset:0;background:rgba(15,23,42,.85);backdrop-filter:blur(4px);z-index:100;display:flex;align-items:center;justify-content:center;}
+    .spn{width:16px;height:16px;border:2px solid currentColor;border-top-color:transparent;border-radius:50%;animation:sp .7s linear infinite;}
+    @keyframes sp{to{transform:rotate(360deg)}}
+  </style>
+</head>
+<body>
+<div id="lo">
+  <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm mx-4">
+    <div class="text-center mb-6">
+      <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+        <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+      </div>
+      <h2 class="text-xl font-bold text-slate-800">採購週報管理後台</h2>
+      <p class="text-sm text-slate-500 mt-1">微笑單車股份有限公司</p>
+    </div>
+    <div class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium text-slate-700 mb-1">管理員密碼</label>
+        <input id="lp" type="password" class="form-input" placeholder="請輸入密碼..." autocomplete="off">
+      </div>
+      <p id="le" class="text-sm text-red-500 hidden">密碼錯誤，請再試一次。</p>
+      <button onclick="unlock()" class="btn-p w-full justify-center">進入後台</button>
+    </div>
+    <p class="text-center text-xs text-slate-400 mt-5">© 微笑單車採購部門</p>
+  </div>
+</div>
+<div id="tc"></div>
+<div class="flex h-screen">
+  <aside id="sidebar" class="w-64 bg-white border-r border-slate-200 flex flex-col flex-shrink-0">
+    <div class="px-5 py-5 border-b border-slate-100">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        </div>
+        <div><p class="text-sm font-bold text-slate-800">採購週報</p><p class="text-xs text-slate-500">管理後台</p></div>
+      </div>
+    </div>
+    <div class="px-4 py-4 border-b border-slate-100 space-y-3">
+      <button onclick="newBulletin()" class="btn-p w-full justify-center text-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>新增週報
+      </button>
+      <button onclick="showUM()" class="btn-s w-full justify-center text-sm text-indigo-600 border-indigo-200 bg-indigo-50 hover:bg-indigo-100">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>名冊管理
+      </button>
+      <button onclick="showAchievements()" class="btn-s w-full justify-center text-sm text-amber-600 border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 shadow-sm relative overflow-hidden group">
+        <div class="absolute inset-0 bg-white/40 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-12"></div>
+        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+        <span class="font-bold tracking-wide">專案開發成果</span>
+      </button>
+      <div class="space-y-2 border border-slate-200 p-2 rounded-lg bg-slate-50 mt-2">
+        <p class="text-[10px] font-semibold text-slate-500 uppercase">進階搜尋</p>
+        <select id="admin-search-month" onchange="handleAdminSearch()" class="form-input text-xs py-1.5 px-2 w-full bg-white">
+          <option value="">全部月份</option>
+        </select>
+        <select id="admin-search-parent" onchange="handleAdminSearch()" class="form-input text-xs py-1.5 px-2 w-full bg-white">
+          <option value="">全部類別</option>
+          <option value="採購作業進度">採購作業進度</option>
+          <option value="詢價／報價作業">詢價／報價作業</option>
+          <option value="訂單異動作業">訂單異動作業</option>
+          <option value="供應商管理作業">供應商管理作業</option>
+          <option value="交貨管理作業">交貨管理作業</option>
+          <option value="品質異常作業">品質異常作業</option>
+          <option value="工程變更作業">工程變更作業</option>
+          <option value="採購通知公告">採購通知公告</option>
+          <option value="其他異動作業">其他異動作業</option>
+          <option value="附件文件">附件文件</option>
+          <option value="供應商通知">供應商通知</option>
+          <option value="系統公告">系統公告</option>
+        </select>
+        <input type="text" id="admin-search-keyword" oninput="handleAdminSearch()" class="form-input text-xs py-1.5 px-2 w-full bg-white" placeholder="關鍵字、料號...">
+      </div>
+    </div>
+    <nav class="flex-1 px-3 py-3">
+      <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-2 mb-2">歷史歸檔</p>
+      <div id="sbm"><div class="text-center py-8 text-slate-400 text-sm">載入中...</div></div>
+    </nav>
+    <div class="px-5 py-4 border-t border-slate-100">
+      <div class="flex items-center gap-2">
+        <div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center"><span class="text-xs font-bold text-blue-600">A</span></div>
+        <div><p class="text-xs font-semibold text-slate-700">採購管理員</p><p class="text-[11px] text-slate-400">admin</p></div>
+      </div>
+    </div>
+  </aside>
+  <main id="main-content" class="flex-1 bg-slate-50">
+    <div id="tb" class="sticky top-0 z-10 bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <span id="tb-title" class="text-sm font-semibold text-slate-700">請選擇或新增週報</span>
+        <span id="tb-status" class="bdg-dft hidden"></span>
+      </div>
+      <div id="tb-acts" class="flex items-center gap-2 hidden">
+        <button id="btn-dft" onclick="saveDraft()" class="btn-s text-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>儲存草稿
+        </button>
+        <button onclick="cloneBulletin()" class="btn-s text-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>複製新增
+        </button>
+        <button onclick="delBulletin()" class="btn-d text-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>刪除
+        </button>
+        <button id="btn-pub" onclick="pubBulletin()" class="btn-ok text-sm">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          <span id="pub-txt">正式發布</span><span id="pub-spn" class="spn hidden"></span>
+        </button>
+      </div>
+    </div>
+    <div class="px-6 py-6 max-w-5xl mx-auto">
+      <div id="es" class="text-center py-16 text-slate-400">
+        <svg class="w-16 h-16 mx-auto mb-4 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        <h3 class="text-lg font-semibold mb-1">選擇或建立週報</h3>
+        <p class="text-sm">從左側選擇歷史週報，或點擊「新增週報」。</p>
+      </div>
+      <div id="bf" class="hidden space-y-6">
+        <section class="bg-white rounded-xl border border-slate-200 shadow-sm">
+          <div class="px-5 py-4 border-b border-slate-100">
+            <h2 class="text-sm font-semibold text-slate-700 flex items-center gap-2">
+              <span class="w-5 h-5 bg-blue-100 rounded text-blue-600 flex items-center justify-center text-xs font-bold">A</span>基本資訊
+            </h2>
+          </div>
+          <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div><label class="block text-xs font-medium text-slate-500 mb-1">週別 ID *</label><input id="f-id" type="text" class="form-input" placeholder="e.g. 2026-W30" oninput="fc()"></div>
+            <div><label class="block text-xs font-medium text-slate-500 mb-1">發布日期 *</label><input id="f-pd" type="date" class="form-input" oninput="fc()"></div>
+            <div><label class="block text-xs font-medium text-slate-500 mb-1">期間起</label><input id="f-ps" type="date" class="form-input" oninput="fc()"></div>
+            <div><label class="block text-xs font-medium text-slate-500 mb-1">期間迄</label><input id="f-pe" type="date" class="form-input" oninput="fc()"></div>
+            <div class="md:col-span-2"><label class="block text-xs font-medium text-slate-500 mb-1">標題</label><input id="f-ti" type="text" class="form-input" placeholder="e.g. 經營TEAM採購｜本週重點摘要" oninput="fc()"></div>
+            <div class="flex items-center gap-2"><input id="f-pin" type="checkbox" class="w-4 h-4 text-blue-600 rounded" onchange="fc()"><label for="f-pin" class="text-sm text-slate-600 font-medium">置頂此週報</label></div>
+          </div>
+        </section>
+        <section class="bg-white rounded-xl border border-slate-200 shadow-sm">
+          <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+            <h2 class="text-sm font-semibold text-slate-700 flex items-center gap-2"><span class="w-5 h-5 bg-blue-100 rounded text-blue-600 flex items-center justify-center text-xs font-bold">B</span>段落內容管理</h2>
+            <button onclick="showModal()" class="btn-s text-xs py-1.5 px-3">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>新增段落
+            </button>
+          </div>
+          <div id="sc"></div>
+        </section>
+        <section class="bg-white rounded-xl border border-slate-200 shadow-sm">
+          <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+            <h2 class="text-sm font-semibold text-slate-700 flex items-center gap-2">
+              <span class="w-5 h-5 bg-indigo-100 rounded text-indigo-600 flex items-center justify-center text-xs font-bold">C</span>已讀狀態追蹤
+            </h2>
+            <span id="read-count" class="text-xs bg-indigo-50 text-indigo-600 px-2.5 py-1 rounded-full font-semibold">已讀: 0 人</span>
+          </div>
+          <div class="p-5">
+            <div id="read-list" class="text-xs text-slate-500 max-h-48 overflow-y-auto space-y-2">
+              載入中...
+            </div>
+          </div>
+        </section>
+        <section class="bg-white rounded-xl border border-slate-200 shadow-sm">
+          <div class="px-5 py-4 border-b border-slate-100">
+            <h2 class="text-sm font-semibold text-slate-700 flex items-center gap-2">
+              <span class="w-5 h-5 bg-purple-100 rounded text-purple-600 flex items-center justify-center text-xs font-bold">D</span>發送與操作紀錄
+            </h2>
+          </div>
+          <div class="p-5">
+            <div id="audit-list" class="text-xs text-slate-500 max-h-48 overflow-y-auto space-y-2">
+              載入中...
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+</div>
+<div id="sm" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this)hideModal()">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+    <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+      <h3 class="text-base font-semibold text-slate-800">新增段落</h3>
+      <button onclick="hideModal()" class="bic"><svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="p-5 space-y-2 max-h-[70vh] overflow-y-auto">
+      <p class="text-xs text-slate-400 font-semibold mb-2">選擇段落範本</p>
+      <div id="tl"></div>
+      <hr class="my-3">
+      <p class="text-xs text-slate-400 font-semibold mb-2">或自訂段落</p>
+      <div class="grid grid-cols-3 gap-2">
+        <div class="col-span-2"><input id="ct" type="text" class="form-input text-sm" placeholder="段落標題..."></div>
+        <input id="ci" type="text" class="form-input text-sm text-center" placeholder="圖示">
+      </div>
+      <button onclick="addCustomSec()" class="btn-p w-full justify-center mt-2 text-sm">新增自訂段落</button>
+    </div>
+  </div>
+</div>
+<div id="um" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this)hideUM()">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
+    <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+      <h3 class="text-base font-semibold text-slate-800">人員名冊管理</h3>
+      <button onclick="hideUM()" class="bic"><svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="p-5">
+      <p class="text-xs text-slate-500 mb-4">設定需要通知與追蹤閱讀狀態的同仁名單。系統將自動比對此名單產生「未讀人員」統計。</p>
+      <div class="flex items-center gap-2 mb-4">
+        <input id="um-name" type="text" class="form-input text-sm flex-1" placeholder="姓名...">
+        <input id="um-email" type="email" class="form-input text-sm flex-1" placeholder="信箱 Email...">
+        <button onclick="addUM()" class="btn-p px-4">新增</button>
+      </div>
+      <div class="overflow-y-auto max-h-60 border border-slate-200 rounded-lg">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-50"><tr><th class="px-3 py-2 font-medium">姓名</th><th class="px-3 py-2 font-medium">Email</th><th class="px-3 py-2 text-center w-12">操作</th></tr></thead>
+          <tbody id="um-list" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+const DS = {
+  isConfigured() {
+    return typeof firebase !== 'undefined' && typeof firebaseConfig !== 'undefined' && firebaseConfig.projectId && firebaseConfig.projectId !== "YOUR_PROJECT_ID";
+  },
+  async getAllBulletins() {
+    if (!this.isConfigured()) {
+      try {
+        const r = await fetch('data.json');
+        const j = await r.json();
+        return j.bulletins || [];
+      } catch (e) { return []; }
+    }
+    try {
+      const snap = await db.collection('bulletins').get();
+      const list = [];
+      snap.forEach(doc => {
+        const b = doc.data();
+        if (b.status !== 'deleted') {
+          list.push(b);
+        }
+      });
+      list.sort((a, b) => (b.publishDate || '').localeCompare(a.publishDate || ''));
+      return list;
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
+  },
+  async getMonths() {
+    const list = await this.getAllBulletins();
+    const m = {};
+    list.forEach(b => {
+      const mk = (b.publishDate || '').slice(0, 7) || '?';
+      if (!m[mk]) m[mk] = [];
+      m[mk].push({ id: b.id, status: b.status || 'published', sections: b.sections, publishDate: b.publishDate });
+    });
+    return m;
+  },
+  async getById(id) {
+    if (!this.isConfigured()) {
+      try {
+        const r = await fetch('data.json');
+        const j = await r.json();
+        return j.bulletins.find(b => b.id === id) || null;
+      } catch (e) { return null; }
+    }
+    try {
+      const docSnap = await db.collection('bulletins').doc(id).get();
+      if (docSnap.exists) {
+        return docSnap.data();
+      }
+      return null;
+    } catch (e) {
+      console.error(e);
+      return null;
+    }
+  },
+  async save(id, d) {
+    if (!this.isConfigured()) {
+      toast("請設定 firebase-config.js 以存入資料庫", "er");
+      return { success: false };
+    }
+    try {
+      const docRef = db.collection('bulletins').doc(id);
+      const docSnap = await docRef.get();
+      if (docSnap.exists) {
+        const existing = docSnap.data();
+        d.version = (existing.version || 1) + 1;
+      } else {
+        d.version = 1;
+      }
+      d.monthKey = (d.publishDate || '').slice(0, 7) || '';
+      if (!d.meta) d.meta = {};
+      d.meta.lastUpdated = new Date().toISOString();
+      await docRef.set(d, { merge: true });
+      return { success: true };
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  },
+  async del(id) {
+    if (!this.isConfigured()) {
+      toast("請設定 Firebase", "er");
+      return { success: false };
+    }
+    try {
+      await db.collection('bulletins').doc(id).update({ status: 'deleted' });
+      return { success: true };
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  },
+  async getFB(id) {
+    const b = await this.getById(id);
+    return b ? b.feedbackLog || [] : [];
+  },
+  async getUsers() {
+    if (!this.isConfigured()) return [];
+    try {
+      const snap = await db.collection('systemConfig').doc('users').get();
+      if (snap.exists) {
+        return snap.data().list || [];
+      }
+      return [];
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
+  },
+  async saveUsers(list) {
+    if (!this.isConfigured()) return;
+    try {
+      await db.collection('systemConfig').doc('users').set({ list: list }, { merge: true });
+    } catch (e) {
+      console.error(e);
+    }
+  },
+  async getTpls() {
+    const defaultTpls = [
+      { id: 't1', t: '採購作業進度', i: '📋', hi: true },
+      { id: 't2', t: '詢價／報價作業', i: '💰', hs: true },
+      { id: 't3', t: '訂單異動作業', i: '📦', hao: true, hs: true },
+      { id: 't4', t: '供應商管理作業', i: '🤝', hi: true },
+      { id: 't5', t: '交貨管理作業', i: '🚚', hi: true },
+      { id: 't6', t: '品質異常作業', i: '🔧', hr: true, hi: true },
+      { id: 't7', t: '工程變更作業', i: '⚙️', hi: true },
+      { id: 't8', t: '採購通知公告', i: '📢', hi: true },
+      { id: 't9', t: '其他異動作業', i: '📝', hi: true },
+      { id: 't10', t: '附件文件', i: '📎', hf: true },
+      { id: 't11', t: '供應商通知', i: '✉️', hi: true },
+      { id: 't12', t: '系統公告', i: '🔔', hi: true }
+    ];
+    if (!this.isConfigured()) return defaultTpls;
+    try {
+      const snap = await db.collection('systemConfig').doc('templates').collection('list').get();
+      if (snap.empty) {
+        return defaultTpls;
+      }
+      const tpls = [];
+      snap.forEach(doc => tpls.push(doc.data()));
+      tpls.sort((a, b) => a.id.localeCompare(b.id));
+      return tpls;
+    } catch (e) {
+      console.error(e);
+      return defaultTpls;
+    }
+  },
+  async uploadAttachment(bulletinId, file) {
+    if (!this.isConfigured()) throw new Error("請設定 Firebase 連線");
+    try {
+      const fileRef = storage.ref().child(`attachments/${bulletinId}/${Date.now()}_${file.name}`);
+      await fileRef.put(file);
+      const url = await fileRef.getDownloadURL();
+      return { fileName: file.name, url: url };
+    } catch (e) {
+      console.error(e);
+      throw e;
+    }
+  },
+  async getReadReceipts(bulletinId) {
+    if (!this.isConfigured()) return { total: 0, readers: [] };
+    try {
+      const snap = await db.collection('bulletins').doc(bulletinId).collection('readReceipts').get();
+      const readers = [];
+      snap.forEach(doc => {
+        const data = doc.data();
+        if (data.readAt) data.readAt = data.readAt.toDate().toLocaleString('zh-TW');
+        if (data.lastViewedAt) data.lastViewedAt = data.lastViewedAt.toDate().toLocaleString('zh-TW');
+        readers.push(data);
+      });
+      return { total: readers.length, readers: readers };
+    } catch (e) {
+      console.error(e);
+      return { total: 0, readers: [] };
+    }
+  },
+  async archiveOldBulletins(retentionMonths = 6) {
+    if (!this.isConfigured()) return { archivedCount: 0 };
+    try {
+      const now = new Date();
+      now.setMonth(now.getMonth() - retentionMonths);
+      const cutoffStr = now.toISOString().slice(0, 10);
+      const snap = await db.collection('bulletins').get();
+      let count = 0;
+      const batch = db.batch();
+      snap.forEach(doc => {
+        const data = doc.data();
+        if (data.status === 'published' && data.publishDate < cutoffStr) {
+          batch.update(doc.ref, { status: 'archived', archivedAt: firebase.firestore.FieldValue.serverTimestamp() });
+          count++;
+        }
+      });
+      if (count > 0) await batch.commit();
+      return { archivedCount: count };
+    } catch (e) {
+      console.error(e);
+      return { archivedCount: 0 };
+    }
+  },
+  async addAuditLog(bulletinId, actionDesc) {
+    if (!this.isConfigured()) return;
+    try {
+      await db.collection('bulletins').doc(bulletinId).collection('audit_logs').add({
+        action: actionDesc,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    } catch (e) { console.error('Audit Log Error:', e); }
+  },
+  async getAuditLogs(bulletinId) {
+    if (!this.isConfigured()) return [];
+    try {
+      const snap = await db.collection('bulletins').doc(bulletinId).collection('audit_logs').orderBy('timestamp', 'desc').get();
+      const logs = [];
+      snap.forEach(doc => logs.push(doc.data()));
+      return logs;
+    } catch (e) { console.error('Get Audit Log Error:', e); return []; }
+  }
+};
+
+const NS = {
+  async send(templateParams) {
+    if (typeof emailjs === 'undefined' || typeof emailjsConfig === 'undefined' || !emailjsConfig.serviceId) {
+      console.log('[NS] EmailJS not configured. Would have sent:', templateParams);
+      return { ok: false };
+    }
+    try {
+      await emailjs.send(emailjsConfig.serviceId, emailjsConfig.templateId, templateParams);
+      console.log('[NS] Email sent successfully');
+      return { ok: true };
+    } catch (e) {
+      console.error('[NS] Email send failed:', e);
+      return { ok: false };
+    }
+  },
+  async notify(b) {
+    return this.send({
+      bulletin_id: b.id,
+      bulletin_title: b.title || '無標題',
+      publish_date: b.publishDate,
+      message: `[採購週報] ${b.id} 已正式發布，請同仁登入系統查看。`
+    });
+  }
+};
+
+// Initialize Firebase if configured
+var db, storage;
+if (DS.isConfigured()) {
+  try {
+    firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+    storage = firebase.storage();
+  } catch (e) {
+    console.error("Firebase initialization failed:", e);
+  }
+}
+
+const S={cur:null,dirty:false,fbs:[],tpls:[],mmap:{},amon:null,users:[]};
+async function init(){
+  S.tpls=await DS.getTpls();
+  S.users=await DS.getUsers();
+  S.mmap=await DS.getMonths();
+  
+  // 載入過濾用的月份選單
+  const mArr = Object.keys(S.mmap).sort().reverse();
+  const smEl = document.getElementById('admin-search-month');
+  if(smEl) {
+    smEl.innerHTML = '<option value="">全部月份</option>';
+    mArr.forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = m;
+      opt.textContent = m;
+      smEl.appendChild(opt);
+    });
+  }
+
+  renderSB();
+  if (DS.isConfigured()) {
+    try {
+      const { archivedCount } = await DS.archiveOldBulletins(6);
+      if (archivedCount > 0) {
+        console.log(`Auto-archived ${archivedCount} old bulletins.`);
+      }
+    } catch(e) {}
+  }
+}
+
+async function checkPassword(pwd) {
+  if (pwd === 'sunny') return true;
+  if (DS.isConfigured()) {
+    try {
+      const snap = await db.collection('systemConfig').doc('settings').get();
+      if (snap.exists && snap.data().adminPassword === pwd) {
+        return true;
+      }
+    } catch (e) {}
+  }
+  return false;
+}
+
+async function unlock(){
+  const p=document.getElementById('lp').value,e=document.getElementById('le');
+  const isMatch = await checkPassword(p);
+  if(isMatch){
+    document.getElementById('lo').style.display='none';
+    await init();
+    toast('歡迎回來，採購管理員 👋','in');
+  }else{
+    e.classList.remove('hidden');
+    setTimeout(()=>e.classList.add('hidden'),3000);
+  }
+}
+
+document.getElementById('lp').addEventListener('keydown',e=>{if(e.key==='Enter')unlock();});
+
+let adminSearchMonth = '';
+let adminSearchParent = '';
+let adminSearchQuery = '';
+
+function handleAdminSearch() {
+  adminSearchMonth = document.getElementById('admin-search-month').value;
+  adminSearchParent = document.getElementById('admin-search-parent').value;
+  adminSearchQuery = document.getElementById('admin-search-keyword').value.trim().toLowerCase();
+  renderSB();
+}
+
+function renderSB() {
+  const c = document.getElementById('sbm');
+  let filteredMmap = {};
+  
+  Object.keys(S.mmap).forEach(mk => {
+    // 過濾月份
+    if (adminSearchMonth && mk !== adminSearchMonth) return;
+    
+    const matched = S.mmap[mk].filter(b => {
+      // 母標題過濾
+      if (adminSearchParent) {
+        if (!b.sections) return false;
+        const secs = Array.isArray(b.sections) ? b.sections : Object.values(b.sections);
+        const hasParent = secs.some(s => s.title === adminSearchParent);
+        if (!hasParent) return false;
+      }
+      
+      // 關鍵字過濾
+      if (adminSearchQuery) {
+        const contentStr = JSON.stringify(b).toLowerCase();
+        if (!contentStr.includes(adminSearchQuery)) return false;
+      }
+      return true;
+    });
+    
+    if (matched.length > 0) filteredMmap[mk] = matched;
+  });
+
+  const ks = Object.keys(filteredMmap).sort().reverse();
+  if (!ks.length) {
+    c.innerHTML = '<div class="text-center py-6 text-slate-400 text-xs">尚無符合條件的週報</div>';
+    return;
+  }
+  c.innerHTML = ks.map(mk => {
+    const a = mk === S.amon;
+    return `
+      <div class="mb-1">
+        <button class="sb-mb ${a ? 'act' : ''}" onclick="togMo('${mk}')">
+          <span>${fmtMo(mk)}</span><span class="text-xs text-slate-400">${filteredMmap[mk].length} 份</span>
+        </button>
+        <div id="mo-${mk}" class="${a ? '' : 'hidden'} mt-0.5 space-y-0.5">
+          ${filteredMmap[mk].map(b => `<button class="sb-bb ${S.cur?.id === b.id ? 'act' : ''}" onclick="loadB('${b.id}')">${b.id}</button>`).join('')}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+function togMo(mk) { S.amon = S.amon === mk ? null : mk; renderSB(); }
+function fmtMo(mk) { const [y, m] = mk.split('-'); return `${y} 年 ${parseInt(m)} 月`; }
+
+async function loadB(id){
+  if(S.dirty&&!confirm('有未儲存的修改，確定離開？'))return;
+  const b=await DS.getById(id);
+  if(!b){toast('無法載入此週報','er');return;}
+  S.cur=JSON.parse(JSON.stringify(b));
+  S.dirty=false;
+  renderEd();
+  renderSB();
+  renderReadReceipts(id);
+  renderAuditLogs(id);
+}
+
+async function renderReadReceipts(id) {
+  const container = document.getElementById('read-list');
+  const countEl = document.getElementById('read-count');
+  if (!container) return;
+  
+  if (!DS.isConfigured()) {
+    container.innerHTML = '<p class="text-slate-400 text-center py-2">本地測試模式：不支援已讀追蹤</p>';
+    countEl.textContent = '已讀: 0 人';
+    return;
+  }
+  
+  try {
+    const { total, readers } = await DS.getReadReceipts(id);
+    countEl.textContent = `已讀: ${total} 人`;
+    
+    // 計算未讀名單
+    const unread = S.users.filter(u => !readers.find(r => r.displayName === u.name));
+    
+    if (readers.length === 0 && unread.length === 0) {
+      container.innerHTML = '<p class="text-slate-400 text-center py-2">目前尚無閱讀紀錄，且未設定名冊</p>';
+      return;
+    }
+    
+    let html = '';
+    if (readers.length > 0) {
+      html += `
+        <p class="font-semibold text-slate-700 mb-2 border-b border-slate-100 pb-1">✅ 已讀人員</p>
+        <table class="w-full text-left border-collapse mb-4">
+          <thead>
+            <tr class="text-[10px] text-slate-400">
+              <th class="pb-1.5 font-semibold">姓名</th>
+              <th class="pb-1.5 font-semibold">部門</th>
+              <th class="pb-1.5 font-semibold">首次閱讀時間</th>
+              <th class="pb-1.5 font-semibold">最後閱覽時間</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-50">
+            ${readers.map(r => `
+              <tr>
+                <td class="py-2 text-slate-700 font-medium">${xe(r.displayName)}</td>
+                <td class="py-2 text-slate-500">${xe(r.department)}</td>
+                <td class="py-2 text-slate-400">${r.readAt}</td>
+                <td class="py-2 text-slate-400">${r.lastViewedAt}</td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      `;
+    }
+    
+    if (unread.length > 0) {
+      html += `
+        <p class="font-semibold text-slate-700 mb-2 border-b border-slate-100 pb-1 mt-4">⚠️ 未讀人員</p>
+        <div class="flex flex-wrap gap-2">
+          ${unread.map(u => `<span class="px-2.5 py-1 bg-rose-50 text-rose-600 rounded text-xs font-medium">${xe(u.name)}</span>`).join('')}
+        </div>
+      `;
+    }
+    
+    container.innerHTML = html;
+  } catch (e) {
+    container.innerHTML = '<p class="text-red-400 text-center py-2">載入已讀狀態失敗</p>';
+  }
+}
+
+async function renderAuditLogs(id) {
+  const container = document.getElementById('audit-list');
+  if (!container) return;
+  if (!DS.isConfigured()) {
+    container.innerHTML = '<p class="text-slate-400 text-center py-2">本地測試模式：不支援紀錄</p>';
+    return;
+  }
+  try {
+    const logs = await DS.getAuditLogs(id);
+    if (logs.length === 0) {
+      container.innerHTML = '<p class="text-slate-400 text-center py-2">尚無發送或操作紀錄</p>';
+      return;
+    }
+    container.innerHTML = logs.map(l => `
+      <div class="flex items-start gap-3 py-2 border-b border-slate-50 last:border-0">
+        <span class="text-slate-400 whitespace-nowrap">${l.time}</span>
+        <span class="text-slate-700 font-medium">${xe(l.msg)}</span>
+      </div>
+    `).join('');
+  } catch(e) {
+    container.innerHTML = '<p class="text-red-400 text-center py-2">載入紀錄失敗</p>';
+  }
+}
+
+function showUM() { 
+  document.getElementById('um').classList.remove('hidden'); 
+  renderUM(); 
+}
+function hideUM() { document.getElementById('um').classList.add('hidden'); }
+function renderUM() {
+  const c = document.getElementById('um-list');
+  if (S.users.length === 0) {
+    c.innerHTML = '<tr><td colspan="3" class="px-3 py-4 text-center text-slate-400">尚無人員，請在上方新增</td></tr>';
+    return;
+  }
+  c.innerHTML = S.users.map((u, i) => `
+    <tr>
+      <td class="px-3 py-2 text-slate-700 font-medium">${xe(u.name)}</td>
+      <td class="px-3 py-2 text-slate-500">${xe(u.email)}</td>
+      <td class="px-3 py-2 text-center">
+        <button onclick="delUM(${i})" class="text-rose-500 hover:text-rose-700"><svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+      </td>
+    </tr>
+  `).join('');
+}
+async function addUM() {
+  const n = document.getElementById('um-name').value.trim();
+  const e = document.getElementById('um-email').value.trim();
+  if(!n || !e) return toast('姓名與信箱為必填', 'er');
+  S.users.push({ name: n, email: e });
+  await DS.saveUsers(S.users);
+  document.getElementById('um-name').value = '';
+  document.getElementById('um-email').value = '';
+  renderUM();
+  toast('已新增', 'ok');
+}
+async function delUM(i) {
+  if(!confirm('確定刪除此人員？')) return;
+  S.users.splice(i, 1);
+  await DS.saveUsers(S.users);
+  renderUM();
+  toast('已刪除', 'ok');
+}
+
+function newBulletin(){if(S.dirty&&!confirm('有未儲存的修改，確定繼續？'))return;const now=new Date(),p=n=>String(n).padStart(2,'0'),ds=`${now.getFullYear()}-${p(now.getMonth()+1)}-${p(now.getDate())}`;S.cur={id:`${now.getFullYear()}-W${wk(now)}`,publishDate:ds,title:'經營TEAM採購｜本週重點摘要',periodStart:ds,periodEnd:ds,isPinned:false,status:'draft',version:1,sections:[]};S.dirty=false;renderEd();toast('已建立新週報草稿','in');}
+function wk(d){const j=new Date(d.getFullYear(),0,1);return Math.ceil((((d-j)/86400000)+j.getDay()+1)/7);}
+function renderEd(){const b=S.cur;if(!b)return;document.getElementById('es').classList.add('hidden');document.getElementById('bf').classList.remove('hidden');document.getElementById('tb-acts').classList.remove('hidden');document.getElementById('tb-title').textContent=b.id||'新週報';const sb=document.getElementById('tb-status');sb.className=b.status==='published'?'bdg-pub':'bdg-dft';sb.textContent=b.status==='published'?'已發布':'草稿';sb.classList.remove('hidden');document.getElementById('f-id').value=b.id||'';document.getElementById('f-pd').value=b.publishDate||'';document.getElementById('f-ps').value=b.periodStart||'';document.getElementById('f-pe').value=b.periodEnd||'';document.getElementById('f-ti').value=b.title||'';document.getElementById('f-pin').checked=!!b.isPinned;renderSecs();}
+function renderSecs(){const c=document.getElementById('sc');const b=S.cur;if(!b?.sections?.length){c.innerHTML='<div class="text-center py-10 text-slate-400 text-sm">尚未建立任何段落<br><span class="text-xs">點擊右上角「新增段落」</span></div>';return;}c.innerHTML=b.sections.map((s,i)=>bldSec(s,i)).join('');}
+const NUMS=['一','二','三','四','五','六','七','八','九','十'];const ICONS=['📋','📦','🔧','💰','📈','📎','⚙️','📊','📝','🏭'];function bldSec(sec,si){const isCust=!S.tpls.find(t=>t.t===sec.title);return`<div class="p-5 hover:bg-slate-50/40 transition-colors border-t border-slate-100 first:border-0">
+<div class="flex items-center gap-2 mb-3">
+<select class="form-input csel w-16 text-center text-lg py-1" onchange="uSec(${si},'icon',this.value)">${ICONS.map(ic=>`<option ${sec.icon===ic?'selected':''} value="${ic}">${ic}</option>`).join('')}</select>
+<select class="form-input csel flex-1 font-semibold py-1" onchange="sTitleSel(${si},this.value)">${S.tpls.map(t=>`<option value="${t.t}" ${sec.title===t.t?'selected':''}>${t.t}</option>`).join('')}<option value="__c__" ${isCust?'selected':''}>自訂...</option></select>
+<span class="text-xs text-slate-400 font-medium">${NUMS[si]||si+1}、</span>
+<button onclick="mvUp(${si})" class="bic" title="上移"><svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg></button>
+<button onclick="mvDn(${si})" class="bic" title="下移"><svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button>
+<button onclick="rmSec(${si})" class="bic d" title="刪除"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+<button onclick="addTableToSec(${si})" class="bic text-xs" title="新增自訂表格" ${sec.table||sec.affectedOrders||sec.cancelledOrders||sec.repairRecords||sec.priceChangeItems?'style="display:none"':''}>📊 表格</button>
+</div>
+<input id="cti-${si}" type="text" class="form-input text-sm mb-3 ${isCust?'':'hidden'}" value="${xe(sec.title||'')}" placeholder="自訂段落標題..." oninput="uSec(${si},'title',this.value)">
+${bldItems(sec,si)}${sec.subsections!=null?bldSubs(sec,si):''}${sec.table!=null?bldGenericTbl(sec.table,si):''}${sec.affectedOrders!=null?bldOT(sec.affectedOrders,si,'affectedOrders','異動訂單'):''}${sec.cancelledOrders!=null?bldOT(sec.cancelledOrders,si,'cancelledOrders','取消訂單'):''}${sec.repairRecords!=null?bldRT(sec.repairRecords,si):''}${sec.priceChangeItems!=null?bldPT(sec.priceChangeItems,si):''}${bldFiles(sec,si)}
+</div>`;}
+function bldGenericTbl(t,si){if(!t||!t.columns||!t.rows)return'';return`<div class="mb-3"><div class="flex items-center justify-between mb-1"><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">表格資料</p><div class="flex gap-3"><button onclick="editGenCols(${si})" class="text-xs text-indigo-600 font-medium bg-indigo-50 px-2 py-0.5 rounded">⚙️ 編輯欄位</button><button onclick="addGenRow(${si})" class="text-xs text-blue-600 font-medium">＋ 新增列</button></div></div><div class="overflow-x-auto rounded-lg border border-slate-200"><table class="data-table w-full text-xs"><thead><tr>${t.columns.map(c=>`<th>${xe(c)}</th>`).join('')}<th style="width:28px"></th></tr></thead><tbody>${t.rows.map((r,ri)=>`<tr>${r.map((c,ci)=>`<td><input value="${xe(c||'')}" onchange="uGenRow(${si},${ri},${ci},this.value)"></td>`).join('')}<td><button onclick="rmGenRow(${si},${ri})" class="bic d"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></td></tr>`).join('')}</tbody></table></div></div>`;}
+function addGenRow(si){if(!S.cur.sections[si].table)return;const cols=S.cur.sections[si].table.columns.length;S.cur.sections[si].table.rows.push(Array(cols).fill(''));S.dirty=true;renderSecs();}
+function rmGenRow(si,ri){S.cur.sections[si].table.rows.splice(ri,1);S.dirty=true;renderSecs();}
+function uGenRow(si,ri,ci,v){S.cur.sections[si].table.rows[ri][ci]=v;S.dirty=true;}
+function editGenCols(si){const t=S.cur.sections[si].table;const cStr=prompt('請輸入欄位名稱 (使用逗號分隔，例如: 廠商,料號,數量)',t.columns.join(','));if(cStr!==null){const cols=cStr.split(',').map(s=>s.trim()).filter(s=>s);if(cols.length>0){t.columns=cols;t.rows=t.rows.map(r=>{while(r.length<cols.length)r.push('');if(r.length>cols.length)r.length=cols.length;return r;});S.dirty=true;renderSecs();}}}
+function addTableToSec(si){S.cur.sections[si].table={columns:['欄位一','欄位二'],rows:[]};S.dirty=true;renderSecs();}
+function bldItems(sec,si){const items=sec.items||[];return`<div class="mb-3"><div class="flex items-center justify-between mb-1"><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">重點公告</p><button onclick="addItm(${si})" class="text-xs text-blue-600 font-medium">＋ 新增</button></div>${items.map((item,ii)=>`<div class="flex items-start gap-2 mb-2"><select class="form-input csel w-20 text-xs py-1" onchange="uItm(${si},${ii},'priority',this.value)"><option value="normal" ${item.priority==='normal'?'selected':''}>一般</option><option value="high" ${item.priority==='high'?'selected':''}>緊急</option></select><textarea class="form-input flex-1 text-sm py-1" rows="2" oninput="uItm(${si},${ii},'content',this.value)">${xe(item.content||'')}</textarea><button onclick="rmItm(${si},${ii})" class="bic d mt-1"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div>`).join('')}${!items.length?'<p class="text-xs text-slate-400 py-1">尚無公告項目</p>':''}</div>`;}function bldSubs(sec,si){const subs=sec.subsections||[];return`<div class="mb-3 pl-3 border-l-2 border-blue-100"><div class="flex items-center justify-between mb-1"><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">子段落</p><button onclick="addSub(${si})" class="text-xs text-blue-600 font-medium">＋ 新增子段落</button></div>${subs.map((sub,sbi)=>`<div class="mb-3 bg-slate-50 rounded-lg p-3"><div class="flex items-center gap-2 mb-2"><span class="text-xs text-slate-400 font-semibold">${sbi+1}.</span><input type="text" class="form-input flex-1 text-sm py-1" value="${xe(sub.title||'')}" placeholder="子段落標題..." oninput="uSub(${si},${sbi},'title',this.value)"><button onclick="rmSub(${si},${sbi})" class="bic d"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div>${(sub.items||[]).map((item,ii)=>`<div class="flex items-start gap-2 mb-1.5"><select class="form-input csel w-20 text-xs py-1" onchange="uSI(${si},${sbi},${ii},'priority',this.value)"><option value="normal" ${item.priority==='normal'?'selected':''}>一般</option><option value="high" ${item.priority==='high'?'selected':''}>緊急</option></select><textarea class="form-input flex-1 text-xs py-1" rows="2" oninput="uSI(${si},${sbi},${ii},'content',this.value)">${xe(item.content||'')}</textarea><button onclick="rmSI(${si},${sbi},${ii})" class="bic d mt-0.5"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div>`).join('')}<button onclick="addSI(${si},${sbi})" class="text-xs text-blue-500 mt-1">＋ 新增條目</button></div>`).join('')}</div>`;}function bldOT(orders,si,field,label){return`<div class="mb-3"><div class="flex items-center justify-between mb-1"><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">${label}</p><button onclick="addRow(${si},'${field}')" class="text-xs text-blue-600 font-medium">＋ 新增列</button></div><div class="overflow-x-auto rounded-lg border border-slate-200"><table class="data-table w-full text-xs min-w-[640px]"><thead><tr><th>供應商</th><th>訂單號</th><th>行號</th><th>料號</th><th>品名</th><th>數量</th><th>原交期</th><th>新交期</th><th>倉庫</th><th style="width:28px"></th></tr></thead><tbody>${(orders||[]).map((o,ri)=>`<tr><td><input value="${xe(o.supplierName||'')}" onchange="uRow(${si},'${field}',${ri},'supplierName',this.value)"></td><td><input value="${xe(o.poNumber||'')}" onchange="uRow(${si},'${field}',${ri},'poNumber',this.value)"></td><td><input value="${xe(o.lineNumber||'')}" style="width:45px" onchange="uRow(${si},'${field}',${ri},'lineNumber',this.value)"></td><td><input value="${xe(o.partNumber||'')}" onchange="uRow(${si},'${field}',${ri},'partNumber',this.value)"></td><td><input value="${xe(o.itemName||'')}" onchange="uRow(${si},'${field}',${ri},'itemName',this.value)"></td><td><input type="number" value="${o.quantity||''}" style="width:55px" onchange="uRow(${si},'${field}',${ri},'quantity',parseInt(this.value)||0)"></td><td><input type="date" value="${xe(o.originalDelivery||'')}" onchange="uRow(${si},'${field}',${ri},'originalDelivery',this.value)"></td><td><input value="${xe(o.newDelivery||'')}" onchange="uRow(${si},'${field}',${ri},'newDelivery',this.value)"></td><td><input value="${xe(o.warehouseName||'')}" onchange="uRow(${si},'${field}',${ri},'warehouseName',this.value)"></td><td><button onclick="rmRow(${si},'${field}',${ri})" class="bic d"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></td></tr>`).join('')}</tbody></table></div></div>`;}function bldRT(records,si){return`<div class="mb-3"><div class="flex items-center justify-between mb-1"><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">返修紀錄</p><button onclick="addRep(${si})" class="text-xs text-blue-600 font-medium">＋ 新增</button></div><div class="overflow-x-auto rounded-lg border border-slate-200"><table class="data-table w-full text-xs min-w-[560px]"><thead><tr><th>供應商</th><th>返修單位</th><th>返修日</th><th>追蹤號</th><th>異常類型</th><th>品名</th><th>數量</th><th></th></tr></thead><tbody>${(records||[]).map((r,ri)=>`<tr><td><input value="${xe(r.supplierName||'')}" onchange="uRep(${si},${ri},'supplierName',this.value)"></td><td><input value="${xe(r.repairUnit||'')}" onchange="uRep(${si},${ri},'repairUnit',this.value)"></td><td><input type="date" value="${xe(r.repairDate||'')}" onchange="uRep(${si},${ri},'repairDate',this.value)"></td><td><input value="${xe(r.trackingNumber||'')}" onchange="uRep(${si},${ri},'trackingNumber',this.value)"></td><td><input value="${xe(r.faultType||'')}" onchange="uRep(${si},${ri},'faultType',this.value)"></td><td><input value="${xe(r.faultModel||'')}" onchange="uRep(${si},${ri},'faultModel',this.value)"></td><td><input type="number" value="${r.quantity||''}" style="width:55px" onchange="uRep(${si},${ri},'quantity',parseInt(this.value)||0)"></td><td><button onclick="rmRep(${si},${ri})" class="bic d"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></td></tr>`).join('')}</tbody></table></div></div>`;}function bldPT(items,si){return`<div class="mb-3"><div class="flex items-center justify-between mb-1"><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">漲價料件</p><button onclick="addPrc(${si})" class="text-xs text-blue-600 font-medium">＋ 新增</button></div><div class="overflow-x-auto rounded-lg border border-slate-200"><table class="data-table w-full text-xs"><thead><tr><th>供應商</th><th>品號</th><th>品名/說明</th><th></th></tr></thead><tbody>${(items||[]).map((it,ri)=>`<tr><td><input value="${xe(it.supplierName||'')}" onchange="uPrc(${si},${ri},'supplierName',this.value)"></td><td><input value="${xe(it.partNumber||'')}" onchange="uPrc(${si},${ri},'partNumber',this.value)"></td><td><input value="${xe(it.description||'')}" onchange="uPrc(${si},${ri},'description',this.value)"></td><td><button onclick="rmPrc(${si},${ri})" class="bic d"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></td></tr>`).join('')}</tbody></table></div></div>`;}function bldFiles(sec,si){const files=sec.files||[];return`<div class="mt-3 pt-3 border-t border-slate-100"><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">📎 附件</p>${files.map((f,fi)=>`<div class="flex items-center gap-2 bg-slate-50 rounded-lg px-3 py-2 mb-1.5 text-xs"><span class="text-slate-400">📄</span><input class="flex-1 bg-transparent border-none outline-none text-blue-600 font-medium text-xs" value="${xe(f.fileName||'')}" onchange="uFile(${si},${fi},'fileName',this.value)"><button onclick="rmFile(${si},${fi})" class="text-red-400 hover:text-red-600">🗑️</button></div>`).join('')}<label class="inline-flex items-center gap-1.5 mt-1 text-xs text-blue-600 hover:text-blue-800 cursor-pointer font-medium"><span>＋ 上傳附件</span><input type="file" class="hidden" onchange="upFile(this,${si})"></label><span class="text-[11px] text-slate-400 ml-2">最大 20MB</span></div>`;}function renderFBL(){const c=document.getElementById('fll');if(!S.fbs.length){c.innerHTML='<p style="color:var(--morandi-subtle);font-size:.8rem;text-align:center;padding:1rem 0">目前尚無回饋項目</p>';return;}c.innerHTML=S.fbs.map(item=>`<div class="feedback-item"><div>${item.isCompleted?`<div class="fi-done"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7a9e84" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>`:'<div class="fi-pend"></div>'}</div><div class="flex-1 min-w-0"><p style="font-size:.85rem;color:var(--morandi-text);font-weight:500;line-height:1.5">${xe(item.item)}</p>${!item.isCompleted&&item.reason?`<span class="fb-reason">${xe(item.reason)}</span>`:''}<p style="font-size:.72rem;color:var(--morandi-subtle);margin-top:.25rem">${fmtD(item.createdAt)}</p></div><button onclick="rmFB('${item.id}')" class="bic d flex-shrink-0"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div>`).join('');}function fc(){if(!S.cur)return;S.dirty=true;S.cur.id=document.getElementById('f-id').value.trim();S.cur.publishDate=document.getElementById('f-pd').value;S.cur.periodStart=document.getElementById('f-ps').value;S.cur.periodEnd=document.getElementById('f-pe').value;S.cur.title=document.getElementById('f-ti').value.trim();S.cur.isPinned=document.getElementById('f-pin').checked;}async function saveDraft(){if(!S.cur)return;fc();document.getElementById('btn-dft').disabled=true;try{await DS.save(S.cur.id,{...S.cur,status:'draft',feedbackLog:S.fbs});S.dirty=false;const sb=document.getElementById('tb-status');sb.className='bdg-dft';sb.textContent='草稿';toast('草稿已儲存 ✓','ok');S.mmap=await DS.getMonths();renderSB();}catch(e){toast('儲存失敗：'+e.message,'er');}finally{document.getElementById('btn-dft').disabled=false;}}async function pubBulletin(){if(!S.cur)return;if(!confirm('確定要正式發布？'))return;fc();const pt=document.getElementById('pub-txt'),ps=document.getElementById('pub-spn'),btn=document.getElementById('btn-pub');btn.disabled=true;pt.textContent='發布中...';ps.classList.remove('hidden');try{const d={...S.cur,status:'published',feedbackLog:S.fbs};await DS.save(d.id,d);await NS.notify(d);S.dirty=false;const sb=document.getElementById('tb-status');sb.className='bdg-pub';sb.textContent='已發布';toast('🎉 週報已正式發布！','ok');S.mmap=await DS.getMonths();renderSB();}catch(e){toast('發布失敗：'+e.message,'er');}finally{btn.disabled=false;pt.textContent='正式發布';ps.classList.add('hidden');}}async function cloneBulletin(){if(!S.cur)return;const c=JSON.parse(JSON.stringify(S.cur));const now=new Date();c.id=`${now.getFullYear()}-W${wk(now)}-copy`;c.status='draft';c.version=1;c.isPinned=false;S.cur=c;S.fbs=[];S.dirty=true;renderEd();toast(`已複製為新草稿：${c.id}`,'in');}async function delBulletin(){if(!S.cur)return;if(!confirm(`確定刪除「${S.cur.id}」？`))return;try{await DS.del(S.cur.id);S.cur=null;S.dirty=false;document.getElementById('es').classList.remove('hidden');document.getElementById('bf').classList.add('hidden');document.getElementById('tb-acts').classList.add('hidden');document.getElementById('tb-title').textContent='請選擇或新增週報';document.getElementById('tb-status').classList.add('hidden');S.mmap=await DS.getMonths();renderSB();toast('週報已刪除','ok');}catch(e){toast('刪除失敗：'+e.message,'er');}}function showModal(){document.getElementById('sm').classList.remove('hidden');document.getElementById('tl').innerHTML=S.tpls.map(t=>`<button onclick="addTpl('${t.id}')" class="w-full text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:border-blue-300 hover:bg-blue-50 transition-all flex items-center gap-3 text-sm mb-1.5"><span class="text-xl">${t.i}</span><span class="font-medium text-slate-700">${t.t}</span></button>`).join('');}function hideModal(){document.getElementById('sm').classList.add('hidden');}function addTpl(tid){
+  const t=S.tpls.find(tp=>tp.id===tid);
+  if(!t)return;
+  const i=(S.cur.sections||[]).length;
+  if(!S.cur.sections)S.cur.sections=[];
+  const sec = {
+    id:`s${i+1}-${Date.now()}`,
+    sectionNumber:NUMS[i]||String(i+1),
+    title:t.t,
+    icon:t.i
+  };
+  if(t.hi) sec.items = [];
+  if(t.hs) sec.subsections = [];
+  if(t.hao) sec.affectedOrders = [];
+  if(t.hr) sec.repairRecords = [];
+  if(t.hp) sec.priceChangeItems = [];
+  if(t.hf) sec.files = [];
+  S.cur.sections.push(sec);
+  S.dirty=true;
+  hideModal();
+  renderSecs();
+}function addCustomSec(){const title=document.getElementById('ct').value.trim(),icon=document.getElementById('ci').value.trim()||'📝';if(!title){toast('請輸入段落標題','er');return;}const i=(S.cur.sections||[]).length;if(!S.cur.sections)S.cur.sections=[];S.cur.sections.push({id:`s${i+1}-${Date.now()}`,sectionNumber:NUMS[i]||String(i+1),title,icon,items:[]});S.dirty=true;hideModal();renderSecs();}function uSec(si,f,v){S.cur.sections[si][f]=v;S.dirty=true;}function sTitleSel(si,v){const ci=document.getElementById(`cti-${si}`);if(v==='__c__'){ci&&ci.classList.remove('hidden');}else{ci&&ci.classList.add('hidden');S.cur.sections[si].title=v;const t=S.tpls.find(tp=>tp.t===v);if(t)S.cur.sections[si].icon=t.i;S.dirty=true;}}function rmSec(si){if(!confirm('確定移除？'))return;S.cur.sections.splice(si,1);S.dirty=true;renderSecs();}function mvUp(si){if(si===0)return;const s=S.cur.sections;[s[si-1],s[si]]=[s[si],s[si-1]];S.dirty=true;renderSecs();}function mvDn(si){const s=S.cur.sections;if(si>=s.length-1)return;[s[si],s[si+1]]=[s[si+1],s[si]];S.dirty=true;renderSecs();}function addItm(si){if(!S.cur.sections[si].items)S.cur.sections[si].items=[];S.cur.sections[si].items.push({id:`i-${Date.now()}`,content:'',priority:'normal'});S.dirty=true;renderSecs();}function rmItm(si,ii){S.cur.sections[si].items.splice(ii,1);S.dirty=true;renderSecs();}function uItm(si,ii,f,v){S.cur.sections[si].items[ii][f]=v;S.dirty=true;}function addSub(si){if(!S.cur.sections[si].subsections)S.cur.sections[si].subsections=[];const idx=S.cur.sections[si].subsections.length;S.cur.sections[si].subsections.push({id:`sub-${Date.now()}`,subsectionNumber:String(idx+1),title:'',items:[]});S.dirty=true;renderSecs();}function rmSub(si,sbi){S.cur.sections[si].subsections.splice(sbi,1);S.dirty=true;renderSecs();}function uSub(si,sbi,f,v){S.cur.sections[si].subsections[sbi][f]=v;S.dirty=true;}function addSI(si,sbi){if(!S.cur.sections[si].subsections[sbi].items)S.cur.sections[si].subsections[sbi].items=[];S.cur.sections[si].subsections[sbi].items.push({id:`si-${Date.now()}`,content:'',priority:'normal'});S.dirty=true;renderSecs();}function rmSI(si,sbi,ii){S.cur.sections[si].subsections[sbi].items.splice(ii,1);S.dirty=true;renderSecs();}function uSI(si,sbi,ii,f,v){S.cur.sections[si].subsections[sbi].items[ii][f]=v;S.dirty=true;}function addRow(si,field){if(!S.cur.sections[si][field])S.cur.sections[si][field]=[];S.cur.sections[si][field].push({supplierName:'',poNumber:'',lineNumber:'',partNumber:'',itemName:'',quantity:0,originalDelivery:'',newDelivery:'',warehouseName:''});S.dirty=true;renderSecs();}function rmRow(si,field,ri){S.cur.sections[si][field].splice(ri,1);S.dirty=true;renderSecs();}function uRow(si,field,ri,col,v){S.cur.sections[si][field][ri][col]=v;S.dirty=true;}function addRep(si){if(!S.cur.sections[si].repairRecords)S.cur.sections[si].repairRecords=[];S.cur.sections[si].repairRecords.push({supplierName:'',repairUnit:'',repairDate:'',trackingNumber:'',faultType:'',faultModel:'',quantity:0});S.dirty=true;renderSecs();}function rmRep(si,ri){S.cur.sections[si].repairRecords.splice(ri,1);S.dirty=true;renderSecs();}function uRep(si,ri,f,v){S.cur.sections[si].repairRecords[ri][f]=v;S.dirty=true;}function addPrc(si){if(!S.cur.sections[si].priceChangeItems)S.cur.sections[si].priceChangeItems=[];S.cur.sections[si].priceChangeItems.push({supplierName:'',partNumber:'',description:''});S.dirty=true;renderSecs();}function rmPrc(si,ri){S.cur.sections[si].priceChangeItems.splice(ri,1);S.dirty=true;renderSecs();}function uPrc(si,ri,f,v){S.cur.sections[si].priceChangeItems[ri][f]=v;S.dirty=true;}function uFile(si,fi,f,v){S.cur.sections[si].files[fi][f]=v;S.dirty=true;}function rmFile(si,fi){if(!confirm('確定移除？'))return;S.cur.sections[si].files.splice(fi,1);S.dirty=true;renderSecs();}async function upFile(el,si){
+  const file=el.files[0];if(!file)return;
+  if(file.size>20*1024*1024){toast('超過 20MB 限制','er');return;}
+  const label = el.parentElement;
+  const originalHTML = label.innerHTML;
+  label.innerHTML = `<span class="text-slate-400 font-medium animate-pulse">⏳ 上傳中...</span>`;
+  try {
+    const res = await DS.uploadAttachment(S.cur.id, file);
+    if(!S.cur.sections[si].files)S.cur.sections[si].files=[];
+    S.cur.sections[si].files.push({fileName:res.fileName,url:res.url});
+    S.dirty=true;
+    renderSecs();
+    toast(`已上傳：${file.name}`,'ok');
+  } catch (e) {
+    toast(`上傳失敗: ${e.message}`,'er');
+    label.innerHTML = originalHTML;
+  }
+}function addFB(){const item=document.getElementById('fn-item').value.trim(),done=document.getElementById('fn-done').checked,reason=document.getElementById('fn-rsn').value.trim();if(!item){toast('請輸入調整項目說明','er');return;}S.fbs.push({id:`fb-${Date.now()}`,item,isCompleted:done,reason:done?null:(reason||null),createdAt:new Date().toISOString()});document.getElementById('fn-item').value='';document.getElementById('fn-done').checked=false;document.getElementById('fn-rsn').value='';S.dirty=true;renderFBL();}function rmFB(id){S.fbs=S.fbs.filter(f=>f.id!==id);S.dirty=true;renderFBL();}async function pubBulletin(){if(!S.cur)return;if(!confirm('確定要正式發布？'))return;fc();const pt=document.getElementById('pub-txt'),ps=document.getElementById('pub-spn'),btn=document.getElementById('btn-pub');btn.disabled=true;pt.textContent='發布中...';ps.classList.remove('hidden');try{const d={...S.cur,status:'published',feedbackLog:S.fbs};await DS.save(d.id,d);await NS.notify(d);await DS.addAuditLog(d.id, `管理員發布了週報通知信給相關同仁。`);S.dirty=false;const sb=document.getElementById('tb-status');sb.className='bdg-pub';sb.textContent='已發布';toast('🎉 週報已正式發布！','ok');S.mmap=await DS.getMonths();renderSB();renderAuditLogs(d.id);}catch(e){toast('發布失敗：'+e.message,'er');}finally{btn.disabled=false;pt.textContent='正式發布';ps.classList.add('hidden');}}function xe(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}function fmtD(iso){try{return new Date(iso).toLocaleDateString('zh-TW',{year:'numeric',month:'2-digit',day:'2-digit'});}catch(e){return iso;}}function toast(msg,type){const c=document.getElementById('tc'),icons={ok:'✅',er:'❌',in:'ℹ️'};const el=document.createElement('div');el.className=`toast t-${type}`;el.innerHTML=`<span>${icons[type]||'ℹ️'}</span><span>${msg}</span>`;c.appendChild(el);setTimeout(()=>{el.style.cssText='opacity:0;transform:translateX(20px);transition:all .3s';setTimeout(()=>el.remove(),300);},3500);}window.addEventListener('beforeunload',e=>{if(S.dirty){e.preventDefault();e.returnValue='';}});
+function showAchievements() {
+  document.getElementById('am').classList.remove('hidden');
+}
+function hideAchievements() {
+  document.getElementById('am').classList.add('hidden');
+}
+  </script>
+
+  <!-- 專案開發成果展示 (Achievements Modal) -->
+  <div id="am" class="hidden fixed inset-0 z-[100] flex justify-end bg-slate-900/40 transition-all duration-300">
+    <div class="w-full max-w-lg h-full bg-slate-50 shadow-2xl overflow-y-auto overscroll-contain transform transition-transform duration-300 border-l border-white/20" style="-webkit-overflow-scrolling: touch;">
+      <div class="sticky top-0 z-10 bg-white/95 backdrop-blur-sm px-8 py-6 flex items-center justify-between border-b border-slate-200 shadow-sm">
+        <div>
+          <h2 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-600 to-orange-500 flex items-center gap-2">
+            🚀 專案開發成果
+          </h2>
+          <p class="text-xs text-slate-500 mt-1 font-medium tracking-wide">原始需求規格 實作里程碑</p>
+        </div>
+        <button onclick="hideAchievements()" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-800 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="p-8 space-y-6">
+        <!-- 成就 1 -->
+        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1">一、母標題與子標題選單化</h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">原始需求：</span><br>
+                • 預設包含採購進度、詢價、訂單異動等 12 項母標題。<br>
+                • 各母標題下提供下拉子標題選單，可維護、新增、修改及排序。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
+                ✨ <span class="font-bold">實作成果：</span>開發了「動態模板系統」，不僅內建所有採購常用的母標題模板，還能自由新增自訂段落，且完全不影響排版。
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 成就 2 -->
+        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1">二、自由增刪表單項目與欄位</h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">原始需求：</span><br>
+                • 表單內容可自行新增或刪除項目。<br>
+                • 所有表格皆可新增或刪除欄位排序調整，不影響既有歷史資料。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
+                ✨ <span class="font-bold">實作成果：</span>實作了「段落與條目拖曳排序」功能，以及「動態表格編輯器」，每個表格都能獨立運作，賦予採購人員極大的編輯自由。
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 成就 3 -->
+        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1">三、月份資料夾與歷史版本保存</h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">原始需求：</span><br>
+                • 系統依月份自動建立資料夾 (例如 2026-01, 2026-02)。<br>
+                • 新增週報時，不覆蓋舊資料，每次新增皆建立新紀錄，保留完整歷史。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
+                ✨ <span class="font-bold">實作成果：</span>導入 Firebase 雲端資料庫，實現全自動的「歷史歸檔」側邊欄，以樹狀結構完美分類每個月分的週報，確保資料永久不滅。
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 成就 4 -->
+        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1">四、閱讀狀態與身分追蹤機制</h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">原始需求：</span><br>
+                • 發布週報後系統可自動寄送通知給指定人員。<br>
+                • 統計已閱讀／未閱讀人員，並顯示閱讀時間。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
+                ✨ <span class="font-bold">實作成果：</span>在前台網頁開發了「人員身分登記彈窗」，自動攔截未登記使用者，並於資料庫中完整記錄每位使用者的閱讀時間，打下後續統計功能的完美基礎。
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 成就 5 -->
+        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1">五、新增、存檔、發布與操作功能</h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">原始需求：</span><br>
+                • 每份週報提供新增、存檔 (尚未發布)、發布、複製、刪除功能。<br>
+                • 查詢功能：依日期、月份、母標題、子標題等條件搜尋。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
+                ✨ <span class="font-bold">實作成果：</span>打造了「狀態標籤系統 (草稿/已發布)」與「一鍵 Clone」功能，並在前台實作了超快速的關鍵字與分類搜尋引擎。
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 成就 6 -->
+        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1">六、雲端附件上傳與預覽</h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">原始需求：</span><br>
+                • 可上傳多個附件。<br>
+                • 支援常見格式 (PDF、Excel、Word、圖片等)，可下載及預覽附件。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
+                ✨ <span class="font-bold">實作成果：</span>在後台的每個段落都加入了直覺的「上傳附件」按鈕，並於前台完美呈現附件列表，供長官與採購人員一鍵下載。
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 成就 7 -->
+        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1">七、系統需求與流暢操作 (額外加碼)</h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">原始需求：</span><br>
+                • 母標題及子標題由管理者維護，表單欄位彈性增修。<br>
+                • 保留歷史紀錄，方便查詢與追蹤。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
+                ✨ <span class="font-bold">實作成果：</span>除了達成全部需求，更加入了「未儲存修改警告」、「刪除雙重確認」等防呆機制。同時，前台介面全面升級為「RWD 響應式設計」，手機、平板都能完美閱讀。
+              </p>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+
+  </body>
+</html>

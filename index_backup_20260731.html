@@ -11,49 +11,65 @@
   <!-- Firebase SDK Compat -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="firebase-config.js"></script>
   
   <!-- Quill CSS for rendering rich text -->
   <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
   
-  <link rel="stylesheet" href="css/index.css">
+  <style>
+    /* 編輯模式下的特定樣式 */
+    .edit-active [contenteditable="true"] {
+      outline: 2px dashed #f59e0b; /* amber-500 */
+      outline-offset: 3px;
+      border-radius: 2px;
+      cursor: text;
+    }
+    .edit-active [contenteditable="true"]:hover {
+      background-color: rgba(245, 158, 11, 0.05);
+    }
+    .edit-active [contenteditable="true"]:focus {
+      outline: 2px solid #3b82f6; /* blue-500 */
+      background-color: #ffffff;
+      box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+    }
+  </style>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen font-sans">
 
   <!-- 使用者資訊登記彈窗 -->
   <div id="user-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm text-center">
-      <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center mx-auto mb-3">
-        <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+    <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm">
+      <div class="text-center mb-4">
+        <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center mx-auto mb-3">
+          <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+        </div>
+        <h3 class="text-lg font-bold text-slate-800">請登記您的資訊</h3>
+        <p class="text-xs text-slate-400 mt-0.5">登記後即可開始瀏覽採購週報，系統將記錄您的已讀狀態。</p>
       </div>
-      <h3 class="text-lg font-bold text-slate-800 mb-1">系統登入驗證</h3>
-      <p class="text-xs text-slate-500 mb-6">為保護機密資訊，請使用 YouBike 企業帳號登入</p>
-      
-      <button onclick="frontendGoogleLogin()" class="w-full flex items-center justify-center gap-2 bg-white border border-slate-300 rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors shadow-sm">
-        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="w-5 h-5">
-        使用 Google 帳號登入
-      </button>
-      <p id="user-le" class="text-xs text-red-500 mt-3 hidden">驗證失敗，請使用 @youbike.com.tw 網域帳號。</p>
-    </div>
-  </div>
-
-  </div>
-
-  <!-- 新公告未讀提醒彈窗 -->
-  <div id="unread-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm text-center">
-      <div class="w-12 h-12 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-3">
-        <svg class="w-6 h-6 text-rose-600 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-        </svg>
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 mb-1">您的姓名 *</label>
+          <input id="user-name" type="text" class="w-full border border-slate-200 rounded-lg p-2 text-sm outline-none focus:border-blue-500" placeholder="e.g. 王小明">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 mb-1">您的公司信箱 *</label>
+          <input id="user-email" type="email" class="w-full border border-slate-200 rounded-lg p-2 text-sm outline-none focus:border-blue-500" placeholder="e.g. name@youbike.com.tw">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-500 mb-1">您的部門 *</label>
+          <select id="user-dept" class="w-full border border-slate-200 rounded-lg p-2 text-sm outline-none focus:border-blue-500">
+            <option value="">請選擇部門...</option>
+            <option value="台北營營部">台北營運部</option>
+            <option value="台中營運部">台中營運部</option>
+            <option value="高雄營運部">高雄營運部</option>
+            <option value="總經理室">總經理室</option>
+            <option value="採購部門">採購部門</option>
+            <option value="財務部門">財務部門</option>
+            <option value="資訊部門">資訊部門</option>
+          </select>
+        </div>
+        <button onclick="saveUserInfo()" class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg p-2 text-sm font-semibold mt-2">開始瀏覽</button>
       </div>
-      <h3 class="text-lg font-bold text-slate-800 mb-1">您有未讀的新公告！</h3>
-      <p class="text-sm text-slate-500 mb-4" id="unread-bulletin-title">最新緊急公告</p>
-      
-      <button onclick="closeUnreadModal()" class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg p-2.5 text-sm font-semibold shadow-sm transition-colors">
-        立即查看
-      </button>
     </div>
   </div>
 
@@ -70,9 +86,11 @@
         <button id="btn-toggle-edit" class="px-4 py-2 rounded text-sm font-medium border border-slate-200 bg-white hover:bg-slate-50 transition-colors shadow-sm hidden" onclick="toggleEditMode()">
           開啟編輯模式
         </button>
-        <button id="btn-toggle-edit" class="px-4 py-2 rounded text-sm font-medium border border-slate-200 bg-white hover:bg-slate-50 transition-colors shadow-sm hidden" onclick="toggleEditMode()">
-          開啟編輯模式
+        <button id="btn-export" class="px-4 py-2 rounded text-sm font-medium bg-blue-600 text-white hover:bg-blue-700 transition-colors shadow-sm hidden flex items-center gap-2" onclick="exportData()">
+          <span id="export-text">發布上線</span>
+          <svg id="export-spinner" class="animate-spin h-4 w-4 text-white hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
         </button>
+      </div>
     </header>
 
     <!-- 操作說明 (編輯模式下顯示) -->
@@ -88,39 +106,39 @@
       </ul>
     </div>
 
-    <!-- 搜尋框與過濾工具列 -->
-    <div class="mb-4 flex flex-wrap justify-end gap-2 items-center bg-white p-2 rounded-lg border border-slate-200 shadow-sm">
-      <select id="search-month" onchange="handleSearch()" class="form-input text-xs py-1.5 px-2 w-28 bg-slate-50">
-        <option value="">全部月份</option>
-      </select>
-      <select id="search-parent" onchange="handleSearch()" class="form-input text-xs py-1.5 px-2 w-36 bg-slate-50">
-        <option value="">全部類別</option>
-        <option value="採購作業進度">採購作業進度</option>
-        <option value="詢價／報價作業">詢價／報價作業</option>
-        <option value="訂單異動作業">訂單異動作業</option>
-        <option value="供應商管理作業">供應商管理作業</option>
-        <option value="交貨管理作業">交貨管理作業</option>
-        <option value="品質異常作業">品質異常作業</option>
-        <option value="工程變更作業">工程變更作業</option>
-        <option value="採購通知公告">採購通知公告</option>
-        <option value="其他異動作業">其他異動作業</option>
-        <option value="附件文件">附件文件</option>
-        <option value="供應商通知">供應商通知</option>
-        <option value="系統公告">系統公告</option>
-      </select>
-      <input type="text" id="search-keyword" oninput="handleSearch()" class="form-input text-xs py-1.5 px-2 w-48 bg-slate-50" placeholder="搜尋標題、料號、廠商...">
-      <button onclick="handleSearch()" class="bg-blue-600 text-white rounded px-3 py-1.5 text-xs font-semibold hover:bg-blue-700 shadow-sm transition-colors">搜尋</button>
-      <button onclick="refreshData()" class="bg-emerald-600 text-white rounded px-3 py-1.5 text-xs font-semibold hover:bg-emerald-700 shadow-sm transition-colors flex items-center gap-1" title="無需重整頁面，立即接收最新布告">
-        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-        接收最新
-      </button>
-    </div>
-
-    <!-- 週別切換 Tab -->
-    <div class="mb-6 border-b border-slate-200 w-full overflow-x-auto">
-      <nav id="tabs-container" class="-mb-px flex space-x-8 min-w-max" aria-label="Tabs">
-        <!-- JS 動態渲染 Tabs -->
-      </nav>
+    <!-- 週別切換 Tab 與搜尋框 -->
+    <div class="mb-6 flex flex-col xl:flex-row xl:items-end justify-between gap-4">
+      <div class="border-b border-slate-200 flex-1 overflow-x-auto">
+        <nav id="tabs-container" class="-mb-px flex space-x-8 min-w-max" aria-label="Tabs">
+          <!-- JS 動態渲染 Tabs -->
+        </nav>
+      </div>
+      <div class="flex-shrink-0 flex flex-wrap gap-2 items-center bg-white p-2 rounded-lg border border-slate-200 shadow-sm">
+        <select id="search-month" onchange="handleSearch()" class="form-input text-xs py-1.5 px-2 w-28 bg-slate-50">
+          <option value="">全部月份</option>
+        </select>
+        <select id="search-parent" onchange="handleSearch()" class="form-input text-xs py-1.5 px-2 w-36 bg-slate-50">
+          <option value="">全部類別</option>
+          <option value="採購作業進度">採購作業進度</option>
+          <option value="詢價／報價作業">詢價／報價作業</option>
+          <option value="訂單異動作業">訂單異動作業</option>
+          <option value="供應商管理作業">供應商管理作業</option>
+          <option value="交貨管理作業">交貨管理作業</option>
+          <option value="品質異常作業">品質異常作業</option>
+          <option value="工程變更作業">工程變更作業</option>
+          <option value="採購通知公告">採購通知公告</option>
+          <option value="其他異動作業">其他異動作業</option>
+          <option value="附件文件">附件文件</option>
+          <option value="供應商通知">供應商通知</option>
+          <option value="系統公告">系統公告</option>
+        </select>
+        <input type="text" id="search-keyword" oninput="handleSearch()" class="form-input text-xs py-1.5 px-2 w-48 bg-slate-50" placeholder="搜尋標題、料號、廠商...">
+        <button onclick="handleSearch()" class="bg-blue-600 text-white rounded px-3 py-1.5 text-xs font-semibold hover:bg-blue-700 shadow-sm transition-colors">搜尋</button>
+        <button onclick="refreshData()" class="bg-emerald-600 text-white rounded px-3 py-1.5 text-xs font-semibold hover:bg-emerald-700 shadow-sm transition-colors flex items-center gap-1" title="無需重整頁面，立即接收最新布告">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          接收最新
+        </button>
+      </div>
     </div>
 
     <!-- 主要佈告欄內容 -->
@@ -217,7 +235,6 @@
           } else {
             await userRef.set({
               userId: user.userId,
-              email: user.email,
               displayName: user.displayName,
               department: user.department,
               readAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -226,16 +243,6 @@
           }
         } catch (e) {
           console.error("markAsRead error:", e);
-        }
-      },
-      async hasRead(bulletinId, userId) {
-        if (!this.isConfigured()) return true; // Default true if no DB
-        try {
-          const docSnap = await db.collection('bulletins').doc(bulletinId).collection('readReceipts').doc(userId).get();
-          return docSnap.exists;
-        } catch (e) {
-          console.error("hasRead error:", e);
-          return true;
         }
       }
     };
@@ -246,20 +253,6 @@
       try {
         firebase.initializeApp(firebaseConfig);
         db = firebase.firestore();
-        
-        // Load Handover Config
-        db.collection('bulletins').doc('config_handover').get().then(snap => {
-          if(snap.exists) {
-            const data = snap.data();
-            if(data.secretCode) window.secretCode = data.secretCode;
-            if(data.encryptedToken) ENCRYPTED_TOKEN = data.encryptedToken;
-            if(data.contact) {
-              window.dynamicContact = data.contact;
-              renderFooter();
-            }
-          }
-        }).catch(e => console.error("Load config error:", e));
-        
       } catch (e) {
         console.error("Firebase initialization failed:", e);
       }
@@ -308,7 +301,6 @@
         });
         const mArr = Array.from(mSet).sort().reverse();
         const smEl = document.getElementById('search-month');
-        smEl.innerHTML = '<option value="">全部月份</option>';
         mArr.forEach(m => {
           const opt = document.createElement('option');
           opt.value = m;
@@ -316,18 +308,11 @@
           smEl.appendChild(opt);
         });
 
-        // 自動鎖定並過濾為最新月份
-        if (mArr.length > 0) {
-          smEl.value = mArr[0];
-          state.searchMonth = mArr[0];
-        }
-
         if (bulletins.length > 0) {
           state.activeBulletinId = bulletins[0].id;
         }
         
         renderApp();
-        handleSearch();
         checkUserIdentity();
       } catch (err) {
         console.error('Failed to load data:', err);
@@ -339,20 +324,12 @@
       }
     }
 
-    async function checkUserIdentity() {
+    function checkUserIdentity() {
       if (!DS.isConfigured()) return;
       const userStr = localStorage.getItem('procurement_user');
       if (userStr) {
         const user = JSON.parse(userStr);
         if (state.activeBulletinId) {
-          const alreadyRead = await DS.hasRead(state.activeBulletinId, user.userId);
-          if (!alreadyRead) {
-            // Unread! Show the unread modal reminder
-            const b = state.data.bulletins.find(x => x.id === state.activeBulletinId);
-            document.getElementById('unread-bulletin-title').textContent = b ? b.title : '最新緊急公告';
-            document.getElementById('unread-modal').classList.remove('hidden');
-          }
-          // Mark as read (updates lastViewedAt if already read, or creates if not)
           DS.markAsRead(state.activeBulletinId, user);
         }
       } else {
@@ -360,83 +337,57 @@
       }
     }
 
-    function closeUnreadModal() {
-      document.getElementById('unread-modal').classList.add('hidden');
-    }
-
-    let pendingUser = null;
-
-    async function frontendGoogleLogin() {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      try {
-        const result = await firebase.auth().signInWithPopup(provider);
-        const user = result.user;
-        const userEmail = user.email.toLowerCase();
-        
-        // Check email address book (whitelist)
-        const mailSnap = await db.collection('systemConfig').doc('whitelist').get();
-        const mailUsers = mailSnap.exists ? (mailSnap.data().list || []) : [];
-        
-        // Case-insensitive check
-        const isAllowed = mailUsers.some(u => u.email.toLowerCase() === userEmail) || 
-                          userEmail === 'leokung@youbike.com.tw' || 
-                          userEmail === 'gb4398@giantcycling.com';
-
-        if (!isAllowed) {
-          await firebase.auth().signOut();
-          const e = document.getElementById('user-le');
-          e.innerText = '無瀏覽權限，請確認是否已被加入通訊錄。';
-          e.classList.remove('hidden');
-          return;
-        }
-
-        // Valid and whitelisted
-        document.getElementById('user-modal').classList.add('hidden');
-        
-        pendingUser = {
-          userId: user.uid,
-          displayName: user.displayName || user.email.split('@')[0],
-          email: userEmail,
-          department: '未指定' // Default value since we removed dept selection
-        };
-        
-        // Login immediately without asking for department
-        await finishLogin(pendingUser);
-
-      } catch (error) {
-        console.error('Login error:', error);
+    async function saveUserInfo() {
+      const name = document.getElementById('user-name').value.trim();
+      const email = document.getElementById('user-email').value.trim();
+      const dept = document.getElementById('user-dept').value;
+      
+      if (!name || !email || !dept) {
+        alert('請填寫完整資訊（姓名、信箱、部門）！');
+        return;
       }
-    }
-
-
-    async function finishLogin(userObj) {
-      localStorage.setItem('procurement_user', JSON.stringify(userObj));
+      
+      if (!email.toLowerCase().endsWith('@youbike.com.tw')) {
+        alert('安全驗證失敗：限 YouBike 公司信箱 (@youbike.com.tw) 登入存取！');
+        return;
+      }
+      
+      const user = {
+        userId: 'user_' + Date.now() + '_' + Math.floor(Math.random()*1000),
+        displayName: name,
+        email: email,
+        department: dept
+      };
+      
+      localStorage.setItem('procurement_user', JSON.stringify(user));
+      document.getElementById('user-modal').classList.add('hidden');
       
       if (DS.isConfigured()) {
         try {
-          await db.collection('users').doc(userObj.userId).set({
-            ...userObj,
+          await db.collection('users').doc(user.userId).set({
+            ...user,
             createdAt: firebase.firestore.FieldValue.serverTimestamp()
-          }, { merge: true });
+          });
         } catch(e) {}
       }
       
       if (state.activeBulletinId) {
-        await DS.markAsRead(state.activeBulletinId, userObj);
+        await DS.markAsRead(state.activeBulletinId, user);
       }
-      // Re-render to check access control now that we are logged in
-      renderApp();
     }
 
     function toggleEditMode() {
       state.isEditMode = !state.isEditMode;
       document.body.classList.toggle('edit-active', state.isEditMode);
       
-      // 切換「操作說明」的顯示/隱藏
+      // 切換「匯出資料」按鈕與「操作說明」的顯示/隱藏
+      const btnExport = document.getElementById('btn-export');
       const editGuide = document.getElementById('edit-guide');
       if (state.isEditMode) {
+        btnExport.classList.remove('hidden');
         if (editGuide) editGuide.classList.remove('hidden');
       } else {
+        btnExport.classList.add('hidden');
         if (editGuide) editGuide.classList.add('hidden');
       }
       
@@ -514,17 +465,8 @@
         return true;
       });
       
-        // 確保目前選中的週報仍在篩選結果內，否則預設選取篩選後的第一筆
-        if (filtered.length > 0) {
-          const stillExists = filtered.find(b => b.id === state.activeBulletinId);
-          if (!stillExists) {
-            state.activeBulletinId = filtered[0].id;
-          }
-        }
-        
-        renderTabs(filtered);
-        renderActiveBulletin();
-      }
+      renderTabs(filtered);
+    }
 
     function renderTabs(filteredBulletins = null) {
       const container = document.getElementById('tabs-container');
@@ -565,53 +507,21 @@
         return;
       }
 
-      // 權限控管檢查
-      const userStr = localStorage.getItem('procurement_user');
-      let isAuthorized = true;
-      
-      if (bulletin.authorizedEmails && Array.isArray(bulletin.authorizedEmails)) {
-        if (!userStr) {
-          isAuthorized = false; // Not logged in yet
-        } else {
-          const user = JSON.parse(userStr);
-          // If authorizedEmails contains emails, check if the user is in it.
-          // Allow admins or test accounts as well if needed.
-          if (!bulletin.authorizedEmails.includes(user.email) && user.email !== 'leokung@youbike.com.tw') {
-            isAuthorized = false;
-          }
-        }
-      }
-
-      if (!isAuthorized) {
-        container.innerHTML = `
-          <div class="bg-red-50 text-red-700 p-8 rounded-2xl border border-red-200 text-center shadow-sm">
-            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-            </div>
-            <h3 class="text-xl font-bold mb-2">權限不足</h3>
-            <p class="text-sm">您無權限瀏覽此公告內容，請聯絡系統管理員。</p>
-          </div>`;
-        return;
-      }
-
       const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
 
       const sectionsHtml = bulletin.sections.map((sec, secIdx) => {
         // 渲染重點公告清單
         const itemsHtml = sec.items && sec.items.length > 0
           ? `
-            <div class="space-y-1 mb-2">
+            <div class="space-y-3 mb-4">
               ${sec.items.map((item, itemIdx) => {
                 const isHigh = item.priority === 'high';
                 const borderClass = isHigh ? 'border-red-500 bg-red-50 text-red-900' : 'border-blue-500 bg-blue-50/50 text-slate-800';
-                const highlightBadge = isHigh ? `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-red-100 text-red-800">緊急</span>` : '';
+                const highlightBadge = isHigh ? `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-red-100 text-red-800 mr-2">緊急</span>` : '';
                 return `
-                  <div class="px-3 py-1 border-l-4 rounded-r-lg shadow-sm transition-all hover:shadow-md ${borderClass}">
-                    <div class="flex items-start gap-2">
-                      ${isHigh ? `<div class="mt-1 flex-shrink-0">${highlightBadge}</div>` : ''}
-                      <div ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].items[${itemIdx}].content" class="text-sm font-medium leading-relaxed outline-none whitespace-pre-wrap ql-editor !p-0 flex-1">
-                        ${item.content}
-                      </div>
+                  <div class="p-4 border-l-4 rounded-r-lg shadow-sm transition-all hover:shadow-md ${borderClass}">
+                    <div ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].items[${itemIdx}].content" class="text-sm font-medium leading-relaxed outline-none whitespace-pre-wrap ql-editor !p-0">
+                      ${highlightBadge}${item.content}
                     </div>
                   </div>
                 `;
@@ -625,12 +535,12 @@
           ? sec.subsections.map((sub, subIdx) => {
               const subItemsHtml = sub.items && sub.items.length > 0
                 ? `
-                  <div class="space-y-1 mb-2">
+                  <div class="space-y-2 mb-4">
                     ${sub.items.map((item, itemIdx) => {
                       const isHigh = item.priority === 'high';
                       const borderClass = isHigh ? 'border-red-400 bg-red-50/30' : 'border-slate-300 bg-slate-50';
                       return `
-                        <div class="px-2 py-1 border-l-2 rounded-r bg-white text-slate-700 text-sm leading-relaxed border-l-4 ${borderClass}">
+                        <div class="p-3 border-l-2 rounded-r bg-white text-slate-700 text-sm leading-relaxed border-l-4 ${borderClass}">
                           <div ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].subsections[${subIdx}].items[${itemIdx}].content" class="outline-none whitespace-pre-wrap ql-editor !p-0">
                             ${item.content}
                           </div>
@@ -642,8 +552,8 @@
                 : '';
 
               return `
-                <div class="mb-3 pl-3 border-l border-slate-100">
-                  <h4 class="text-md font-bold text-slate-700 mb-1.5 flex items-center gap-2">
+                <div class="mb-6 pl-4 border-l border-slate-100">
+                  <h4 class="text-md font-bold text-slate-700 mb-3 flex items-center gap-2">
                     <span>${e(sub.subsectionNumber)}.</span>
                     <span ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].subsections[${subIdx}].title" class="outline-none">${e(sub.title)}</span>
                   </h4>
@@ -657,9 +567,9 @@
         // 渲染附件
         const filesHtml = (sec.files && sec.files.length > 0) || state.isEditMode
           ? `
-            <div class="mt-2 bg-slate-50 px-3 py-2.5 rounded-lg border border-slate-100">
+            <div class="mt-4 bg-slate-50 p-4 rounded-lg border border-slate-100">
               <h5 class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">附件下載</h5>
-              <ul class="space-y-1.5">
+              <ul class="space-y-2 mb-3">
                 ${(sec.files || []).map((file, fileIdx) => `
                   <li class="flex items-center justify-between text-sm bg-white p-2 rounded border border-slate-100 shadow-sm">
                     <div class="flex items-center gap-2">
@@ -686,14 +596,11 @@
           : '';
 
         return `
-          <section class="bg-white rounded-xl shadow-sm border border-slate-100 p-4">
-            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2 pb-2 mb-3 border-b border-slate-100 flex-wrap">
-              <div class="flex items-center gap-2">
-                <span class="text-xl">${e(sec.icon)}</span>
-                <span class="text-blue-600">${e(sec.sectionNumber)}、</span>
-                <span ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].title" class="outline-none">${e(sec.title.replace(/^[一二三四五六七八九十]+、\s*/, ''))}</span>
-              </div>
-              ${sec.subtitle ? `<span class="text-sm font-medium text-slate-500 px-2 py-0.5 bg-slate-100 rounded-md border border-slate-200">${e(sec.subtitle)}</span>` : ''}
+          <section class="bg-white rounded-lg p-6 border border-slate-200/60 shadow-sm space-y-4">
+            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2 pb-3 border-b border-slate-100">
+              <span class="text-xl">${e(sec.icon)}</span>
+              <span class="text-blue-600">${e(sec.sectionNumber)}、</span>
+              <span ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].title" class="outline-none">${e(sec.title)}</span>
             </h3>
             
             ${itemsHtml}
@@ -704,46 +611,19 @@
         `;
       }).join('');
 
-      let publishTimeHtml = `<div>發布日期: <span ${editableAttr} data-path="${bulletin.id}.publishDate" class="font-semibold outline-none">${e(bulletin.publishDate)}</span></div>`;
-      if (bulletin.meta && bulletin.meta.publishedAt) {
-        const pDate = new Date(bulletin.meta.publishedAt);
-        const pAt = `${pDate.getFullYear()}/${String(pDate.getMonth()+1).padStart(2, '0')}/${String(pDate.getDate()).padStart(2, '0')} ${String(pDate.getHours()).padStart(2, '0')}:${String(pDate.getMinutes()).padStart(2, '0')}:${String(pDate.getSeconds()).padStart(2, '0')}`;
-        
-        let updateText = '';
-        if (bulletin.meta.lastUpdated) {
-           const uDate = new Date(bulletin.meta.lastUpdated);
-           // Only show update text if it's been updated after publishing
-           if (uDate.getTime() - pDate.getTime() > 60000) {
-             const uAt = `${String(uDate.getMonth()+1).padStart(2, '0')}/${String(uDate.getDate()).padStart(2, '0')} ${String(uDate.getHours()).padStart(2, '0')}:${String(uDate.getMinutes()).padStart(2, '0')}`;
-             updateText = ` <span class="opacity-75 text-xs font-normal ml-1">(最後更新：${uAt})</span>`;
-           }
-        }
-        publishTimeHtml = `
-          <div class="flex items-center gap-2 text-sm text-white bg-white/15 px-3 py-1.5 rounded-full border border-white/20 backdrop-blur-sm shadow-inner transition-colors hover:bg-white/20 cursor-default">
-            <span class="text-base leading-none">🕒</span>
-            <span class="font-medium tracking-wide">發布時間：${pAt}</span>
-            ${updateText}
-          </div>
-        `;
-      }
-
       container.innerHTML = `
-        <div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white rounded-lg p-6 shadow-md relative overflow-hidden">
-          <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
-          <div class="flex items-center gap-3 relative z-10">
-            ${bulletin.isPinned ? `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500 text-white shadow-sm flex items-center gap-1.5"><span class="animate-pulse">🚨</span> 緊急</span>` : ''}
-            <h2 ${editableAttr} data-path="${bulletin.id}.title" class="text-xl font-bold outline-none leading-snug">${e(bulletin.title)}</h2>
+        <div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white rounded-lg p-6 shadow-md">
+          <div class="flex items-center gap-3">
+            ${bulletin.isPinned ? `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500 text-white animate-pulse">重要置頂</span>` : ''}
+            <h2 ${editableAttr} data-path="${bulletin.id}.title" class="text-xl font-bold outline-none">${e(bulletin.title)}</h2>
           </div>
-          <div class="mt-4 flex flex-wrap items-center gap-x-5 gap-y-3 relative z-10">
-            ${publishTimeHtml}
-            <div class="flex items-center gap-4 text-sm text-blue-200/90 pl-1 border-l border-white/20">
-              <div>期數 ID: <span class="font-semibold text-blue-50">${e(bulletin.id)}</span></div>
-              <div class="w-1 h-1 bg-blue-400 rounded-full"></div>
-              <div>統計期間: <span class="font-semibold text-blue-50">${e(bulletin.periodStart)} 至 ${e(bulletin.periodEnd)}</span></div>
-            </div>
+          <div class="mt-3 flex flex-wrap gap-x-6 gap-y-2 text-sm text-blue-100">
+            <div>期數 ID: <span class="font-semibold">${e(bulletin.id)}</span></div>
+            <div>發布日期: <span ${editableAttr} data-path="${bulletin.id}.publishDate" class="font-semibold outline-none">${e(bulletin.publishDate)}</span></div>
+            <div>統計期間: <span class="font-semibold">${e(bulletin.periodStart)} 至 ${e(bulletin.periodEnd)}</span></div>
           </div>
         </div>
-        <div class="space-y-6 mt-6">
+        <div class="space-y-6">
           ${sectionsHtml}
           ${(() => {
             const fbs = bulletin.feedbackLog || [];
@@ -971,7 +851,7 @@
         email: "sunnyting@youbike.com.tw",
         address: "105403 台北市松山區民生東路三段138號10樓"
       };
-      const contact = window.dynamicContact || ((state.data && state.data.meta && state.data.meta.contact) ? state.data.meta.contact : defaultContact);
+      const contact = (state.data && state.data.meta && state.data.meta.contact) ? state.data.meta.contact : defaultContact;
       container.innerHTML = `
         <div><span class="font-semibold text-slate-600">聯絡窗口：</span>${e(contact.name)}</div>
         <div><span class="font-semibold text-slate-600">聯絡電話：</span>${e(contact.tel)}</div>
@@ -998,17 +878,195 @@
        3. Attachment Upload Logic
        ========================================= */
     async function uploadAttachment(inputEl, secIdx) {
-      alert('前台已停止支援上傳附件，請至管理員後台或使用雲端儲存空間進行附件上傳！');
-      inputEl.value = '';
+      if (!inputEl.files || inputEl.files.length === 0) return;
+      const file = inputEl.files[0];
+      
+      // 檔案大小限制 20MB = 20 * 1024 * 1024 bytes
+      if (file.size > 20 * 1024 * 1024) {
+        alert('檔案大小超過 20MB 限制，請重新選擇較小檔案。');
+        inputEl.value = '';
+        return;
+      }
+      
+      if (!decryptedGitHubToken) {
+        alert('錯誤：找不到 GitHub 金鑰。請確認您已設定好 ENCRYPTED_TOKEN 且密碼正確。');
+        return;
+      }
+
+      // 替換原本的 label 變成 Loading 狀態
+      const labelEl = inputEl.parentElement;
+      const originalHtml = labelEl.innerHTML;
+      labelEl.innerHTML = `<span class="text-slate-500 font-bold animate-pulse px-2 py-1.5">⏳ 正在上傳至 GitHub... 請稍候</span>`;
+      
+      // 同步 DOM，避免 re-render 時洗掉尚未發布的文字
+      syncDOMToState();
+
+      try {
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+          try {
+            const result = e.target.result;
+            // 濾除 "data:application/pdf;base64," 頭部
+            const base64Content = result.split(',')[1];
+            const fileName = file.name;
+            const apiUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/attachments/${encodeURIComponent(fileName)}`;
+            
+            // 先嘗試取得檔案 (為了 SHA 以覆蓋舊檔)
+            let currentSha = undefined;
+            try {
+              const resGet = await fetch(apiUrl, { headers: { 'Authorization': `token ${decryptedGitHubToken}` } });
+              if (resGet.ok) {
+                const getJson = await resGet.json();
+                currentSha = getJson.sha;
+              }
+            } catch(e) {} 
+
+            // 發送上傳請求
+            const resPut = await fetch(apiUrl, {
+              method: 'PUT',
+              headers: {
+                'Authorization': `token ${decryptedGitHubToken}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                message: `[自動上傳] 新增附件 ${fileName}`,
+                content: base64Content,
+                sha: currentSha
+              })
+            });
+
+            if (!resPut.ok) throw new Error("上傳失敗，GitHub API 拒絕請求。");
+
+            // 更新 state.data
+            const bulletin = state.data.bulletins.find(b => b.id === state.activeBulletinId);
+            if (!bulletin.sections[secIdx].files) bulletin.sections[secIdx].files = [];
+            
+            const newFileObj = { fileName: fileName, url: `attachments/${fileName}` };
+            const existingIdx = bulletin.sections[secIdx].files.findIndex(f => f.fileName === fileName);
+            if (existingIdx >= 0) {
+              bulletin.sections[secIdx].files[existingIdx] = newFileObj;
+            } else {
+              bulletin.sections[secIdx].files.push(newFileObj);
+            }
+            
+            renderApp(); // 更新畫面顯示新附件
+            alert('✅ 附件實體檔案已成功上傳！\n\n⚠️ 重要提醒：請務必點擊右上角的「發布上線」按鈕，新的附件下載連結才會正式存入佈告欄紀錄中喔！');
+            
+          } catch(err) {
+            console.error(err);
+            alert("上傳發生錯誤: " + err.message);
+            labelEl.innerHTML = originalHtml;
+          }
+        };
+        reader.onerror = () => { throw new Error('讀取本地檔案失敗'); };
+        reader.readAsDataURL(file);
+      } catch (error) {
+        alert("錯誤: " + error.message);
+        labelEl.innerHTML = originalHtml;
+      }
     }
 
     function removeAttachment(secIdx, fileIdx) {
-      if (!confirm('確定要從這份佈告移除此附件連結嗎？')) return;
-      syncDOMToState(); 
+      if (!confirm('確定要從這份佈告移除此附件連結嗎？\n(按下發布上線後才會正式生效)')) return;
+      syncDOMToState(); // 記住修改
       const bulletin = state.data.bulletins.find(b => b.id === state.activeBulletinId);
       if (bulletin && bulletin.sections[secIdx] && bulletin.sections[secIdx].files) {
         bulletin.sections[secIdx].files.splice(fileIdx, 1);
         renderApp();
+      }
+    }
+
+    /* =========================================
+       4. Data Export Logic (GitHub API + AES)
+       ========================================= */
+    const GITHUB_OWNER = 'a13a5510-ctrl'; // 替換為您的帳號
+    const GITHUB_REPO = 'procurement-board';   // 替換為專案名稱
+    const ENCRYPTED_TOKEN = 'YDvHkI6Cek/WDcXieHLG2ydHkZCp2womuYpfpc/gBU2Kv/fiPqt+o2GUFhJWeIr/O9zuVHXV/dcrZkv9A/23RHvan205LdAwcWJdtnaSq5Nb/tj2b9PPnhyR3W+fPLDdtinyu9th28yNoZ5tbqc6okslMuCTmDT8XYv1HLLTu12XTS0x7o25xdY='; 
+    let decryptedGitHubToken = null;
+
+    async function exportData() {
+      if (!state.data) return;
+      
+      const btn = document.getElementById('btn-export');
+      const spinner = document.getElementById('export-spinner');
+      const btnText = document.getElementById('export-text');
+      
+      if (!decryptedGitHubToken && ENCRYPTED_TOKEN !== '請將 encrypt.html 產生的亂碼貼在這裡') {
+         alert("金鑰解密失敗或遺失，請重新整理網頁後再次輸入密碼解鎖。");
+         return;
+      }
+      
+      if (ENCRYPTED_TOKEN === '請將 encrypt.html 產生的亂碼貼在這裡') {
+         alert("本地開發提示：您尚未設定 ENCRYPTED_TOKEN，請先照著步驟填入 GitHub 專案資訊，方可發布！");
+         return;
+      }
+
+      btn.disabled = true;
+      spinner.classList.remove('hidden');
+      btnText.textContent = '發布中...';
+
+      // 1. 同步目前的 DOM 編輯回 state
+      syncDOMToState();
+      const exportState = JSON.parse(JSON.stringify(state.data));
+
+      // 2. 更新時間戳記
+      const now = new Date();
+      const tzOffset = -now.getTimezoneOffset();
+      const diff = tzOffset >= 0 ? '+' : '-';
+      const pad = (num) => String(num).padStart(2, '0');
+      const formattedTz = diff + pad(Math.floor(Math.abs(tzOffset) / 60)) + ':' + pad(Math.abs(tzOffset) % 60);
+      exportState.meta.lastUpdated = now.getFullYear() +
+        '-' + pad(now.getMonth() + 1) +
+        '-' + pad(now.getDate()) +
+        'T' + pad(now.getHours()) +
+        ':' + pad(now.getMinutes()) +
+        ':' + pad(now.getSeconds()) +
+        formattedTz;
+
+      const jsonString = JSON.stringify(exportState, null, 2);
+
+      // 3. 透過 GitHub API 自動發布
+      try {
+        const apiUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/data.json`;
+        
+        // a) 先取得目前的檔案 SHA (覆寫必備)
+        const resGet = await fetch(apiUrl, {
+          headers: { 'Authorization': `token ${decryptedGitHubToken}` }
+        });
+        if (!resGet.ok) throw new Error("取得專案檔案狀態失敗。請檢查 Repo/Owner 設定，以及金鑰權限是否具備 Read/Write access to code。");
+        const getJson = await resGet.json();
+        const currentSha = getJson.sha;
+        
+        // b) base64 編碼支援中文 (utf-8 to base64)
+        const base64Content = btoa(unescape(encodeURIComponent(jsonString)));
+        
+        // c) PUT 覆寫檔案
+        const resPut = await fetch(apiUrl, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `token ${decryptedGitHubToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            message: `[自動發布] 採購佈告欄更新 (${exportState.meta.lastUpdated})`,
+            content: base64Content,
+            sha: currentSha
+          })
+        });
+        
+        if (!resPut.ok) throw new Error("寫入 GitHub 失敗！");
+        
+        alert("🎉 發布成功！GitHub Pages 將在幾分鐘內自動更新。");
+        state.data = exportState; // 更新本地狀態
+        toggleEditMode(); // 回到檢視模式
+        
+      } catch (err) {
+        console.error(err);
+        alert("錯誤：" + err.message);
+      } finally {
+        btn.disabled = false;
+        spinner.classList.add('hidden');
+        btnText.textContent = '發布上線';
       }
     }
 
@@ -1041,7 +1099,75 @@
       currentObj[lastPart] = value;
     }
 
+    // --- Web Crypto AES 解密邏輯 ---
+    async function deriveKey(passwordStr, salt) {
+      const enc = new TextEncoder();
+      const keyMaterial = await window.crypto.subtle.importKey(
+        "raw",
+        enc.encode(passwordStr),
+        { name: "PBKDF2" },
+        false,
+        ["deriveBits", "deriveKey"]
+      );
+      return window.crypto.subtle.deriveKey(
+        { name: "PBKDF2", salt: salt, iterations: 100000, hash: "SHA-256" },
+        keyMaterial,
+        { name: "AES-GCM", length: 256 },
+        true,
+        ["encrypt", "decrypt"]
+      );
+    }
+    
+    async function decryptToken(base64Str, passwordStr) {
+      try {
+        const combined = new Uint8Array(atob(base64Str).split('').map(c => c.charCodeAt(0)));
+        const salt = combined.slice(0, 16);
+        const iv = combined.slice(16, 28);
+        const ciphertext = combined.slice(28);
+        
+        const key = await deriveKey(passwordStr, salt);
+        const decrypted = await window.crypto.subtle.decrypt(
+          { name: "AES-GCM", iv: iv },
+          key,
+          ciphertext
+        );
+        const dec = new TextDecoder();
+        return dec.decode(decrypted);
+      } catch (e) {
+        return null; // 解密失敗
+      }
+    }
 
+    // 秘密開關：監聽鍵盤輸入，輸入 'sunny' 解鎖編輯按鈕
+    let secretCode = 'sunny';
+    let inputSequence = '';
+    window.addEventListener('keydown', async (e) => {
+      if (e.key.length === 1) {
+        inputSequence += e.key.toLowerCase();
+        if (inputSequence.length > secretCode.length) {
+          inputSequence = inputSequence.slice(-secretCode.length);
+        }
+        if (inputSequence === secretCode) {
+          
+          if (ENCRYPTED_TOKEN && ENCRYPTED_TOKEN !== '請將 encrypt.html 產生的亂碼貼在這裡') {
+            const token = await decryptToken(ENCRYPTED_TOKEN, secretCode);
+            if (token) {
+              decryptedGitHubToken = token;
+              const btnEdit = document.getElementById('btn-toggle-edit');
+              btnEdit.classList.remove('hidden');
+              inputSequence = ''; 
+            } else {
+              console.warn("AES 解密失敗：金鑰格式錯誤。");
+            }
+          } else {
+            // 本地測試/未填入設定時，直接解鎖，但不具備發布能力
+            const btnEdit = document.getElementById('btn-toggle-edit');
+            btnEdit.classList.remove('hidden');
+            inputSequence = ''; 
+          }
+        }
+      }
+    });
 
     // 程式進入點
     window.addEventListener('DOMContentLoaded', () => {

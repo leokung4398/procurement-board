@@ -23,32 +23,6 @@
       }
     })();
   </script>
-  <style>
-    /* 滑順捲動與美化捲軸 (Custom Scrollbar) */
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 8px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: transparent;
-      border-radius: 10px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 10px;
-      border: 2px solid transparent;
-      background-clip: content-box;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: #94a3b8;
-      background-clip: content-box;
-    }
-    /* 使平滑捲動與無邊界回彈(overscroll-behavior) 更舒適 */
-    .smooth-scroll-pane {
-      -webkit-overflow-scrolling: touch;
-      overscroll-behavior-y: contain;
-      scroll-behavior: smooth;
-    }
-  </style>
   <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>
@@ -86,12 +60,25 @@
       <button onclick="newBulletin()" class="btn-p w-full justify-center text-sm">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>新增週報
       </button>
-      <button onclick="openSettingsModal()" class="btn-s w-full justify-center text-sm text-slate-600 border-slate-200 bg-slate-50 hover:bg-slate-100 mt-2">
-        <span class="font-bold tracking-wide">⚙️ 系統設定中心</span>
+      <button onclick="showUM()" class="btn-s w-full justify-center text-sm text-indigo-600 border-indigo-200 bg-indigo-50 hover:bg-indigo-100">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>名冊管理
       </button>
-      <button onclick="openAboutModal()" class="btn-s w-full justify-center text-sm text-amber-600 border-amber-200 bg-amber-50 hover:bg-amber-100 mt-2 relative overflow-hidden group">
+      <button onclick="showAchievements()" class="btn-s w-full justify-center text-sm text-amber-600 border-amber-200 bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 shadow-sm relative overflow-hidden group">
         <div class="absolute inset-0 bg-white/40 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-12"></div>
-        <span class="font-bold tracking-wide">ℹ️ 系統與專案成果</span>
+        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/></svg>
+        <span class="font-bold tracking-wide">專案開發成果</span>
+      </button>
+      <button onclick="showKM()" class="btn-s w-full justify-center text-sm text-emerald-600 border-emerald-200 bg-emerald-50 hover:bg-emerald-100 mt-2">
+        <span class="font-bold tracking-wide">📚 關鍵字資料庫維護</span>
+      </button>
+      <button onclick="showWL()" class="btn-s w-full justify-center text-sm text-cyan-600 border-cyan-200 bg-cyan-50 hover:bg-cyan-100 mt-2">
+        <span class="font-bold tracking-wide">✉️ 郵件白名單管理</span>
+      </button>
+      <button onclick="showAdminList()" class="btn-s w-full justify-center text-sm text-rose-600 border-rose-200 bg-rose-50 hover:bg-rose-100 mt-2">
+        <span class="font-bold tracking-wide">🛡️ 管理員白名單</span>
+      </button>
+      <button onclick="showGuide()" class="btn-s w-full justify-center text-sm text-amber-600 border-amber-200 bg-amber-50 hover:bg-amber-100 mt-2">
+        <span class="font-bold tracking-wide">💡 系統操作指南</span>
       </button>
       <div class="space-y-2 border border-slate-200 p-2 rounded-lg bg-slate-50 mt-2">
         <p class="text-[10px] font-semibold text-slate-500 uppercase">進階搜尋</p>
@@ -195,10 +182,7 @@
             <h2 class="text-sm font-semibold text-slate-700 flex items-center gap-2">
               <span class="w-5 h-5 bg-indigo-100 rounded text-indigo-600 flex items-center justify-center text-xs font-bold">C</span>已讀狀態追蹤
             </h2>
-            <div id="read-count" class="flex items-center gap-2">
-              <span class="text-xs bg-indigo-50 text-indigo-600 px-2.5 py-1 rounded-full font-semibold border border-indigo-100">已讀: 0 人</span>
-              <span class="text-xs bg-slate-50 text-slate-500 px-2.5 py-1 rounded-full font-medium border border-slate-200">未讀: 0 人</span>
-            </div>
+            <span id="read-count" class="text-xs bg-indigo-50 text-indigo-600 px-2.5 py-1 rounded-full font-semibold">已讀: 0 人</span>
           </div>
           <div class="p-5">
             <div id="read-list" class="text-xs text-slate-500 max-h-48 overflow-y-auto space-y-2">
@@ -242,355 +226,69 @@
     </div>
   </div>
 </div>
-
-<!-- 設定中心 Modal -->
-<div id="settings-modal" class="hidden fixed inset-0 z-[150] flex justify-center items-center bg-slate-900/60 backdrop-blur-sm transition-all duration-300">
-  <div class="w-full max-w-6xl h-[85vh] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden m-4">
-    <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-      <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">⚙️ 系統設定中心</h3>
-      <button onclick="closeSettingsModal()" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-200 text-slate-500 transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+<div id="um" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this)hideUM()">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
+    <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
+      <h3 class="text-base font-semibold text-slate-800">人員名冊管理</h3>
+      <button onclick="hideUM()" class="bic"><svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
     </div>
-    <div class="flex-1 flex overflow-hidden">
-      <!-- 左側 Tabs -->
-      <div class="w-1/4 border-r border-slate-200 bg-slate-50/50 flex flex-col p-3 gap-1 overflow-y-auto">
-
-        <button onclick="switchSettingsTab('tab-whitelist')" id="btn-tab-whitelist" class="text-left px-4 py-3 rounded-lg font-medium text-sm transition-colors text-slate-600 hover:bg-slate-100 flex items-center gap-2">
-          <span>✉️</span> 郵件通訊錄
-        </button>
-        <button onclick="switchSettingsTab('tab-groups')" id="btn-tab-groups" class="text-left px-4 py-3 rounded-lg font-medium text-sm transition-colors text-slate-600 hover:bg-slate-100 flex items-center gap-2">
-          <span>👥</span> 發信群組管理
-        </button>
-        <button onclick="switchSettingsTab('tab-admin')" id="btn-tab-admin" class="text-left px-4 py-3 rounded-lg font-medium text-sm transition-colors text-slate-600 hover:bg-slate-100 flex items-center gap-2">
-          <span>🛡️</span> 後台管理員名單
-        </button>
-        <button onclick="switchSettingsTab('tab-keywords')" id="btn-tab-keywords" class="text-left px-4 py-3 rounded-lg font-medium text-sm transition-colors text-slate-600 hover:bg-slate-100 flex items-center gap-2">
-          <span>📚</span> 關鍵字資料庫
-        </button>
-        <button onclick="switchSettingsTab('tab-handover')" id="btn-tab-handover" class="text-left px-4 py-3 rounded-lg font-medium text-sm transition-colors text-slate-600 hover:bg-slate-100 flex items-center gap-2">
-          <span>⚙️</span> 系統交接設定
-        </button>
+    <div class="p-5">
+      <p class="text-xs text-slate-500 mb-4">設定需要通知與追蹤閱讀狀態的同仁名單。系統將自動比對此名單產生「未讀人員」統計。</p>
+      <div class="flex items-center gap-2 mb-4">
+        <input id="um-name" type="text" class="form-input text-sm flex-1" placeholder="姓名...">
+        <input id="um-email" type="email" class="form-input text-sm flex-1" placeholder="信箱 Email...">
+        <button onclick="addUM()" class="btn-p px-4">新增</button>
       </div>
-
-      <!-- 右側內容 -->
-      <div class="w-3/4 bg-white relative flex flex-col overflow-hidden">
-        
-            </div>
-          </div>
-          <div class="flex-1 overflow-y-auto p-5">
-            <div class="border border-slate-200 rounded-lg">
-              <table class="w-full text-left text-xs">
-                <thead class="bg-slate-50 sticky top-0"><tr><th class="px-3 py-2 font-medium">姓名</th><th class="px-3 py-2 font-medium">Email</th><th class="px-3 py-2 text-center w-12">操作</th></tr></thead>
-                <tbody id="um-list" class="divide-y divide-slate-100"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- 郵件通訊錄 -->
-        <div id="tab-whitelist" class="settings-tab-pane hidden flex-1 flex flex-col h-full">
-          <div class="p-5 border-b border-slate-100 relative">
-            <div class="flex items-center justify-between mb-2">
-              <h4 class="text-lg font-bold text-slate-800">郵件通訊錄</h4>
-              <button onclick="toggleBatchMode()" id="btn-batch-mode" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold px-3 py-1.5 rounded transition-colors">批次管理</button>
-            </div>
-            <p class="text-xs text-slate-500 mb-4">在此建立採購相關的所有收件人名單。這些名單可用於發布週報，也可供加入群組。</p>
-            <div class="flex items-center gap-2 mb-3">
-              <input type="text" id="wl-name" placeholder="姓名 (例: 吳俊緯)" class="form-input flex-1">
-              <input type="email" id="wl-email" placeholder="信箱 (@youbike.com.tw)" class="form-input flex-1">
-              <button onclick="addWL()" id="wl-btn" class="btn-p">新增</button>
-            </div>
-            <!-- 搜尋與批次操作列 -->
-            <div class="flex items-center gap-2 pt-3 border-t border-slate-100">
-              <div class="flex-1 relative">
-                <input type="text" id="wl-search" oninput="renderWL()" placeholder="搜尋姓名或信箱..." class="form-input w-full pl-8 text-sm">
-                <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-              </div>
-              <div id="batch-actions" class="hidden flex items-center gap-2">
-                <button onclick="openBatchGroupModal()" class="text-sm bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold px-3 py-2 rounded transition-colors shadow-sm flex items-center gap-1">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>批次加入群組
-                </button>
-                <button onclick="batchDeleteWL()" class="text-sm bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold px-3 py-2 rounded transition-colors shadow-sm flex items-center gap-1">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>批次刪除
-                </button>
-              </div>
-            </div>
-          </div>
-          <div class="flex-1 overflow-y-auto p-5 bg-slate-50/30" id="wl-list"></div>
-        </div>
-
-        <!-- 發信群組管理 -->
-        <div id="tab-groups" class="settings-tab-pane hidden flex-1 flex flex-col h-full">
-          <div class="p-5 border-b border-slate-100">
-            <h4 class="text-lg font-bold text-slate-800 mb-2">發信群組管理</h4>
-            <p class="text-xs text-slate-500 mb-4">建立部門或職務群組，發布週報時可一鍵全選整個群組的人員。</p>
-            <div class="flex items-center gap-2">
-              <input type="text" id="grp-name" placeholder="群組名稱 (例: 長官群、資訊部)" class="form-input flex-1">
-              <button onclick="addGroup()" class="btn-p">建立群組</button>
-            </div>
-          </div>
-          <div class="flex-1 flex overflow-hidden">
-            <div class="w-1/3 border-r border-slate-200 flex flex-col">
-              <div class="p-3 border-b border-slate-100">
-                <input type="text" id="grp-list-search" oninput="renderGroupList()" placeholder="搜尋群組..." class="form-input w-full text-xs">
-              </div>
-              <div class="flex-1 overflow-y-auto p-3" id="group-list">
-              <!-- 群組列表 -->
-            </div>
-            </div>
-            <div class="w-2/3 flex flex-col h-full">
-              <div class="p-3 border-b border-slate-200 bg-slate-50 flex flex-col gap-2">
-                <div class="flex justify-between items-center font-semibold text-sm text-slate-700">
-                  <span id="group-detail-title">請選擇左側群組</span>
-                  <span class="text-xs text-slate-500 font-normal">勾選加入群組</span>
-                </div>
-                <div class="relative mt-1">
-                  <input type="text" id="grp-search" oninput="renderGroupMembers()" placeholder="搜尋聯絡人..." class="form-input w-full pl-8 text-xs py-1.5">
-                  <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
-                </div>
-              </div>
-              <div class="flex-1 overflow-y-auto p-4" id="group-members">
-                <!-- 成員勾選列表 -->
-                <div class="text-center text-slate-400 mt-10 text-sm">請先在「郵件通訊錄」新增名單，再到此處分配群組。</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 後台管理員名單 -->
-        <div id="tab-admin" class="settings-tab-pane hidden flex-1 flex flex-col h-full">
-          <div class="p-5 border-b border-slate-100">
-            <h4 class="text-lg font-bold text-slate-800 mb-2">後台管理員名單</h4>
-            <p class="text-xs text-rose-600 mb-4 bg-rose-50 p-2 rounded-lg">設定能夠登入此後台的帳號。系統預設的超級管理員 leokung@youbike.com.tw 不會顯示於此，但永遠具有登入權限。</p>
-            <div class="flex items-center gap-2 mb-4">
-              <input id="am-name" type="text" class="form-input text-sm flex-1" placeholder="姓名...">
-              <input id="am-email" type="email" class="form-input text-sm flex-1" placeholder="信箱 (@youbike.com.tw)">
-              <button onclick="addAdmin()" class="btn-p bg-rose-600 hover:bg-rose-700 border-rose-600 px-4">新增</button>
-            </div>
-          </div>
-          <div class="flex-1 overflow-y-auto p-5">
-            <div class="border border-slate-200 rounded-lg">
-              <table class="w-full text-left text-xs">
-                <thead class="bg-slate-50 sticky top-0"><tr><th class="px-3 py-2 font-medium">姓名</th><th class="px-3 py-2 font-medium">Email</th><th class="px-3 py-2 text-center w-12">操作</th></tr></thead>
-                <tbody id="am-list" class="divide-y divide-slate-100"></tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- 關鍵字資料庫 -->
-        <div id="tab-keywords" class="settings-tab-pane hidden flex-1 flex flex-col h-full">
-          <div class="flex-1 flex overflow-hidden">
-            <div class="w-1/3 border-r border-slate-200 bg-slate-50/50 flex flex-col">
-              <div class="p-3 border-b border-slate-200 font-semibold text-sm text-slate-600 bg-white shadow-sm z-10">母標題 (類別)</div>
-              <div class="flex-1 overflow-y-auto p-2" id="km-cat-list"></div>
-            </div>
-            <div class="flex-1 flex flex-col bg-white relative">
-              <div class="p-3 border-b border-slate-200 flex items-center justify-between shadow-sm z-10">
-                <span class="font-semibold text-sm text-slate-600" id="km-kw-title">請選擇左側母標題</span>
-                <button onclick="addKW()" class="text-xs bg-blue-50 text-blue-600 font-semibold px-3 py-1.5 rounded hover:bg-blue-100 transition-colors">＋ 新增關鍵字</button>
-              </div>
-              <div class="flex-1 overflow-y-auto p-4 bg-slate-50/30" id="km-kw-list">
-                <div class="text-center text-slate-400 mt-10 text-sm">請從左側選擇一個母標題來編輯對應的子標題</div>
-              </div>
-            </div>
-          </div>
-          <div class="p-4 border-t border-slate-200 bg-slate-50 flex justify-end">
-            <button onclick="saveKMDb()" class="btn-p">💾 儲存關鍵字並發布生效</button>
-          </div>
-        </div>
-
-        <!-- 系統交接設定 -->
-        <div id="tab-handover" class="settings-tab-pane hidden flex-1 flex flex-col h-full">
-          <div class="p-5 border-b border-slate-100">
-            <h4 class="text-lg font-bold text-slate-800 mb-2">系統交接與聯絡資訊</h4>
-            <p class="text-xs text-slate-500 mb-4">設定前台底部顯示的維護人員聯絡資訊。</p>
-          </div>
-          <div class="flex-1 overflow-y-auto p-6 space-y-4 max-w-lg">
-            <div>
-              <label class="block text-sm font-semibold text-slate-700 mb-1">聯絡窗口姓名</label>
-              <input id="ho-name" type="text" class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" placeholder="例如: Sunny Ting 丁美云">
-            </div>
-            <div>
-              <label class="block text-sm font-semibold text-slate-700 mb-1">聯絡電話</label>
-              <input id="ho-tel" type="text" class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" placeholder="例如: +886-2-8978-5094">
-            </div>
-            <div>
-              <label class="block text-sm font-semibold text-slate-700 mb-1">電子郵件</label>
-              <input id="ho-email" type="text" class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" placeholder="例如: sunnyting@youbike.com.tw">
-            </div>
-            <div>
-              <label class="block text-sm font-semibold text-slate-700 mb-1">聯絡地址</label>
-              <input id="ho-addr" type="text" class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" placeholder="例如: 105403 台北市松山區民權東路3段138號10樓">
-            </div>
-            <div class="pt-4">
-              <button id="btn-save-ho" onclick="saveHandover()" class="btn-p flex items-center gap-2">儲存聯絡資訊</button>
-            </div>
-          </div>
-        </div>
-
-      </div>
+      <div class="overflow-y-auto max-h-60 border border-slate-200 rounded-lg">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-50"><tr><th class="px-3 py-2 font-medium">姓名</th><th class="px-3 py-2 font-medium">Email</th><th class="px-3 py-2 text-center w-12">操作</th></tr></thead>
+          <tbody id="um-list" class="divide-y divide-slate-100"></tbody>
+        </table>
       </div>
     </div>
   </div>
 </div>
 
-<!-- 批次加入群組 Modal -->
-<div id="batch-group-modal" class="hidden fixed inset-0 z-[160] flex justify-center items-center bg-slate-900/60 backdrop-blur-sm transition-all duration-300">
-  <div class="w-full max-w-md bg-white rounded-2xl shadow-2xl flex flex-col m-4 overflow-hidden">
-    <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
-      <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">👥 選擇目標群組</h3>
-      <button onclick="closeBatchGroupModal()" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-200 text-slate-500 transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+<div id="admin-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-[150] hidden flex items-center justify-center p-4" onclick="if(event.target===this)hideAdminList()">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
+    <div class="px-6 py-5 border-b border-rose-100 bg-rose-50 rounded-t-2xl flex items-center justify-between">
+      <h3 class="text-base font-semibold text-rose-800">🛡️ 管理員白名單</h3>
+      <button onclick="hideAdminList()" class="bic"><svg class="w-5 h-5 text-rose-400 hover:text-rose-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
     </div>
-    <div class="p-5 flex-1 overflow-y-auto">
-      <p class="text-sm text-slate-600 mb-4">請勾選要加入的群組：</p>
-      <div id="batch-group-list" class="space-y-2 max-h-60 overflow-y-auto p-2 border border-slate-200 rounded">
-        <!-- JS渲染群組選項 -->
+    <div class="p-5">
+      <p class="text-xs text-rose-600 mb-4 bg-rose-50 p-2 rounded-lg">設定能夠登入此後台的帳號。系統預設的超級管理員 leokung@youbike.com.tw 不會顯示於此，但永遠具有登入權限。</p>
+      <div class="flex items-center gap-2 mb-4">
+        <input id="am-name" type="text" class="form-input text-sm flex-1" placeholder="姓名...">
+        <input id="am-email" type="email" class="form-input text-sm flex-1" placeholder="信箱 (@youbike.com.tw)">
+        <button onclick="addAdmin()" class="btn-p bg-rose-600 hover:bg-rose-700 focus:ring-rose-200 border-rose-600 px-4">新增</button>
       </div>
-    </div>
-    <div class="p-4 border-t border-slate-200 bg-slate-50 flex justify-end gap-2">
-      <button onclick="closeBatchGroupModal()" class="px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded font-medium hover:bg-slate-50 transition-colors">取消</button>
-      <button onclick="confirmBatchAddGroup()" class="px-4 py-2 bg-indigo-600 text-white rounded font-medium hover:bg-indigo-700 transition-colors">確認加入</button>
+      <div class="overflow-y-auto max-h-60 border border-slate-200 rounded-lg">
+        <table class="w-full text-left text-xs">
+          <thead class="bg-slate-50"><tr><th class="px-3 py-2 font-medium">姓名</th><th class="px-3 py-2 font-medium">Email</th><th class="px-3 py-2 text-center w-12">操作</th></tr></thead>
+          <tbody id="am-list" class="divide-y divide-slate-100"></tbody>
+        </table>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- 系統與專案成果 Modal -->
-<div id="about-modal" class="hidden fixed inset-0 z-[200] flex justify-center items-center bg-slate-900/60 backdrop-blur-sm transition-all duration-300">
-  <div class="w-full max-w-5xl h-[85vh] bg-white rounded-2xl shadow-2xl flex flex-col m-4 overflow-hidden">
-    <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-gradient-to-r from-amber-50 to-orange-50">
-      <h3 class="text-xl font-bold text-amber-800 flex items-center gap-2">ℹ️ 系統說明與專案成果</h3>
-      <button onclick="closeAboutModal()" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-amber-100 text-amber-600 transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
-    </div>
-    
-    <div class="flex-1 flex flex-col overflow-hidden">
-      <!-- 內部 Tabs -->
-      <div class="flex border-b border-slate-200 bg-white">
-        <button onclick="switchAboutTab('tab-guide')" id="btn-tab-guide" class="flex-1 py-3 font-semibold text-sm border-b-2 transition-colors text-amber-600 border-amber-500">系統操作指南</button>
-        <button onclick="switchAboutTab('tab-achievements')" id="btn-tab-achievements" class="flex-1 py-3 font-semibold text-sm border-b-2 transition-colors text-slate-500 border-transparent hover:text-slate-700">專案開發成果</button>
-      </div>
 
-      <!-- 操作指南內容 -->
-      <div id="tab-guide" class="about-tab-pane flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/30 custom-scrollbar smooth-scroll-pane">
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">1</span>發布錯誤沒關係，一鍵撤回與重發</h4>
-          <p class="text-sm leading-relaxed mb-2 text-slate-600">發現公告有錯字或少傳附件？點擊右上角「撤回發布」，週報就會立刻從前台下架，變成草稿狀態。</p>
-          <p class="text-sm leading-relaxed text-slate-600">修正完畢後再次點選「正式發布」，系統會彈出名單，讓您重新勾選要額外通知的人員，不怕漏發更新版本給長官！</p>
+  <!-- 專案開發成果展示 (Achievements Modal) -->
+  <div id="am" class="hidden fixed inset-0 z-[100] flex justify-end bg-slate-900/40 transition-all duration-300">
+    <div class="w-full max-w-lg h-full bg-slate-50 shadow-2xl overflow-y-auto overscroll-contain transform transition-transform duration-300 border-l border-white/20" style="-webkit-overflow-scrolling: touch;">
+      <div class="sticky top-0 z-10 bg-white/95 backdrop-blur-sm px-8 py-6 flex items-center justify-between border-b border-slate-200 shadow-sm">
+        <div>
+          <h2 class="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-amber-600 to-orange-500 flex items-center gap-2">
+            🚀 專案開發成果
+          </h2>
+          <p class="text-xs text-slate-500 mt-1 font-medium tracking-wide">原始需求規格 實作里程碑</p>
         </div>
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">2</span>嚴密的安全防護與精準通知</h4>
-          <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>前台防護：</strong>只有使用 <code class="bg-slate-100 px-1 py-0.5 rounded text-red-500">@youbike.com.tw</code> 信箱的同仁才能登入前台閱讀週報，保護機密不外洩。</p>
-          <p class="text-sm leading-relaxed text-slate-600"><strong>後台白名單：</strong>後台內建了「系統設定中心」，您可以自由維護常設的通知名單與群組。發布週報時，可以像點餐一樣輕鬆勾選這次要特別通知誰。</p>
-        </div>
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-300 transition-colors">
-          <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">3</span>免安裝、點開即用的雲端系統</h4>
-          <p class="text-sm leading-relaxed text-slate-600">不用複雜的安裝步驟，只要雙擊檔案就能開啟。所有的週報資料都會自動存入最高級別的 Firebase 雲端資料庫，隨寫隨存，資料安全不遺失。</p>
-        </div>
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-300 transition-colors">
-          <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">4</span>乾淨俐落的編輯畫面</h4>
-          <p class="text-sm leading-relaxed mb-2 text-slate-600">為了讓您有最大的打字空間，我們把文字工具列（粗體、顏色等）藏了起來。</p>
-          <p class="text-sm leading-relaxed text-slate-600">只要您 <strong>點擊任何一個段落的文字框</strong>，工具列就會聰明地出現在「B 段落內容管理」的標題列上方，既不佔空間又好用！</p>
-        </div>
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-300 transition-colors">
-          <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">5</span>豐富的專屬業務表格</h4>
-          <p class="text-sm leading-relaxed text-slate-600">除了打字，您還可以點擊每個段落右側的「📊 表格」按鈕，快速插入「漲價料件清單」、「修繕紀錄」等採購專屬表格，資料填寫更結構化。</p>
-        </div>
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-300 transition-colors">
-          <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">6</span>誰看過週報？一目了然</h4>
-          <p class="text-sm leading-relaxed mb-2 text-slate-600">系統會自動記錄哪些長官或同仁已經點開閱讀過這份週報，您可以在 C 區塊即時追蹤。</p>
-          <p class="text-sm leading-relaxed text-slate-600">您還可以在右側的「回饋與待辦」區塊，為每篇週報記下需要追蹤的事項，打勾就代表完成！</p>
-        </div>
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-300 transition-colors">
-          <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">7</span>統一用語，分類更輕鬆</h4>
-          <p class="text-sm leading-relaxed mb-2 text-slate-600">系統內建了標準的「8 大管理分類」與對應的子標題。當您選擇主分類後，點擊旁邊的子標題欄位，系統會自動推薦關鍵字，省去手動打字的麻煩。</p>
-          <p class="text-sm leading-relaxed text-slate-600">您可以隨時在左側的「📚 關鍵字資料庫維護」中，依照現況新增、修改或停用這些分類選項。</p>
-        </div>
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-300 transition-colors">
-          <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">8</span>精心設計的閱讀留白</h4>
-          <p class="text-sm leading-relaxed mb-2 text-slate-600">前台佈告欄的文字與外框之間，我們刻意保留了「黃金比例的留白（空白間距）」。</p>
-          <p class="text-sm leading-relaxed text-slate-600">當未來週報資料量變大、包含長篇交期更新時，這些留白能避免版面變成擁擠的「文字牆」，有效降低視覺疲勞，讓重點一目了然！</p>
-        </div>
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">9</span>信件必讀公告，重點直達主管信箱</h4>
-          <p class="text-sm leading-relaxed mb-2 text-slate-600">當主管很忙沒空點進網站看公告怎麼辦？</p>
-          <p class="text-sm leading-relaxed text-slate-600">發布週報時，只要打勾「附加必讀公告」，系統就會自動把這份週報裡所有標記為 <strong>「緊急」</strong> 的項目，整理成文字直接貼在信件內容裡！重點訊息不漏接！</p>
-        </div>
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">10</span>後台專屬的最高防護：管理員白名單</h4>
-          <p class="text-sm leading-relaxed mb-2 text-slate-600">後台不是任何人都能進來的！為了保護採購資料的安全性，系統特別設立了「管理員白名單」。</p>
-          <p class="text-sm leading-relaxed text-slate-600">您可以從「系統設定中心」隨時新增或移除管理員。當有新人報到或同仁交接時，只要在這裡輸入他的 Email，他就能立刻獲得發布與修改週報的最高權限！</p>
-        </div>
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">11</span>自由新增群組，一鍵勾選不漏發</h4>
-          <p class="text-sm leading-relaxed mb-2 text-slate-600">每次發布都要一個一個勾選太麻煩？</p>
-          <p class="text-sm leading-relaxed text-slate-600">您可以到「系統設定中心」建立專屬群組。發布時，只要點擊群組名稱，系統就會自動為您勾選該群組內的所有人員，大幅節省發布時間！</p>
-        </div>
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">12</span>已讀追蹤與智慧防干擾</h4>
-          <p class="text-sm leading-relaxed mb-2 text-slate-600">想知道誰還沒看過緊急公告？</p>
-          <p class="text-sm leading-relaxed text-slate-600">後台的「閱讀狀態追蹤儀表板」除了顯示已讀與未讀名單，更新增了「已讀 / 未讀人數」統計標籤！同時，閱讀過的人員再次登入時，系統會啟動防干擾機制，不會再重複彈出新公告提醒視窗。</p>
-        </div>
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">13</span>發送與更新時間精準顯示</h4>
-          <p class="text-sm leading-relaxed mb-2 text-slate-600">想知道這篇公告是何時發布或更新的嗎？</p>
-          <p class="text-sm leading-relaxed text-slate-600">系統會在每篇公告的標題下方，以精美的時間膠囊顯示「🕒 發布時間」。如果您後續有對內容進行編輯，系統也會智慧地在後方補充顯示「(最後更新時間)」，讓資訊時效性一目了然。</p>
-        </div>
-        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm">
-          <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">14</span>自動聚焦當月最新公告，保持版面清爽</h4>
-          <p class="text-sm leading-relaxed mb-2 text-slate-600">歷史週報累積越來越多，會不會很難找？</p>
-          <p class="text-sm leading-relaxed text-slate-600">別擔心！系統設計了精緻的「下拉式月份篩選」，網頁開啟時會自動鎖定在「當前最新月份」，讓畫面上只顯示近期的週報。若需查詢歷史資料，隨時可透過下拉選單切換月份，甚至選擇「全部月份」，且系統會聰明地為您預先選取該月份最新的一篇公告！</p>
-        </div>
+        <button onclick="hideAchievements()" class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 hover:text-slate-800 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
       </div>
-
-      <!-- 專案開發成果內容 -->
-      <div id="tab-achievements" class="about-tab-pane hidden flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/30 custom-scrollbar smooth-scroll-pane">
-        <p class="text-sm text-slate-500 mb-4 font-medium tracking-wide">採購需求增補 & 專案成就</p>
-        
-        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
-          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
-          <div class="flex gap-4">
-            <div class="mt-0.5">
-              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-              </div>
-            </div>
-            <div>
-              <h3 class="text-sm font-bold text-slate-800 mb-1">已讀狀態追蹤與智慧防干擾機制</h3>
-              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                <span class="font-semibold text-slate-600">採購需求：</span><br>
-                1. 每則公告需顯示具有閱讀權限人員的閱讀狀態(已讀)<br>
-                2. 閱讀公告的人員，再次登入系統後不再重複顯示該公告,避免干擾。<br>
-                3. 新增「已讀人數」及「未讀人數」統計，作為效益分析依據。
-              </p>
-              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
-                💡 <span class="font-bold">專案成果：</span>運用 Firebase Subcollection 技術實作分散式讀取紀錄（無併發寫入衝突）。後台動態比對發佈名單與讀取紀錄，產生名單與「已讀 / 未讀人數 Data Pills」視覺化統計標籤；前台匯入智慧防干擾判定，新公告僅針對未讀者進行彈窗提示，閱讀後默默歸檔。
-              </p>
-            </div>
-          </div>
-        </div>
-        
-        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
-          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
-          <div class="flex gap-4">
-            <div class="mt-0.5">
-              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-              </div>
-            </div>
-            <div>
-              <h3 class="text-sm font-bold text-slate-800 mb-1">郵件通訊錄批次管理與前台版面優化</h3>
-              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                <span class="font-semibold text-slate-600">採購需求：</span><br>
-                1. 郵件通訊錄中需有快速篩選功能，並可勾選批次加入群組，因應高流動率。<br>
-                2. 紀錄區需增加顯示「發送人」及「完整發送時間」。<br>
-                3. 前台佈告欄的「週報與日期變動」移至獨立的一列，避免排版擠壓。
-              </p>
-              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
-                💡 <span class="font-bold">專案成果：</span>郵件通訊錄導入了批次管理模式，支援關鍵字即時篩選與一鍵多選加入特定群組，並同步處理名單刪除功能。操作與發送紀錄已精準抓取操作者資訊 (Sender) 與格式化時間 (YYYY/MM/DD HH:mm)。前台版面將週報分頁籤獨立於第二列，讓整體視覺更俐落、搜尋列更清晰！
-              </p>
-            </div>
-          </div>
-        </div>
-        
+      <div class="p-8 space-y-6">
+        <!-- 成就 1 -->
         <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
           <div class="flex gap-4">
@@ -612,6 +310,8 @@
             </div>
           </div>
         </div>
+
+        <!-- 成就 2 -->
         <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
           <div class="flex gap-4">
@@ -633,6 +333,8 @@
             </div>
           </div>
         </div>
+
+        <!-- 成就 3 -->
         <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
           <div class="flex gap-4">
@@ -649,11 +351,13 @@
                 • 新增週報時，不覆蓋舊資料，每次新增皆建立新紀錄，保留完整歷史。
               </p>
               <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
-                ✨ <span class="font-bold">實作成果：</span>導入 Firebase 雲端資料庫，搭配「下拉式月份篩選選單」，實現全自動的歷史歸檔。系統預設僅顯示當月最新公告，保持排版極簡清爽，同時又能隨時切換月份查找完整的歷史資料，確保資料永久不滅。
+                ✨ <span class="font-bold">實作成果：</span>導入 Firebase 雲端資料庫，實現全自動的「歷史歸檔」側邊欄，以樹狀結構完美分類每個月分的週報，確保資料永久不滅。
               </p>
             </div>
           </div>
         </div>
+
+        <!-- 成就 4 -->
         <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
           <div class="flex gap-4">
@@ -675,6 +379,8 @@
             </div>
           </div>
         </div>
+
+        <!-- 成就 5 -->
         <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
           <div class="flex gap-4">
@@ -696,6 +402,8 @@
             </div>
           </div>
         </div>
+
+        <!-- 成就 6 -->
         <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
           <div class="flex gap-4">
@@ -717,6 +425,8 @@
             </div>
           </div>
         </div>
+
+        <!-- 成就 7 -->
         <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
           <div class="flex gap-4">
@@ -738,6 +448,7 @@
             </div>
           </div>
         </div>
+        <!-- 成就 8 -->
         <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
           <div class="flex gap-4">
@@ -759,6 +470,7 @@
             </div>
           </div>
         </div>
+        <!-- 成就 9 -->
         <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden mt-6">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
           <div class="flex gap-4">
@@ -780,6 +492,8 @@
             </div>
           </div>
         </div>
+
+        <!-- 成就 10 -->
         <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden mt-6">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
           <div class="flex gap-4">
@@ -801,6 +515,9 @@
             </div>
           </div>
         </div>
+      </div>
+
+        <!-- 成就 11 -->
         <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden mt-6">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
           <div class="flex gap-4">
@@ -822,6 +539,8 @@
             </div>
           </div>
         </div>
+
+        <!-- 成就 12 -->
         <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden mt-6">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
           <div class="flex gap-4">
@@ -843,55 +562,60 @@
             </div>
           </div>
         </div>
-        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
-          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
-          <div class="flex gap-4">
-            <div class="mt-0.5">
-              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-              </div>
-            </div>
-            <div>
-              <h3 class="text-sm font-bold text-slate-800 mb-1">十三、群組發送機制與系統介面大改版</h3>
-              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                <span class="font-semibold text-slate-600">最新需求：</span><br>
-                • 新增群組發送機制，依部門/職務設定群組發送。<br>
-                • 將過多的功能介面進行整合，保持左側導覽列乾淨。
-              </p>
-              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
-                ✨ <span class="font-bold">實作成果：</span>將原本多達 6 個獨立設定視窗，完美重構成具備現代感的「Tab 頁籤式系統設定中心」。不但畫面乾淨清爽，更導入了自訂發信群組架構，並將原本存在本地端的白名單全面搬遷至 Firebase 雲端，讓所有管理員無縫共用設定！
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
-          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
-          <div class="flex gap-4">
-            <div class="mt-0.5">
-              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-              </div>
-            </div>
-            <div>
-              <h3 class="text-sm font-bold text-slate-800 mb-1">十四、發佈與更新時間顯示設計</h3>
-              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                <span class="font-semibold text-slate-600">最新需求：</span><br>
-                公告發布後，於公告資訊中顯示實際發送時間（日期及時間）,方便收件人確認資訊發布時點。
-              </p>
-              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
-                ✨ <span class="font-bold">實作成果：</span>以前台「深藍色漸層主視覺區塊」為基礎，打造帶有微透視玻璃質感（Glassmorphism）的圓角標籤：🕒 發布時間。並具備「智慧隱藏更新時間」邏輯：有更新時才會淡淡地補上最後更新時間，排版極致整潔好看美觀！
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   </div>
+
+  <!-- Keyword Maintenance Modal -->
+  <div id="km" class="hidden fixed inset-0 z-[110] flex justify-center items-center bg-slate-900/60 backdrop-blur-sm transition-all duration-300">
+    <div class="w-full max-w-5xl h-[85vh] bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden m-4">
+      <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50">
+        <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">📚 關鍵字資料庫維護</h3>
+        <button onclick="hideKM()" class="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-slate-200 text-slate-500 transition-colors"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+      </div>
+      <div class="flex-1 flex overflow-hidden">
+        <!-- Left: Categories -->
+        <div class="w-1/3 border-r border-slate-200 bg-slate-50/50 flex flex-col">
+          <div class="p-3 border-b border-slate-200 font-semibold text-sm text-slate-600 bg-white shadow-sm z-10">母標題 (類別)</div>
+          <div class="flex-1 overflow-y-auto p-2" id="km-cat-list"></div>
+        </div>
+        <!-- Right: Keywords -->
+        <div class="flex-1 flex flex-col bg-white relative">
+          <div class="p-3 border-b border-slate-200 flex items-center justify-between shadow-sm z-10">
+            <span class="font-semibold text-sm text-slate-600" id="km-kw-title">請選擇左側母標題</span>
+            <button onclick="addKW()" class="text-xs bg-blue-50 text-blue-600 font-semibold px-3 py-1.5 rounded hover:bg-blue-100 transition-colors">＋ 新增關鍵字</button>
+          </div>
+          <div class="flex-1 overflow-y-auto p-4 bg-slate-50/30" id="km-kw-list">
+            <div class="text-center text-slate-400 mt-10 text-sm">請從左側選擇一個母標題來編輯對應的子標題</div>
+          </div>
+        </div>
+      </div>
+      <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 flex justify-end gap-3">
+        <button onclick="hideKM()" class="btn-s">取消</button>
+        <button onclick="saveKMDb()" class="btn-p">💾 儲存並發布生效</button>
+      </div>
+    </div>
+  </div>
+  
+<!-- 郵件白名單 Modal -->
+<div id="wl-modal" class="hidden fixed inset-0 z-[110] flex justify-center items-center bg-slate-900/60 backdrop-blur-sm transition-all duration-300">
+  <div class="w-full max-w-2xl bg-white rounded-2xl shadow-2xl flex flex-col m-4 max-h-[80vh]">
+    <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 rounded-t-2xl">
+      <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">✉️ 郵件白名單管理</h3>
+      <button onclick="hideWL()" class="text-slate-500 hover:bg-slate-200 p-1.5 rounded-lg"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="p-4 border-b border-slate-100 flex gap-2">
+      <input type="text" id="wl-name" placeholder="姓名 (例: 吳俊緯)" class="form-input flex-1">
+      <input type="email" id="wl-email" placeholder="信箱 (@youbike.com.tw)" class="form-input flex-1">
+      <button onclick="addWL()" id="wl-btn" class="btn-p">新增</button>
+    </div>
+    <div class="flex-1 overflow-y-auto p-4 bg-slate-50/30" id="wl-list"></div>
+  </div>
 </div>
 
-<!-- 發送郵件確認 Modal (含群組UI) -->
+<!-- 發送郵件確認 Modal -->
 <div id="pub-modal" class="hidden fixed inset-0 z-[120] flex justify-center items-center bg-slate-900/60 backdrop-blur-sm">
-  <div class="w-full max-w-3xl bg-white rounded-2xl shadow-2xl flex flex-col m-4">
+  <div class="w-full max-w-2xl bg-white rounded-2xl shadow-2xl flex flex-col m-4">
     <div class="px-6 py-4 border-b border-slate-200 bg-slate-50 rounded-t-2xl flex justify-between items-center">
       <div>
         <h3 class="text-lg font-bold text-slate-800">✅ 選擇發送對象</h3>
@@ -899,21 +623,16 @@
       </div>
       <button onclick="hidePubModal()" class="text-slate-500 hover:bg-slate-200 p-1.5 rounded-lg"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
     </div>
-    <div class="px-4 py-3 bg-blue-50 border-b border-blue-100 flex flex-col gap-2">
-        <!-- 快速群組按鈕區 -->
-        <div class="flex items-center gap-2 flex-wrap mb-1" id="pub-group-buttons">
-          <span class="text-xs font-semibold text-blue-800 mr-2">群組快選：</span>
-          <!-- 動態載入群組按鈕 -->
-        </div>
-        <label class="flex items-center gap-2 cursor-pointer text-sm font-medium text-blue-800 border-t border-blue-200/50 pt-2">
+    <div class="px-4 py-2 bg-blue-50 border-b border-blue-100 flex flex-col gap-2">
+        <label class="flex items-center gap-2 cursor-pointer text-sm font-medium text-blue-800">
             <input type="checkbox" id="pub-wl-all" class="rounded text-blue-600" checked onchange="toggleAllWL(this.checked)"> 全選 / 取消全選
         </label>
-        <label class="flex items-center gap-2 cursor-pointer text-sm font-medium text-amber-700 mt-1">
+        <label class="flex items-center gap-2 cursor-pointer text-sm font-medium text-amber-700 mt-1 border-t border-blue-200/50 pt-2">
             <input type="checkbox" id="pub-must-read" class="rounded text-amber-600" checked>
             附加「必讀公告」：自動擷取週報內標記為「緊急」的項目，直接顯示於信件中
         </label>
     </div>
-    <div class="p-4 max-h-[50vh] overflow-y-auto grid grid-cols-2 md:grid-cols-3 gap-3" id="pub-wl-list"></div>
+    <div class="p-4 max-h-[50vh] overflow-y-auto grid grid-cols-2 gap-3" id="pub-wl-list"></div>
     <div class="p-4 border-t border-slate-200 flex justify-end gap-3 bg-slate-50 rounded-b-2xl">
       <button onclick="hidePubModal()" class="btn-s">取消</button>
       <button onclick="confirmPubBulletin()" class="btn-p" id="btn-pub-confirm">確認發布並寄信</button>
@@ -921,6 +640,108 @@
   </div>
 </div>
 
-<script src="js/admin.js?v=20260804"></script>
+
+<!-- System Guide Modal -->
+<div id="guide-modal" class="hidden fixed inset-0 z-[200] flex justify-center bg-slate-900/50 backdrop-blur-sm transition-all duration-300" style="align-items: center;">
+  <div class="w-full max-w-4xl bg-white rounded-2xl shadow-2xl flex flex-col m-4 max-h-[85vh]">
+    <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-gradient-to-r from-amber-50 to-orange-50 rounded-t-2xl">
+      <h3 class="text-xl font-bold text-amber-800 flex items-center gap-2">💡 採購週報系統：新手操作指南</h3>
+      <button onclick="hideGuide()" class="text-amber-600 hover:bg-amber-100 p-1.5 rounded-lg transition-colors"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="p-6 overflow-y-auto overscroll-contain transform-gpu space-y-6 text-slate-700 bg-slate-50/30">
+      
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-300 transition-colors">
+        <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">1</span>發布錯誤沒關係，一鍵撤回與重發</h4>
+        <p class="text-sm leading-relaxed mb-2 text-slate-600">發現公告有錯字或少傳附件？點擊右上角「撤回發布」，週報就會立刻從前台下架，變成草稿狀態。</p>
+        <p class="text-sm leading-relaxed text-slate-600">修正完畢後再次點選「正式發布」，系統會彈出名單，讓您重新勾選要額外通知的人員，不怕漏發更新版本給長官！</p>
+      </div>
+
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-300 transition-colors">
+        <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">2</span>嚴密的安全防護與精準通知</h4>
+        <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>前台防護：</strong>只有使用 <code class="bg-slate-100 px-1 py-0.5 rounded text-red-500">@youbike.com.tw</code> 信箱的同仁才能登入前台閱讀週報，保護機密不外洩。</p>
+        <p class="text-sm leading-relaxed text-slate-600"><strong>後台白名單：</strong>後台內建了「郵件白名單管理」，您可以自由維護常設的通知名單。發布週報時，可以像點餐一樣輕鬆勾選這次要特別通知誰。</p>
+      </div>
+
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-300 transition-colors">
+        <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">3</span>免安裝、點開即用的雲端系統</h4>
+        <p class="text-sm leading-relaxed text-slate-600">不用複雜的安裝步驟，只要雙擊檔案就能開啟。所有的週報資料都會自動存入最高級別的 Firebase 雲端資料庫，隨寫隨存，資料安全不遺失。</p>
+      </div>
+
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-300 transition-colors">
+        <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">4</span>乾淨俐落的編輯畫面</h4>
+        <p class="text-sm leading-relaxed mb-2 text-slate-600">為了讓您有最大的打字空間，我們把文字工具列（粗體、顏色等）藏了起來。</p>
+        <p class="text-sm leading-relaxed text-slate-600">只要您 <strong>點擊任何一個段落的文字框</strong>，工具列就會聰明地出現在「B 段落內容管理」的標題列上方，既不佔空間又好用！</p>
+      </div>
+
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-300 transition-colors">
+        <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">5</span>豐富的專屬業務表格</h4>
+        <p class="text-sm leading-relaxed text-slate-600">除了打字，您還可以點擊每個段落右側的「📊 表格」按鈕，快速插入「漲價料件清單」、「修繕紀錄」等採購專屬表格，資料填寫更結構化。</p>
+      </div>
+
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-300 transition-colors">
+        <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">6</span>誰看過週報？一目了然</h4>
+        <p class="text-sm leading-relaxed mb-2 text-slate-600">系統會自動記錄哪些長官或同仁已經點開閱讀過這份週報，您可以在 C 區塊即時追蹤。</p>
+        <p class="text-sm leading-relaxed text-slate-600">您還可以在右側的「回饋與待辦」區塊，為每篇週報記下需要追蹤的事項，打勾就代表完成！</p>
+      </div>
+
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-300 transition-colors">
+        <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">7</span>統一用語，分類更輕鬆</h4>
+        <p class="text-sm leading-relaxed mb-2 text-slate-600">系統內建了標準的「8 大管理分類」與對應的子標題。當您選擇主分類後，點擊旁邊的子標題欄位，系統會自動推薦關鍵字，省去手動打字的麻煩。</p>
+        <p class="text-sm leading-relaxed text-slate-600">您可以隨時在左側的「📚 關鍵字資料庫維護」中，依照現況新增、修改或停用這些分類選項。</p>
+      </div>
+
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-300 transition-colors">
+        <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">8</span>精心設計的閱讀留白</h4>
+        <p class="text-sm leading-relaxed mb-2 text-slate-600">前台佈告欄的文字與外框之間，我們刻意保留了「黃金比例的留白（空白間距）」。</p>
+        <p class="text-sm leading-relaxed text-slate-600">當未來週報資料量變大、包含長篇交期更新時，這些留白能避免版面變成擁擠的「文字牆」，有效降低視覺疲勞，讓重點一目了然！</p>
+      </div>
+
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-300 transition-colors">
+        <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">9</span>信件必讀公告，重點直達主管信箱</h4>
+        <p class="text-sm leading-relaxed mb-2 text-slate-600">當主管很忙沒空點進網站看公告怎麼辦？</p>
+        <p class="text-sm leading-relaxed text-slate-600">發布週報時，只要打勾「附加必讀公告」，系統就會自動把這份週報裡所有標記為 <strong>「緊急」</strong> 的項目，整理成文字直接貼在信件內容裡！重點訊息不漏接！</p>
+      </div>
+
+      <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-300 transition-colors">
+        <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">10</span>後台專屬的最高防護：管理員白名單</h4>
+        <p class="text-sm leading-relaxed mb-2 text-slate-600">後台不是任何人都能進來的！為了保護採購資料的安全性，系統特別設立了「管理員白名單」。</p>
+        <p class="text-sm leading-relaxed text-slate-600">您可以從左側選單的「🛡️ 管理員白名單」隨時新增或移除管理員。當有新人報到或同仁交接時，只要在這裡輸入他的 Email，他就能立刻獲得發布與修改週報的最高權限！</p>
+      </div>
+
+    </div>
+  </div>
+</div>
+<div id="handover-modal" class="hidden fixed inset-0 z-[200] flex justify-center bg-slate-900/50 backdrop-blur-sm transition-all duration-300" style="align-items: center;">
+  <div class="w-full max-w-lg bg-white rounded-2xl shadow-2xl flex flex-col m-4 max-h-[90vh]">
+    <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between bg-slate-50 rounded-t-2xl">
+      <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2">⚙️ 系統交接設定</h3>
+      <button onclick="hideHandover()" class="text-slate-400 hover:bg-slate-200 p-1.5 rounded-lg transition-colors"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="p-6 overflow-y-auto space-y-4">
+      <h4 class="text-md font-bold text-slate-800">前台底部聯絡資訊</h4>
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-1">聯絡窗口姓名</label>
+        <input id="ho-name" type="text" class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" placeholder="例如: Sunny Ting 丁美云">
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-1">聯絡電話</label>
+        <input id="ho-tel" type="text" class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" placeholder="例如: +886-2-8978-5094">
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-1">電子郵件</label>
+        <input id="ho-email" type="text" class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" placeholder="例如: sunnyting@youbike.com.tw">
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-slate-700 mb-1">聯絡地址</label>
+        <input id="ho-addr" type="text" class="w-full border border-slate-300 rounded px-3 py-2 text-sm focus:border-blue-500 focus:outline-none" placeholder="例如: 105403 台北市松山區民生東路三段138號10樓">
+      </div>
+    </div>
+    <div class="px-6 py-4 border-t border-slate-200 bg-slate-50 rounded-b-2xl flex justify-end gap-2">
+      <button onclick="hideHandover()" class="px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200 rounded transition-colors">取消</button>
+      <button id="btn-save-ho" onclick="saveHandover()" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded transition-colors flex items-center gap-2">儲存設定</button>
+    </div>
+  </div>
+</div>
+  <script src="js/admin.js?v=20260804"></script>
 </body>
 </html>

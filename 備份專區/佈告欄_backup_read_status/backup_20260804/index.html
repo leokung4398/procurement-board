@@ -38,22 +38,22 @@
     </div>
   </div>
 
-  </div>
-
-  <!-- 新公告未讀提醒彈窗 -->
-  <div id="unread-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm text-center">
-      <div class="w-12 h-12 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-3">
-        <svg class="w-6 h-6 text-rose-600 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-        </svg>
-      </div>
-      <h3 class="text-lg font-bold text-slate-800 mb-1">您有未讀的新公告！</h3>
-      <p class="text-sm text-slate-500 mb-4" id="unread-bulletin-title">最新緊急公告</p>
-      
-      <button onclick="closeUnreadModal()" class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg p-2.5 text-sm font-semibold shadow-sm transition-colors">
-        立即查看
-      </button>
+  <!-- 部門選擇彈窗 (首次登入用) -->
+  <div id="dept-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm">
+      <h3 class="text-lg font-bold text-slate-800 mb-2">請選擇您的所屬部門</h3>
+      <p class="text-xs text-slate-500 mb-4">系統需要記錄您的部門資訊，這是最後一步囉！</p>
+      <select id="user-dept" class="w-full border border-slate-200 rounded-lg p-2 text-sm outline-none focus:border-blue-500 mb-4">
+        <option value="">請選擇部門...</option>
+        <option value="台北營運部">台北營運部</option>
+        <option value="台中營運部">台中營運部</option>
+        <option value="高雄營運部">高雄營運部</option>
+        <option value="總經理室">總經理室</option>
+        <option value="採購部門">採購部門</option>
+        <option value="財務部門">財務部門</option>
+        <option value="資訊部門">資訊部門</option>
+      </select>
+      <button onclick="saveDeptInfo()" class="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-lg p-2 text-sm font-semibold">確認並開始瀏覽</button>
     </div>
   </div>
 
@@ -88,39 +88,39 @@
       </ul>
     </div>
 
-    <!-- 搜尋框與過濾工具列 -->
-    <div class="mb-4 flex flex-wrap justify-end gap-2 items-center bg-white p-2 rounded-lg border border-slate-200 shadow-sm">
-      <select id="search-month" onchange="handleSearch()" class="form-input text-xs py-1.5 px-2 w-28 bg-slate-50">
-        <option value="">全部月份</option>
-      </select>
-      <select id="search-parent" onchange="handleSearch()" class="form-input text-xs py-1.5 px-2 w-36 bg-slate-50">
-        <option value="">全部類別</option>
-        <option value="採購作業進度">採購作業進度</option>
-        <option value="詢價／報價作業">詢價／報價作業</option>
-        <option value="訂單異動作業">訂單異動作業</option>
-        <option value="供應商管理作業">供應商管理作業</option>
-        <option value="交貨管理作業">交貨管理作業</option>
-        <option value="品質異常作業">品質異常作業</option>
-        <option value="工程變更作業">工程變更作業</option>
-        <option value="採購通知公告">採購通知公告</option>
-        <option value="其他異動作業">其他異動作業</option>
-        <option value="附件文件">附件文件</option>
-        <option value="供應商通知">供應商通知</option>
-        <option value="系統公告">系統公告</option>
-      </select>
-      <input type="text" id="search-keyword" oninput="handleSearch()" class="form-input text-xs py-1.5 px-2 w-48 bg-slate-50" placeholder="搜尋標題、料號、廠商...">
-      <button onclick="handleSearch()" class="bg-blue-600 text-white rounded px-3 py-1.5 text-xs font-semibold hover:bg-blue-700 shadow-sm transition-colors">搜尋</button>
-      <button onclick="refreshData()" class="bg-emerald-600 text-white rounded px-3 py-1.5 text-xs font-semibold hover:bg-emerald-700 shadow-sm transition-colors flex items-center gap-1" title="無需重整頁面，立即接收最新布告">
-        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-        接收最新
-      </button>
-    </div>
-
-    <!-- 週別切換 Tab -->
-    <div class="mb-6 border-b border-slate-200 w-full overflow-x-auto">
-      <nav id="tabs-container" class="-mb-px flex space-x-8 min-w-max" aria-label="Tabs">
-        <!-- JS 動態渲染 Tabs -->
-      </nav>
+    <!-- 週別切換 Tab 與搜尋框 -->
+    <div class="mb-6 flex flex-col xl:flex-row xl:items-end justify-between gap-4">
+      <div class="border-b border-slate-200 flex-1 overflow-x-auto">
+        <nav id="tabs-container" class="-mb-px flex space-x-8 min-w-max" aria-label="Tabs">
+          <!-- JS 動態渲染 Tabs -->
+        </nav>
+      </div>
+      <div class="flex-shrink-0 flex flex-wrap gap-2 items-center bg-white p-2 rounded-lg border border-slate-200 shadow-sm">
+        <select id="search-month" onchange="handleSearch()" class="form-input text-xs py-1.5 px-2 w-28 bg-slate-50">
+          <option value="">全部月份</option>
+        </select>
+        <select id="search-parent" onchange="handleSearch()" class="form-input text-xs py-1.5 px-2 w-36 bg-slate-50">
+          <option value="">全部類別</option>
+          <option value="採購作業進度">採購作業進度</option>
+          <option value="詢價／報價作業">詢價／報價作業</option>
+          <option value="訂單異動作業">訂單異動作業</option>
+          <option value="供應商管理作業">供應商管理作業</option>
+          <option value="交貨管理作業">交貨管理作業</option>
+          <option value="品質異常作業">品質異常作業</option>
+          <option value="工程變更作業">工程變更作業</option>
+          <option value="採購通知公告">採購通知公告</option>
+          <option value="其他異動作業">其他異動作業</option>
+          <option value="附件文件">附件文件</option>
+          <option value="供應商通知">供應商通知</option>
+          <option value="系統公告">系統公告</option>
+        </select>
+        <input type="text" id="search-keyword" oninput="handleSearch()" class="form-input text-xs py-1.5 px-2 w-48 bg-slate-50" placeholder="搜尋標題、料號、廠商...">
+        <button onclick="handleSearch()" class="bg-blue-600 text-white rounded px-3 py-1.5 text-xs font-semibold hover:bg-blue-700 shadow-sm transition-colors">搜尋</button>
+        <button onclick="refreshData()" class="bg-emerald-600 text-white rounded px-3 py-1.5 text-xs font-semibold hover:bg-emerald-700 shadow-sm transition-colors flex items-center gap-1" title="無需重整頁面，立即接收最新布告">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          接收最新
+        </button>
+      </div>
     </div>
 
     <!-- 主要佈告欄內容 -->
@@ -217,7 +217,6 @@
           } else {
             await userRef.set({
               userId: user.userId,
-              email: user.email,
               displayName: user.displayName,
               department: user.department,
               readAt: firebase.firestore.FieldValue.serverTimestamp(),
@@ -226,16 +225,6 @@
           }
         } catch (e) {
           console.error("markAsRead error:", e);
-        }
-      },
-      async hasRead(bulletinId, userId) {
-        if (!this.isConfigured()) return true; // Default true if no DB
-        try {
-          const docSnap = await db.collection('bulletins').doc(bulletinId).collection('readReceipts').doc(userId).get();
-          return docSnap.exists;
-        } catch (e) {
-          console.error("hasRead error:", e);
-          return true;
         }
       }
     };
@@ -308,7 +297,6 @@
         });
         const mArr = Array.from(mSet).sort().reverse();
         const smEl = document.getElementById('search-month');
-        smEl.innerHTML = '<option value="">全部月份</option>';
         mArr.forEach(m => {
           const opt = document.createElement('option');
           opt.value = m;
@@ -316,18 +304,11 @@
           smEl.appendChild(opt);
         });
 
-        // 自動鎖定並過濾為最新月份
-        if (mArr.length > 0) {
-          smEl.value = mArr[0];
-          state.searchMonth = mArr[0];
-        }
-
         if (bulletins.length > 0) {
           state.activeBulletinId = bulletins[0].id;
         }
         
         renderApp();
-        handleSearch();
         checkUserIdentity();
       } catch (err) {
         console.error('Failed to load data:', err);
@@ -339,29 +320,17 @@
       }
     }
 
-    async function checkUserIdentity() {
+    function checkUserIdentity() {
       if (!DS.isConfigured()) return;
       const userStr = localStorage.getItem('procurement_user');
       if (userStr) {
         const user = JSON.parse(userStr);
         if (state.activeBulletinId) {
-          const alreadyRead = await DS.hasRead(state.activeBulletinId, user.userId);
-          if (!alreadyRead) {
-            // Unread! Show the unread modal reminder
-            const b = state.data.bulletins.find(x => x.id === state.activeBulletinId);
-            document.getElementById('unread-bulletin-title').textContent = b ? b.title : '最新緊急公告';
-            document.getElementById('unread-modal').classList.remove('hidden');
-          }
-          // Mark as read (updates lastViewedAt if already read, or creates if not)
           DS.markAsRead(state.activeBulletinId, user);
         }
       } else {
         document.getElementById('user-modal').classList.remove('hidden');
       }
-    }
-
-    function closeUnreadModal() {
-      document.getElementById('unread-modal').classList.add('hidden');
     }
 
     let pendingUser = null;
@@ -371,43 +340,65 @@
       try {
         const result = await firebase.auth().signInWithPopup(provider);
         const user = result.user;
-        const userEmail = user.email.toLowerCase();
-        
-        // Check email address book (whitelist)
-        const mailSnap = await db.collection('systemConfig').doc('whitelist').get();
-        const mailUsers = mailSnap.exists ? (mailSnap.data().list || []) : [];
-        
-        // Case-insensitive check
-        const isAllowed = mailUsers.some(u => u.email.toLowerCase() === userEmail) || 
-                          userEmail === 'leokung@youbike.com.tw' || 
-                          userEmail === 'gb4398@giantcycling.com';
+        if (user.email.endsWith('@youbike.com.tw') || user.email === 'leokung@youbike.com.tw') {
+          // Check whitelist
+          const snap = await db.collection('systemConfig').doc('users').get();
+          const allowedUsers = snap.exists ? (snap.data().list || []) : [];
+          
+          if (!allowedUsers.some(u => u.email === user.email) && user.email !== 'leokung@youbike.com.tw') {
+            await firebase.auth().signOut();
+            const e = document.getElementById('user-le');
+            e.innerText = '無瀏覽權限，請確認是否已被加入白名單。';
+            e.classList.remove('hidden');
+            return;
+          }
 
-        if (!isAllowed) {
+          // Valid domain and whitelisted
+          document.getElementById('user-modal').classList.add('hidden');
+          
+          pendingUser = {
+            userId: user.uid,
+            displayName: user.displayName || user.email.split('@')[0],
+            email: user.email
+          };
+
+          // Check if we already have their department saved
+          let existingUser = localStorage.getItem('procurement_user');
+          if (existingUser) {
+            let parsed = JSON.parse(existingUser);
+            if (parsed.email === user.email && parsed.department) {
+              pendingUser.department = parsed.department;
+              await finishLogin(pendingUser);
+              return;
+            }
+          }
+          
+          // Need department
+          document.getElementById('dept-modal').classList.remove('hidden');
+
+        } else {
           await firebase.auth().signOut();
           const e = document.getElementById('user-le');
-          e.innerText = '無瀏覽權限，請確認是否已被加入通訊錄。';
+          e.innerText = '無權限，請使用 @youbike.com.tw 帳號。';
           e.classList.remove('hidden');
-          return;
         }
-
-        // Valid and whitelisted
-        document.getElementById('user-modal').classList.add('hidden');
-        
-        pendingUser = {
-          userId: user.uid,
-          displayName: user.displayName || user.email.split('@')[0],
-          email: userEmail,
-          department: '未指定' // Default value since we removed dept selection
-        };
-        
-        // Login immediately without asking for department
-        await finishLogin(pendingUser);
-
       } catch (error) {
         console.error('Login error:', error);
       }
     }
 
+    async function saveDeptInfo() {
+      const dept = document.getElementById('user-dept').value;
+      if (!dept) {
+        alert('請選擇所屬部門！');
+        return;
+      }
+      if (pendingUser) {
+        pendingUser.department = dept;
+        document.getElementById('dept-modal').classList.add('hidden');
+        await finishLogin(pendingUser);
+      }
+    }
 
     async function finishLogin(userObj) {
       localStorage.setItem('procurement_user', JSON.stringify(userObj));
@@ -514,17 +505,8 @@
         return true;
       });
       
-        // 確保目前選中的週報仍在篩選結果內，否則預設選取篩選後的第一筆
-        if (filtered.length > 0) {
-          const stillExists = filtered.find(b => b.id === state.activeBulletinId);
-          if (!stillExists) {
-            state.activeBulletinId = filtered[0].id;
-          }
-        }
-        
-        renderTabs(filtered);
-        renderActiveBulletin();
-      }
+      renderTabs(filtered);
+    }
 
     function renderTabs(filteredBulletins = null) {
       const container = document.getElementById('tabs-container');
@@ -604,14 +586,11 @@
               ${sec.items.map((item, itemIdx) => {
                 const isHigh = item.priority === 'high';
                 const borderClass = isHigh ? 'border-red-500 bg-red-50 text-red-900' : 'border-blue-500 bg-blue-50/50 text-slate-800';
-                const highlightBadge = isHigh ? `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-red-100 text-red-800">緊急</span>` : '';
+                const highlightBadge = isHigh ? `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-red-100 text-red-800 mr-2">緊急</span>` : '';
                 return `
                   <div class="px-3 py-1 border-l-4 rounded-r-lg shadow-sm transition-all hover:shadow-md ${borderClass}">
-                    <div class="flex items-start gap-2">
-                      ${isHigh ? `<div class="mt-1 flex-shrink-0">${highlightBadge}</div>` : ''}
-                      <div ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].items[${itemIdx}].content" class="text-sm font-medium leading-relaxed outline-none whitespace-pre-wrap ql-editor !p-0 flex-1">
-                        ${item.content}
-                      </div>
+                    <div ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].items[${itemIdx}].content" class="text-sm font-medium leading-relaxed outline-none whitespace-pre-wrap ql-editor !p-0">
+                      ${highlightBadge}${item.content}
                     </div>
                   </div>
                 `;
@@ -687,13 +666,10 @@
 
         return `
           <section class="bg-white rounded-xl shadow-sm border border-slate-100 p-4">
-            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2 pb-2 mb-3 border-b border-slate-100 flex-wrap">
-              <div class="flex items-center gap-2">
-                <span class="text-xl">${e(sec.icon)}</span>
-                <span class="text-blue-600">${e(sec.sectionNumber)}、</span>
-                <span ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].title" class="outline-none">${e(sec.title.replace(/^[一二三四五六七八九十]+、\s*/, ''))}</span>
-              </div>
-              ${sec.subtitle ? `<span class="text-sm font-medium text-slate-500 px-2 py-0.5 bg-slate-100 rounded-md border border-slate-200">${e(sec.subtitle)}</span>` : ''}
+            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2 pb-2 mb-3 border-b border-slate-100">
+              <span class="text-xl">${e(sec.icon)}</span>
+              <span class="text-blue-600">${e(sec.sectionNumber)}、</span>
+              <span ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].title" class="outline-none">${e(sec.title)}</span>
             </h3>
             
             ${itemsHtml}
@@ -704,46 +680,19 @@
         `;
       }).join('');
 
-      let publishTimeHtml = `<div>發布日期: <span ${editableAttr} data-path="${bulletin.id}.publishDate" class="font-semibold outline-none">${e(bulletin.publishDate)}</span></div>`;
-      if (bulletin.meta && bulletin.meta.publishedAt) {
-        const pDate = new Date(bulletin.meta.publishedAt);
-        const pAt = `${pDate.getFullYear()}/${String(pDate.getMonth()+1).padStart(2, '0')}/${String(pDate.getDate()).padStart(2, '0')} ${String(pDate.getHours()).padStart(2, '0')}:${String(pDate.getMinutes()).padStart(2, '0')}:${String(pDate.getSeconds()).padStart(2, '0')}`;
-        
-        let updateText = '';
-        if (bulletin.meta.lastUpdated) {
-           const uDate = new Date(bulletin.meta.lastUpdated);
-           // Only show update text if it's been updated after publishing
-           if (uDate.getTime() - pDate.getTime() > 60000) {
-             const uAt = `${String(uDate.getMonth()+1).padStart(2, '0')}/${String(uDate.getDate()).padStart(2, '0')} ${String(uDate.getHours()).padStart(2, '0')}:${String(uDate.getMinutes()).padStart(2, '0')}`;
-             updateText = ` <span class="opacity-75 text-xs font-normal ml-1">(最後更新：${uAt})</span>`;
-           }
-        }
-        publishTimeHtml = `
-          <div class="flex items-center gap-2 text-sm text-white bg-white/15 px-3 py-1.5 rounded-full border border-white/20 backdrop-blur-sm shadow-inner transition-colors hover:bg-white/20 cursor-default">
-            <span class="text-base leading-none">🕒</span>
-            <span class="font-medium tracking-wide">發布時間：${pAt}</span>
-            ${updateText}
-          </div>
-        `;
-      }
-
       container.innerHTML = `
-        <div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white rounded-lg p-6 shadow-md relative overflow-hidden">
-          <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
-          <div class="flex items-center gap-3 relative z-10">
-            ${bulletin.isPinned ? `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500 text-white shadow-sm flex items-center gap-1.5"><span class="animate-pulse">🚨</span> 緊急</span>` : ''}
-            <h2 ${editableAttr} data-path="${bulletin.id}.title" class="text-xl font-bold outline-none leading-snug">${e(bulletin.title)}</h2>
+        <div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white rounded-lg p-6 shadow-md">
+          <div class="flex items-center gap-3">
+            ${bulletin.isPinned ? `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500 text-white animate-pulse">重要置頂</span>` : ''}
+            <h2 ${editableAttr} data-path="${bulletin.id}.title" class="text-xl font-bold outline-none">${e(bulletin.title)}</h2>
           </div>
-          <div class="mt-4 flex flex-wrap items-center gap-x-5 gap-y-3 relative z-10">
-            ${publishTimeHtml}
-            <div class="flex items-center gap-4 text-sm text-blue-200/90 pl-1 border-l border-white/20">
-              <div>期數 ID: <span class="font-semibold text-blue-50">${e(bulletin.id)}</span></div>
-              <div class="w-1 h-1 bg-blue-400 rounded-full"></div>
-              <div>統計期間: <span class="font-semibold text-blue-50">${e(bulletin.periodStart)} 至 ${e(bulletin.periodEnd)}</span></div>
-            </div>
+          <div class="mt-3 flex flex-wrap gap-x-6 gap-y-2 text-sm text-blue-100">
+            <div>期數 ID: <span class="font-semibold">${e(bulletin.id)}</span></div>
+            <div>發布日期: <span ${editableAttr} data-path="${bulletin.id}.publishDate" class="font-semibold outline-none">${e(bulletin.publishDate)}</span></div>
+            <div>統計期間: <span class="font-semibold">${e(bulletin.periodStart)} 至 ${e(bulletin.periodEnd)}</span></div>
           </div>
         </div>
-        <div class="space-y-6 mt-6">
+        <div class="space-y-6">
           ${sectionsHtml}
           ${(() => {
             const fbs = bulletin.feedbackLog || [];
