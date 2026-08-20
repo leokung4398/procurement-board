@@ -388,7 +388,8 @@
         // Case-insensitive check
         const isAllowed = mailUsers.some(u => u.email.toLowerCase() === userEmail) || 
                           userEmail === 'leokung@youbike.com.tw' || 
-                          userEmail === 'gb4398@giantcycling.com';
+                          userEmail === 'gb4398@giantcycling.com' ||
+                          userEmail === 'sunnyting@youbike.com.tw';
 
         if (!isAllowed) {
           await firebase.auth().signOut();
