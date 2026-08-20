@@ -75,32 +75,33 @@
         classDef external fill:#fef2f2,stroke:#ef4444,stroke-width:2px,color:#991b1b
         classDef group fill:#f8fafc,stroke:#94a3b8,stroke-width:1px,stroke-dasharray: 5 5
 
-        User(("👨‍💼 一般同仁\n(Reader)")):::user
-        Admin(("👩‍💻 採購管理員\n(Admin)")):::admin
+        User(("👨‍💼 一般同仁<br>(Reader)")):::user
+        Admin(("👩‍💻 採購管理員<br>(Admin)")):::admin
 
-        subgraph Frontend [🌐 前端介面層 (GitHub Pages 靜態代管)]
+        subgraph Frontend [🌐 前端介面層 GitHub Pages]
             direction TB
-            Index["前台 (index.html)\n・響應式介面設計\n・週報與歷史歸檔查詢\n・免密碼公開閱覽"]:::frontend
-            AdminUI["後台 (admin.html)\n・視覺化編輯器 (Quill.js)\n・草稿/發布生命週期\n・群組與聯絡人管理"]:::frontend
+            Index["前台 (index.html)<br>・響應式介面設計<br>・週報與歷史歸檔查詢<br>・免密碼公開閱覽"]:::frontend
+            AdminUI["後台 (admin.html)<br>・視覺化編輯器<br>・草稿/發布生命週期<br>・群組與聯絡人管理"]:::frontend
         end
 
-        subgraph Backend [☁️ Google Firebase 雲端後端 (BaaS)]
+        subgraph Backend [☁️ Google Firebase 雲端後端 BaaS]
             direction TB
-            Rules{"Security Rules\n(存取規則與資安牆)"}:::firebase
+            Rules{"Security Rules<br>(存取規則與資安牆)"}:::firebase
             
             subgraph DB [Database & Storage]
                 direction LR
-                Firestore[("Firestore (NoSQL)\n・bulletins (週報本體)\n・mailGroups (寄信群組)\n・auditLogs (操作稽核)")]:::firebase
-                Storage[("Cloud Storage\n・文章內嵌圖片\n・實體附件檔案")]:::firebase
+                Firestore[("Firestore NoSQL<br>・bulletins 週報本體<br>・mailGroups 群組<br>・auditLogs 稽核")]:::firebase
+                Storage[("Cloud Storage<br>・文章內嵌圖片<br>・實體附件檔案")]:::firebase
             end
             
-            Rules --> DB
+            Rules --> Firestore
+            Rules --> Storage
         end
 
         subgraph External [🔗 第三方服務與自動化]
             direction TB
-            EmailJS["✉️ EmailJS API\n(無伺服器郵件代發)"]:::external
-            GHA["⚙️ GitHub Actions\n(CI/CD 自動化部署)"]:::external
+            EmailJS["✉️ EmailJS API<br>(無伺服器郵件代發)"]:::external
+            GHA["⚙️ GitHub Actions<br>(自動化部署)"]:::external
         end
 
         User ===>|瀏覽/查詢| Index
@@ -109,7 +110,7 @@
         Index -.->|API 讀取公開資料| Rules
         AdminUI ===>|API 寫入/更新資料| Rules
         
-        AdminUI -->|觸發發布通知\n傳遞收件名單與 HTML 內容| EmailJS
+        AdminUI -->|觸發發布通知<br>傳遞收件名單與內容| EmailJS
         EmailJS -.->|寄送新版週報上線信件| User
         
         AdminUI -.->|更新程式碼| GHA
