@@ -362,9 +362,10 @@ async function adminGoogleLogin() {
   try {
     const result = await firebase.auth().signInWithPopup(provider);
     const user = result.user;
-    if (user.email.endsWith('@youbike.com.tw') || ADMIN_EMAILS.includes(user.email)) {
+    const userEmail = user.email.toLowerCase();
+    if (userEmail.endsWith('@youbike.com.tw') || ADMIN_EMAILS.includes(userEmail) || ADMIN_EMAILS.map(e => e.toLowerCase()).includes(userEmail)) {
       const adminList = await DS.getAdmins();
-      if (adminList.some(a => a.email === user.email) || ADMIN_EMAILS.includes(user.email)) {
+      if (adminList.some(a => a.email.toLowerCase() === userEmail) || ADMIN_EMAILS.map(e => e.toLowerCase()).includes(userEmail)) {
         document.getElementById('lo').style.display = 'none';
         await init();
         toast('歡迎回來，採購管理員 👋', 'in');
