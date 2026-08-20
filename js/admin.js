@@ -1166,7 +1166,8 @@ async function confirmPubBulletin() {
         message: '新版採購週報已上線，請點擊連結查看。',
         link: window.location.href.replace('admin.html', 'index.html') + '?id=' + d.id,
         must_read_text: mustReadText
-      });
+        });
+      }
     }
     
     S.dirty=false;
