@@ -352,7 +352,9 @@ async function init(){
 }
 
 const ADMIN_EMAILS = [
-  'leokung@youbike.com.tw'
+  'leokung@youbike.com.tw',
+  'sunnyting@youbike.com.tw',
+  'gb4398@giantcycling.com'
 ];
 
 async function adminGoogleLogin() {

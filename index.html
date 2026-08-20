@@ -587,7 +587,8 @@
           // 檢查是否為後台管理員 (Admin bypass)
           const isAdmin = (state.admins || []).some(a => a.email.toLowerCase() === userEmailLower) || 
                           userEmailLower === 'leokung@youbike.com.tw' || 
-                          userEmailLower === 'gb4398@giantcycling.com';
+                          userEmailLower === 'gb4398@giantcycling.com' ||
+                          userEmailLower === 'sunnyting@youbike.com.tw';
           
           if (!isAdmin) {
              // 非管理員，進行大小寫不敏感比對
