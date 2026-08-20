@@ -388,11 +388,17 @@
         const result = await firebase.auth().signInWithPopup(provider);
         const user = result.user;
         if (user.email.endsWith('@youbike.com.tw') || user.email === 'leokung@youbike.com.tw') {
-          // Check whitelist
+          // Check frontend whitelist
           const snap = await db.collection('systemConfig').doc('users').get();
           const allowedUsers = snap.exists ? (snap.data().list || []) : [];
           
-          if (!allowedUsers.some(u => u.email === user.email) && user.email !== 'leokung@youbike.com.tw') {
+          // Check email address book (whitelist)
+          const mailSnap = await db.collection('systemConfig').doc('whitelist').get();
+          const mailUsers = mailSnap.exists ? (mailSnap.data().list || []) : [];
+          
+          const isAllowed = allowedUsers.some(u => u.email === user.email) || mailUsers.some(u => u.email === user.email) || user.email === 'leokung@youbike.com.tw';
+
+          if (!isAllowed) {
             await firebase.auth().signOut();
             const e = document.getElementById('user-le');
             e.innerText = '無瀏覽權限，請確認是否已被加入白名單。';
