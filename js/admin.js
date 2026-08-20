@@ -1015,9 +1015,14 @@ async function confirmBatchAddGroup() {
 function renderWL() {
   const c = document.getElementById('wl-list');
   const searchEl = document.getElementById('wl-search');
+  const regionEl = document.getElementById('wl-filter-region');
   const kw = searchEl ? searchEl.value.trim().toLowerCase() : '';
+  const regionKw = regionEl ? regionEl.value : '';
   
   let list = S.whitelist;
+  if(regionKw) {
+    list = list.filter(w => w.region === regionKw);
+  }
   if(kw) {
     list = list.filter(w => w.name.toLowerCase().includes(kw) || w.email.toLowerCase().includes(kw));
   }
