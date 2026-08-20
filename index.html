@@ -580,6 +580,7 @@
       // 權限控管檢查
       const userStr = localStorage.getItem('procurement_user');
       let isAuthorized = true;
+      let isAdmin = false;
       
       if (bulletin.authorizedEmails && Array.isArray(bulletin.authorizedEmails)) {
         if (!userStr) {
@@ -589,7 +590,7 @@
           const userEmailLower = user.email.toLowerCase();
           
           // 檢查是否為後台管理員 (Admin bypass)
-          const isAdmin = (state.admins || []).some(a => a.email.toLowerCase() === userEmailLower) || 
+          isAdmin = (state.admins || []).some(a => a.email.toLowerCase() === userEmailLower) || 
                           userEmailLower === 'leokung@youbike.com.tw' || 
                           userEmailLower === 'gb4398@giantcycling.com' ||
                           userEmailLower === 'sunnyting@youbike.com.tw';
@@ -605,6 +606,8 @@
       }
 
       if (!isAuthorized) {
+        const dbgUser = userStr ? JSON.parse(userStr).email : 'none';
+        const dbgAuth = (bulletin.authorizedEmails || []).join(', ');
         container.innerHTML = `
           <div class="bg-red-50 text-red-700 p-8 rounded-2xl border border-red-200 text-center shadow-sm">
             <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -612,6 +615,13 @@
             </div>
             <h3 class="text-xl font-bold mb-2">權限不足</h3>
             <p class="text-sm">您無權限瀏覽此公告內容，請聯絡系統管理員。</p>
+            <div class="mt-4 text-xs text-red-400 text-left bg-red-100 p-2 rounded">
+               DEBUG INFO: <br>
+               Current User: ${dbgUser} <br>
+               Admins Loaded: ${state.admins ? state.admins.length : 0} <br>
+               Is Admin Evaluated: ${isAdmin !== undefined ? isAdmin : 'undef'} <br>
+               Allowed: ${dbgAuth}
+            </div>
           </div>`;
         return;
       }
