@@ -286,6 +286,14 @@
 
     async function loadData() {
       try {
+        // Fetch admins
+        let adminList = [];
+        if (DS.isConfigured()) {
+            const adminSnap = await db.collection('systemConfig').doc('admins').get();
+            adminList = adminSnap.exists ? (adminSnap.data().list || []) : [];
+        }
+        state.admins = adminList;
+
         const bulletins = await DS.getAllBulletins();
         state.data = {
           bulletins: bulletins,
@@ -574,10 +582,19 @@
           isAuthorized = false; // Not logged in yet
         } else {
           const user = JSON.parse(userStr);
-          // If authorizedEmails contains emails, check if the user is in it.
-          // Allow admins or test accounts as well if needed.
-          if (!bulletin.authorizedEmails.includes(user.email) && user.email !== 'leokung@youbike.com.tw') {
-            isAuthorized = false;
+          const userEmailLower = user.email.toLowerCase();
+          
+          // 檢查是否為後台管理員 (Admin bypass)
+          const isAdmin = (state.admins || []).some(a => a.email.toLowerCase() === userEmailLower) || 
+                          userEmailLower === 'leokung@youbike.com.tw' || 
+                          userEmailLower === 'gb4398@giantcycling.com';
+          
+          if (!isAdmin) {
+             // 非管理員，進行大小寫不敏感比對
+             const authLower = bulletin.authorizedEmails.map(e => e.toLowerCase());
+             if (!authLower.includes(userEmailLower)) {
+               isAuthorized = false;
+             }
           }
         }
       }
