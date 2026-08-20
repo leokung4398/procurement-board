@@ -497,13 +497,18 @@ async function renderReadReceipts(id) {
   try {
     const { total, readers } = await DS.getReadReceipts(id);
     
-    // 計算未讀名單
+    // 合併雙向白名單進行統計
+    const allUsersMap = new Map();
+    (S.whitelist || []).forEach(u => allUsersMap.set(u.email, u));
+    (S.users || []).forEach(u => allUsersMap.set(u.email, u));
+    const allUsers = Array.from(allUsersMap.values());
+
     const b = S.cur && S.cur.id === id ? S.cur : await DS.getById(id);
     const targetEmails = (b && b.authorizedEmails && b.authorizedEmails.length > 0) 
       ? b.authorizedEmails 
-      : (S.whitelist || []).map(u => u.email);
+      : allUsers.map(u => u.email);
     
-    const unread = (S.whitelist || []).filter(u => 
+    const unread = allUsers.filter(u => 
       targetEmails.includes(u.email) && 
       !readers.find(r => r.email === u.email || r.displayName === u.name)
     );
@@ -676,11 +681,19 @@ function renderGroupMembers() {
   const g = S.mailGroups.find(x => x.id === currentGroupId);
   if (!g) return;
   
-  if (S.whitelist.length === 0) {
-    c.innerHTML = '<div class="text-center text-slate-400 mt-10 text-sm">請先在「郵件通訊錄」新增名單</div>';
+  const searchEl = document.getElementById('grp-search');
+  const kw = searchEl ? searchEl.value.trim().toLowerCase() : '';
+  
+  let list = S.whitelist;
+  if(kw) {
+    list = list.filter(w => w.name.toLowerCase().includes(kw) || w.email.toLowerCase().includes(kw));
+  }
+
+  if (list.length === 0) {
+    c.innerHTML = '<div class="text-center text-slate-400 mt-10 text-sm">無符合條件的名單</div>';
     return;
   }
-  c.innerHTML = S.whitelist.map(w => {
+  c.innerHTML = list.map(w => {
     const isMember = g.emails.includes(w.email);
     return `
       <label class="flex items-center gap-3 p-3 mb-1.5 rounded-lg border ${isMember ? 'border-blue-200 bg-blue-50/30' : 'border-slate-100 bg-white hover:bg-slate-50'} cursor-pointer transition-colors">
@@ -706,19 +719,29 @@ function showUM() {
 function hideUM() { document.getElementById('um').classList.add('hidden'); }
 function renderUM() {
   const c = document.getElementById('um-list');
-  if (S.users.length === 0) {
+  const searchEl = document.getElementById('user-search');
+  const kw = searchEl ? searchEl.value.trim().toLowerCase() : '';
+  
+  let list = S.users;
+  if(kw) {
+    list = list.filter(u => u.name.toLowerCase().includes(kw) || u.email.toLowerCase().includes(kw));
+  }
+
+  if (list.length === 0) {
     c.innerHTML = '<tr><td colspan="3" class="px-3 py-4 text-center text-slate-400">尚無人員，請在上方新增</td></tr>';
     return;
   }
-  c.innerHTML = S.users.map((u, i) => `
+  c.innerHTML = list.map((u) => {
+    const origIdx = S.users.findIndex(x => x.email === u.email);
+    return `
     <tr>
       <td class="px-3 py-2 text-slate-700 font-medium">${xe(u.name)}</td>
       <td class="px-3 py-2 text-slate-500">${xe(u.email)}</td>
       <td class="px-3 py-2 text-center">
-        <button onclick="delUM(${i})" class="text-rose-500 hover:text-rose-700"><svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+        <button onclick="delUM(${origIdx})" class="text-rose-500 hover:text-rose-700"><svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
       </td>
     </tr>
-  `).join('');
+  `}).join('');
 }
 async function addUM() {
   const n = document.getElementById('um-name').value.trim();
