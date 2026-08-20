@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>採購佈告欄 - 系統架構與邏輯說明</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { 
+      font-family: 'Inter', 'PingFang TC', 'Microsoft JhengHei', sans-serif; 
+      background-color: #f8fafc; 
+    }
+    .mermaid-container { 
+      background: white; 
+      border-radius: 16px; 
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05); 
+      padding: 2.5rem; 
+      overflow-x: auto; 
+    }
+    .card { 
+      background: white; 
+      border-radius: 16px; 
+      padding: 1.75rem; 
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); 
+      border: 1px solid #e2e8f0; 
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+    .mermaid { opacity: 0; transition: opacity 0.5s ease-in; }
+    .mermaid[data-processed="true"] { opacity: 1; }
+  </style>
+  <script>
+    mermaid.initialize({ 
+      startOnLoad: true,
+      theme: 'base',
+      themeVariables: {
+        primaryColor: '#ffffff',
+        primaryBorderColor: '#cbd5e1',
+        primaryTextColor: '#1e293b',
+        lineColor: '#64748b',
+        fontFamily: 'Inter, PingFang TC, sans-serif',
+        fontSize: '15px'
+      },
+      flowchart: { curve: 'basis' }
+    });
+  </script>
+</head>
+<body class="p-6 md:p-12 max-w-7xl mx-auto">
+
+<div class="mb-10 text-center md:text-left">
+  <div class="inline-flex items-center justify-center p-3 bg-blue-100 rounded-xl mb-4">
+    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+  </div>
+  <h1 class="text-3xl md:text-4xl font-bold text-slate-800 mb-3 tracking-tight">採購佈告欄系統架構與邏輯設計</h1>
+  <p class="text-slate-500 text-lg max-w-3xl">本專案採用現代化的 Serverless（無伺服器）架構，達成零硬體維護成本、高安全性與自動化作業。以下為系統的前後端分離架構、資料流向與外部服務整合說明。</p>
+</div>
+
+<div class="mermaid-container mb-12 border border-slate-200">
+  <h2 class="text-xl font-bold text-slate-700 mb-6 flex items-center gap-2">
+    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+    系統全貌資料流向圖 (Data Flow & Architecture)
+  </h2>
+  
+  <div class="mermaid flex justify-center">
+    flowchart TB
+        classDef user fill:#eff6ff,stroke:#3b82f6,stroke-width:2px,color:#1e40af,rx:10px
+        classDef admin fill:#fdf4ff,stroke:#d946ef,stroke-width:2px,color:#86198f,rx:10px
+        classDef frontend fill:#ecfdf5,stroke:#10b981,stroke-width:2px,color:#065f46
+        classDef firebase fill:#fffbeb,stroke:#f59e0b,stroke-width:2px,color:#92400e
+        classDef external fill:#fef2f2,stroke:#ef4444,stroke-width:2px,color:#991b1b
+        classDef group fill:#f8fafc,stroke:#94a3b8,stroke-width:1px,stroke-dasharray: 5 5
+
+        User(("👨‍💼 一般同仁\n(Reader)")):::user
+        Admin(("👩‍💻 採購管理員\n(Admin)")):::admin
+
+        subgraph Frontend [🌐 前端介面層 (GitHub Pages 靜態代管)]
+            direction TB
+            Index["前台 (index.html)\n・響應式介面設計\n・週報與歷史歸檔查詢\n・免密碼公開閱覽"]:::frontend
+            AdminUI["後台 (admin.html)\n・視覺化編輯器 (Quill.js)\n・草稿/發布生命週期\n・群組與聯絡人管理"]:::frontend
+        end
+
+        subgraph Backend [☁️ Google Firebase 雲端後端 (BaaS)]
+            direction TB
+            Rules{"Security Rules\n(存取規則與資安牆)"}:::firebase
+            
+            subgraph DB [Database & Storage]
+                direction LR
+                Firestore[("Firestore (NoSQL)\n・bulletins (週報本體)\n・mailGroups (寄信群組)\n・auditLogs (操作稽核)")]:::firebase
+                Storage[("Cloud Storage\n・文章內嵌圖片\n・實體附件檔案")]:::firebase
+            end
+            
+            Rules --> DB
+        end
+
+        subgraph External [🔗 第三方服務與自動化]
+            direction TB
+            EmailJS["✉️ EmailJS API\n(無伺服器郵件代發)"]:::external
+            GHA["⚙️ GitHub Actions\n(CI/CD 自動化部署)"]:::external
+        end
+
+        User ===>|瀏覽/查詢| Index
+        Admin ===>|身分驗證/編輯管理| AdminUI
+
+        Index -.->|API 讀取公開資料| Rules
+        AdminUI ===>|API 寫入/更新資料| Rules
+        
+        AdminUI -->|觸發發布通知\n傳遞收件名單與 HTML 內容| EmailJS
+        EmailJS -.->|寄送新版週報上線信件| User
+        
+        AdminUI -.->|更新程式碼| GHA
+        GHA -.->|自動編譯並部署| Frontend
+  </div>
+</div>
+
+<h2 class="text-xl font-bold text-slate-700 mb-6 flex items-center gap-2">
+  <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+  專案核心亮點與技術邏輯
+</h2>
+
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+  
+  <div class="card">
+    <div class="flex flex-col gap-3 mb-4">
+      <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
+      </div>
+      <h3 class="font-bold text-slate-800 text-lg">Serverless 無伺服器架構</h3>
+    </div>
+    <p class="text-sm text-slate-600 leading-relaxed mb-4">
+      捨棄傳統需要買主機、架設作業系統的框架。全站採用 <strong>HTML5 + JS</strong> 開發，搭配 <strong>GitHub Actions</strong> 實現 CI/CD，每次修改程式碼就會自動發佈至 <strong>GitHub Pages</strong>。
+    </p>
+    <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
+      <li>維護成本為零，無須擔心主機當機</li>
+      <li>全球 CDN 加速，開啟網頁瞬間完成</li>
+      <li>架構極輕量，移交與接手門檻低</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="flex flex-col gap-3 mb-4">
+      <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-amber-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+      </div>
+      <h3 class="font-bold text-slate-800 text-lg">Firebase 企業級資料雲</h3>
+    </div>
+    <p class="text-sm text-slate-600 leading-relaxed mb-4">
+      後端資料庫選用 Google 的 <strong>Firebase Firestore (NoSQL)</strong>，具備極高的擴充性。圖文附件則上傳至 <strong>Cloud Storage</strong>。
+    </p>
+    <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
+      <li><strong>資安防護：</strong>透過 Security Rules 嚴格阻擋非管理員的惡意竄改。</li>
+      <li><strong>稽核軌跡：</strong>後台具備 Audit Logs (操作紀錄)，誰在什麼時候發布皆有跡可循。</li>
+      <li>即時同步更新，資料落地安全有保障。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="flex flex-col gap-3 mb-4">
+      <div class="w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center text-rose-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+      </div>
+      <h3 class="font-bold text-slate-800 text-lg">EmailJS 自動化通知引擎</h3>
+    </div>
+    <p class="text-sm text-slate-600 leading-relaxed mb-4">
+      過去寄發週報需要人工一封封複製貼上，現在系統內建聯絡人與群組管理，並直接串接 <strong>EmailJS API</strong>。
+    </p>
+    <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
+      <li>後台點擊「發布」，自動抓取必讀重點。</li>
+      <li>動態生成 HTML 豐富排版（包含圖片）寄送給同仁。</li>
+      <li>徹底消除人工發信的人為疏失與時間成本。</li>
+    </ul>
+  </div>
+
+</div>
+
+</body>
+</html>
