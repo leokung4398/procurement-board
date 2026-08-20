@@ -387,54 +387,52 @@
       try {
         const result = await firebase.auth().signInWithPopup(provider);
         const user = result.user;
-        if (user.email.endsWith('@youbike.com.tw') || user.email === 'leokung@youbike.com.tw') {
-          // Check frontend whitelist
-          const snap = await db.collection('systemConfig').doc('users').get();
-          const allowedUsers = snap.exists ? (snap.data().list || []) : [];
-          
-          // Check email address book (whitelist)
-          const mailSnap = await db.collection('systemConfig').doc('whitelist').get();
-          const mailUsers = mailSnap.exists ? (mailSnap.data().list || []) : [];
-          
-          const isAllowed = allowedUsers.some(u => u.email === user.email) || mailUsers.some(u => u.email === user.email) || user.email === 'leokung@youbike.com.tw';
+        const userEmail = user.email.toLowerCase();
 
-          if (!isAllowed) {
-            await firebase.auth().signOut();
-            const e = document.getElementById('user-le');
-            e.innerText = '無瀏覽權限，請確認是否已被加入白名單。';
-            e.classList.remove('hidden');
-            return;
-          }
+        // Check frontend whitelist
+        const snap = await db.collection('systemConfig').doc('users').get();
+        const allowedUsers = snap.exists ? (snap.data().list || []) : [];
+        
+        // Check email address book (whitelist)
+        const mailSnap = await db.collection('systemConfig').doc('whitelist').get();
+        const mailUsers = mailSnap.exists ? (mailSnap.data().list || []) : [];
+        
+        // Case-insensitive check
+        const isAllowed = allowedUsers.some(u => u.email.toLowerCase() === userEmail) || 
+                          mailUsers.some(u => u.email.toLowerCase() === userEmail) || 
+                          userEmail === 'leokung@youbike.com.tw' || 
+                          userEmail === 'gb4398@giantcycling.com';
 
-          // Valid domain and whitelisted
-          document.getElementById('user-modal').classList.add('hidden');
-          
-          pendingUser = {
-            userId: user.uid,
-            displayName: user.displayName || user.email.split('@')[0],
-            email: user.email
-          };
-
-          // Check if we already have their department saved
-          let existingUser = localStorage.getItem('procurement_user');
-          if (existingUser) {
-            let parsed = JSON.parse(existingUser);
-            if (parsed.email === user.email && parsed.department) {
-              pendingUser.department = parsed.department;
-              await finishLogin(pendingUser);
-              return;
-            }
-          }
-          
-          // Need department
-          document.getElementById('dept-modal').classList.remove('hidden');
-
-        } else {
+        if (!isAllowed) {
           await firebase.auth().signOut();
           const e = document.getElementById('user-le');
-          e.innerText = '無權限，請使用 @youbike.com.tw 帳號。';
+          e.innerText = '無瀏覽權限，請確認是否已被加入白名單。';
           e.classList.remove('hidden');
+          return;
         }
+
+        // Valid and whitelisted
+        document.getElementById('user-modal').classList.add('hidden');
+        
+        pendingUser = {
+          userId: user.uid,
+          displayName: user.displayName || user.email.split('@')[0],
+          email: userEmail
+        };
+
+        // Check if we already have their department saved
+        let existingUser = localStorage.getItem('procurement_user');
+        if (existingUser) {
+          let parsed = JSON.parse(existingUser);
+          if (parsed.email.toLowerCase() === userEmail && parsed.department) {
+            pendingUser.department = parsed.department;
+            await finishLogin(pendingUser);
+            return;
+          }
+        }
+        
+        // Need department
+        document.getElementById('dept-modal').classList.remove('hidden');
       } catch (error) {
         console.error('Login error:', error);
       }
