@@ -70,12 +70,14 @@
         <p class="text-sm text-slate-500 mt-1">提供本週重點摘要、交期異動與物料狀況明細</p>
       </div>
       <div class="flex items-center gap-3">
-        <button id="btn-toggle-edit" class="px-4 py-2 rounded text-sm font-medium border border-slate-200 bg-white hover:bg-slate-50 transition-colors shadow-sm hidden" onclick="toggleEditMode()">
-          開啟編輯模式
+        <button onclick="frontendLogout()" class="px-4 py-2 rounded text-sm font-medium border border-slate-200 text-slate-600 bg-white hover:bg-slate-50 transition-colors shadow-sm flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          登出
         </button>
         <button id="btn-toggle-edit" class="px-4 py-2 rounded text-sm font-medium border border-slate-200 bg-white hover:bg-slate-50 transition-colors shadow-sm hidden" onclick="toggleEditMode()">
           開啟編輯模式
         </button>
+      </div>
     </header>
 
     <!-- 操作說明 (編輯模式下顯示) -->
@@ -377,6 +379,18 @@
 
     let pendingUser = null;
 
+    async function frontendLogout() {
+      if(confirm('確定要登出嗎？')) {
+        try {
+          if (typeof firebase !== 'undefined') {
+            await firebase.auth().signOut();
+          }
+        } catch(e) {}
+        localStorage.removeItem('procurement_user');
+        window.location.reload();
+      }
+    }
+
     async function frontendGoogleLogin() {
       const provider = new firebase.auth.GoogleAuthProvider();
       try {
@@ -606,8 +620,6 @@
       }
 
       if (!isAuthorized) {
-        const dbgUser = userStr ? JSON.parse(userStr).email : 'none';
-        const dbgAuth = (bulletin.authorizedEmails || []).join(', ');
         container.innerHTML = `
           <div class="bg-red-50 text-red-700 p-8 rounded-2xl border border-red-200 text-center shadow-sm">
             <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -615,13 +627,6 @@
             </div>
             <h3 class="text-xl font-bold mb-2">權限不足</h3>
             <p class="text-sm">您無權限瀏覽此公告內容，請聯絡系統管理員。</p>
-            <div class="mt-4 text-xs text-red-400 text-left bg-red-100 p-2 rounded">
-               DEBUG INFO: <br>
-               Current User: ${dbgUser} <br>
-               Admins Loaded: ${state.admins ? state.admins.length : 0} <br>
-               Is Admin Evaluated: ${isAdmin !== undefined ? isAdmin : 'undef'} <br>
-               Allowed: ${dbgAuth}
-            </div>
           </div>`;
         return;
       }
