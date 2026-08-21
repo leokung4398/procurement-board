@@ -123,7 +123,7 @@
   專案核心亮點與技術邏輯
 </h2>
 
-<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
   
   <div class="card">
     <div class="flex flex-col gap-3 mb-4">
@@ -173,6 +173,23 @@
       <li>後台點擊「發布」，自動抓取必讀重點。</li>
       <li>動態生成 HTML 豐富排版（包含圖片）寄送給同仁。</li>
       <li>徹底消除人工發信的人為疏失與時間成本。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="flex flex-col gap-3 mb-4">
+      <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+      </div>
+      <h3 class="font-bold text-slate-800 text-lg">全域權限與強制更新</h3>
+    </div>
+    <p class="text-sm text-slate-600 leading-relaxed mb-4">
+      系統具備 <strong>Global Whitelist</strong> (全域白名單) 權限控管與 <strong>Version Checker</strong> (強制更新) 機制。
+    </p>
+    <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
+      <li>通訊錄名單即為全站觀看權限，無須逐篇設定</li>
+      <li>管理員可透過 <code class="bg-slate-100 px-1 rounded text-xs">?test_user=1</code> 模擬前台權限</li>
+      <li>發布新版時透過比對 version.txt 強制破除瀏覽器暫存</li>
     </ul>
   </div>
 
