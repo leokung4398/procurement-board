@@ -626,10 +626,11 @@
           const userEmailLower = user.email.toLowerCase();
           
           // 檢查是否為後台管理員 (Admin bypass)
-          isAdmin = (state.admins || []).some(a => a.email.toLowerCase() === userEmailLower) || 
+          const isTestUser = new URLSearchParams(window.location.search).has('test_user');
+          isAdmin = !isTestUser && ((state.admins || []).some(a => a.email.toLowerCase() === userEmailLower) || 
                           userEmailLower === 'leokung@youbike.com.tw' || 
                           userEmailLower === 'gb4398@giantcycling.com' ||
-                          userEmailLower === 'sunnyting@youbike.com.tw';
+                          userEmailLower === 'sunnyting@youbike.com.tw');
           
           if (!isAdmin) {
              // 非管理員，進行大小寫不敏感比對
