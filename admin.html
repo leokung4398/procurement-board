@@ -48,7 +48,44 @@
       overscroll-behavior-y: contain;
       scroll-behavior: smooth;
     }
-  </style>
+  
+    /* Quill Custom Picker Labels */
+    .ql-picker.ql-size .ql-picker-label[data-value="10pt"]::before, .ql-picker.ql-size .ql-picker-item[data-value="10pt"]::before { content: "10pt"; }
+    .ql-picker.ql-size .ql-picker-label[data-value="12pt"]::before, .ql-picker.ql-size .ql-picker-item[data-value="12pt"]::before { content: "12pt"; }
+    .ql-picker.ql-size .ql-picker-label[data-value="14pt"]::before, .ql-picker.ql-size .ql-picker-item[data-value="14pt"]::before { content: "14pt"; }
+    .ql-picker.ql-size .ql-picker-label::before, .ql-picker.ql-size .ql-picker-item::before { content: "16pt(預設)"; } /* default size */
+    .ql-picker.ql-size .ql-picker-label[data-value="18pt"]::before, .ql-picker.ql-size .ql-picker-item[data-value="18pt"]::before { content: "18pt"; }
+    .ql-picker.ql-size .ql-picker-label[data-value="20pt"]::before, .ql-picker.ql-size .ql-picker-item[data-value="20pt"]::before { content: "20pt"; }
+    .ql-picker.ql-size .ql-picker-label[data-value="24pt"]::before, .ql-picker.ql-size .ql-picker-item[data-value="24pt"]::before { content: "24pt"; }
+    .ql-picker.ql-size .ql-picker-label[data-value="28pt"]::before, .ql-picker.ql-size .ql-picker-item[data-value="28pt"]::before { content: "28pt"; }
+    .ql-picker.ql-size .ql-picker-label[data-value="32pt"]::before, .ql-picker.ql-size .ql-picker-item[data-value="32pt"]::before { content: "32pt"; }
+
+    .ql-picker.ql-lineHeight .ql-picker-label::before, .ql-picker.ql-lineHeight .ql-picker-item::before { content: "單行"; }
+    .ql-picker.ql-lineHeight .ql-picker-label[data-value="1.5"]::before, .ql-picker.ql-lineHeight .ql-picker-item[data-value="1.5"]::before { content: "1.5倍"; }
+    .ql-picker.ql-lineHeight .ql-picker-label[data-value="2"]::before, .ql-picker.ql-lineHeight .ql-picker-item[data-value="2"]::before { content: "雙行"; }
+    .ql-picker.ql-lineHeight .ql-picker-label[data-value="2.5"]::before, .ql-picker.ql-lineHeight .ql-picker-item[data-value="2.5"]::before { content: "2.5倍"; }
+    .ql-picker.ql-lineHeight .ql-picker-label[data-value="3"]::before, .ql-picker.ql-lineHeight .ql-picker-item[data-value="3"]::before { content: "3倍"; }
+
+    /* Fix width for pickers */
+    .ql-snow .ql-picker.ql-size { width: 90px; }
+    .ql-snow .ql-picker.ql-lineHeight { width: 70px; }
+
+    /* Custom button icon for boxed */
+    .ql-snow .ql-toolbar button.ql-boxed {
+      width: 28px;
+    }
+    .ql-snow .ql-toolbar button.ql-boxed::after {
+      content: "🄰";
+      font-size: 16px;
+      font-weight: bold;
+      color: #444;
+      line-height: 1;
+    }
+    .ql-snow .ql-toolbar button.ql-boxed:hover::after,
+    .ql-snow .ql-toolbar button.ql-boxed.ql-active::after {
+      color: #06c;
+    }
+</style>
   <link rel="stylesheet" href="css/admin.css">
 </head>
 <body>

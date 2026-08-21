@@ -1,3 +1,35 @@
+// Quill Customizations
+if (typeof Quill !== 'undefined') {
+  const SizeStyle = Quill.import('attributors/style/size');
+  SizeStyle.whitelist = ['10pt', '12pt', '14pt', '16pt', '18pt', '20pt', '24pt', '28pt', '32pt'];
+  Quill.register(SizeStyle, true);
+
+  const StyleAttributor = Quill.import('parchment').StyleAttributor;
+  const LineHeightStyle = new StyleAttributor('lineHeight', 'line-height', {
+    scope: Quill.import('parchment').Scope.BLOCK,
+    whitelist: ['1', '1.5', '2', '2.5', '3']
+  });
+  Quill.register(LineHeightStyle, true);
+
+  const Inline = Quill.import('blots/inline');
+  class BoxBlot extends Inline {
+    static create() {
+      let node = super.create();
+      node.style.border = '1px solid #666';
+      node.style.padding = '0 4px';
+      node.style.borderRadius = '4px';
+      return node;
+    }
+    static formats(node) {
+      return true;
+    }
+  }
+  BoxBlot.blotName = 'boxed';
+  BoxBlot.tagName = 'span';
+  BoxBlot.className = 'ql-boxed';
+  Quill.register(BoxBlot);
+}
+
 const DS = {
   isConfigured() {
     return typeof firebase !== 'undefined' && typeof firebaseConfig !== 'undefined' && firebaseConfig.projectId && firebaseConfig.projectId !== "YOUR_PROJECT_ID";
@@ -742,7 +774,12 @@ function newBulletin(){if(S.dirty&&!confirm('有未儲存的修改，確定繼�
 function wk(d){const j=new Date(d.getFullYear(),0,1);return Math.ceil((((d-j)/86400000)+j.getDay()+1)/7);}
 async function unpubBulletin(){if(!S.cur)return;if(!confirm('確定要撤回發布？撤回後前台將無法看見此週報。'))return;const pt=document.getElementById('pub-txt'),btn=document.getElementById('btn-unpub');btn.disabled=true;pt.textContent='撤回中...';try{const d={...S.cur,status:'draft',feedbackLog:S.fbs};await DS.save(d.id,d);await DS.addAuditLog(d.id, `管理員撤回了週報。`);S.dirty=false;const sb=document.getElementById('tb-status');sb.className='bdg-dft';sb.textContent='草稿';toast('週報已撤回發布！','ok');S.mmap=await DS.getMonths();renderSB();renderAuditLogs(d.id);renderEd();}catch(e){toast('撤回失敗：'+e.message,'er');}finally{btn.disabled=false;pt.textContent='正式發布';}}
 function renderEd(){const b=S.cur;if(!b)return;document.getElementById('es').classList.add('hidden');document.getElementById('bf').classList.remove('hidden');document.getElementById('tb-acts').classList.remove('hidden');document.getElementById('tb-title').textContent=b.id||'新週報';const sb=document.getElementById('tb-status');sb.className=b.status==='published'?'bdg-pub':'bdg-dft';sb.textContent=b.status==='published'?'已發布':'草稿';sb.classList.remove('hidden');if(b.status==='published'){document.getElementById('btn-unpub').classList.remove('hidden');document.getElementById('btn-pub').classList.add('hidden');}else{document.getElementById('btn-unpub').classList.add('hidden');document.getElementById('btn-pub').classList.remove('hidden');}document.getElementById('f-id').value=b.id||'';document.getElementById('f-pd').value=b.publishDate||'';document.getElementById('f-ps').value=b.periodStart||'';document.getElementById('f-pe').value=b.periodEnd||'';document.getElementById('f-ti').value=b.title||'';document.getElementById('f-pin').checked=!!b.isPinned;renderSecs();}
-function renderSecs(){const c=document.getElementById('sc');const b=S.cur;const ptl=document.getElementById('toolbar-portal');if(ptl)ptl.innerHTML='';if(!b?.sections?.length){c.innerHTML='<div class="text-center py-10 text-slate-400 text-sm">尚未建立任何段落<br><span class="text-xs">點擊右上角「新增段落」</span></div>';return;}c.innerHTML=b.sections.map((s,i)=>bldSec(s,i)).join('');setTimeout(()=>{document.querySelectorAll('.quill-editor').forEach(el=>{if(el.__quill)return;const q=new Quill(el,{theme:'snow',modules:{toolbar:[['bold','italic','underline'],[{'color':[]},{'background':[]}],[{'size':['small',false,'large','huge']}]]}});el.__quill=q;q.root.addEventListener('paste', async (e) => {
+function renderSecs(){const c=document.getElementById('sc');const b=S.cur;const ptl=document.getElementById('toolbar-portal');if(ptl)ptl.innerHTML='';if(!b?.sections?.length){c.innerHTML='<div class="text-center py-10 text-slate-400 text-sm">尚未建立任何段落<br><span class="text-xs">點擊右上角「新增段落」</span></div>';return;}c.innerHTML=b.sections.map((s,i)=>bldSec(s,i)).join('');setTimeout(()=>{document.querySelectorAll('.quill-editor').forEach(el=>{if(el.__quill)return;const q=new Quill(el,{theme:'snow',modules:{toolbar:[
+  ['bold','italic','underline','boxed'],
+  [{'color':[]},{'background':[]}],
+  [{'size':['10pt', '12pt', '14pt', false, '18pt', '20pt', '24pt', '28pt', '32pt']}],
+  [{'lineHeight':['1', '1.5', '2', '2.5', '3']}]
+]}});el.__quill=q;q.root.addEventListener('paste', async (e) => {
 const file = e.clipboardData?.files?.[0];
 if (file && file.type.startsWith('image/')) {
 e.preventDefault();

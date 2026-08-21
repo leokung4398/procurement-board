@@ -1,0 +1,49 @@
+const DS = {
+  isConfigured() {
+    return typeof firebase !== 'undefined' && typeof firebaseConfig !== 'undefined' && firebaseConfig.projectId && firebaseConfig.projectId !== "YOUR_PROJECT_ID";
+  },
+  async getAllBulletins() {
+    if (!this.isConfigured()) {
+      try {
+        const r = await fetch('data.json');
+        const j = await r.json();
+        return j.bulletins || [];
+      } catch (e) { return []; }
+    }
+    try {
+      const snap = await db.collection('bulletins').get();
+      const list = [];
+      snap.forEach(doc => {
+        const b = doc.data();
+        if (b.status !== 'deleted') {
+          list.push(b);
+        }
+      });
+      list.sort((a, b) => (b.publishDate || '').localeCompare(a.publishDate || ''));
+      return list;
+    } catch (e) {
+      console.error(e);
+      return [];
+    }
+  },
+  async getMonths() {
+    const list = await this.getAllBulletins();
+    const m = {};
+    list.forEach(b => {
+      const mk = (b.publishDate || '').slice(0, 7) || '?';
+      if (!m[mk]) m[mk] = [];
+      m[mk].push({ id: b.id, status: b.status || 'published', sections: b.sections, publishDate: b.publishDate });
+    });
+    return m;
+  },
+  async getById(id) {
+    if (!this.isConfigured()) {
+      try {
+        const r = await fetch('data.json');
+        const j = await r.json();
+        return j.bulletins.find(b => b.id === id) || null;
+      } catch (e) { return null; }
+    }
+    try {
+      const docSnap = await db.collection('bulletins').doc(id).get();
+     

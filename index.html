@@ -403,7 +403,7 @@
         const mailUsers = mailSnap.exists ? (mailSnap.data().list || []) : [];
         
         // Case-insensitive check
-        const isAllowed = mailUsers.some(u => u.email.toLowerCase() === userEmail) || 
+        const isAllowed = mailUsers.some(u => u && u.email && u.email.toLowerCase() === userEmail) || 
                           userEmail === 'leokung@youbike.com.tw' || 
                           userEmail === 'gb4398@giantcycling.com' ||
                           userEmail === 'sunnyting@youbike.com.tw';
