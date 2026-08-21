@@ -615,45 +615,10 @@
 
       // 權限控管檢查
       const userStr = localStorage.getItem('procurement_user');
-      let isAuthorized = true;
-      let isAdmin = false;
       
-      if (bulletin.authorizedEmails && Array.isArray(bulletin.authorizedEmails)) {
-        if (!userStr) {
-          isAuthorized = false; // Not logged in yet
-        } else {
-          const user = JSON.parse(userStr);
-          const userEmailLower = user.email.toLowerCase();
-          
-          // 檢查是否為後台管理員 (Admin bypass)
-          const isTestUser = new URLSearchParams(window.location.search).has('test_user');
-          isAdmin = !isTestUser && ((state.admins || []).some(a => a.email.toLowerCase() === userEmailLower) || 
-                          userEmailLower === 'leokung@youbike.com.tw' || 
-                          userEmailLower === 'gb4398@giantcycling.com' ||
-                          userEmailLower === 'sunnyting@youbike.com.tw');
-          
-          if (!isAdmin) {
-             // 非管理員，進行大小寫不敏感比對
-             const authLower = bulletin.authorizedEmails.map(e => e.toLowerCase());
-             if (!authLower.includes(userEmailLower)) {
-               isAuthorized = false;
-             }
-          }
-        }
-      }
-
-      if (!isAuthorized) {
-        container.innerHTML = `
-          <div class="bg-red-50 text-red-700 p-8 rounded-2xl border border-red-200 text-center shadow-sm">
-            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-            </div>
-            <h3 class="text-xl font-bold mb-2">權限不足</h3>
-            <p class="text-sm">您無權限瀏覽此公告內容，請聯絡系統管理員。</p>
-          </div>`;
-        return;
-      }
-
+      // 權限檢查已統一在登入時由全局白名單處理 (frontendGoogleLogin)
+      // 只要能登入，就能觀看所有已發布的佈告欄
+      
       const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
 
       const sectionsHtml = bulletin.sections.map((sec, secIdx) => {
