@@ -3,7 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>採購週報管理系統 | 後台</title>
+  
+  <script>
+    // 強制更新機制：比對 version.txt
+    (async function checkVersion() {
+      try {
+        const res = await fetch('version.txt?t=' + new Date().getTime());
+        if (res.ok) {
+          const latestVersion = (await res.text()).trim();
+          const currentVersion = localStorage.getItem('app_version');
+          if (currentVersion && currentVersion !== latestVersion) {
+            localStorage.setItem('app_version', latestVersion);
+            // 發現新版本，強制重新載入
+            window.location.reload(true);
+          } else if (!currentVersion) {
+            localStorage.setItem('app_version', latestVersion);
+          }
+        }
+      } catch (e) {
+        console.error('Version check failed', e);
+      }
+    })();
+  </script>
+<title>採購週報管理系統 | 後台</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 

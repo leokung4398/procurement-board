@@ -6,7 +6,29 @@
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
   <meta http-equiv="Pragma" content="no-cache">
   <meta http-equiv="Expires" content="0">
-  <title>經營TEAM採購｜佈告欄</title>
+  
+  <script>
+    // 強制更新機制：比對 version.txt
+    (async function checkVersion() {
+      try {
+        const res = await fetch('version.txt?t=' + new Date().getTime());
+        if (res.ok) {
+          const latestVersion = (await res.text()).trim();
+          const currentVersion = localStorage.getItem('app_version');
+          if (currentVersion && currentVersion !== latestVersion) {
+            localStorage.setItem('app_version', latestVersion);
+            // 發現新版本，強制重新載入
+            window.location.reload(true);
+          } else if (!currentVersion) {
+            localStorage.setItem('app_version', latestVersion);
+          }
+        }
+      } catch (e) {
+        console.error('Version check failed', e);
+      }
+    })();
+  </script>
+<title>經營TEAM採購｜佈告欄</title>
   
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
