@@ -4,9 +4,11 @@ if (typeof Quill !== 'undefined') {
   SizeStyle.whitelist = ['10pt', '12pt', '14pt', '16pt', '18pt', '20pt', '24pt', '28pt', '32pt'];
   Quill.register(SizeStyle, true);
 
-  const StyleAttributor = Quill.import('parchment').StyleAttributor;
+  // Get StyleAttributor safely from SizeStyle's constructor
+  const StyleAttributor = SizeStyle.constructor;
+  const Parchment = Quill.import('parchment');
   const LineHeightStyle = new StyleAttributor('lineHeight', 'line-height', {
-    scope: Quill.import('parchment').Scope.BLOCK,
+    scope: Parchment.Scope ? Parchment.Scope.BLOCK : 2,
     whitelist: ['1', '1.5', '2', '2.5', '3']
   });
   Quill.register(LineHeightStyle, true);
