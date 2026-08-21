@@ -617,11 +617,40 @@
           <p class="text-sm leading-relaxed mb-2 text-slate-600">歷史週報累積越來越多，會不會很難找？</p>
           <p class="text-sm leading-relaxed text-slate-600">別擔心！系統設計了精緻的「下拉式月份篩選」，網頁開啟時會自動鎖定在「當前最新月份」，讓畫面上只顯示近期的週報。若需查詢歷史資料，隨時可透過下拉選單切換月份，甚至選擇「全部月份」，且系統會聰明地為您預先選取該月份最新的一篇公告！</p>
         </div>
-      </div>
+      
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-300 transition-colors">
+          <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">15</span>管理員測試前台與強制更新</h4>
+          <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>測試前台權限：</strong>身為管理員，您預設擁有全站觀看權限。若想模擬一般同仁測試「權限不足」的阻擋畫面，只需在佈告欄前台網址後方加上 <code class="bg-slate-100 px-1 py-0.5 rounded text-blue-500">?test_user=1</code> 即可暫時解除特權。</p>
+          <p class="text-sm leading-relaxed text-slate-600"><strong>強制更新機制：</strong>系統已內建自動版本檢測功能（Version Checker）。未來當發布任何新功能或修正時，系統會在背景自動比對並強制刷新使用者的網頁，解決以往同仁卡在暫存看不到新版的問題。</p>
+        </div>
+</div>
 
       <!-- 專案開發成果內容 -->
       <div id="tab-achievements" class="about-tab-pane hidden flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/30 custom-scrollbar smooth-scroll-pane">
         <p class="text-sm text-slate-500 mb-4 font-medium tracking-wide">採購需求增補 & 專案成就</p>
+        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1">全局白名單權限、編輯器升級與強制更新機制</h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">採購需求：</span><br>
+                1. 重新釐清權限架構：通訊錄即為全站觀看白名單，發布時的勾選僅用於控制信件發送對象。<br>
+                2. 預防使用者網頁卡在舊版暫存，導致無法看到最新系統功能。<br>
+                3. 編輯器擴增：字體大小、行距調整、自訂字元框線，並確保 Email 信件能完美相容顯示。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
+                ✨ <span class="font-bold">專案成果：</span>統一全局白名單認證，只要能登入即可觀看，解決舊機制造成的權限衝突；加入前端 Auto Version Checker，背景比對 version.txt 發現新版時自動觸發 Hard Reload；Quill 編輯器深度客製化，開發自訂 Blot (BoxBlot) 與 Attributor 寫入 Inline-style，確保發信無跑版風險。
+              </p>
+            </div>
+          </div>
+        </div>
+
         
         <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
