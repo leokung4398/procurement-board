@@ -1,35 +1,55 @@
 // Quill Customizations
 if (typeof Quill !== 'undefined') {
   const SizeStyle = Quill.import('attributors/style/size');
-  SizeStyle.whitelist = ['10pt', '12pt', '14pt', '16pt', '18pt', '20pt', '24pt', '28pt', '32pt'];
+  SizeStyle.whitelist = ['8pt', '10pt', '12pt', '14pt', '16pt', '18pt', '20pt', '24pt', '28pt', '32pt'];
   Quill.register(SizeStyle, true);
 
   // Get StyleAttributor safely from SizeStyle's constructor
   const StyleAttributor = SizeStyle.constructor;
   const Parchment = Quill.import('parchment');
+  
   const LineHeightStyle = new StyleAttributor('lineHeight', 'line-height', {
     scope: Parchment.Scope ? Parchment.Scope.BLOCK : 2,
     whitelist: ['1', '1.5', '2', '2.5', '3']
   });
   Quill.register(LineHeightStyle, true);
 
+  const FontStyle = new StyleAttributor('font', 'font-family', {
+    scope: Parchment.Scope ? Parchment.Scope.INLINE : 1,
+    whitelist: ['"Inter", sans-serif', '"MingLiU", PMingLiU, serif', '"Microsoft JhengHei", sans-serif', 'monospace']
+  });
+  Quill.register(FontStyle, true);
+
   const Inline = Quill.import('blots/inline');
   class BoxBlot extends Inline {
     static create() {
       let node = super.create();
-      node.style.border = '1px solid #666';
+      node.style.border = '1px solid currentColor';
       node.style.padding = '0 4px';
       node.style.borderRadius = '4px';
       return node;
     }
-    static formats(node) {
-      return true;
-    }
+    static formats(node) { return true; }
   }
   BoxBlot.blotName = 'boxed';
   BoxBlot.tagName = 'span';
   BoxBlot.className = 'ql-boxed';
   Quill.register(BoxBlot);
+
+  class CircleBlot extends Inline {
+    static create() {
+      let node = super.create();
+      node.style.border = '1px solid currentColor';
+      node.style.padding = '1px 5px';
+      node.style.borderRadius = '50%';
+      return node;
+    }
+    static formats(node) { return true; }
+  }
+  CircleBlot.blotName = 'circled';
+  CircleBlot.tagName = 'span';
+  CircleBlot.className = 'ql-circled';
+  Quill.register(CircleBlot);
 }
 
 const DS = {
@@ -563,9 +583,14 @@ async function renderReadReceipts(id) {
     }
     
     if (unread.length > 0) {
+      const isDraft = S.cur && S.cur.status === 'draft';
+      const hiddenCls = isDraft ? 'hidden' : '';
+      const toggleBtn = isDraft ? `<button onclick="document.getElementById('unread-container').classList.toggle('hidden')" class="ml-2 text-xs text-blue-500 hover:text-blue-700 font-normal bg-blue-50 px-2 py-0.5 rounded cursor-pointer border border-blue-200">👁️ 顯示/隱藏</button>` : '';
       html += `
-        <p class="font-semibold text-slate-700 mb-2 border-b border-slate-100 pb-1 mt-4">⚠️ 未讀人員</p>
-        <div class="flex flex-wrap gap-2">
+        <div class="font-semibold text-slate-700 mb-2 border-b border-slate-100 pb-1 mt-4 flex items-center">
+          <span>⚠️ 未讀人員</span> ${toggleBtn}
+        </div>
+        <div id="unread-container" class="flex flex-wrap gap-2 ${hiddenCls}">
           ${unread.map(u => `<span class="px-2.5 py-1 bg-rose-50 text-rose-600 rounded text-xs font-medium">${xe(u.name)}</span>`).join('')}
         </div>
       `;
@@ -776,12 +801,35 @@ function newBulletin(){if(S.dirty&&!confirm('有未儲存的修改，確定繼�
 function wk(d){const j=new Date(d.getFullYear(),0,1);return Math.ceil((((d-j)/86400000)+j.getDay()+1)/7);}
 async function unpubBulletin(){if(!S.cur)return;if(!confirm('確定要撤回發布？撤回後前台將無法看見此週報。'))return;const pt=document.getElementById('pub-txt'),btn=document.getElementById('btn-unpub');btn.disabled=true;pt.textContent='撤回中...';try{const d={...S.cur,status:'draft',feedbackLog:S.fbs};await DS.save(d.id,d);await DS.addAuditLog(d.id, `管理員撤回了週報。`);S.dirty=false;const sb=document.getElementById('tb-status');sb.className='bdg-dft';sb.textContent='草稿';toast('週報已撤回發布！','ok');S.mmap=await DS.getMonths();renderSB();renderAuditLogs(d.id);renderEd();}catch(e){toast('撤回失敗：'+e.message,'er');}finally{btn.disabled=false;pt.textContent='正式發布';}}
 function renderEd(){const b=S.cur;if(!b)return;document.getElementById('es').classList.add('hidden');document.getElementById('bf').classList.remove('hidden');document.getElementById('tb-acts').classList.remove('hidden');document.getElementById('tb-title').textContent=b.id||'新週報';const sb=document.getElementById('tb-status');sb.className=b.status==='published'?'bdg-pub':'bdg-dft';sb.textContent=b.status==='published'?'已發布':'草稿';sb.classList.remove('hidden');if(b.status==='published'){document.getElementById('btn-unpub').classList.remove('hidden');document.getElementById('btn-pub').classList.add('hidden');}else{document.getElementById('btn-unpub').classList.add('hidden');document.getElementById('btn-pub').classList.remove('hidden');}document.getElementById('f-id').value=b.id||'';document.getElementById('f-pd').value=b.publishDate||'';document.getElementById('f-ps').value=b.periodStart||'';document.getElementById('f-pe').value=b.periodEnd||'';document.getElementById('f-ti').value=b.title||'';document.getElementById('f-pin').checked=!!b.isPinned;renderSecs();}
-function renderSecs(){const c=document.getElementById('sc');const b=S.cur;const ptl=document.getElementById('toolbar-portal');if(ptl)ptl.innerHTML='';if(!b?.sections?.length){c.innerHTML='<div class="text-center py-10 text-slate-400 text-sm">尚未建立任何段落<br><span class="text-xs">點擊右上角「新增段落」</span></div>';return;}c.innerHTML=b.sections.map((s,i)=>bldSec(s,i)).join('');setTimeout(()=>{document.querySelectorAll('.quill-editor').forEach(el=>{if(el.__quill)return;const q=new Quill(el,{theme:'snow',modules:{toolbar:[
-  ['bold','italic','underline','boxed'],
-  [{'color':[]},{'background':[]}],
-  [{'size':['10pt', '12pt', '14pt', false, '18pt', '20pt', '24pt', '28pt', '32pt']}],
-  [{'lineHeight':['1', '1.5', '2', '2.5', '3']}]
-]}});el.__quill=q;q.root.addEventListener('paste', async (e) => {
+function renderSecs(){const c=document.getElementById('sc');const b=S.cur;const ptl=document.getElementById('toolbar-portal');if(ptl)ptl.innerHTML='';if(!b?.sections?.length){c.innerHTML='<div class="text-center py-10 text-slate-400 text-sm">尚未建立任何段落<br><span class="text-xs">點擊右上角「新增段落」</span></div>';return;}c.innerHTML=b.sections.map((s,i)=>bldSec(s,i)).join('');setTimeout(()=>{document.querySelectorAll('.quill-editor').forEach(el=>{if(el.__quill)return;const q=new Quill(el,{theme:'snow',modules:{toolbar:{
+  container: [
+    [{'font':['"Inter", sans-serif', '"MingLiU", PMingLiU, serif', '"Microsoft JhengHei", sans-serif', 'monospace']}, {'size':['8pt', '10pt', '12pt', '14pt', false, '18pt', '20pt', '24pt', '28pt', '32pt']}],
+    ['bold','italic','underline','strike'],
+    ['boxed', 'circled'],
+    [{'color':['#000000', '#444444', '#666666', '#999999', '#cccccc', '#eeeeee', '#f3f4f6', '#ffffff', '#ff0000', '#ff9900', '#ffff00', '#00ff00', '#00ffff', '#0000ff', '#9900ff', '#ff00ff', '#f4cccc', '#fce5cd', '#fff2cc', '#d9ead3', '#d0e0e3', '#cfe2f3', '#d9d2e9', '#ead1dc', '#ea9999', '#f9cb9c', '#ffe599', '#b6d7a8', '#a2c4c9', '#9fc5e8', '#b4a7d6', '#d5a6bd', '#e06666', '#f6b26b', '#ffd966', '#93c47d', '#76a5af', '#6fa8dc', '#8e7cc3', '#c27ba0', '#cc0000', '#e69138', '#f1c232', '#6aa84f', '#45818e', '#3d85c6', '#674ea7', '#a64d79', '#990000', '#b45f06', '#bf9000', '#38761d', '#134f5c', '#0b5394', '#351c75', '#741b47', '#660000', '#783f04', '#7f6000', '#274e13', '#0c343d', '#073763', '#20124d', '#4c1130']},
+     {'background':['#000000', '#444444', '#666666', '#999999', '#cccccc', '#eeeeee', '#f3f4f6', '#ffffff', '#ff0000', '#ff9900', '#ffff00', '#00ff00', '#00ffff', '#0000ff', '#9900ff', '#ff00ff', '#f4cccc', '#fce5cd', '#fff2cc', '#d9ead3', '#d0e0e3', '#cfe2f3', '#d9d2e9', '#ead1dc', '#ea9999', '#f9cb9c', '#ffe599', '#b6d7a8', '#a2c4c9', '#9fc5e8', '#b4a7d6', '#d5a6bd', '#e06666', '#f6b26b', '#ffd966', '#93c47d', '#76a5af', '#6fa8dc', '#8e7cc3', '#c27ba0', '#cc0000', '#e69138', '#f1c232', '#6aa84f', '#45818e', '#3d85c6', '#674ea7', '#a64d79', '#990000', '#b45f06', '#bf9000', '#38761d', '#134f5c', '#0b5394', '#351c75', '#741b47', '#660000', '#783f04', '#7f6000', '#274e13', '#0c343d', '#073763', '#20124d', '#4c1130']}],
+    [{'lineHeight':['1', '1.5', '2', '2.5', '3']}],
+    ['delete-table', 'clean']
+  ],
+  handlers: {
+    'delete-table': function() {
+      const range = this.quill.getSelection();
+      if(range) {
+          const leaf = this.quill.getLeaf(range.index);
+          let node = leaf && leaf[0] ? leaf[0].domNode : null;
+          while(node && node.tagName !== 'TABLE' && node.tagName !== 'BODY') {
+              node = node.parentNode;
+          }
+          if(node && node.tagName === 'TABLE') {
+              node.remove();
+              this.quill.update();
+          } else {
+              toast('請先將游標點擊在表格內，再按下刪除按鈕', 'in');
+          }
+      }
+    }
+  }
+}}});el.__quill=q;q.root.addEventListener('paste', async (e) => {
 const file = e.clipboardData?.files?.[0];
 if (file && file.type.startsWith('image/')) {
 e.preventDefault();
@@ -1127,9 +1175,14 @@ function selectPubGroup(groupId) {
   const g = S.mailGroups.find(x => x.id === groupId);
   if (!g) return;
   document.querySelectorAll('.pub-wl-cb').forEach(cb => {
-    cb.checked = g.emails.includes(cb.dataset.email);
+    if (g.emails.includes(cb.dataset.email)) {
+      cb.checked = true;
+    }
   });
-  document.getElementById('pub-wl-all').checked = false;
+  // Check if all are selected now
+  const allCbs = document.querySelectorAll('.pub-wl-cb');
+  const allChecked = Array.from(allCbs).every(cb => cb.checked);
+  document.getElementById('pub-wl-all').checked = allChecked;
 }
 
 function renderPubWLList() {

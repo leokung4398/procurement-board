@@ -80,3 +80,16 @@
       border-color: #3b82f6 !important;
       box-shadow: 0 0 0 3px rgba(59,130,246,.12);
     }
+    /* Quill Custom Buttons */
+    .ql-snow .ql-picker.ql-font .ql-picker-label[data-value='"MingLiU", PMingLiU, serif']::before,
+    .ql-snow .ql-picker.ql-font .ql-picker-item[data-value='"MingLiU", PMingLiU, serif']::before { content: '細明體'; font-family: "MingLiU", PMingLiU, serif; }
+    .ql-snow .ql-picker.ql-font .ql-picker-label[data-value='"Microsoft JhengHei", sans-serif']::before,
+    .ql-snow .ql-picker.ql-font .ql-picker-item[data-value='"Microsoft JhengHei", sans-serif']::before { content: '正黑體'; font-family: "Microsoft JhengHei", sans-serif; }
+    .ql-snow .ql-picker.ql-font .ql-picker-label[data-value='"Inter", sans-serif']::before,
+    .ql-snow .ql-picker.ql-font .ql-picker-item[data-value='"Inter", sans-serif']::before { content: 'Inter'; font-family: "Inter", sans-serif; }
+
+    .ql-snow .ql-toolbar button.ql-delete-table::before { content: '🗑️'; font-size: 14px; }
+    .ql-snow .ql-toolbar button.ql-delete-table { width: 32px !important; padding: 0 !important; }
+    
+    .ql-snow .ql-toolbar button.ql-boxed::before { content: '🄰'; font-size: 14px; font-weight: bold; color: #444; }
+    .ql-snow .ql-toolbar button.ql-circled::before { content: '⭕'; font-size: 14px; font-weight: bold; color: #444; }
