@@ -44,7 +44,19 @@
   
   <link rel="stylesheet" href="css/index.css">
 
+
   <style>
+    /* Force remove any margins on paragraphs just to be absolutely certain */
+    .ql-editor p {
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+    }
+    .ql-editor > *:first-child {
+      margin-top: 0 !important;
+    }
+    .ql-editor > *:last-child {
+      margin-bottom: 0 !important;
+    }
     .ql-editor > p:first-child > br:first-child { display: none; }
     .ql-editor > p:last-child > br:last-child { display: none; }
   </style>
@@ -615,10 +627,10 @@
         let lastR = '';
         while (r !== lastR) {
           lastR = r;
-          r = r.replace(/^(?:\s*<p>(?:<br\s*\/?>|&nbsp;|\s)*<\/p>\s*)+/gi, '');
+          r = r.replace(/^(?:\s*<p[^>]*>(?:<br\s*\/?>|&nbsp;|\s)*<\/p>\s*)+/gi, '');
           r = r.replace(/^(?:\s*<br\s*\/?>\s*)+/gi, '');
-          r = r.replace(/^(?:\s*<p>)(?:\s*<br\s*\/?>|&nbsp;|\s)+/gi, '<p>');
-          r = r.replace(/(?:\s*<p>(?:<br\s*\/?>|&nbsp;|\s)*<\/p>\s*)+$/gi, '');
+          r = r.replace(/^(?:\s*)(<p[^>]*>)(?:\s*<br\s*\/?>|&nbsp;|\s)+/gi, '');
+          r = r.replace(/(?:\s*<p[^>]*>(?:<br\s*\/?>|&nbsp;|\s)*<\/p>\s*)+$/gi, '');
           r = r.replace(/(?:\s*<br\s*\/?>\s*)+$/gi, '');
           r = r.replace(/(?:<br\s*\/?>|&nbsp;|\s)+(<\/p>\s*)$/gi, '');
         }
