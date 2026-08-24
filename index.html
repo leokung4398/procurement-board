@@ -603,7 +603,18 @@
       container.innerHTML = tabsHtml;
     }
 
-    function renderActiveBulletin() {
+    
+      function clnHtm(h) {
+        if (!h) return '';
+        let r = h;
+        r = r.replace(/^(?:\s*<p>(?:<br>|&nbsp;|\s)*<\/p>\s*)+/gi, '');
+        r = r.replace(/^(?:\s*<br\s*\/?>\s*)+/gi, '');
+        r = r.replace(/(?:\s*<p>(?:<br>|&nbsp;|\s)*<\/p>\s*)+$/gi, '');
+        r = r.replace(/(?:\s*<br\s*\/?>\s*)+$/gi, '');
+        return r;
+      }
+
+      function renderActiveBulletin() {
       const container = document.getElementById('bulletin-content-area');
       if (!container) return;
 
