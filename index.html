@@ -631,12 +631,10 @@
                 const borderClass = isHigh ? 'border-red-500 bg-red-50 text-red-900' : 'border-blue-500 bg-blue-50/50 text-slate-800';
                 const highlightBadge = isHigh ? `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-red-100 text-red-800">緊急</span>` : '';
                 return `
-                  <div class="px-3 py-1 border-l-4 rounded-r-lg shadow-sm transition-all hover:shadow-md ${borderClass}">
-                    <div class="flex items-start gap-2">
-                      ${isHigh ? `<div class="mt-1 flex-shrink-0">${highlightBadge}</div>` : ''}
-                      <div ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].items[${itemIdx}].content" class="text-sm font-medium leading-relaxed outline-none whitespace-pre-wrap ql-editor !p-0 flex-1 text-left">
-                        ${item.content}
-                      </div>
+                  <div class="pl-2 pr-1 py-1 border-l-4 rounded-r-lg shadow-sm transition-all hover:shadow-md ${borderClass}">
+                    ${isHigh ? `<div class="mb-0.5">${highlightBadge}</div>` : ''}
+                    <div ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].items[${itemIdx}].content" class="text-sm font-medium leading-relaxed outline-none whitespace-pre-wrap ql-editor !p-0 text-left">
+                      ${item.content}
                     </div>
                   </div>
                 `;
@@ -711,8 +709,8 @@
           : '';
 
         return `
-          <section class="bg-white rounded-xl shadow-sm border border-slate-100 p-4">
-            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2 pb-2 mb-3 border-b border-slate-100 flex-wrap">
+          <section class="bg-white rounded-xl shadow-sm border border-slate-100 px-3 py-2">
+            <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2 pb-2 mb-2 border-b border-slate-100 flex-wrap">
               <div class="flex items-center gap-2">
                 <span class="text-xl">${e(sec.icon)}</span>
                 <span class="text-blue-600">${e(sec.sectionNumber)}、</span>
