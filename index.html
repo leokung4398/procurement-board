@@ -43,6 +43,11 @@
   <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
   
   <link rel="stylesheet" href="css/index.css">
+
+  <style>
+    .ql-editor > p:first-child > br:first-child { display: none; }
+    .ql-editor > p:last-child > br:last-child { display: none; }
+  </style>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen font-sans">
 
@@ -607,10 +612,16 @@
       function clnHtm(h) {
         if (!h) return '';
         let r = h;
-        r = r.replace(/^(?:\s*<p>(?:<br>|&nbsp;|\s)*<\/p>\s*)+/gi, '');
-        r = r.replace(/^(?:\s*<br\s*\/?>\s*)+/gi, '');
-        r = r.replace(/(?:\s*<p>(?:<br>|&nbsp;|\s)*<\/p>\s*)+$/gi, '');
-        r = r.replace(/(?:\s*<br\s*\/?>\s*)+$/gi, '');
+        let lastR = '';
+        while (r !== lastR) {
+          lastR = r;
+          r = r.replace(/^(?:\s*<p>(?:<br\s*\/?>|&nbsp;|\s)*<\/p>\s*)+/gi, '');
+          r = r.replace(/^(?:\s*<br\s*\/?>\s*)+/gi, '');
+          r = r.replace(/^(?:\s*<p>)(?:\s*<br\s*\/?>|&nbsp;|\s)+/gi, '<p>');
+          r = r.replace(/(?:\s*<p>(?:<br\s*\/?>|&nbsp;|\s)*<\/p>\s*)+$/gi, '');
+          r = r.replace(/(?:\s*<br\s*\/?>\s*)+$/gi, '');
+          r = r.replace(/(?:<br\s*\/?>|&nbsp;|\s)+(<\/p>\s*)$/gi, '');
+        }
         return r;
       }
 
