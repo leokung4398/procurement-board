@@ -1174,8 +1174,9 @@ async function pubBulletin() {
 function selectPubGroup(groupId) {
   const g = S.mailGroups.find(x => x.id === groupId);
   if (!g) return;
+  const groupEmailsLower = g.emails.map(e => (e || '').toLowerCase());
   document.querySelectorAll('.pub-wl-cb').forEach(cb => {
-    if (g.emails.includes(cb.dataset.email)) {
+    if (groupEmailsLower.includes((cb.dataset.email || '').toLowerCase())) {
       cb.checked = true;
     }
   });
