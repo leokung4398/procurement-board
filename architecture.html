@@ -123,7 +123,7 @@
   專案核心亮點與技術邏輯
 </h2>
 
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
   
   <div class="card">
     <div class="flex flex-col gap-3 mb-4">
@@ -193,7 +193,43 @@
     </ul>
   </div>
 
+
+  <div class="card">
+    <div class="flex flex-col gap-3 mb-4">
+      <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+      </div>
+      <h3 class="font-bold text-slate-800 text-lg">機密週報防護機制</h3>
+    </div>
+    <p class="text-sm text-slate-600 leading-relaxed mb-4">
+      針對特定高敏資料引入了 <strong>ACL (存取控制清單)</strong> 機制。發布時動態解析收件群組，並在資料庫底層嚴格管制讀取權限。
+    </p>
+    <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
+      <li><strong>資料庫閘門</strong>：Firebase Security Rules 從底層攔截越權存取。</li>
+      <li><strong>動態群組展開</strong>：發布時將群組解碼為個人 Email 名單供權限比對。</li>
+      <li><strong>防外流浮水印</strong>：前台自動套用登入者 Email 滿版浮水印，強烈心理嚇阻。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="flex flex-col gap-3 mb-4">
+      <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path></svg>
+      </div>
+      <h3 class="font-bold text-slate-800 text-lg">前端版面極致最佳化</h3>
+    </div>
+    <p class="text-sm text-slate-600 leading-relaxed mb-4">
+      為迎合使用者對於「高密度資訊、無留白」的嚴格要求，在前端實作了深度的 HTML 過濾與 DOM 重塑引擎。
+    </p>
+    <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
+      <li><strong>智慧空行消除</strong>：遞迴剝離富文本編輯器產生的幽靈空白與換行。</li>
+      <li><strong>響應式懸浮微標</strong>：「緊急」標籤改為 Hover 觸發，不佔用任何版面空間。</li>
+      <li><strong>強制版面壓縮</strong>：覆寫 Tailwind 與 Quill 預設樣式，實現 0 padding/margin。</li>
+    </ul>
+  </div>
+
 </div>
 
 </body>
 </html>
+
