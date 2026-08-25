@@ -1034,6 +1034,11 @@
           <input type="checkbox" id="pub-must-read" class="rounded text-amber-600" checked>
           附加「必讀公告」：自動讀取週報內標記為「緊急」的項目，直接顯示於信件中
       </label>
+      <label class="flex items-center gap-2 cursor-pointer text-sm font-medium text-rose-700">
+          <input type="checkbox" id="pub-confidential" class="rounded text-rose-600">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+          設為機密週報 (僅允許下方打勾的收件人登入前台查看，且將套用安全防護浮水印)
+      </label>
     </div>
 
     <!-- Checkbox list -->
@@ -1047,7 +1052,7 @@
   </div>
 </div>
 
-<script src="js/admin.js?v=20260824_4"></script>
+<script src="js/admin.js?v=20260825_1"></script>
 <script>
   window.addEventListener('load', () => {
     setTimeout(async () => {

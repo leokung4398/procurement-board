@@ -653,7 +653,18 @@
       // 權限檢查已統一在登入時由全局白名單處理 (frontendGoogleLogin)
       // 只要能登入，就能觀看所有已發布的佈告欄
       
-      const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
+      
+      let watermarkHtml = '';
+      if (bulletin.isConfidential) {
+        const uStr = localStorage.getItem('procurement_user');
+        const userEmail = uStr ? JSON.parse(uStr).email : 'CONFIDENTIAL';
+        watermarkHtml = 
+          <div class="fixed inset-0 pointer-events-none z-50 overflow-hidden flex flex-wrap justify-center content-center opacity-[0.03] select-none" style="gap: 50px; transform: rotate(-30deg) scale(1.5);">
+            
+          </div>
+        ;
+      }
+const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
 
       const sectionsHtml = bulletin.sections.map((sec, secIdx) => {
         // 渲染重點公告清單
@@ -837,7 +848,18 @@
 
     function renderTable(container, bulletinId, basePath) {
       let html = '';
-      const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
+      
+      let watermarkHtml = '';
+      if (bulletin.isConfidential) {
+        const uStr = localStorage.getItem('procurement_user');
+        const userEmail = uStr ? JSON.parse(uStr).email : 'CONFIDENTIAL';
+        watermarkHtml = 
+          <div class="fixed inset-0 pointer-events-none z-50 overflow-hidden flex flex-wrap justify-center content-center opacity-[0.03] select-none" style="gap: 50px; transform: rotate(-30deg) scale(1.5);">
+            
+          </div>
+        ;
+      }
+const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
       const renderCell = (pathPart, val, extraClass = '') => `<td class="px-4 py-3"><div ${editableAttr} data-path="${bulletinId}.${basePath}.${pathPart}" class="outline-none ${extraClass}">${e(val)}</div></td>`;
 
       if (container.table && container.table.columns && container.table.rows) {

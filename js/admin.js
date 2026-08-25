@@ -1230,7 +1230,8 @@ async function confirmPubBulletin() {
   const btn=document.getElementById('btn-pub-confirm');
   btn.disabled=true; btn.textContent='發布中...';
   try {
-    const d={...S.cur, status:'published', feedbackLog:S.fbs};
+    const isConfidential = document.getElementById('pub-confidential') ? document.getElementById('pub-confidential').checked : false;
+    const d={...S.cur, status:'published', feedbackLog:S.fbs, isConfidential: isConfidential};
     
     // Save authorizedEmails for access control
     d.authorizedEmails = selectedEmails;
