@@ -95,6 +95,35 @@
     </style>
   <link rel="stylesheet" href="css/admin.css">
   <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+  <style>
+    .mermaid-container { background: white; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05); padding: 2.5rem; overflow-x: auto; }
+    .card { background: white; border-radius: 16px; padding: 1.75rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: 1px solid #e2e8f0; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+    .mermaid { opacity: 0; transition: opacity 0.5s ease-in; }
+    .mermaid[data-processed="true"] { opacity: 1; }
+  </style>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+        if(window.mermaid) {
+          mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+              primaryColor: '#ffffff',
+              primaryBorderColor: '#cbd5e1',
+              primaryTextColor: '#1e293b',
+              lineColor: '#64748b',
+              fontFamily: 'Inter, PingFang TC, sans-serif',
+              fontSize: '15px'
+            },
+            flowchart: { curve: 'basis' }
+          });
+        }
+    });
+  </script>
+
 </head>
 <body>
 <div id="lo" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-[9999] flex items-center justify-center">
@@ -138,7 +167,12 @@
         <div class="absolute inset-0 bg-white/40 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-12"></div>
         <span class="font-bold tracking-wide">ℹ️ 系統與專案成果</span>
       </button>
-      <div class="space-y-2 border border-slate-200 p-2 rounded-lg bg-slate-50 mt-2">
+
+      <div class="mt-2">
+      <button onclick="showKPI()" class="w-full flex items-center justify-center gap-2 bg-indigo-50 text-indigo-600 border border-indigo-100 rounded-lg px-4 py-2 text-sm font-semibold hover:bg-indigo-100 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>績效統計
+      </button>
+    </div>      <div class="space-y-2 border border-slate-200 p-2 rounded-lg bg-slate-50 mt-2">
         <p class="text-[10px] font-semibold text-slate-500 uppercase">進階搜尋</p>
         <select id="admin-search-month" onchange="handleAdminSearch()" class="form-input text-xs py-1.5 px-2 w-full bg-white">
           <option value="">全部月份</option>
@@ -161,11 +195,7 @@
         <input type="text" id="admin-search-keyword" oninput="handleAdminSearch()" class="form-input text-xs py-1.5 px-2 w-full bg-white" placeholder="關鍵字、料號...">
       </div>
     </div>
-        <div class="px-4 py-2 border-b border-slate-100">
-      <button onclick="showKPI()" class="w-full flex items-center justify-center gap-2 bg-indigo-50 text-indigo-600 border border-indigo-100 rounded-lg px-4 py-2 text-sm font-semibold hover:bg-indigo-100 transition-colors">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>績效統計
-      </button>
-    </div>
+        
     <nav class="flex-1 px-3 py-3">
       <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-2 mb-2">歷史歸檔</p>
       <div id="sbm"><div class="text-center py-8 text-slate-400 text-sm">載入中...</div></div>
@@ -553,6 +583,7 @@
       <div class="flex border-b border-slate-200 bg-white">
         <button onclick="switchAboutTab('tab-guide')" id="btn-tab-guide" class="flex-1 py-3 font-semibold text-sm border-b-2 transition-colors text-amber-600 border-amber-500">系統操作指南</button>
         <button onclick="switchAboutTab('tab-achievements')" id="btn-tab-achievements" class="flex-1 py-3 font-semibold text-sm border-b-2 transition-colors text-slate-500 border-transparent hover:text-slate-700">專案開發成果</button>
+        <button onclick="switchAboutTab('tab-architecture')" id="btn-tab-architecture" class="flex-1 py-3 font-semibold text-sm border-b-2 transition-colors text-slate-500 border-transparent hover:text-slate-700">系統架構圖</button>
       </div>
 
       <!-- 操作指南內容 -->
@@ -1034,6 +1065,233 @@
             </div>
           </div>
         </div>
+
+        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1">週報點閱績效統計看板</h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">採購需求：</span><br>
+                1. 登入後台及前台自動跳出點閱率統計畫面。<br>
+                2. 統計當月/上月各單位的佈告數、應閱讀數、已確認、未確認及閱讀率，並以燈號顯示狀態。<br>
+                3. 防呆機制：若單位無主要聯絡人則不列入統計，並顯示警告。<br>
+                4. 支援 Excel 匯出留存。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
+                💡 <span class="font-bold">專案成果：</span>整合 Firestore 與純前端 SheetJS 套件，動態交叉比對通訊錄中的 isPrimary 欄位與 readReceipts 子集合。前端實作 SessionStorage 控制的彈窗，達成零伺服器下的複雜 KPI 統計與自動化報表匯出功能。
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 架構說明內容 -->
+      <div id="tab-architecture" class="about-tab-pane hidden flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/30 custom-scrollbar smooth-scroll-pane">
+        
+
+<div class="mb-10 text-center md:text-left">
+  <div class="inline-flex items-center justify-center p-3 bg-blue-100 rounded-xl mb-4">
+    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+  </div>
+  <h1 class="text-3xl md:text-4xl font-bold text-slate-800 mb-3 tracking-tight">採購佈告欄系統架構與邏輯設計</h1>
+  <p class="text-slate-500 text-lg max-w-3xl">本專案採用現代化的 Serverless（無伺服器）架構，達成零硬體維護成本、高安全性與自動化作業。以下為系統的前後端分離架構、資料流向與外部服務整合說明。</p>
+</div>
+
+<div class="mermaid-container mb-12 border border-slate-200">
+  <h2 class="text-xl font-bold text-slate-700 mb-6 flex items-center gap-2">
+    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+    系統全貌資料流向圖 (Data Flow & Architecture)
+  </h2>
+  
+  <div class="mermaid flex justify-center">
+    flowchart TB
+        classDef user fill:#eff6ff,stroke:#3b82f6,stroke-width:2px,color:#1e40af,rx:10px
+        classDef admin fill:#fdf4ff,stroke:#d946ef,stroke-width:2px,color:#86198f,rx:10px
+        classDef frontend fill:#ecfdf5,stroke:#10b981,stroke-width:2px,color:#065f46
+        classDef firebase fill:#fffbeb,stroke:#f59e0b,stroke-width:2px,color:#92400e
+        classDef external fill:#fef2f2,stroke:#ef4444,stroke-width:2px,color:#991b1b
+        classDef group fill:#f8fafc,stroke:#94a3b8,stroke-width:1px,stroke-dasharray: 5 5
+
+        User(("👨‍💼 一般同仁<br>(Reader)")):::user
+        Admin(("👩‍💻 採購管理員<br>(Admin)")):::admin
+
+        subgraph Frontend [🌐 前端介面層 GitHub Pages]
+            direction TB
+            Index["前台 (index.html)<br>・響應式介面設計<br>・週報與歷史歸檔查詢<br>・免密碼公開閱覽"]:::frontend
+            AdminUI["後台 (admin.html)<br>・視覺化編輯器<br>・草稿/發布生命週期<br>・群組與聯絡人管理"]:::frontend
+        end
+
+        subgraph Backend [☁️ Google Firebase 雲端後端 BaaS]
+            direction TB
+            Rules{"Security Rules<br>(存取規則與資安牆)"}:::firebase
+            
+            subgraph DB [Database & Storage]
+                direction LR
+                Firestore[("Firestore NoSQL<br>・bulletins 週報本體<br>・mailGroups 群組<br>・auditLogs 稽核")]:::firebase
+                Storage[("Cloud Storage<br>・文章內嵌圖片<br>・實體附件檔案")]:::firebase
+            end
+            
+            Rules --> Firestore
+            Rules --> Storage
+        end
+
+        subgraph External [🔗 第三方服務與自動化]
+            direction TB
+            EmailJS["✉️ EmailJS API<br>(無伺服器郵件代發)"]:::external
+            GHA["⚙️ GitHub Actions<br>(自動化部署)"]:::external
+        end
+
+        User ===>|瀏覽/查詢| Index
+        Admin ===>|身分驗證/編輯管理| AdminUI
+
+        Index -.->|API 讀取公開資料| Rules
+        AdminUI ===>|API 寫入/更新資料| Rules
+        
+        AdminUI -->|觸發發布通知<br>傳遞收件名單與內容| EmailJS
+        EmailJS -.->|寄送新版週報上線信件| User
+        
+        AdminUI -.->|更新程式碼| GHA
+        GHA -.->|自動編譯並部署| Frontend
+  </div>
+</div>
+
+<h2 class="text-xl font-bold text-slate-700 mb-6 flex items-center gap-2">
+  <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+  專案核心亮點與技術邏輯
+</h2>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  
+  <div class="card">
+    <div class="flex flex-col gap-3 mb-4">
+      <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
+      </div>
+      <h3 class="font-bold text-slate-800 text-lg">Serverless 無伺服器架構</h3>
+    </div>
+    <p class="text-sm text-slate-600 leading-relaxed mb-4">
+      捨棄傳統需要買主機、架設作業系統的框架。全站採用 <strong>HTML5 + JS</strong> 開發，搭配 <strong>GitHub Actions</strong> 實現 CI/CD，每次修改程式碼就會自動發佈至 <strong>GitHub Pages</strong>。
+    </p>
+    <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
+      <li>維護成本為零，無須擔心主機當機</li>
+      <li>全球 CDN 加速，開啟網頁瞬間完成</li>
+      <li>架構極輕量，移交與接手門檻低</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="flex flex-col gap-3 mb-4">
+      <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-amber-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
+      </div>
+      <h3 class="font-bold text-slate-800 text-lg">Firebase 企業級資料雲</h3>
+    </div>
+    <p class="text-sm text-slate-600 leading-relaxed mb-4">
+      後端資料庫選用 Google 的 <strong>Firebase Firestore (NoSQL)</strong>，具備極高的擴充性。圖文附件則上傳至 <strong>Cloud Storage</strong>。
+    </p>
+    <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
+      <li><strong>資安防護：</strong>透過 Security Rules 嚴格阻擋非管理員的惡意竄改。</li>
+      <li><strong>稽核軌跡：</strong>後台具備 Audit Logs (操作紀錄)，誰在什麼時候發布皆有跡可循。</li>
+      <li>即時同步更新，資料落地安全有保障。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="flex flex-col gap-3 mb-4">
+      <div class="w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center text-rose-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+      </div>
+      <h3 class="font-bold text-slate-800 text-lg">EmailJS 自動化通知引擎</h3>
+    </div>
+    <p class="text-sm text-slate-600 leading-relaxed mb-4">
+      過去寄發週報需要人工一封封複製貼上，現在系統內建聯絡人與群組管理，並直接串接 <strong>EmailJS API</strong>。
+    </p>
+    <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
+      <li>後台點擊「發布」，自動抓取必讀重點。</li>
+      <li>動態生成 HTML 豐富排版（包含圖片）寄送給同仁。</li>
+      <li>徹底消除人工發信的人為疏失與時間成本。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="flex flex-col gap-3 mb-4">
+      <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+      </div>
+      <h3 class="font-bold text-slate-800 text-lg">全域權限與強制更新</h3>
+    </div>
+    <p class="text-sm text-slate-600 leading-relaxed mb-4">
+      系統具備 <strong>Global Whitelist</strong> (全域白名單) 權限控管與 <strong>Version Checker</strong> (強制更新) 機制。
+    </p>
+    <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
+      <li>通訊錄名單即為全站觀看權限，無須逐篇設定</li>
+      <li>管理員可透過 <code class="bg-slate-100 px-1 rounded text-xs">?test_user=1</code> 模擬前台權限</li>
+      <li>發布新版時透過比對 version.txt 強制破除瀏覽器暫存</li>
+    </ul>
+  </div>
+
+
+  <div class="card">
+    <div class="flex flex-col gap-3 mb-4">
+      <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+      </div>
+      <h3 class="font-bold text-slate-800 text-lg">機密週報防護機制</h3>
+    </div>
+    <p class="text-sm text-slate-600 leading-relaxed mb-4">
+      針對特定高敏資料引入了 <strong>ACL (存取控制清單)</strong> 機制。發布時動態解析收件群組，並在資料庫底層嚴格管制讀取權限。
+    </p>
+    <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
+      <li><strong>資料庫閘門</strong>：Firebase Security Rules 從底層攔截越權存取。</li>
+      <li><strong>動態群組展開</strong>：發布時將群組解碼為個人 Email 名單供權限比對。</li>
+      <li><strong>防外流浮水印</strong>：前台自動套用登入者 Email 滿版浮水印，強烈心理嚇阻。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="flex flex-col gap-3 mb-4">
+      <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path></svg>
+      </div>
+      <h3 class="font-bold text-slate-800 text-lg">前端版面極致最佳化</h3>
+    </div>
+    <p class="text-sm text-slate-600 leading-relaxed mb-4">
+      為迎合使用者對於「高密度資訊、無留白」的嚴格要求，在前端實作了深度的 HTML 過濾與 DOM 重塑引擎。
+    </p>
+    <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
+      <li><strong>智慧空行消除</strong>：遞迴剝離富文本編輯器產生的幽靈空白與換行。</li>
+      <li><strong>響應式懸浮微標</strong>：「緊急」標籤改為 Hover 觸發，不佔用任何版面空間。</li>
+      <li><strong>強制版面壓縮</strong>：覆寫 Tailwind 與 Quill 預設樣式，實現 0 padding/margin。</li>
+    </ul>
+  </div>
+
+
+  <div class="card">
+    <div class="flex flex-col gap-3 mb-4">
+      <div class="w-12 h-12 bg-cyan-100 rounded-full flex items-center justify-center text-cyan-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+      </div>
+      <h3 class="font-bold text-slate-800 text-lg">週報點閱績效統計與數據匯出</h3>
+    </div>
+    <p class="text-sm text-slate-600 leading-relaxed mb-4">
+      前後台整合的視覺化 KPI 看板，能自動追蹤各營運處的閱讀狀況，並支援 Excel 報表匯出。
+    </p>
+    <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
+      <li><strong>自動結算：</strong>自動計算主要聯絡人的應讀與已讀數據。</li>
+      <li><strong>防呆機制：</strong>防呆過濾未設定主要聯絡人的單位，避免數據失真。</li>
+      <li><strong>公開透明：</strong>前台登入自動彈出統計看板，促進團隊內部閱讀積極度。</li>
+    </ul>
+  </div>
+
+</div>
+
+
       </div>
     </div>
   </div>
