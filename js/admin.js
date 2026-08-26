@@ -677,11 +677,20 @@ function closeAboutModal() { document.getElementById('about-modal').classList.ad
 function switchAboutTab(t) {
   document.querySelectorAll('.about-tab-pane').forEach(el => el.classList.add('hidden'));
   document.querySelectorAll('[id^="btn-tab-"]').forEach(el => {
-    if(el.id==='btn-tab-guide'||el.id==='btn-tab-achievements') { el.classList.remove('text-amber-600','border-amber-500'); el.classList.add('text-slate-500','border-transparent'); }
+    el.classList.remove('text-amber-600','border-amber-500');
+    el.classList.add('text-slate-500','border-transparent');
   });
   const tEl = document.getElementById(t), bEl = document.getElementById('btn-'+t);
   if (tEl) tEl.classList.remove('hidden');
   if (bEl) { bEl.classList.remove('text-slate-500','border-transparent'); bEl.classList.add('text-amber-600','border-amber-500'); }
+  
+  if (t === 'tab-architecture' && window.mermaid) {
+    try {
+      mermaid.run({
+        nodes: document.querySelectorAll('.mermaid')
+      });
+    } catch(e) {}
+  }
 }
 
 let currentGroupId = null;
