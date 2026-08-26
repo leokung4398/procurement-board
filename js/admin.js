@@ -1412,3 +1412,206 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('lo').style.display = 'flex';
   });
 });
+
+
+// KPI Logic
+let currentKPIOffset = 0;
+let kpiDataCache = {};
+
+function closeKPIModal() {
+  document.getElementById('kpi-modal').classList.add('hidden');
+}
+
+async function fetchKPIData(monthOffset) {
+  const targetDate = new Date();
+  targetDate.setMonth(targetDate.getMonth() + monthOffset);
+  const targetYear = targetDate.getFullYear();
+  const targetMonth = targetDate.getMonth();
+  
+  const monthStr = `${targetYear} 年 ${targetMonth + 1} 月`;
+  
+  // 1. Get whitelist
+  const snapW = await db.collection('systemConfig').doc('whitelist').get();
+  const whitelist = snapW.exists ? (snapW.data().list || []) : [];
+  
+  const unitPrimaryCount = {};
+  const allUnits = new Set();
+  
+  whitelist.forEach(w => {
+    if (!w.unit) return;
+    allUnits.add(w.unit);
+    if (w.isPrimary) {
+      unitPrimaryCount[w.unit] = (unitPrimaryCount[w.unit] || 0) + 1;
+    }
+  });
+  
+  const missingUnits = [];
+  const validUnits = [];
+  allUnits.forEach(u => {
+    if (!unitPrimaryCount[u]) {
+      missingUnits.push(u);
+    } else {
+      validUnits.push(u);
+    }
+  });
+
+  // 2. Get bulletins for the month
+  let start = new Date(targetYear, targetMonth, 1);
+  let end = new Date(targetYear, targetMonth + 1, 1);
+  
+  const snapB = await db.collection('bulletins')
+    .where('status', '==', 'published')
+    .where('createdAt', '>=', start)
+    .where('createdAt', '<', end)
+    .get();
+    
+  let bulletinCount = snapB.size;
+  let bulletinIds = [];
+  snapB.forEach(d => bulletinIds.push(d.id));
+
+  // 3. Process reads
+  const unitConfirmed = {};
+  validUnits.forEach(u => unitConfirmed[u] = 0);
+
+  for (let bId of bulletinIds) {
+    const snapR = await db.collection('bulletins').doc(bId).collection('readReceipts').get();
+    const readEmails = new Set();
+    snapR.forEach(r => readEmails.add(r.id.toLowerCase()));
+    
+    whitelist.forEach(w => {
+      if (w.isPrimary && unitPrimaryCount[w.unit] && readEmails.has(w.email.toLowerCase())) {
+        unitConfirmed[w.unit]++;
+      }
+    });
+  }
+
+  // 4. Compile stats
+  let totalExpected = 0;
+  let totalConfirmed = 0;
+  const tableData = [];
+  
+  validUnits.forEach(u => {
+    let expected = unitPrimaryCount[u] * bulletinCount;
+    let confirmed = unitConfirmed[u];
+    let unconfirmed = expected - confirmed;
+    let rate = expected === 0 ? 0 : Math.round((confirmed / expected) * 100);
+    
+    totalExpected += expected;
+    totalConfirmed += confirmed;
+    
+    tableData.push({
+      unit: u,
+      bulletins: bulletinCount,
+      expected: expected,
+      confirmed: confirmed,
+      unconfirmed: unconfirmed,
+      rate: rate
+    });
+  });
+  
+  let overallRate = totalExpected === 0 ? 0 : Math.round((totalConfirmed / totalExpected) * 100);
+  
+  // Sort by rate descending
+  tableData.sort((a, b) => b.rate - a.rate);
+  
+  return {
+    monthStr,
+    missingUnits,
+    tableData,
+    overallRate
+  };
+}
+
+async function showKPI(monthOffset = 0) {
+  currentKPIOffset = monthOffset;
+  document.getElementById('kpi-modal').classList.remove('hidden');
+  
+  document.getElementById('kpi-tab-0').className = monthOffset === 0 ? 'px-4 py-1.5 text-sm font-semibold rounded-md transition-colors bg-white text-blue-600 shadow-sm' : 'px-4 py-1.5 text-sm font-semibold rounded-md transition-colors text-slate-500 hover:text-slate-700';
+  document.getElementById('kpi-tab-1').className = monthOffset === -1 ? 'px-4 py-1.5 text-sm font-semibold rounded-md transition-colors bg-white text-blue-600 shadow-sm' : 'px-4 py-1.5 text-sm font-semibold rounded-md transition-colors text-slate-500 hover:text-slate-700';
+  
+  document.getElementById('kpi-month-label').innerText = '載入中...';
+  document.getElementById('kpi-table-body').innerHTML = '<tr><td colspan="7" class="text-center py-8 text-slate-400">載入中...</td></tr>';
+  
+  const data = await fetchKPIData(monthOffset);
+  window._lastKPIData = data; // store for export
+  
+  document.getElementById('kpi-month-label').innerText = data.monthStr;
+  
+  if (data.missingUnits.length > 0) {
+    document.getElementById('kpi-warning').classList.remove('hidden');
+    document.getElementById('kpi-missing-units').innerText = data.missingUnits.join('、');
+  } else {
+    document.getElementById('kpi-warning').classList.add('hidden');
+  }
+  
+  document.getElementById('kpi-total-rate').innerText = `${data.overallRate}%`;
+  
+  if (data.tableData.length > 0) {
+    document.getElementById('kpi-best-unit').innerText = data.tableData[0].unit;
+    document.getElementById('kpi-best-rate').innerText = `${data.tableData[0].rate}%`;
+    document.getElementById('kpi-worst-unit').innerText = data.tableData[data.tableData.length - 1].unit;
+    document.getElementById('kpi-worst-rate').innerText = `${data.tableData[data.tableData.length - 1].rate}%`;
+  } else {
+    document.getElementById('kpi-best-unit').innerText = '--';
+    document.getElementById('kpi-best-rate').innerText = '--%';
+    document.getElementById('kpi-worst-unit').innerText = '--';
+    document.getElementById('kpi-worst-rate').innerText = '--%';
+  }
+  
+  let html = '';
+  data.tableData.forEach(row => {
+    let light = '';
+    let statusText = '';
+    if (row.rate >= 100) { light = 'bg-green-500'; statusText = '已達標'; }
+    else if (row.rate >= 90) { light = 'bg-yellow-400'; statusText = '待提升'; }
+    else { light = 'bg-red-500'; statusText = '未達標'; }
+    
+    html += `
+      <tr class="hover:bg-slate-50 transition-colors">
+        <td class="px-4 py-3 text-sm font-medium text-slate-800">${row.unit}</td>
+        <td class="px-4 py-3 text-sm text-slate-600 text-center">${row.bulletins}</td>
+        <td class="px-4 py-3 text-sm text-slate-600 text-center">${row.expected}</td>
+        <td class="px-4 py-3 text-sm text-slate-600 text-center">${row.confirmed}</td>
+        <td class="px-4 py-3 text-sm text-slate-600 text-center">${row.unconfirmed}</td>
+        <td class="px-4 py-3 text-sm font-bold text-slate-700 text-right">${row.rate}%</td>
+        <td class="px-4 py-3 text-sm text-center">
+          <div class="inline-flex items-center gap-1.5" title="${statusText}">
+            <span class="w-3.5 h-3.5 rounded-full ${light} shadow-sm border border-black/10"></span>
+          </div>
+        </td>
+      </tr>
+    `;
+  });
+  
+  if(html === '') html = '<tr><td colspan="7" class="text-center py-8 text-slate-400">尚無資料</td></tr>';
+  document.getElementById('kpi-table-body').innerHTML = html;
+}
+
+
+function exportKPIExcel() {
+  if (!window._lastKPIData) return;
+  const data = window._lastKPIData;
+  
+  const exportData = data.tableData.map(row => {
+    let status = '未達標';
+    if(row.rate >= 100) status = '已達標';
+    else if (row.rate >= 90) status = '待提升';
+    
+    return {
+      '單位': row.unit,
+      '(月)佈告數': row.bulletins,
+      '應閱讀': row.expected,
+      '已確認': row.confirmed,
+      '未確認': row.unconfirmed,
+      '閱讀率(%)': row.rate,
+      '燈號/狀態': status
+    };
+  });
+  
+  const ws = XLSX.utils.json_to_sheet(exportData);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "點閱統計");
+  
+  const filename = `週報點閱績效統計_${data.monthStr.replace(/ /g, '')}.xlsx`;
+  XLSX.writeFile(wb, filename);
+}
