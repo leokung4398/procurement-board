@@ -1017,21 +1017,29 @@ async function addWL() {
   const n = document.getElementById('wl-name').value.trim();
   const e = document.getElementById('wl-email').value.trim();
   const region = document.getElementById('wl-region').value;
+  const unit = document.getElementById('wl-unit') ? document.getElementById('wl-unit').value.trim() : '';
+  const isPrimary = document.getElementById('wl-primary') ? document.getElementById('wl-primary').checked : false;
+  const unit = document.getElementById('wl-unit') ? document.getElementById('wl-unit').value.trim() : '';
+  const isPrimary = document.getElementById('wl-primary') ? document.getElementById('wl-primary').checked : false;
   const receiveEmail = document.getElementById('wl-receive').checked;
-  if(!n || !e) return toast('姓名與信箱必填', 'er');
+  if(!n || !e) return toast('姓名或信箱為空', 'er');
+  
+  const newData = {name: n, email: e, region, unit, isPrimary, receiveEmail};
   if (editWLIndex !== null) {
-    S.whitelist[editWLIndex] = {name: n, email: e, region, receiveEmail};
+    S.whitelist[editWLIndex] = newData;
     editWLIndex = null;
     document.getElementById('wl-btn').innerText = '新增';
     toast('已更新名單', 'ok');
   } else {
-    S.whitelist.push({name: n, email: e, region, receiveEmail});
+    S.whitelist.push(newData);
     toast('已新增名單', 'ok');
   }
   await DS.saveWhitelist(S.whitelist); renderWL();
   document.getElementById('wl-name').value=''; 
   document.getElementById('wl-email').value='';
   document.getElementById('wl-region').value='';
+  if(document.getElementById('wl-unit')) document.getElementById('wl-unit').value='';
+  if(document.getElementById('wl-primary')) document.getElementById('wl-primary').checked=false;
   document.getElementById('wl-receive').checked=true;
 }
 function editWL(idx) {
@@ -1159,14 +1167,16 @@ function renderWL() {
   c.innerHTML = list.map((w) => {
     const origIdx = S.whitelist.findIndex(x => x.email === w.email);
     const regionBadge = w.region ? `<span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-600 border border-slate-200">${w.region}</span>` : '';
-    const receiveBadge = (w.receiveEmail !== false) ? `<span class="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-green-50 text-green-600 border border-green-100">✉️</span>` : `<span class="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-50 text-slate-400 border border-slate-100" title="不收信">🔕</span>`;
+    const unitBadge = w.unit ? `<span class="ml-1 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-600 border border-blue-100">${w.unit}</span>` : '';
+    const primaryBadge = w.isPrimary ? `<span class="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-200 shadow-sm" title="主要聯絡人">⭐ 主要</span>` : '';
+    const receiveBadge = (w.receiveEmail !== false) ? `<span class="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-green-50 text-green-600 border border-green-100">收信</span>` : `<span class="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-50 text-slate-400 border border-slate-100" title="不收信">停用</span>`;
     return `
-      <div class="flex items-center gap-3 p-3 mb-2 bg-white rounded-lg border border-slate-200 hover:border-blue-200 transition-colors">
+      <div class="flex items-center gap-3 p-3 mb-2 ${w.isPrimary ? 'bg-amber-50/30 border-amber-200' : 'bg-white border-slate-200'} rounded-lg border hover:border-blue-300 transition-colors">
         ${isBatchMode ? `
           <input type="checkbox" onchange="toggleWLCb('${w.email}', this.checked)" class="w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500" ${selectedWL.includes(w.email) ? 'checked' : ''}>
         ` : ''}
         <div class="flex-1 min-w-0">
-          <div class="font-medium text-slate-800 text-sm truncate flex items-center">${w.name}${regionBadge}${receiveBadge}</div>
+          <div class="font-medium text-slate-800 text-sm truncate flex items-center">${w.name}${primaryBadge}${regionBadge}${unitBadge}${receiveBadge}</div>
           <div class="text-xs text-slate-500 truncate">${w.email}</div>
         </div>
         ${!isBatchMode ? `

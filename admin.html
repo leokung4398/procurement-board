@@ -328,26 +328,43 @@
             </div>
             <p class="text-xs text-slate-500 mb-4">在此建立採購相關的所有收件人名單。這些名單可用於發布週報，也可供加入群組。</p>
             <div class="flex items-center gap-2 mb-3">
-              <select id="wl-region" class="form-input flex-1 max-w-[100px] text-sm px-2">
-                <option value="">(無)</option>
-                <option value="台北">台北</option>
-                <option value="新北">新北</option>
-                <option value="桃園">桃園</option>
-                <option value="新竹">新竹</option>
-                <option value="苗栗">苗栗</option>
-                <option value="台中">台中</option>
-                <option value="嘉義">嘉義</option>
-                <option value="台南">台南</option>
-                <option value="高雄">高雄</option>
-                <option value="屏東">屏東</option>
-              </select>
-              <input type="text" id="wl-name" placeholder="姓名" class="form-input flex-1 text-sm">
-              <input type="email" id="wl-email" placeholder="信箱 (@youbike.com.tw)" class="form-input flex-[2] text-sm">
-              <label class="flex items-center gap-1 cursor-pointer text-xs font-medium text-slate-600 whitespace-nowrap">
-                 <input type="checkbox" id="wl-receive" class="rounded w-3.5 h-3.5 text-blue-600" checked>
-                 接收信件
-              </label>
-              <button onclick="addWL()" id="wl-btn" class="btn-p ml-1">新增</button>
+              <div class="flex flex-col gap-2 w-full">
+                <div class="flex items-center gap-2">
+                  <select id="wl-region" class="form-input flex-1 text-sm px-2">
+                    <option value="">(地區)</option>
+                    <option value="工程處">工程處</option>
+                    <option value="經營Team">經營Team</option>
+                    <option value="台北">台北</option>
+                    <option value="新北">新北</option>
+                    <option value="桃園">桃園</option>
+                    <option value="新竹">新竹</option>
+                    <option value="苗栗">苗栗</option>
+                    <option value="台中">台中</option>
+                    <option value="嘉義">嘉義</option>
+                    <option value="台南">台南</option>
+                    <option value="高雄">高雄</option>
+                    <option value="屏東">屏東</option>
+                  </select>
+                  <input type="text" id="wl-unit" placeholder="單位 (如: 台中營運處)" class="form-input flex-1 text-sm">
+                  <input type="text" id="wl-name" placeholder="姓名" class="form-input flex-1 text-sm">
+                  <input type="email" id="wl-email" placeholder="信箱" class="form-input flex-[2] text-sm">
+                </div>
+                <div class="flex items-center justify-between mt-1">
+                  <div class="flex items-center gap-4">
+                    <label class="flex items-center gap-1 cursor-pointer text-xs font-medium text-amber-600 whitespace-nowrap bg-amber-50 px-2 py-1 rounded border border-amber-200">
+                      <input type="checkbox" id="wl-primary" class="rounded w-3.5 h-3.5 text-amber-600">
+                      ⭐ 主要聯絡人
+                    </label>
+                    <label class="flex items-center gap-1 cursor-pointer text-xs font-medium text-slate-600 whitespace-nowrap">
+                      <input type="checkbox" id="wl-receive" class="rounded w-3.5 h-3.5 text-blue-600" checked>
+                      接收信件
+                    </label>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <button onclick="addWL()" id="wl-btn" class="btn-p ml-1">新增</button>
+                  </div>
+                </div>
+              </div>
             </div>
             <!-- 搜尋與批次操作列 -->
             <div class="flex items-center gap-2 pt-3 border-t border-slate-100">
@@ -1059,7 +1076,7 @@
   </div>
 </div>
 
-<script src="js/admin.js?v=20260826_6"></script>
+<script src="js/admin.js?v=20260826_8"></script>
 <script>
   window.addEventListener('load', () => {
     setTimeout(async () => {
