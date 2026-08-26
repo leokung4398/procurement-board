@@ -147,7 +147,17 @@ const DS = {
       // 移除可能存在的 undefined 屬性 (Firestore 不支援 undefined)
       const cleanData = JSON.parse(JSON.stringify(d));
       
-      await docRef.set(cleanData, { merge: true });
+            if (cleanData.isConfidential) {
+          const secData = cleanData.sections || [];
+          cleanData.sections = []; 
+          await docRef.set(cleanData, { merge: true });
+          await docRef.collection('private').doc('content').set({
+              sections: secData,
+              authorizedEmails: cleanData.authorizedEmails || []
+          });
+      } else {
+          await docRef.set(cleanData, { merge: true });
+      }
       return { success: true };
     } catch (e) {
       console.error(e);

@@ -658,11 +658,11 @@
       if (bulletin.isConfidential) {
         const uStr = localStorage.getItem('procurement_user');
         const userEmail = uStr ? JSON.parse(uStr).email : 'CONFIDENTIAL';
-        watermarkHtml = 
+        watermarkHtml = `
           <div class="fixed inset-0 pointer-events-none z-50 overflow-hidden flex flex-wrap justify-center content-center opacity-[0.03] select-none" style="gap: 50px; transform: rotate(-30deg) scale(1.5);">
-            
+            ${Array(100).fill(`<span class="text-3xl font-bold text-slate-800 tracking-widest whitespace-nowrap">` + userEmail + `</span>`).join('')}
           </div>
-        ;
+        `;
       }
 const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
 
@@ -873,11 +873,11 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
       if (bulletin.isConfidential) {
         const uStr = localStorage.getItem('procurement_user');
         const userEmail = uStr ? JSON.parse(uStr).email : 'CONFIDENTIAL';
-        watermarkHtml = 
+        watermarkHtml = `
           <div class="fixed inset-0 pointer-events-none z-50 overflow-hidden flex flex-wrap justify-center content-center opacity-[0.03] select-none" style="gap: 50px; transform: rotate(-30deg) scale(1.5);">
-            
+            ${Array(100).fill(`<span class="text-3xl font-bold text-slate-800 tracking-widest whitespace-nowrap">` + userEmail + `</span>`).join('')}
           </div>
-        ;
+        `;
       }
 const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
 
