@@ -1396,17 +1396,19 @@ async function saveHandover() {
 
 window.addEventListener('DOMContentLoaded', () => {
   firebase.auth().onAuthStateChanged(async (user) => {
-    if (user && (user.email.endsWith('@youbike.com.tw') || ADMIN_EMAILS.includes(user.email))) {
-      const snap = await db.collection('systemConfig').doc('admins').get();
-      const adminList = snap.exists ? (snap.data().list || []) : [];
-      if (adminList.some(a => a.email === user.email) || ADMIN_EMAILS.includes(user.email)) {
-        document.getElementById('lo').style.display = 'none';
-        await init();
-      } else {
-        document.getElementById('lo').style.display = 'flex';
+    if (user) {
+      const userEmail = user.email.toLowerCase();
+      const allowedEmails = ADMIN_EMAILS.map(e => e.toLowerCase());
+      if (userEmail.endsWith('@youbike.com.tw') || allowedEmails.includes(userEmail)) {
+        const snap = await db.collection('systemConfig').doc('admins').get();
+        const adminList = snap.exists ? (snap.data().list || []) : [];
+        if (adminList.some(a => a.email.toLowerCase() === userEmail) || allowedEmails.includes(userEmail)) {
+          document.getElementById('lo').style.display = 'none';
+          await init();
+          return;
+        }
       }
-    } else {
-      document.getElementById('lo').style.display = 'flex';
     }
+    document.getElementById('lo').style.display = 'flex';
   });
 });
