@@ -101,7 +101,17 @@ const DS = {
     try {
       const docSnap = await db.collection('bulletins').doc(id).get();
       if (docSnap.exists) {
-        return docSnap.data();
+        const b = docSnap.data();
+        if (b.isConfidential) {
+          try {
+            const p = await db.collection('bulletins').doc(id).collection('private').doc('content').get();
+            if (p.exists) b.sections = p.data().sections || [];
+            else b.sections = [];
+          } catch(e) {
+            b.sections = [];
+          }
+        }
+        return b;
       }
       return null;
     } catch (e) {
