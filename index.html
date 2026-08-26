@@ -321,12 +321,7 @@
       btn.innerHTML = `<span class="animate-pulse">🔄 更新中...</span>`;
       btn.disabled = true;
       try {
-        await 
-      if (!sessionStorage.getItem('kpiShown')) {
-        showKPI();
-        sessionStorage.setItem('kpiShown', '1');
-      }
-      loadData();
+        await loadData();
       } finally {
         btn.innerHTML = originalHtml;
         btn.disabled = false;
@@ -1310,6 +1305,10 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
 
     // 程式進入點
     window.addEventListener('DOMContentLoaded', () => {
+      if (!sessionStorage.getItem('kpiShown')) {
+        showKPI();
+        sessionStorage.setItem('kpiShown', '1');
+      }
       loadData();
     });
   </script>
