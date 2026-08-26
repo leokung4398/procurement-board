@@ -1,0 +1,466 @@
+[
+  {
+    "region": "台中",
+    "unit": "台中營運處",
+    "name": "萬偉",
+    "email": "weiwan@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "工程處",
+    "unit": "工程處",
+    "name": "傅涵立",
+    "email": "hanleyfu@youbike.com.tw",
+    "isPrimary": true,
+    "receiveEmail": true
+  },
+  {
+    "region": "台中",
+    "unit": "台中營運處",
+    "name": "陳恩柔",
+    "email": "rubychen2@youbike.com.tw",
+    "isPrimary": true,
+    "receiveEmail": true
+  },
+  {
+    "region": "工程處",
+    "unit": "工程處",
+    "name": "黃仁瑱",
+    "email": "ringkahuang@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "台東",
+    "unit": "台東營運處",
+    "name": "吳建穎(可樂哥)",
+    "email": "colawu@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "工程處",
+    "unit": "工程處",
+    "name": "盧瑞云",
+    "email": "wendylu@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "台東",
+    "unit": "台東營運處",
+    "name": "張挐瑄",
+    "email": "ruxuanzhang@youbike.com.tw",
+    "isPrimary": true,
+    "receiveEmail": true
+  },
+  {
+    "region": "工程處",
+    "unit": "工程處",
+    "name": "王若維",
+    "email": "ruoweiwang@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "台南",
+    "unit": "台南營運處",
+    "name": "黃聖育",
+    "email": "samhuang@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "工程處",
+    "unit": "工程處",
+    "name": "陳韻欣",
+    "email": "yunchen@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "台南",
+    "unit": "台南營運處",
+    "name": "黃龍輝",
+    "email": "clonhuang@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "工程處",
+    "unit": "工程處",
+    "name": "彭上維",
+    "email": "ryanpeng@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "台南",
+    "unit": "台南營運處",
+    "name": "倪順一",
+    "email": "shunini@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "工程處",
+    "unit": "工程處",
+    "name": "簡榮德",
+    "email": "michaelchien@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "台南",
+    "unit": "台南營運處",
+    "name": "朱栩葳",
+    "email": "hsuweichu@youbike.com.tw",
+    "isPrimary": true,
+    "receiveEmail": true
+  },
+  {
+    "region": "工程處",
+    "unit": "工程處",
+    "name": "蔡瀚緯",
+    "email": "hanktsai@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "台南",
+    "unit": "台南營運處",
+    "name": "李建融",
+    "email": "chienlonglee@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "工程處",
+    "unit": "工程處",
+    "name": "林明孝",
+    "email": "mingxiaolin@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "台南",
+    "unit": "台南營運處",
+    "name": "李庠霖",
+    "email": "hsianglinlee@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "工程處",
+    "unit": "工程處",
+    "name": "白正隆",
+    "email": "chenlongpai@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "新北",
+    "unit": "經營Team",
+    "name": "張必忠",
+    "email": "joshchang@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "工程處",
+    "unit": "工程處",
+    "name": "黃啟中",
+    "email": "qizhonghuang@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "屏東",
+    "unit": "屏東營運處",
+    "name": "邱宜敏",
+    "email": "yiminchiu@youbike.com.tw",
+    "isPrimary": true,
+    "receiveEmail": true
+  },
+  {
+    "region": "台南 屏東",
+    "unit": "台南營運處",
+    "name": "洪訢睿",
+    "email": "xinrayhung@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "苗栗",
+    "unit": "苗栗營運處",
+    "name": "彭世華",
+    "email": "harrypeng@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "苗栗",
+    "unit": "苗栗營運處",
+    "name": "莊佳誼",
+    "email": "janechuang@youbike.com.tw",
+    "isPrimary": true,
+    "receiveEmail": true
+  },
+  {
+    "region": "苗栗",
+    "unit": "苗栗營運處",
+    "name": "曾薰嬉",
+    "email": "xunxizeng@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "桃園",
+    "unit": "桃園營運處",
+    "name": "林瑋泰",
+    "email": "marslin@youbike.com.tw",
+    "isPrimary": true,
+    "receiveEmail": true
+  },
+  {
+    "region": "桃園",
+    "unit": "桃園營運處",
+    "name": "陳俊帆",
+    "email": "georgechen@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "桃園",
+    "unit": "桃園營運處",
+    "name": "吳曉昀",
+    "email": "vivianwu@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "高雄",
+    "unit": "高雄營運處",
+    "name": "陳漢全",
+    "email": "boachen@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "高雄 屏東",
+    "unit": "高雄營運處",
+    "name": "林渝軒",
+    "email": "brucelin@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "高雄",
+    "unit": "高雄營運處",
+    "name": "李嘉修",
+    "email": "chiahsiuli@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "經營Team",
+    "unit": "工程處",
+    "name": "徐嘉鴻",
+    "email": "jhsu@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "高雄",
+    "unit": "高雄營運處",
+    "name": "呂淑綺",
+    "email": "insurance77ouo@gmail.co",
+    "isPrimary": true,
+    "receiveEmail": true
+  },
+  {
+    "region": "經營Team",
+    "unit": "工程處",
+    "name": "陳麒任",
+    "email": "aidpanchen@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "高雄",
+    "unit": "高雄營運處",
+    "name": "劉建德",
+    "email": "jiandeliu@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "經營Team",
+    "unit": "工程處",
+    "name": "蕭琮瀚",
+    "email": "jackhsiao@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "新竹",
+    "unit": "新竹營運處",
+    "name": "任北辰",
+    "email": "beichenren@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "經營Team",
+    "unit": "工程處",
+    "name": "賴宜平",
+    "email": "benlai@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "新竹",
+    "unit": "新竹營運處",
+    "name": "林柏勳",
+    "email": "poxunlin@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "經營Team",
+    "unit": "工程處",
+    "name": "張必忠",
+    "email": "joshchang@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "新竹",
+    "unit": "新竹營運處",
+    "name": "林言柔",
+    "email": "zoeylin@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "經營Team",
+    "unit": "工程處",
+    "name": "孔令淳",
+    "email": "leokung@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "新竹",
+    "unit": "新竹營運處",
+    "name": "謝小雪",
+    "email": "alicexie@youbike.com.tw",
+    "isPrimary": true,
+    "receiveEmail": true
+  },
+  {
+    "region": "經營Team",
+    "unit": "工程處",
+    "name": "陸逸群",
+    "email": "yichunlu@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "嘉義 台中",
+    "unit": "嘉義營運處",
+    "name": "林育民",
+    "email": "tanklin@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "經營Team",
+    "unit": "工程處",
+    "name": "葉爵豪",
+    "email": "chuehhaoyeh@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "嘉義",
+    "unit": "嘉義營運處",
+    "name": "林信安",
+    "email": "sinanlin@youbike.com.tw",
+    "isPrimary": true,
+    "receiveEmail": true
+  },
+  {
+    "region": "經營Team",
+    "unit": "工程處",
+    "name": "包于巧",
+    "email": "ciaopao@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "新北",
+    "unit": "北區營運處",
+    "name": "王文樺",
+    "email": "lucaswang@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "新北",
+    "unit": "北區營運處",
+    "name": "吳俊緯",
+    "email": "junweiwu@youbike.com.tw",
+    "isPrimary": true,
+    "receiveEmail": true
+  },
+  {
+    "region": "新北",
+    "unit": "北區營運處",
+    "name": "顧致宇",
+    "email": "jiyugu@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "新北",
+    "unit": "北區營運處",
+    "name": "李子岳",
+    "email": "zihyueli@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "新北",
+    "unit": "北區營運處",
+    "name": "李明穎",
+    "email": "mingyinglee@giant.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "新北",
+    "unit": "北區營運處",
+    "name": "陳彥文",
+    "email": "kevenchen@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "台北",
+    "unit": "營運總處",
+    "name": "唐仕伀",
+    "email": "colintang@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  },
+  {
+    "region": "台北",
+    "unit": "營運總處",
+    "name": "李碩晏",
+    "email": "seanlee@youbike.com.tw",
+    "isPrimary": false,
+    "receiveEmail": true
+  }
+]
