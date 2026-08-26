@@ -652,6 +652,11 @@ async function showKPI(monthOffset = 0) {
     async function finishLogin(userObj) {
       localStorage.setItem('procurement_user', JSON.stringify(userObj));
       
+      if (!sessionStorage.getItem('kpiShown')) {
+        showKPI();
+        sessionStorage.setItem('kpiShown', '1');
+      }
+      
       if (DS.isConfigured()) {
         try {
           await db.collection('users').doc(userObj.userId).set({
@@ -1305,7 +1310,7 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
 
     // 程式進入點
     window.addEventListener('DOMContentLoaded', () => {
-      if (!sessionStorage.getItem('kpiShown')) {
+      if (localStorage.getItem('procurement_user') && !sessionStorage.getItem('kpiShown')) {
         showKPI();
         sessionStorage.setItem('kpiShown', '1');
       }
