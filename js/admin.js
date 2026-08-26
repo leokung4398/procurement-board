@@ -1019,8 +1019,6 @@ async function addWL() {
   const region = document.getElementById('wl-region').value;
   const unit = document.getElementById('wl-unit') ? document.getElementById('wl-unit').value.trim() : '';
   const isPrimary = document.getElementById('wl-primary') ? document.getElementById('wl-primary').checked : false;
-  const unit = document.getElementById('wl-unit') ? document.getElementById('wl-unit').value.trim() : '';
-  const isPrimary = document.getElementById('wl-primary') ? document.getElementById('wl-primary').checked : false;
   const receiveEmail = document.getElementById('wl-receive').checked;
   if(!n || !e) return toast('姓名或信箱為空', 'er');
   
@@ -1047,6 +1045,8 @@ function editWL(idx) {
   document.getElementById('wl-name').value = S.whitelist[idx].name || '';
   document.getElementById('wl-email').value = S.whitelist[idx].email || '';
   document.getElementById('wl-region').value = S.whitelist[idx].region || '';
+  if(document.getElementById('wl-unit')) document.getElementById('wl-unit').value = S.whitelist[idx].unit || '';
+  if(document.getElementById('wl-primary')) document.getElementById('wl-primary').checked = S.whitelist[idx].isPrimary === true;
   document.getElementById('wl-receive').checked = (S.whitelist[idx].receiveEmail !== false);
   document.getElementById('wl-btn').innerText = '儲存';
   document.getElementById('wl-name').focus();
