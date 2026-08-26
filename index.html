@@ -666,6 +666,17 @@
       }
 const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
 
+      // Frontend Security Gate
+      if (bulletin.isConfidential) {
+        const uStr = localStorage.getItem('procurement_user');
+        const user = uStr ? JSON.parse(uStr) : null;
+        const userEmail = user ? user.email.toLowerCase() : null;
+        if (!userEmail || !bulletin.authorizedEmails || !bulletin.authorizedEmails.includes(userEmail)) {
+           container.innerHTML = '<div class="text-center py-20"><div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-rose-100 text-rose-600 mb-4"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg></div><h3 class="text-xl font-bold text-slate-800">機密文件</h3><p class="text-slate-500 mt-2">您不在本份機密週報的授權名單中，無法檢視內容。</p></div>';
+           return;
+        }
+      }
+
       const sectionsHtml = bulletin.sections.map((sec, secIdx) => {
         // 渲染重點公告清單
         const itemsHtml = sec.items && sec.items.length > 0
@@ -860,6 +871,17 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
         ;
       }
 const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
+
+      // Frontend Security Gate
+      if (bulletin.isConfidential) {
+        const uStr = localStorage.getItem('procurement_user');
+        const user = uStr ? JSON.parse(uStr) : null;
+        const userEmail = user ? user.email.toLowerCase() : null;
+        if (!userEmail || !bulletin.authorizedEmails || !bulletin.authorizedEmails.includes(userEmail)) {
+           container.innerHTML = '<div class="text-center py-20"><div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-rose-100 text-rose-600 mb-4"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg></div><h3 class="text-xl font-bold text-slate-800">機密文件</h3><p class="text-slate-500 mt-2">您不在本份機密週報的授權名單中，無法檢視內容。</p></div>';
+           return;
+        }
+      }
       const renderCell = (pathPart, val, extraClass = '') => `<td class="px-4 py-3"><div ${editableAttr} data-path="${bulletinId}.${basePath}.${pathPart}" class="outline-none ${extraClass}">${e(val)}</div></td>`;
 
       if (container.table && container.table.columns && container.table.rows) {
