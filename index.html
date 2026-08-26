@@ -158,7 +158,7 @@
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
         接收最新
       </button>
-      <button onclick="showKPI()" class="bg-indigo-600 text-white rounded px-3 py-1.5 text-xs font-semibold hover:bg-indigo-700 shadow-sm transition-colors flex items-center gap-1">
+      <button id="kpi-btn" onclick="showKPI()" class="hidden bg-indigo-600 text-white rounded px-3 py-1.5 text-xs font-semibold hover:bg-indigo-700 shadow-sm transition-colors flex items-center gap-1">
         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
         績效統計
       </button>
@@ -656,10 +656,7 @@ async function showKPI(monthOffset = 0) {
     async function finishLogin(userObj) {
       localStorage.setItem('procurement_user', JSON.stringify(userObj));
       
-      if (!sessionStorage.getItem('kpiShown')) {
-        showKPI();
-        sessionStorage.setItem('kpiShown', '1');
-      }
+      checkAndShowKPI();
       
       if (DS.isConfigured()) {
         try {
@@ -1312,12 +1309,26 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
 
 
 
+        function checkAndShowKPI() {
+      const now = new Date();
+      const launchDate = new Date('2026-09-01T00:00:00+08:00');
+      if (now >= launchDate) {
+        const btn = document.getElementById('kpi-btn');
+        if (btn) {
+          btn.classList.remove('hidden');
+          btn.classList.add('flex');
+        }
+        
+        if (localStorage.getItem('procurement_user') && !sessionStorage.getItem('kpiShown')) {
+          showKPI();
+          sessionStorage.setItem('kpiShown', '1');
+        }
+      }
+    }
+    
     // 程式進入點
     window.addEventListener('DOMContentLoaded', () => {
-      if (localStorage.getItem('procurement_user') && !sessionStorage.getItem('kpiShown')) {
-        showKPI();
-        sessionStorage.setItem('kpiShown', '1');
-      }
+      checkAndShowKPI();
       loadData();
     });
   </script>
