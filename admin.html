@@ -680,7 +680,338 @@
       <!-- 專案開發成果內容 -->
       <div id="tab-achievements" class="about-tab-pane hidden flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/30 custom-scrollbar smooth-scroll-pane">
         <p class="text-sm text-slate-500 mb-4 font-medium tracking-wide">採購需求增補 & 專案成就</p>
-        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+<div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1">一、母標題與子標題選單化</h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">原始需求：</span><br>
+                • 預設包含採購進度、詢價、訂單異動等 12 項母標題。<br>
+                • 各母標題下提供下拉子標題選單，可維護、新增、修改及排序。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
+                ✨ <span class="font-bold">實作成果：</span>開發了「動態模板系統」，不僅內建所有採購常用的母標題模板，還能自由新增自訂段落，且完全不影響排版。
+              </p>
+            </div>
+          </div>
+        </div>
+        
+<div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1">二、自由增刪表單項目與欄位</h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">原始需求：</span><br>
+                • 表單內容可自行新增或刪除項目。<br>
+                • 所有表格皆可新增或刪除欄位排序調整，不影響既有歷史資料。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
+                ✨ <span class="font-bold">實作成果：</span>實作了「段落與條目拖曳排序」功能，以及「動態表格編輯器」，每個表格都能獨立運作，賦予採購人員極大的編輯自由。
+              </p>
+            </div>
+          </div>
+        </div>
+        
+<div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1">三、月份資料夾與歷史版本保存</h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">原始需求：</span><br>
+                • 系統依月份自動建立資料夾 (例如 2026-01, 2026-02)。<br>
+                • 新增週報時，不覆蓋舊資料，每次新增皆建立新紀錄，保留完整歷史。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
+                ✨ <span class="font-bold">實作成果：</span>導入 Firebase 雲端資料庫，搭配「下拉式月份篩選選單」，實現全自動的歷史歸檔。系統預設僅顯示當月最新公告，保持排版極簡清爽，同時又能隨時切換月份查找完整的歷史資料，確保資料永久不滅。
+              </p>
+            </div>
+          </div>
+        </div>
+        
+<div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1">四、閱讀狀態與身分追蹤機制</h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">原始需求：</span><br>
+                • 發布週報後系統可自動寄送通知給指定人員。<br>
+                • 統計已閱讀／未閱讀人員，並顯示閱讀時間。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
+                ✨ <span class="font-bold">實作成果：</span>在前台網頁開發了「人員身分登記彈窗」，自動攔截未登記使用者，並於資料庫中完整記錄每位使用者的閱讀時間，打下後續統計功能的完美基礎。
+              </p>
+            </div>
+          </div>
+        </div>
+        
+<div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1">五、新增、存檔、發布與操作功能</h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">原始需求：</span><br>
+                • 每份週報提供新增、存檔 (尚未發布)、發布、複製、刪除功能。<br>
+                • 查詢功能：依日期、月份、母標題、子標題等條件搜尋。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
+                ✨ <span class="font-bold">實作成果：</span>打造了「狀態標籤系統 (草稿/已發布)」與「一鍵 Clone」功能，並在前台實作了超快速的關鍵字與分類搜尋引擎。
+              </p>
+            </div>
+          </div>
+        </div>
+        
+<div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1">六、雲端附件上傳與預覽</h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">原始需求：</span><br>
+                • 可上傳多個附件。<br>
+                • 支援常見格式 (PDF、Excel、Word、圖片等)，可下載及預覽附件。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
+                ✨ <span class="font-bold">實作成果：</span>在後台的每個段落都加入了直覺的「上傳附件」按鈕，並於前台完美呈現附件列表，供長官與採購人員一鍵下載。
+              </p>
+            </div>
+          </div>
+        </div>
+        
+<div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1">七、系統需求與流暢操作 (額外加碼)</h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">原始需求：</span><br>
+                • 母標題及子標題由管理者維護，表單欄位彈性增修。<br>
+                • 保留歷史紀錄，方便查詢與追蹤。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
+                ✨ <span class="font-bold">實作成果：</span>除了達成全部需求，更加入了「未儲存修改警告」、「刪除雙重確認」等防呆機制。同時，前台介面全面升級為「RWD 響應式設計」，手機、平板都能完美閱讀。
+              </p>
+            </div>
+          </div>
+        </div>
+        
+<div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1">八、專屬關鍵字資料庫與連動選單</h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">最新需求：</span><br>
+                • 建立獨立的 12 大類母標題與 63 個常用關鍵字資料庫。<br>
+                • 編輯器表單輸入時，兩者必須連動且具備高度防呆。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
+                ✨ <span class="font-bold">實作成果：</span>於後台新增「關鍵字維護大廳」，並開發了雙層連動式下拉選單，完美結合滑鼠點擊與鍵盤模糊搜尋，大幅縮減了採購人員手動輸入的時間與錯字率！
+              </p>
+            </div>
+          </div>
+        </div>
+        
+<div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden mt-6">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1">九、前台多行排版與無縫更新</h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">最新需求：</span><br>
+                • 前台顯示需依照後台編輯的換行與排版格式呈現。<br>
+                • 使用者需能不重新整理頁面即可獲取最新發布內容。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
+                ✨ <span class="font-bold">實作成果：</span>前台支援 <code>whitespace-pre-wrap</code>，保留編輯空格與換行。新增「更新」按鈕並結合資料庫即時同步機制，一鍵無縫載入最新公告。
+              </p>
+            </div>
+          </div>
+        </div>
+        
+<div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden mt-6">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1">十、撤回發布功能與富文本編輯器整合</h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">最新需求：</span><br>
+                • 支援將已發布的內容「撤回」或「取消發布」。<br>
+                • 後台公告編輯支援文字格式化 (粗斜體、底線、字體大小、顏色)。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
+                ✨ <span class="font-bold">實作成果：</span>管理列新增直覺的「撤回發布」按鈕，快速將公告退為草稿。段落編輯區成功導入 <code>Quill.js</code> 富文本編輯器，並讓前台同步完美渲染 HTML 內容，大大提升公告質感。
+              </p>
+            </div>
+          </div>
+        </div>
+        
+<div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden mt-6">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1">十一、信件必讀公告與緊急提示</h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">最新需求：</span><br>
+                • 發送週報信件時，將標記為「緊急」的項目特別抓出。<br>
+                • 在信件內文最上方直接顯示，確保主管不會漏看重要事項。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
+                ✨ <span class="font-bold">實作成果：</span>於寄信確認介面新增「附加必讀公告」選項。系統會自動掃描全篇週報的紅字緊急標籤，並於信件開頭彙整出「🚨 緊急：必讀公告」，大幅提升資訊傳達效率！
+              </p>
+            </div>
+          </div>
+        </div>
+        
+<div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden mt-6">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1">十二、多層次防護與管理員白名單</h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">最新需求：</span><br>
+                • 前台系統需建立嚴密的存取控制，僅限有權限的人員進入。<br>
+                • 後台必須擁有獨立的管理員白名單，確保編輯權限不外洩，且方便交接。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
+                ✨ <span class="font-bold">實作成果：</span>建立三道防線：網域限制 (@youbike.com.tw)、前台郵件白名單連動、後台專屬管理員白名單介面。讓系統安全性滴水不漏，又能透過視覺化介面輕鬆管理人員異動。
+              </p>
+            </div>
+          </div>
+        </div>
+        
+<div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1">十三、群組發送機制與系統介面大改版</h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">最新需求：</span><br>
+                • 新增群組發送機制，依部門/職務設定群組發送。<br>
+                • 將過多的功能介面進行整合，保持左側導覽列乾淨。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
+                ✨ <span class="font-bold">實作成果：</span>將原本多達 6 個獨立設定視窗，完美重構成具備現代感的「Tab 頁籤式系統設定中心」。不但畫面乾淨清爽，更導入了自訂發信群組架構，並將原本存在本地端的白名單全面搬遷至 Firebase 雲端，讓所有管理員無縫共用設定！
+              </p>
+            </div>
+          </div>
+        </div>
+        
+<div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1">十四、發佈與更新時間顯示設計</h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">最新需求：</span><br>
+                公告發布後，於公告資訊中顯示實際發送時間（日期及時間）,方便收件人確認資訊發布時點。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
+                ✨ <span class="font-bold">實作成果：</span>以前台「深藍色漸層主視覺區塊」為基礎，打造帶有微透視玻璃質感（Glassmorphism）的圓角標籤：🕒 發布時間。並具備「智慧隱藏更新時間」邏輯：有更新時才會淡淡地補上最後更新時間，排版極致整潔好看美觀！
+              </p>
+            </div>
+          </div>
+        </div>
+        
+<div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden mt-6">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1">十五、權限邏輯極簡化與智慧過濾搜尋</h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">最新需求：</span><br>
+                • 取消前台登入時選擇部門的冗餘步驟。<br>
+                • 前台閱讀權限名單與發信通訊錄完全整合，並賦予「收信開關」功能。<br>
+                • 後台通訊錄、發信群組、寄件選單全面導入搜尋功能。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
+                ✨ <span class="font-bold">實作成果：</span>進行了一次完美「減法工程」！前台登入實現了真正的無痛進入，後台則將兩份名單整合為一，不僅保留了「純觀看」的特權帳號，還大幅擴充了通訊錄的地區欄位與關鍵字即時搜尋功能，並透過邏輯重構實現發布名單「跨搜尋記憶勾選」，操作體驗全面昇華！
+              </p>
+            </div>
+          </div>
+        </div>
+
+        
+<div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
           <div class="flex gap-4">
             <div class="mt-0.5">
@@ -704,7 +1035,8 @@
         </div>
 
         
-        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+        
+<div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
           <div class="flex gap-4">
             <div class="mt-0.5">
@@ -727,7 +1059,8 @@
           </div>
         </div>
         
-        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+        
+<div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
           <div class="flex gap-4">
             <div class="mt-0.5">
@@ -750,323 +1083,8 @@
           </div>
         </div>
         
-        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
-          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
-          <div class="flex gap-4">
-            <div class="mt-0.5">
-              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-              </div>
-            </div>
-            <div>
-              <h3 class="text-sm font-bold text-slate-800 mb-1">一、母標題與子標題選單化</h3>
-              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                <span class="font-semibold text-slate-600">原始需求：</span><br>
-                • 預設包含採購進度、詢價、訂單異動等 12 項母標題。<br>
-                • 各母標題下提供下拉子標題選單，可維護、新增、修改及排序。
-              </p>
-              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
-                ✨ <span class="font-bold">實作成果：</span>開發了「動態模板系統」，不僅內建所有採購常用的母標題模板，還能自由新增自訂段落，且完全不影響排版。
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
-          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
-          <div class="flex gap-4">
-            <div class="mt-0.5">
-              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-              </div>
-            </div>
-            <div>
-              <h3 class="text-sm font-bold text-slate-800 mb-1">二、自由增刪表單項目與欄位</h3>
-              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                <span class="font-semibold text-slate-600">原始需求：</span><br>
-                • 表單內容可自行新增或刪除項目。<br>
-                • 所有表格皆可新增或刪除欄位排序調整，不影響既有歷史資料。
-              </p>
-              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
-                ✨ <span class="font-bold">實作成果：</span>實作了「段落與條目拖曳排序」功能，以及「動態表格編輯器」，每個表格都能獨立運作，賦予採購人員極大的編輯自由。
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
-          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
-          <div class="flex gap-4">
-            <div class="mt-0.5">
-              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-              </div>
-            </div>
-            <div>
-              <h3 class="text-sm font-bold text-slate-800 mb-1">三、月份資料夾與歷史版本保存</h3>
-              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                <span class="font-semibold text-slate-600">原始需求：</span><br>
-                • 系統依月份自動建立資料夾 (例如 2026-01, 2026-02)。<br>
-                • 新增週報時，不覆蓋舊資料，每次新增皆建立新紀錄，保留完整歷史。
-              </p>
-              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
-                ✨ <span class="font-bold">實作成果：</span>導入 Firebase 雲端資料庫，搭配「下拉式月份篩選選單」，實現全自動的歷史歸檔。系統預設僅顯示當月最新公告，保持排版極簡清爽，同時又能隨時切換月份查找完整的歷史資料，確保資料永久不滅。
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
-          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
-          <div class="flex gap-4">
-            <div class="mt-0.5">
-              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-              </div>
-            </div>
-            <div>
-              <h3 class="text-sm font-bold text-slate-800 mb-1">四、閱讀狀態與身分追蹤機制</h3>
-              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                <span class="font-semibold text-slate-600">原始需求：</span><br>
-                • 發布週報後系統可自動寄送通知給指定人員。<br>
-                • 統計已閱讀／未閱讀人員，並顯示閱讀時間。
-              </p>
-              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
-                ✨ <span class="font-bold">實作成果：</span>在前台網頁開發了「人員身分登記彈窗」，自動攔截未登記使用者，並於資料庫中完整記錄每位使用者的閱讀時間，打下後續統計功能的完美基礎。
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
-          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
-          <div class="flex gap-4">
-            <div class="mt-0.5">
-              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-              </div>
-            </div>
-            <div>
-              <h3 class="text-sm font-bold text-slate-800 mb-1">五、新增、存檔、發布與操作功能</h3>
-              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                <span class="font-semibold text-slate-600">原始需求：</span><br>
-                • 每份週報提供新增、存檔 (尚未發布)、發布、複製、刪除功能。<br>
-                • 查詢功能：依日期、月份、母標題、子標題等條件搜尋。
-              </p>
-              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
-                ✨ <span class="font-bold">實作成果：</span>打造了「狀態標籤系統 (草稿/已發布)」與「一鍵 Clone」功能，並在前台實作了超快速的關鍵字與分類搜尋引擎。
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
-          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
-          <div class="flex gap-4">
-            <div class="mt-0.5">
-              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-              </div>
-            </div>
-            <div>
-              <h3 class="text-sm font-bold text-slate-800 mb-1">六、雲端附件上傳與預覽</h3>
-              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                <span class="font-semibold text-slate-600">原始需求：</span><br>
-                • 可上傳多個附件。<br>
-                • 支援常見格式 (PDF、Excel、Word、圖片等)，可下載及預覽附件。
-              </p>
-              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
-                ✨ <span class="font-bold">實作成果：</span>在後台的每個段落都加入了直覺的「上傳附件」按鈕，並於前台完美呈現附件列表，供長官與採購人員一鍵下載。
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
-          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
-          <div class="flex gap-4">
-            <div class="mt-0.5">
-              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-              </div>
-            </div>
-            <div>
-              <h3 class="text-sm font-bold text-slate-800 mb-1">七、系統需求與流暢操作 (額外加碼)</h3>
-              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                <span class="font-semibold text-slate-600">原始需求：</span><br>
-                • 母標題及子標題由管理者維護，表單欄位彈性增修。<br>
-                • 保留歷史紀錄，方便查詢與追蹤。
-              </p>
-              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
-                ✨ <span class="font-bold">實作成果：</span>除了達成全部需求，更加入了「未儲存修改警告」、「刪除雙重確認」等防呆機制。同時，前台介面全面升級為「RWD 響應式設計」，手機、平板都能完美閱讀。
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
-          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
-          <div class="flex gap-4">
-            <div class="mt-0.5">
-              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-              </div>
-            </div>
-            <div>
-              <h3 class="text-sm font-bold text-slate-800 mb-1">八、專屬關鍵字資料庫與連動選單</h3>
-              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                <span class="font-semibold text-slate-600">最新需求：</span><br>
-                • 建立獨立的 12 大類母標題與 63 個常用關鍵字資料庫。<br>
-                • 編輯器表單輸入時，兩者必須連動且具備高度防呆。
-              </p>
-              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
-                ✨ <span class="font-bold">實作成果：</span>於後台新增「關鍵字維護大廳」，並開發了雙層連動式下拉選單，完美結合滑鼠點擊與鍵盤模糊搜尋，大幅縮減了採購人員手動輸入的時間與錯字率！
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden mt-6">
-          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
-          <div class="flex gap-4">
-            <div class="mt-0.5">
-              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-              </div>
-            </div>
-            <div>
-              <h3 class="text-sm font-bold text-slate-800 mb-1">九、前台多行排版與無縫更新</h3>
-              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                <span class="font-semibold text-slate-600">最新需求：</span><br>
-                • 前台顯示需依照後台編輯的換行與排版格式呈現。<br>
-                • 使用者需能不重新整理頁面即可獲取最新發布內容。
-              </p>
-              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
-                ✨ <span class="font-bold">實作成果：</span>前台支援 <code>whitespace-pre-wrap</code>，保留編輯空格與換行。新增「更新」按鈕並結合資料庫即時同步機制，一鍵無縫載入最新公告。
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden mt-6">
-          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
-          <div class="flex gap-4">
-            <div class="mt-0.5">
-              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-              </div>
-            </div>
-            <div>
-              <h3 class="text-sm font-bold text-slate-800 mb-1">十、撤回發布功能與富文本編輯器整合</h3>
-              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                <span class="font-semibold text-slate-600">最新需求：</span><br>
-                • 支援將已發布的內容「撤回」或「取消發布」。<br>
-                • 後台公告編輯支援文字格式化 (粗斜體、底線、字體大小、顏色)。
-              </p>
-              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
-                ✨ <span class="font-bold">實作成果：</span>管理列新增直覺的「撤回發布」按鈕，快速將公告退為草稿。段落編輯區成功導入 <code>Quill.js</code> 富文本編輯器，並讓前台同步完美渲染 HTML 內容，大大提升公告質感。
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden mt-6">
-          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
-          <div class="flex gap-4">
-            <div class="mt-0.5">
-              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-              </div>
-            </div>
-            <div>
-              <h3 class="text-sm font-bold text-slate-800 mb-1">十一、信件必讀公告與緊急提示</h3>
-              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                <span class="font-semibold text-slate-600">最新需求：</span><br>
-                • 發送週報信件時，將標記為「緊急」的項目特別抓出。<br>
-                • 在信件內文最上方直接顯示，確保主管不會漏看重要事項。
-              </p>
-              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
-                ✨ <span class="font-bold">實作成果：</span>於寄信確認介面新增「附加必讀公告」選項。系統會自動掃描全篇週報的紅字緊急標籤，並於信件開頭彙整出「🚨 緊急：必讀公告」，大幅提升資訊傳達效率！
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden mt-6">
-          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
-          <div class="flex gap-4">
-            <div class="mt-0.5">
-              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-              </div>
-            </div>
-            <div>
-              <h3 class="text-sm font-bold text-slate-800 mb-1">十二、多層次防護與管理員白名單</h3>
-              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                <span class="font-semibold text-slate-600">最新需求：</span><br>
-                • 前台系統需建立嚴密的存取控制，僅限有權限的人員進入。<br>
-                • 後台必須擁有獨立的管理員白名單，確保編輯權限不外洩，且方便交接。
-              </p>
-              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
-                ✨ <span class="font-bold">實作成果：</span>建立三道防線：網域限制 (@youbike.com.tw)、前台郵件白名單連動、後台專屬管理員白名單介面。讓系統安全性滴水不漏，又能透過視覺化介面輕鬆管理人員異動。
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
-          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
-          <div class="flex gap-4">
-            <div class="mt-0.5">
-              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-              </div>
-            </div>
-            <div>
-              <h3 class="text-sm font-bold text-slate-800 mb-1">十三、群組發送機制與系統介面大改版</h3>
-              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                <span class="font-semibold text-slate-600">最新需求：</span><br>
-                • 新增群組發送機制，依部門/職務設定群組發送。<br>
-                • 將過多的功能介面進行整合，保持左側導覽列乾淨。
-              </p>
-              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
-                ✨ <span class="font-bold">實作成果：</span>將原本多達 6 個獨立設定視窗，完美重構成具備現代感的「Tab 頁籤式系統設定中心」。不但畫面乾淨清爽，更導入了自訂發信群組架構，並將原本存在本地端的白名單全面搬遷至 Firebase 雲端，讓所有管理員無縫共用設定！
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
-          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
-          <div class="flex gap-4">
-            <div class="mt-0.5">
-              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-              </div>
-            </div>
-            <div>
-              <h3 class="text-sm font-bold text-slate-800 mb-1">十四、發佈與更新時間顯示設計</h3>
-              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                <span class="font-semibold text-slate-600">最新需求：</span><br>
-                公告發布後，於公告資訊中顯示實際發送時間（日期及時間）,方便收件人確認資訊發布時點。
-              </p>
-              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
-                ✨ <span class="font-bold">實作成果：</span>以前台「深藍色漸層主視覺區塊」為基礎，打造帶有微透視玻璃質感（Glassmorphism）的圓角標籤：🕒 發布時間。並具備「智慧隱藏更新時間」邏輯：有更新時才會淡淡地補上最後更新時間，排版極致整潔好看美觀！
-              </p>
-            </div>
-          </div>
-        </div>
-        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden mt-6">
-          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
-          <div class="flex gap-4">
-            <div class="mt-0.5">
-              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
-              </div>
-            </div>
-            <div>
-              <h3 class="text-sm font-bold text-slate-800 mb-1">十五、權限邏輯極簡化與智慧過濾搜尋</h3>
-              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                <span class="font-semibold text-slate-600">最新需求：</span><br>
-                • 取消前台登入時選擇部門的冗餘步驟。<br>
-                • 前台閱讀權限名單與發信通訊錄完全整合，並賦予「收信開關」功能。<br>
-                • 後台通訊錄、發信群組、寄件選單全面導入搜尋功能。
-              </p>
-              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
-                ✨ <span class="font-bold">實作成果：</span>進行了一次完美「減法工程」！前台登入實現了真正的無痛進入，後台則將兩份名單整合為一，不僅保留了「純觀看」的特權帳號，還大幅擴充了通訊錄的地區欄位與關鍵字即時搜尋功能，並透過邏輯重構實現發布名單「跨搜尋記憶勾選」，操作體驗全面昇華！
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+        
+<div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
           <div class="flex gap-4">
             <div class="mt-0.5">
@@ -1089,7 +1107,8 @@
             </div>
           </div>
         </div>
-        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+        
+<div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
           <div class="flex gap-4">
             <div class="mt-0.5">
@@ -1113,6 +1132,7 @@
             </div>
           </div>
         </div>
+      
       </div>
 
       <!-- 架構說明內容 -->
