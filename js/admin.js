@@ -830,65 +830,73 @@ function newBulletin(){if(S.dirty&&!confirm('有未儲存的修改，確定繼�
 function wk(d){const j=new Date(d.getFullYear(),0,1);return Math.ceil((((d-j)/86400000)+j.getDay()+1)/7);}
 async function unpubBulletin(){if(!S.cur)return;if(!confirm('確定要撤回發布？撤回後前台將無法看見此週報。'))return;const pt=document.getElementById('pub-txt'),btn=document.getElementById('btn-unpub');btn.disabled=true;pt.textContent='撤回中...';try{const d={...S.cur,status:'draft',feedbackLog:S.fbs};await DS.save(d.id,d);await DS.addAuditLog(d.id, `管理員撤回了週報。`);S.dirty=false;const sb=document.getElementById('tb-status');sb.className='bdg-dft';sb.textContent='草稿';toast('週報已撤回發布！','ok');S.mmap=await DS.getMonths();renderSB();renderAuditLogs(d.id);renderEd();}catch(e){toast('撤回失敗：'+e.message,'er');}finally{btn.disabled=false;pt.textContent='正式發布';}}
 function renderEd(){const b=S.cur;if(!b)return;document.getElementById('es').classList.add('hidden');document.getElementById('bf').classList.remove('hidden');document.getElementById('tb-acts').classList.remove('hidden');document.getElementById('tb-title').textContent=b.id||'新週報';const sb=document.getElementById('tb-status');sb.className=b.status==='published'?'bdg-pub':'bdg-dft';sb.textContent=b.status==='published'?'已發布':'草稿';sb.classList.remove('hidden');if(b.status==='published'){document.getElementById('btn-unpub').classList.remove('hidden');document.getElementById('btn-pub').classList.add('hidden');}else{document.getElementById('btn-unpub').classList.add('hidden');document.getElementById('btn-pub').classList.remove('hidden');}document.getElementById('f-id').value=b.id||'';document.getElementById('f-pd').value=b.publishDate||'';document.getElementById('f-ps').value=b.periodStart||'';document.getElementById('f-pe').value=b.periodEnd||'';document.getElementById('f-ti').value=b.title||'';document.getElementById('f-pin').checked=!!b.isPinned;renderSecs();}
-function renderSecs(){const c=document.getElementById('sc');const b=S.cur;const ptl=document.getElementById('toolbar-portal');if(ptl)ptl.innerHTML='';if(!b?.sections?.length){c.innerHTML='<div class="text-center py-10 text-slate-400 text-sm">尚未建立任何段落<br><span class="text-xs">點擊右上角「新增段落」</span></div>';return;}c.innerHTML=b.sections.map((s,i)=>bldSec(s,i)).join('');setTimeout(()=>{document.querySelectorAll('.quill-editor').forEach(el=>{if(el.__quill)return;const q=new Quill(el,{theme:'snow',modules:{toolbar:{
-  container: [
-    [{'font':['"Inter", sans-serif', '"MingLiU", PMingLiU, serif', '"Microsoft JhengHei", sans-serif', 'monospace']}, {'size':['8pt', '10pt', '12pt', '14pt', false, '18pt', '20pt', '24pt', '28pt', '32pt']}],
-    ['bold','italic','underline','strike'],
-    ['boxed', 'circled'],
-    [{'color':['#000000', '#444444', '#666666', '#999999', '#cccccc', '#eeeeee', '#f3f4f6', '#ffffff', '#ff0000', '#ff9900', '#ffff00', '#00ff00', '#00ffff', '#0000ff', '#9900ff', '#ff00ff', '#f4cccc', '#fce5cd', '#fff2cc', '#d9ead3', '#d0e0e3', '#cfe2f3', '#d9d2e9', '#ead1dc', '#ea9999', '#f9cb9c', '#ffe599', '#b6d7a8', '#a2c4c9', '#9fc5e8', '#b4a7d6', '#d5a6bd', '#e06666', '#f6b26b', '#ffd966', '#93c47d', '#76a5af', '#6fa8dc', '#8e7cc3', '#c27ba0', '#cc0000', '#e69138', '#f1c232', '#6aa84f', '#45818e', '#3d85c6', '#674ea7', '#a64d79', '#990000', '#b45f06', '#bf9000', '#38761d', '#134f5c', '#0b5394', '#351c75', '#741b47', '#660000', '#783f04', '#7f6000', '#274e13', '#0c343d', '#073763', '#20124d', '#4c1130']},
-     {'background':['#000000', '#444444', '#666666', '#999999', '#cccccc', '#eeeeee', '#f3f4f6', '#ffffff', '#ff0000', '#ff9900', '#ffff00', '#00ff00', '#00ffff', '#0000ff', '#9900ff', '#ff00ff', '#f4cccc', '#fce5cd', '#fff2cc', '#d9ead3', '#d0e0e3', '#cfe2f3', '#d9d2e9', '#ead1dc', '#ea9999', '#f9cb9c', '#ffe599', '#b6d7a8', '#a2c4c9', '#9fc5e8', '#b4a7d6', '#d5a6bd', '#e06666', '#f6b26b', '#ffd966', '#93c47d', '#76a5af', '#6fa8dc', '#8e7cc3', '#c27ba0', '#cc0000', '#e69138', '#f1c232', '#6aa84f', '#45818e', '#3d85c6', '#674ea7', '#a64d79', '#990000', '#b45f06', '#bf9000', '#38761d', '#134f5c', '#0b5394', '#351c75', '#741b47', '#660000', '#783f04', '#7f6000', '#274e13', '#0c343d', '#073763', '#20124d', '#4c1130']}],
-    [{'lineHeight':['1', '1.5', '2', '2.5', '3']}],
-    ['delete-table', 'clean']
-  ],
-  handlers: {
-    'delete-table': function() {
-      const range = this.quill.getSelection();
-      if(range) {
-          const leaf = this.quill.getLeaf(range.index);
-          let node = leaf && leaf[0] ? leaf[0].domNode : null;
-          while(node && node.tagName !== 'TABLE' && node.tagName !== 'BODY') {
-              node = node.parentNode;
+function renderSecs(){const c=document.getElementById('sc');const b=S.cur;const ptl=document.getElementById('toolbar-portal');if(ptl)ptl.innerHTML='';if(!b?.sections?.length){c.innerHTML='<div class="text-center py-10 text-slate-400 text-sm">尚未建立任何段落<br><span class="text-xs">點擊右上角「新增段落」</span></div>';return;}c.innerHTML=b.sections.map((s,i)=>bldSec(s,i)).join('');setTimeout(()=>{
+  document.querySelectorAll('.quill-editor').forEach(el=>{
+    if(el.classList.contains('tox-target')) return;
+    tinymce.init({
+      target: el,
+      language: 'zh-Hant',
+      language_url: 'https://cdn.jsdelivr.net/npm/tinymce-i18n@26.8.2/langs6/zh-Hant.js',
+      inline: true,
+      menubar: false,
+      plugins: 'table lists link image autolink searchreplace wordcount',
+      toolbar: 'undo redo | fontfamily fontsize | bold italic underline strikethrough | boxed circled | forecolor backcolor | lineheight | table | removeformat',
+      fixed_toolbar_container: '#toolbar-portal',
+      font_size_formats: '6pt 8pt 9pt 10pt 11pt 12pt 14pt 16pt 18pt 20pt 22pt 24pt 26pt 28pt 32pt',
+      font_family_formats: 'Inter="Inter", sans-serif; MingLiU="MingLiU", PMingLiU, serif; Microsoft JhengHei="Microsoft JhengHei", sans-serif; Monospace=monospace',
+      line_height_formats: '1 1.5 2 2.5 3',
+      color_map: [
+        '000000', 'Black', '444444', 'Dark Gray', '666666', 'Gray', '999999', 'Light Gray', 'cccccc', 'Very Light Gray', 'eeeeee', 'Extra Light Gray', 'f3f4f6', 'Tailwind Gray', 'ffffff', 'White',
+        'ff0000', 'Red', 'ff9900', 'Orange', 'ffff00', 'Yellow', '00ff00', 'Green', '00ffff', 'Cyan', '0000ff', 'Blue', '9900ff', 'Purple', 'ff00ff', 'Magenta'
+      ],
+      setup: function(editor) {
+        editor.ui.registry.addButton('boxed', {
+          text: '🄰',
+          tooltip: '文字加框',
+          onAction: function () { editor.formatter.toggle('boxed'); }
+        });
+        editor.ui.registry.addButton('circled', {
+          text: '⭕',
+          tooltip: '文字加圓圈',
+          onAction: function () { editor.formatter.toggle('circled'); }
+        });
+        
+        editor.on('init', function() {
+          editor.formatter.register('boxed', { inline: 'span', styles: { border: '1px solid currentColor', padding: '0 4px', borderRadius: '4px' }, classes: 'ql-boxed' });
+          editor.formatter.register('circled', { inline: 'span', styles: { border: '1px solid currentColor', padding: '1px 5px', borderRadius: '50%' }, classes: 'ql-circled' });
+          const ptl = document.getElementById('toolbar-portal');
+          const hint = document.getElementById('toolbar-hint');
+          if (hint) hint.style.display = 'none';
+        });
+        
+        editor.on('focus', function() {
+          const hint = document.getElementById('toolbar-hint');
+          if (hint) hint.style.display = 'none';
+        });
+        
+        editor.on('input change undo redo execCommand paste', function() {
+          let obj=S.cur;
+          const p=el.getAttribute('data-path').split(/[.\[\]]/).filter(Boolean);
+          for(let i=0;i<p.length-1;i++) obj=obj[p[i]];
+          obj[p[p.length-1]]=editor.getContent();
+          S.dirty=true;
+        });
+      },
+      paste_data_images: true,
+      images_upload_handler: function (blobInfo, progress) {
+        return new Promise(async (resolve, reject) => {
+          try {
+            const res = await DS.uploadAttachment(S.cur.id || 'temp', blobInfo.blob());
+            resolve(res.url);
+          } catch(err) {
+            toast('圖片上傳失敗', 'er');
+            reject('Image upload failed');
           }
-          if(node && node.tagName === 'TABLE') {
-              node.remove();
-              this.quill.update();
-          } else {
-              toast('請先將游標點擊在表格內，再按下刪除按鈕', 'in');
-          }
+        });
       }
-    }
-  }
-}}});el.__quill=q;q.root.addEventListener('paste', async (e) => {
-const file = e.clipboardData?.files?.[0];
-if (file && file.type.startsWith('image/')) {
-e.preventDefault();
-const range = q.getSelection(true);
-q.insertText(range.index, '⏳ 圖片上傳中...', 'user');
-try {
-const res = await DS.uploadAttachment(S.cur.id || 'temp', file);
-q.deleteText(range.index, '⏳ 圖片上傳中...'.length);
-q.insertEmbed(range.index, 'image', res.url, 'user');
-} catch(err) {
-q.deleteText(range.index, '⏳ 圖片上傳中...'.length);
-toast('圖片上傳失敗', 'er');
-}
-}
-});const tb=el.previousElementSibling;if(tb&&tb.classList.contains('ql-toolbar')){tb.style.display='none';if(ptl)ptl.appendChild(tb);const focusFn=()=>{if(ptl){Array.from(ptl.children).forEach(ch=>ch.style.display='none');tb.style.display='flex';const hint=document.getElementById('toolbar-hint');if(hint)hint.style.display='none';}};q.root.addEventListener('focus',focusFn);tb.addEventListener('mousedown',(e)=>{e.preventDefault();focusFn();});
-const setIcon = (cls, icon, title, groupIndex) => {
-  let btn = tb.querySelector('.ql-' + cls);
-  if(!btn) {
-    btn = document.createElement('button');
-    btn.className = 'ql-' + cls;
-    const groups = tb.querySelectorAll('.ql-formats');
-    if(groups.length > groupIndex) groups[groupIndex].appendChild(btn);
-    else if(groups.length > 0) groups[groups.length-1].appendChild(btn);
-  }
-  btn.innerHTML = icon; btn.title = title; btn.style.fontSize='14px';
-};
-setIcon('boxed', '🄰', '文字加框', 2);
-setIcon('circled', '⭕', '文字加圓圈', 2);
-setIcon('delete-table', '🗑️', '刪除段落內表格', 5);
-}q.on('text-change',()=>{let obj=S.cur;const p=el.getAttribute('data-path').split(/[.\[\]]/).filter(Boolean);for(let i=0;i<p.length-1;i++)obj=obj[p[i]];obj[p[p.length-1]]=q.root.innerHTML;S.dirty=true;});});},10);}
+    });
+  });
+},10);}
 const NUMS=['一','二','三','四','五','六','七','八','九','十'];const ICONS=['📋','📦','🔧','💰','📈','📎','⚙️','📊','📝','🏭'];function bldSec(sec,si){const isCust=!S.keywords.find(c=>c.name===sec.title);
 const curCat = S.keywords.find(c=>c.name===sec.title) || (S.keywords.length ? S.keywords[0] : null);
 const dlHTML = curCat ? `<datalist id="dl-${si}">${(curCat.keywords||[]).filter(k=>k.isActive!==false).sort((a,b)=>a.order-b.order).map(k=>`<option value="${k.text}">`).join('')}</datalist>` : '';
