@@ -835,8 +835,8 @@ function renderSecs(){const c=document.getElementById('sc');const b=S.cur;const 
     if(el.classList.contains('tox-target')) return;
     tinymce.init({
       target: el,
-      language: 'zh_TW',
-      language_url: 'https://cdn.jsdelivr.net/npm/tinymce-i18n@23.10.9/langs6/zh_TW.min.js',
+      language: 'zh-Hant',
+      language_url: 'https://cdn.jsdelivr.net/npm/tinymce-i18n@26.8.2/langs6/zh-Hant.js',
       inline: true,
       menubar: false,
       plugins: 'table lists link image autolink searchreplace wordcount',
