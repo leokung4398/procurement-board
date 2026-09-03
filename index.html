@@ -206,6 +206,18 @@
     /* =========================================
        1. Store & State Management
        ========================================= */
+    function restoreTablesFromFirestore(obj) {
+      if (!obj) return;
+      if (Array.isArray(obj)) {
+        obj.forEach(restoreTablesFromFirestore);
+      } else if (typeof obj === 'object') {
+        if (obj.table && Array.isArray(obj.table.rows)) {
+          obj.table.rows = obj.table.rows.map(r => Array.isArray(r) ? r : (r && r.c ? r.c : (r && r.cols ? r.cols : [])));
+        }
+        Object.values(obj).forEach(restoreTablesFromFirestore);
+      }
+    }
+
     const DS = {
       isConfigured() {
         return typeof firebase !== 'undefined' && typeof firebaseConfig !== 'undefined' && firebaseConfig.projectId && firebaseConfig.projectId !== "YOUR_PROJECT_ID";
@@ -223,6 +235,7 @@
           const list = [];
           snap.forEach(doc => {
             const b = doc.data();
+            restoreTablesFromFirestore(b);
             if (b.status !== 'deleted') {
               list.push(b);
             }
@@ -245,7 +258,9 @@
         try {
           const docSnap = await db.collection('bulletins').doc(id).get();
           if (docSnap.exists) {
-            return docSnap.data();
+            const b = docSnap.data();
+            restoreTablesFromFirestore(b);
+            return b;
           }
           return null;
         } catch (e) {
@@ -855,6 +870,7 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
                 const privSnap = await db.collection('bulletins').doc(bulletin.id).collection('private').doc('content').get();
                 if (privSnap.exists) {
                     bulletin.sections = privSnap.data().sections || [];
+                    restoreTablesFromFirestore(bulletin);
                     bulletin.privateLoaded = true;
                     renderActiveBulletin();
                     return;
@@ -1067,13 +1083,15 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-200 bg-white">
-                ${container.table.rows.map((row, rIdx) => `
+                ${container.table.rows.map((row, rIdx) => {
+                  const cells = Array.isArray(row) ? row : (row && row.c ? row.c : (row && row.cols ? row.cols : []));
+                  return `
                   <tr class="hover:bg-slate-50 transition-colors">
-                    ${row.map((cell, cIdx) => `
+                    ${cells.map((cell, cIdx) => `
                       ${renderCell(`table.rows[${rIdx}][${cIdx}]`, cell)}
                     `).join('')}
                   </tr>
-                `).join('')}
+                `;}).join('')}
               </tbody>
             </table>
           </div>
