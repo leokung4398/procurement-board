@@ -312,6 +312,7 @@ const DS = {
         const data = doc.data();
         if (data.readAt) data.readAt = data.readAt.toDate().toLocaleString('zh-TW');
         if (data.lastViewedAt) data.lastViewedAt = data.lastViewedAt.toDate().toLocaleString('zh-TW');
+        data.readProgress = typeof data.readProgress === 'number' ? data.readProgress : 100;
         readers.push(data);
       });
       return { total: readers.length, readers: readers };
@@ -610,19 +611,30 @@ async function renderReadReceipts(id) {
             <tr class="text-[10px] text-slate-400">
               <th class="pb-1.5 font-semibold">姓名</th>
               <th class="pb-1.5 font-semibold">部門</th>
+              <th class="pb-1.5 font-semibold text-center">閱讀完成率</th>
               <th class="pb-1.5 font-semibold">首次閱讀時間</th>
               <th class="pb-1.5 font-semibold">最後閱覽時間</th>
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-50">
-            ${readers.map(r => `
+            ${readers.map(r => {
+              const prog = typeof r.readProgress === 'number' ? r.readProgress : 100;
+              let badgeCls = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+              if (prog < 50) badgeCls = 'bg-slate-100 text-slate-600 border-slate-200';
+              else if (prog < 100) badgeCls = 'bg-amber-50 text-amber-700 border-amber-200';
+              return `
               <tr>
                 <td class="py-2 text-slate-700 font-medium">${xe(r.displayName)}</td>
                 <td class="py-2 text-slate-500">${xe(r.department)}</td>
+                <td class="py-2 text-center">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold border ${badgeCls}">
+                    ${prog === 100 ? '✓ ' : ''}${prog}%
+                  </span>
+                </td>
                 <td class="py-2 text-slate-400">${r.readAt}</td>
                 <td class="py-2 text-slate-400">${r.lastViewedAt}</td>
               </tr>
-            `).join('')}
+            `;}).join('')}
           </tbody>
         </table>
       `;
@@ -1514,16 +1526,28 @@ async function fetchKPIData(monthOffset) {
 
   // 3. Process reads
   const unitConfirmed = {};
-  validUnits.forEach(u => unitConfirmed[u] = 0);
+  const unitTotalProgress = {};
+  validUnits.forEach(u => {
+    unitConfirmed[u] = 0;
+    unitTotalProgress[u] = 0;
+  });
 
   for (let bId of bulletinIds) {
     const snapR = await db.collection('bulletins').doc(bId).collection('readReceipts').get();
-    const readEmails = new Set();
-    snapR.forEach(r => readEmails.add(r.id.toLowerCase()));
+    const readerMap = new Map();
+    snapR.forEach(r => {
+      const data = r.data();
+      const prog = typeof data.readProgress === 'number' ? data.readProgress : 100;
+      readerMap.set(r.id.toLowerCase(), prog);
+    });
     
     whitelist.forEach(w => {
-      if (w.isPrimary && unitPrimaryCount[w.unit] && readEmails.has(w.email.toLowerCase())) {
-        unitConfirmed[w.unit]++;
+      if (w.isPrimary && unitPrimaryCount[w.unit]) {
+        const email = w.email.toLowerCase();
+        if (readerMap.has(email)) {
+          unitConfirmed[w.unit]++;
+          unitTotalProgress[w.unit] += readerMap.get(email);
+        }
       }
     });
   }
@@ -1531,6 +1555,7 @@ async function fetchKPIData(monthOffset) {
   // 4. Compile stats
   let totalExpected = 0;
   let totalConfirmed = 0;
+  let totalProgressSum = 0;
   const tableData = [];
   
   validUnits.forEach(u => {
@@ -1538,9 +1563,11 @@ async function fetchKPIData(monthOffset) {
     let confirmed = unitConfirmed[u];
     let unconfirmed = expected - confirmed;
     let rate = expected === 0 ? 0 : Math.round((confirmed / expected) * 100);
+    let avgProgress = expected === 0 ? 0 : Math.round(unitTotalProgress[u] / expected);
     
     totalExpected += expected;
     totalConfirmed += confirmed;
+    totalProgressSum += unitTotalProgress[u];
     
     tableData.push({
       unit: u,
@@ -1548,11 +1575,13 @@ async function fetchKPIData(monthOffset) {
       expected: expected,
       confirmed: confirmed,
       unconfirmed: unconfirmed,
-      rate: rate
+      rate: rate,
+      avgProgress: avgProgress
     });
   });
   
   let overallRate = totalExpected === 0 ? 0 : Math.round((totalConfirmed / totalExpected) * 100);
+  let overallAvgProgress = totalExpected === 0 ? 0 : Math.round(totalProgressSum / (totalExpected || 1));
   
   // Sort by rate descending
   tableData.sort((a, b) => b.rate - a.rate);
@@ -1573,7 +1602,7 @@ async function showKPI(monthOffset = 0) {
   document.getElementById('kpi-tab-1').className = monthOffset === -1 ? 'px-4 py-1.5 text-sm font-semibold rounded-md transition-colors bg-white text-blue-600 shadow-sm' : 'px-4 py-1.5 text-sm font-semibold rounded-md transition-colors text-slate-500 hover:text-slate-700';
   
   document.getElementById('kpi-month-label').innerText = '載入中...';
-  document.getElementById('kpi-table-body').innerHTML = '<tr><td colspan="7" class="text-center py-8 text-slate-400">載入中...</td></tr>';
+  document.getElementById('kpi-table-body').innerHTML = '<tr><td colspan="8" class="text-center py-8 text-slate-400">載入中...</td></tr>';
   
   const data = await fetchKPIData(monthOffset);
   window._lastKPIData = data; // store for export
@@ -1617,6 +1646,11 @@ async function showKPI(monthOffset = 0) {
         <td class="px-4 py-3 text-sm text-slate-600 text-center">${row.confirmed}</td>
         <td class="px-4 py-3 text-sm text-slate-600 text-center">${row.unconfirmed}</td>
         <td class="px-4 py-3 text-sm font-bold text-slate-700 text-right">${row.rate}%</td>
+        <td class="px-4 py-3 text-sm font-semibold text-slate-700 text-right">
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold ${row.avgProgress >= 90 ? 'bg-emerald-50 text-emerald-700' : (row.avgProgress >= 70 ? 'bg-amber-50 text-amber-700' : 'bg-slate-100 text-slate-600')}">
+            ${row.avgProgress}%
+          </span>
+        </td>
         <td class="px-4 py-3 text-sm text-center">
           <div class="inline-flex items-center gap-1.5" title="${statusText}">
             <span class="w-3.5 h-3.5 rounded-full ${light} shadow-sm border border-black/10"></span>
@@ -1626,7 +1660,7 @@ async function showKPI(monthOffset = 0) {
     `;
   });
   
-  if(html === '') html = '<tr><td colspan="7" class="text-center py-8 text-slate-400">尚無資料</td></tr>';
+  if(html === '') html = '<tr><td colspan="8" class="text-center py-8 text-slate-400">尚無資料</td></tr>';
   document.getElementById('kpi-table-body').innerHTML = html;
 }
 
@@ -1647,6 +1681,7 @@ function exportKPIExcel() {
       '已確認': row.confirmed,
       '未確認': row.unconfirmed,
       '閱讀率(%)': row.rate,
+      '平均閱讀完成率(%)': row.avgProgress,
       '燈號/狀態': status
     };
   });

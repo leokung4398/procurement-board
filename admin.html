@@ -1133,6 +1133,29 @@
           </div>
         </div>
       
+        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1 flex items-center gap-2">二十一、閱讀完成率追蹤與落實度分析 <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-0.5 rounded-full font-normal tracking-wide">2026-09-03</span></h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">採購需求：</span><br>
+                1. 於現有閱讀狀態中增加「閱讀完成率」資訊，追蹤每位人員實際閱讀進度百分比。<br>
+                2. 確認同仁是否完整閱畢週報內容，避免僅點開即關閉之形式化閱讀。<br>
+                3. 於點閱績效統計看板中呈現整體與各單位的平均完成率，掌握各廠處真實落實狀況。<br>
+                4. 支援 Excel 報表匯出平均閱讀完成率欄位。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
+                💡 <span class="font-bold">專案成果：</span>前台導入捲動深度運算與即時頂部進度條，並設計 1.5 秒防抖節流與離頁自動回傳機制（節省資料庫流量）；後台已讀名冊即時渲染各同仁專屬的完成率百分比徽章；KPI 績效看板與 Excel 匯出全面整合「平均閱讀完成率」，助管理階層精準掌握資訊傳遞成效！
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- 架構說明內容 -->
@@ -1390,7 +1413,7 @@
   </div>
 </div>
 
-<script src="js/admin.js?v=20260903_01"></script>
+<script src="js/admin.js?v=20260903_02"></script>
 <script>
   window.addEventListener('load', () => {
     setTimeout(async () => {
@@ -1491,11 +1514,12 @@
               <th class="px-4 py-3 text-xs font-semibold text-slate-500 uppercase text-center">已確認</th>
               <th class="px-4 py-3 text-xs font-semibold text-slate-500 uppercase text-center">未確認</th>
               <th class="px-4 py-3 text-xs font-semibold text-slate-500 uppercase text-right">閱讀率</th>
+              <th class="px-4 py-3 text-xs font-semibold text-slate-500 uppercase text-right">平均完成率</th>
               <th class="px-4 py-3 text-xs font-semibold text-slate-500 uppercase text-center">狀態</th>
             </tr>
           </thead>
           <tbody id="kpi-table-body" class="divide-y divide-slate-100">
-            <tr><td colspan="7" class="text-center py-8 text-slate-400">載入中...</td></tr>
+            <tr><td colspan="8" class="text-center py-8 text-slate-400">載入中...</td></tr>
           </tbody>
         </table>
       </div>

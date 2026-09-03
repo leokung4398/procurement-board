@@ -268,21 +268,30 @@
           return null;
         }
       },
-      async markAsRead(bulletinId, user) {
-        if (!this.isConfigured()) return;
+      async markAsRead(bulletinId, user, progress = null) {
+        if (!this.isConfigured() || !bulletinId || !user || !user.userId) return;
         try {
           const userRef = db.collection('bulletins').doc(bulletinId).collection('readReceipts').doc(user.userId);
           const docSnap = await userRef.get();
           if (docSnap.exists) {
-            await userRef.update({
+            const updateData = {
               lastViewedAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
+            };
+            if (progress !== null && typeof progress === 'number') {
+              const currentProgress = docSnap.data().readProgress || 0;
+              if (progress > currentProgress) {
+                updateData.readProgress = Math.min(100, Math.round(progress));
+              }
+            }
+            await userRef.update(updateData);
           } else {
+            const initialProgress = (progress !== null && typeof progress === 'number') ? Math.min(100, Math.round(progress)) : 10;
             await userRef.set({
               userId: user.userId,
               email: user.email,
               displayName: user.displayName,
               department: user.department,
+              readProgress: initialProgress,
               readAt: firebase.firestore.FieldValue.serverTimestamp(),
               lastViewedAt: firebase.firestore.FieldValue.serverTimestamp()
             });
@@ -405,16 +414,28 @@ async function fetchKPIData(monthOffset) {
 
   // 3. Process reads
   const unitConfirmed = {};
-  validUnits.forEach(u => unitConfirmed[u] = 0);
+  const unitTotalProgress = {};
+  validUnits.forEach(u => {
+    unitConfirmed[u] = 0;
+    unitTotalProgress[u] = 0;
+  });
 
   for (let bId of bulletinIds) {
     const snapR = await db.collection('bulletins').doc(bId).collection('readReceipts').get();
-    const readEmails = new Set();
-    snapR.forEach(r => readEmails.add(r.id.toLowerCase()));
+    const readerMap = new Map();
+    snapR.forEach(r => {
+      const data = r.data();
+      const prog = typeof data.readProgress === 'number' ? data.readProgress : 100;
+      readerMap.set(r.id.toLowerCase(), prog);
+    });
     
     whitelist.forEach(w => {
-      if (w.isPrimary && unitPrimaryCount[w.unit] && readEmails.has(w.email.toLowerCase())) {
-        unitConfirmed[w.unit]++;
+      if (w.isPrimary && unitPrimaryCount[w.unit]) {
+        const email = w.email.toLowerCase();
+        if (readerMap.has(email)) {
+          unitConfirmed[w.unit]++;
+          unitTotalProgress[w.unit] += readerMap.get(email);
+        }
       }
     });
   }
@@ -422,6 +443,7 @@ async function fetchKPIData(monthOffset) {
   // 4. Compile stats
   let totalExpected = 0;
   let totalConfirmed = 0;
+  let totalProgressSum = 0;
   const tableData = [];
   
   validUnits.forEach(u => {
@@ -429,9 +451,11 @@ async function fetchKPIData(monthOffset) {
     let confirmed = unitConfirmed[u];
     let unconfirmed = expected - confirmed;
     let rate = expected === 0 ? 0 : Math.round((confirmed / expected) * 100);
+    let avgProgress = expected === 0 ? 0 : Math.round(unitTotalProgress[u] / expected);
     
     totalExpected += expected;
     totalConfirmed += confirmed;
+    totalProgressSum += unitTotalProgress[u];
     
     tableData.push({
       unit: u,
@@ -439,11 +463,13 @@ async function fetchKPIData(monthOffset) {
       expected: expected,
       confirmed: confirmed,
       unconfirmed: unconfirmed,
-      rate: rate
+      rate: rate,
+      avgProgress: avgProgress
     });
   });
   
   let overallRate = totalExpected === 0 ? 0 : Math.round((totalConfirmed / totalExpected) * 100);
+  let overallAvgProgress = totalExpected === 0 ? 0 : Math.round(totalProgressSum / (totalExpected || 1));
   
   // Sort by rate descending
   tableData.sort((a, b) => b.rate - a.rate);
@@ -464,7 +490,7 @@ async function showKPI(monthOffset = 0) {
   document.getElementById('kpi-tab-1').className = monthOffset === -1 ? 'px-4 py-1.5 text-sm font-semibold rounded-md transition-colors bg-white text-blue-600 shadow-sm' : 'px-4 py-1.5 text-sm font-semibold rounded-md transition-colors text-slate-500 hover:text-slate-700';
   
   document.getElementById('kpi-month-label').innerText = '載入中...';
-  document.getElementById('kpi-table-body').innerHTML = '<tr><td colspan="7" class="text-center py-8 text-slate-400">載入中...</td></tr>';
+  document.getElementById('kpi-table-body').innerHTML = '<tr><td colspan="8" class="text-center py-8 text-slate-400">載入中...</td></tr>';
   
   const data = await fetchKPIData(monthOffset);
   window._lastKPIData = data; // store for export
@@ -508,6 +534,11 @@ async function showKPI(monthOffset = 0) {
         <td class="px-4 py-3 text-sm text-slate-600 text-center">${row.confirmed}</td>
         <td class="px-4 py-3 text-sm text-slate-600 text-center">${row.unconfirmed}</td>
         <td class="px-4 py-3 text-sm font-bold text-slate-700 text-right">${row.rate}%</td>
+        <td class="px-4 py-3 text-sm font-semibold text-slate-700 text-right">
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold ${row.avgProgress >= 90 ? 'bg-emerald-50 text-emerald-700' : (row.avgProgress >= 70 ? 'bg-amber-50 text-amber-700' : 'bg-slate-100 text-slate-600')}">
+            ${row.avgProgress}%
+          </span>
+        </td>
         <td class="px-4 py-3 text-sm text-center">
           <div class="inline-flex items-center gap-1.5" title="${statusText}">
             <span class="w-3.5 h-3.5 rounded-full ${light} shadow-sm border border-black/10"></span>
@@ -517,7 +548,7 @@ async function showKPI(monthOffset = 0) {
     `;
   });
   
-  if(html === '') html = '<tr><td colspan="7" class="text-center py-8 text-slate-400">尚無資料</td></tr>';
+  if(html === '') html = '<tr><td colspan="8" class="text-center py-8 text-slate-400">尚無資料</td></tr>';
   document.getElementById('kpi-table-body').innerHTML = html;
 }
 
@@ -705,6 +736,10 @@ async function showKPI(monthOffset = 0) {
     }
 
     function selectBulletin(id) {
+      if (window.syncReadingProgress) window.syncReadingProgress();
+      currentBulletinProgress = 0;
+      const bar = document.getElementById('reading-progress-bar');
+      if (bar) bar.style.width = '0%';
       if (state.isEditMode) syncDOMToState();
       state.activeBulletinId = id;
       renderApp();
@@ -1061,7 +1096,65 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
           })()}
         </div>
       `;
+      setupReadingProgressTracker();
     }
+    // ==========================================
+    // 閱讀完成率追蹤（Scroll Depth Tracker）
+    // ==========================================
+    let progressDebounceTimer = null;
+    let currentBulletinProgress = 0;
+
+    function setupReadingProgressTracker() {
+      const userStr = localStorage.getItem('procurement_user');
+      if (!userStr || !state.activeBulletinId) return;
+
+      function checkProgress() {
+        const docElem = document.documentElement;
+        const scrollHeight = docElem.scrollHeight;
+        const clientHeight = window.innerHeight;
+        const scrollTop = window.scrollY || docElem.scrollTop;
+
+        // 若內容小於等於一頁高度，直接判定 100%
+        if (scrollHeight <= clientHeight + 50) {
+          currentBulletinProgress = 100;
+        } else {
+          // 以滑動到頁面最深處位置計算百分比 (10% ~ 100%)
+          const scrollPercent = Math.min(100, Math.max(10, Math.round(((scrollTop + clientHeight) / scrollHeight) * 100)));
+          currentBulletinProgress = Math.max(currentBulletinProgress, scrollPercent);
+        }
+
+        const bar = document.getElementById('reading-progress-bar');
+        if (bar) bar.style.width = `${currentBulletinProgress}%`;
+
+        // 節流回傳 (防抖 1.5 秒)
+        clearTimeout(progressDebounceTimer);
+        progressDebounceTimer = setTimeout(() => {
+          syncReadingProgress();
+        }, 1500);
+      }
+
+      function syncReadingProgress() {
+        if (!state.activeBulletinId || currentBulletinProgress <= 0) return;
+        const uStr = localStorage.getItem('procurement_user');
+        if (!uStr) return;
+        const u = JSON.parse(uStr);
+        DS.markAsRead(state.activeBulletinId, u, currentBulletinProgress);
+      }
+      window.syncReadingProgress = syncReadingProgress;
+
+      window.removeEventListener('scroll', checkProgress);
+      window.addEventListener('scroll', checkProgress, { passive: true });
+
+      setTimeout(checkProgress, 350);
+
+      window.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'hidden') {
+          syncReadingProgress();
+        }
+      });
+      window.addEventListener('beforeunload', syncReadingProgress);
+    }
+
 
     function renderTable(container, bulletinId, basePath) {
       let html = '';
@@ -1419,11 +1512,12 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
               <th class="px-4 py-3 text-xs font-semibold text-slate-500 uppercase text-center">已確認</th>
               <th class="px-4 py-3 text-xs font-semibold text-slate-500 uppercase text-center">未確認</th>
               <th class="px-4 py-3 text-xs font-semibold text-slate-500 uppercase text-right">閱讀率</th>
+              <th class="px-4 py-3 text-xs font-semibold text-slate-500 uppercase text-right">平均完成率</th>
               <th class="px-4 py-3 text-xs font-semibold text-slate-500 uppercase text-center">狀態</th>
             </tr>
           </thead>
           <tbody id="kpi-table-body" class="divide-y divide-slate-100">
-            <tr><td colspan="7" class="text-center py-8 text-slate-400">載入中...</td></tr>
+            <tr><td colspan="8" class="text-center py-8 text-slate-400">載入中...</td></tr>
           </tbody>
         </table>
       </div>
