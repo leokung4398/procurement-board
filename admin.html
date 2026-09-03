@@ -677,7 +677,7 @@
         </div>
         <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-300 transition-colors">
           <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">18</span>閱讀完成率追蹤與落實度分析</h4>
-          <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>前台即時追蹤：</strong>同仁在前台閱讀週報時，頁面最頂端會顯示漸層藍色進度條，隨著滑動即時向前推進；滑動至頁面最底端即自動認列為 100% 完整閱讀（只增不減），並具備自動節流同步機制。</p>
+          <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>前台即時追蹤與完讀滿條：</strong>同仁在前台閱讀週報時，頁面最頂端會顯示漸層藍色進度條隨滑動即時推進；滑動至頁面最底端即自動認列為 100% 完整閱讀。<strong>凡已看滿 100% 的同仁，重新整理或日後再次點開該篇週報時，頂部進度條將直接常駐為 100% 滿條</strong>，提供直觀的完讀標示與成就感！</p>
           <p class="text-sm leading-relaxed text-slate-600"><strong>後台名冊與績效看板：</strong>後台「已讀狀態追蹤」名冊可即時查看每位人員的「閱讀完成率」百分比徽章；「點閱績效看板」與「匯出 Excel」同步新增各單位的「平均閱讀完成率」，杜絕僅點開即關閉之形式化簽到，精準掌握各廠處資訊落實狀況！</p>
         </div>
       </div>
@@ -1152,11 +1152,12 @@
                 <span class="font-semibold text-slate-600">採購需求：</span><br>
                 1. 於現有閱讀狀態中增加「閱讀完成率」資訊，追蹤每位人員實際閱讀進度百分比。<br>
                 2. 確認同仁是否完整閱畢週報內容，避免僅點開即關閉之形式化閱讀。<br>
-                3. 於點閱績效統計看板中呈現整體與各單位的平均完成率，掌握各廠處真實落實狀況。<br>
-                4. 支援 Excel 報表匯出平均閱讀完成率欄位。
+                3. 前台進度條需支援完讀狀態記憶，已完讀 100% 者再次點閱時直接呈現滿條。<br>
+                4. 於點閱績效統計看板中呈現整體與各單位的平均完成率，掌握各廠處真實落實狀況。<br>
+                5. 支援 Excel 報表匯出平均閱讀完成率欄位。
               </p>
               <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
-                💡 <span class="font-bold">專案成果：</span>前台導入捲動深度運算與即時頂部進度條，並設計 1.5 秒防抖節流與離頁自動回傳機制（節省資料庫流量）；後台已讀名冊即時渲染各同仁專屬的完成率百分比徽章；KPI 績效看板與 Excel 匯出全面整合「平均閱讀完成率」，助管理階層精準掌握資訊傳遞成效！
+                💡 <span class="font-bold">專案成果：</span>前台導入捲動深度運算與即時頂部進度條，支援「已完讀 100% 滿條常駐記憶」與 1.5 秒防抖節流機制（節省資料庫流量）；後台已讀名冊即時渲染各同仁專屬的完成率百分比徽章；KPI 績效看板與 Excel 匯出全面整合「平均閱讀完成率」，助管理階層精準掌握資訊傳遞成效！
               </p>
             </div>
           </div>
@@ -1195,8 +1196,8 @@
 
         subgraph Frontend [🌐 前端介面層 GitHub Pages]
             direction TB
-            Index["前台 (index.html)<br>・響應式介面設計<br>・週報與歷史歸檔查詢<br>・免密碼公開閱覽"]:::frontend
-            AdminUI["後台 (admin.html)<br>・視覺化編輯器<br>・草稿/發布生命週期<br>・群組與聯絡人管理"]:::frontend
+            Index["前台 (index.html)<br>・響應式介面設計<br>・週報與歷史歸檔查詢<br>・閱讀完成率與滿條常駐"]:::frontend
+            AdminUI["後台 (admin.html)<br>・視覺化編輯器<br>・草稿/發布生命週期<br>・已讀名冊與 KPI 完成率看板"]:::frontend
         end
 
         subgraph Backend [☁️ Google Firebase 雲端後端 BaaS]
@@ -1358,6 +1359,23 @@
       <li><strong>自動結算：</strong>自動計算主要聯絡人的應讀與已讀數據。</li>
       <li><strong>防呆機制：</strong>防呆過濾未設定主要聯絡人的單位，避免數據失真。</li>
       <li><strong>公開透明：</strong>前台登入自動彈出統計看板，促進團隊內部閱讀積極度。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="flex flex-col gap-3 mb-4">
+      <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-amber-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+      </div>
+      <h3 class="font-bold text-slate-800 text-lg">閱讀完成率與滿條常駐記憶</h3>
+    </div>
+    <p class="text-sm text-slate-600 leading-relaxed mb-4">
+      打破傳統「點開即算已讀」的粗糙統計，前台依據真實捲動深度計算閱畢百分比，並兼顧使用者完讀成就感。
+    </p>
+    <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
+      <li><strong>完讀滿條常駐</strong>：已達 100% 者重開時直接常駐滿條，直觀標示通關狀態。</li>
+      <li><strong>無感防抖節流</strong>：停止滾動 1.5 秒或離頁時自動回傳資料庫，節省流量。</li>
+      <li><strong>全維度落實分析</strong>：後台名冊徽章與 KPI 看板同步呈現單位平均完成率。</li>
     </ul>
   </div>
 

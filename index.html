@@ -307,14 +307,18 @@
         }
       },
       async hasRead(bulletinId, userId) {
-        if (!this.isConfigured()) return true; // Default true if no DB
-        if (!userId) return false;
+        if (!this.isConfigured()) return { hasRead: true, readProgress: 100 };
+        if (!userId) return { hasRead: false, readProgress: 0 };
         try {
           const docSnap = await db.collection('bulletins').doc(bulletinId).collection('readReceipts').doc(userId).get();
-          return docSnap.exists;
+          if (docSnap.exists) {
+            const p = docSnap.data().readProgress;
+            return { hasRead: true, readProgress: typeof p === 'number' ? p : 100 };
+          }
+          return { hasRead: false, readProgress: 0 };
         } catch (e) {
           console.error("hasRead error:", e);
-          return false;
+          return { hasRead: false, readProgress: 0 };
         }
       }
     };
@@ -637,14 +641,20 @@ async function showKPI(monthOffset = 0) {
           }
 
           const uid = user.userId || user.uid || (user.email ? user.email.replace(/[@.]/g, '_') : null);
-          const alreadyRead = uid ? await DS.hasRead(state.activeBulletinId, uid) : false;
-          if (!alreadyRead) {
+          const res = uid ? await DS.hasRead(state.activeBulletinId, uid) : { hasRead: false, readProgress: 0 };
+          if (!res.hasRead) {
             // Unread! Show the unread modal reminder
             const b = state.data.bulletins.find(x => x.id === state.activeBulletinId);
             document.getElementById('unread-bulletin-title').textContent = b ? b.title : '最新緊急公告';
             document.getElementById('unread-modal').classList.remove('hidden');
           } else {
             try { localStorage.setItem('has_read_' + state.activeBulletinId, '1'); } catch(e) {}
+            if (res.readProgress >= 100) {
+              try { localStorage.setItem('progress_' + state.activeBulletinId, '100'); } catch(e) {}
+              currentBulletinProgress = 100;
+              const bar = document.getElementById('reading-progress-bar');
+              if (bar) bar.style.width = '100%';
+            }
           }
           // Mark as read in Firestore
           DS.markAsRead(state.activeBulletinId, user);
@@ -765,8 +775,14 @@ async function showKPI(monthOffset = 0) {
     function selectBulletin(id) {
       if (window.syncReadingProgress) window.syncReadingProgress();
       currentBulletinProgress = 0;
+      const storedProgress = parseInt(localStorage.getItem('progress_' + id) || '0', 10);
       const bar = document.getElementById('reading-progress-bar');
-      if (bar) bar.style.width = '0%';
+      if (bar) {
+        bar.style.width = storedProgress >= 100 ? '100%' : '0%';
+      }
+      if (storedProgress >= 100) {
+        currentBulletinProgress = 100;
+      }
       if (state.isEditMode) syncDOMToState();
       state.activeBulletinId = id;
       renderApp();
@@ -1135,7 +1151,22 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
       const userStr = localStorage.getItem('procurement_user');
       if (!userStr || !state.activeBulletinId) return;
 
+      // 檢查是否已完讀 100%（若是，直接滿條常駐）
+      const storedProgress = parseInt(localStorage.getItem('progress_' + state.activeBulletinId) || '0', 10);
+      const bar = document.getElementById('reading-progress-bar');
+      if (storedProgress >= 100) {
+        currentBulletinProgress = 100;
+        if (bar) bar.style.width = '100%';
+        return; // 已完讀滿條常駐
+      }
+
       function checkProgress() {
+        // 若已完讀滿條，直接鎖定 100%
+        if (currentBulletinProgress >= 100) {
+          if (bar) bar.style.width = '100%';
+          return;
+        }
+
         const docElem = document.documentElement;
         const scrollHeight = docElem.scrollHeight;
         const clientHeight = window.innerHeight;
@@ -1153,6 +1184,10 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
         const bar = document.getElementById('reading-progress-bar');
         if (bar) bar.style.width = `${currentBulletinProgress}%`;
 
+        if (currentBulletinProgress >= 100) {
+          try { localStorage.setItem('progress_' + state.activeBulletinId, '100'); } catch(e) {}
+        }
+
         // 節流回傳 (防抖 1.5 秒)
         clearTimeout(progressDebounceTimer);
         progressDebounceTimer = setTimeout(() => {
@@ -1166,6 +1201,9 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
         if (!uStr) return;
         const u = JSON.parse(uStr);
         DS.markAsRead(state.activeBulletinId, u, currentBulletinProgress);
+        if (currentBulletinProgress >= 100) {
+          try { localStorage.setItem('progress_' + state.activeBulletinId, '100'); } catch(e) {}
+        }
       }
       window.syncReadingProgress = syncReadingProgress;
 
