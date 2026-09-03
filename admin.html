@@ -112,6 +112,49 @@
       font-weight: 600 !important;
       color: #475569 !important;
     }
+  
+    /* TinyMCE Overflow Menu Horizontal Layout */
+    .tox-pop .tox-toolbar,
+    .tox-pop .tox-toolbar__overflow,
+    .tox-tinymce-aux .tox-toolbar,
+    .tox-tinymce-aux .tox-toolbar__overflow,
+    .tox .tox-toolbar__overflow {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: wrap !important;
+      align-items: center !important;
+      max-width: 480px !important;
+      width: auto !important;
+      gap: 4px !important;
+      padding: 6px 8px !important;
+      background: white !important;
+      border-radius: 10px !important;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+    }
+    .tox-pop .tox-toolbar__group,
+    .tox-tinymce-aux .tox-toolbar__group,
+    .tox .tox-toolbar__overflow .tox-toolbar__group {
+      display: flex !important;
+      flex-direction: row !important;
+      align-items: center !important;
+      width: auto !important;
+      margin: 0 !important;
+    }
+    .tox-pop .tox-tbtn,
+    .tox-tinymce-aux .tox-tbtn,
+    .tox .tox-toolbar__overflow .tox-tbtn {
+      width: 32px !important;
+      height: 32px !important;
+      justify-content: center !important;
+      margin: 0 1px !important;
+    }
+    .tox-pop .tox-split-button,
+    .tox-tinymce-aux .tox-split-button,
+    .tox .tox-toolbar__overflow .tox-split-button {
+      width: auto !important;
+      margin: 0 1px !important;
+    }
+
   </style>
   <link rel="stylesheet" href="css/admin.css">
   <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
@@ -279,10 +322,10 @@
         </section>
         <section class="bg-white rounded-xl border border-slate-200 shadow-sm">
           <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white/95 backdrop-blur-sm z-10 shadow-sm">
-            <div class="flex items-center gap-4">
-              <h2 class="text-sm font-semibold text-slate-700 flex items-center gap-2"><span class="w-5 h-5 bg-blue-100 rounded text-blue-600 flex items-center justify-center text-xs font-bold">B</span>段落內容管理</h2>
-              <div class="text-xs text-slate-400 font-medium" id="toolbar-hint">✨ 點擊下方文字框啟用編輯工具</div>
-              <div id="toolbar-portal" class="flex items-center"></div>
+            <div class="flex items-center gap-3 flex-1 min-w-0 mr-4">
+              <h2 class="text-sm font-semibold text-slate-700 flex items-center gap-2 shrink-0"><span class="w-5 h-5 bg-blue-100 rounded text-blue-600 flex items-center justify-center text-xs font-bold">B</span>段落內容管理</h2>
+              <div class="text-xs text-slate-400 font-medium shrink-0" id="toolbar-hint">✨ 點擊下方文字框啟用編輯工具</div>
+              <div id="toolbar-portal" class="flex items-center flex-1 min-w-0"></div>
             </div>
             <button onclick="showModal()" class="btn-s text-xs py-1.5 px-3">
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>新增段落
@@ -1485,7 +1528,7 @@
   </div>
 </div>
 
-<script src="js/admin.js?v=20260903_03"></script>
+<script src="js/admin.js?v=20260904_01"></script>
 <script>
   window.addEventListener('load', () => {
     setTimeout(async () => {

@@ -880,6 +880,7 @@ function renderSecs(){const c=document.getElementById('sc');const b=S.cur;const 
       plugins: 'table lists link image autolink searchreplace wordcount',
       toolbar: 'undo redo | fontfamily fontsize | bold italic underline strikethrough | boxed circled | forecolor backcolor | alignleft aligncenter alignright alignjustify | merge_center table | lineheight removeformat',
       fixed_toolbar_container: '#toolbar-portal',
+      toolbar_mode: 'sliding',
       table_toolbar: 'tableprops tabledelete | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol | tablemergecells tablesplitcells | tablecellvalign',
       table_grid: true,
       table_default_attributes: {
