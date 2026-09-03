@@ -62,6 +62,8 @@
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen font-sans">
+  <!-- 頂部閱讀進度條 -->
+  <div id="reading-progress-bar" class="fixed top-0 left-0 h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-teal-400 z-[9999] transition-all duration-200 pointer-events-none shadow-sm" style="width: 0%;"></div>
 
   <!-- 使用者資訊登記彈窗 -->
   <div id="user-modal" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
@@ -269,9 +271,11 @@
         }
       },
       async markAsRead(bulletinId, user, progress = null) {
-        if (!this.isConfigured() || !bulletinId || !user || !user.userId) return;
+        if (!this.isConfigured() || !bulletinId || !user) return;
+        const uid = user.userId || user.uid || (user.email ? user.email.replace(/[@.]/g, '_') : null);
+        if (!uid) return;
         try {
-          const userRef = db.collection('bulletins').doc(bulletinId).collection('readReceipts').doc(user.userId);
+          const userRef = db.collection('bulletins').doc(bulletinId).collection('readReceipts').doc(uid);
           const docSnap = await userRef.get();
           if (docSnap.exists) {
             const updateData = {
@@ -286,28 +290,31 @@
             await userRef.update(updateData);
           } else {
             const initialProgress = (progress !== null && typeof progress === 'number') ? Math.min(100, Math.round(progress)) : 10;
-            await userRef.set({
-              userId: user.userId,
-              email: user.email,
-              displayName: user.displayName,
-              department: user.department,
+            const newDoc = {
+              userId: uid,
+              email: user.email || '',
+              displayName: user.displayName || user.name || (user.email ? user.email.split('@')[0] : '同仁'),
+              department: user.department || '未指定',
               readProgress: initialProgress,
               readAt: firebase.firestore.FieldValue.serverTimestamp(),
               lastViewedAt: firebase.firestore.FieldValue.serverTimestamp()
-            });
+            };
+            await userRef.set(newDoc);
           }
+          try { localStorage.setItem('has_read_' + bulletinId, '1'); } catch(e) {}
         } catch (e) {
           console.error("markAsRead error:", e);
         }
       },
       async hasRead(bulletinId, userId) {
         if (!this.isConfigured()) return true; // Default true if no DB
+        if (!userId) return false;
         try {
           const docSnap = await db.collection('bulletins').doc(bulletinId).collection('readReceipts').doc(userId).get();
           return docSnap.exists;
         } catch (e) {
           console.error("hasRead error:", e);
-          return true;
+          return false;
         }
       }
     };
@@ -622,14 +629,24 @@ async function showKPI(monthOffset = 0) {
       if (userStr) {
         const user = JSON.parse(userStr);
         if (state.activeBulletinId) {
-          const alreadyRead = await DS.hasRead(state.activeBulletinId, user.userId);
+          // 1. 本地防干擾快取：若此瀏覽器已標記閱讀過，不再重複跳出彈窗
+          const localRead = localStorage.getItem('has_read_' + state.activeBulletinId);
+          if (localRead === '1') {
+            DS.markAsRead(state.activeBulletinId, user);
+            return;
+          }
+
+          const uid = user.userId || user.uid || (user.email ? user.email.replace(/[@.]/g, '_') : null);
+          const alreadyRead = uid ? await DS.hasRead(state.activeBulletinId, uid) : false;
           if (!alreadyRead) {
             // Unread! Show the unread modal reminder
             const b = state.data.bulletins.find(x => x.id === state.activeBulletinId);
             document.getElementById('unread-bulletin-title').textContent = b ? b.title : '最新緊急公告';
             document.getElementById('unread-modal').classList.remove('hidden');
+          } else {
+            try { localStorage.setItem('has_read_' + state.activeBulletinId, '1'); } catch(e) {}
           }
-          // Mark as read (updates lastViewedAt if already read, or creates if not)
+          // Mark as read in Firestore
           DS.markAsRead(state.activeBulletinId, user);
         }
       } else {
@@ -639,6 +656,16 @@ async function showKPI(monthOffset = 0) {
 
     function closeUnreadModal() {
       document.getElementById('unread-modal').classList.add('hidden');
+      if (state.activeBulletinId) {
+        try {
+          localStorage.setItem('has_read_' + state.activeBulletinId, '1');
+          const userStr = localStorage.getItem('procurement_user');
+          if (userStr) {
+            const user = JSON.parse(userStr);
+            DS.markAsRead(state.activeBulletinId, user, 10);
+          }
+        } catch(e) {}
+      }
     }
 
     let pendingUser = null;
