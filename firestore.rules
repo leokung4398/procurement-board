@@ -30,5 +30,11 @@ service cloud.firestore {
       // 允許前台讀取設定（例如登入時驗證白名單），且後台無使用 Firebase Auth 因此放開寫入
       allow read: if true; allow write: if true; 
     }
+
+    // 4. 使用需求調查問卷集合 (Surveys)
+    match /surveys/{surveyId} {
+      // 允許同仁提交問卷與後台統計讀取
+      allow read, write: if true;
+    }
   }
 }

@@ -1807,3 +1807,156 @@ if (!window._toxGlobalClickBound) {
     }
   });
 }
+
+
+// --- Survey Feedback & Analytics ---
+var _lastSurveyData = [];
+
+async function showSurveyModal() {
+  const modal = document.getElementById('survey-modal');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+  await fetchSurveyData();
+}
+
+function closeSurveyModal() {
+  const modal = document.getElementById('survey-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
+async function fetchSurveyData() {
+  const tbody = document.getElementById('survey-table-body');
+  if (!tbody) return;
+  tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-slate-400">載入問卷資料中...</td></tr>';
+  
+  try {
+    if (typeof db === 'undefined' || !db) {
+      tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-rose-500">Firebase 資料庫未就緒</td></tr>';
+      return;
+    }
+    
+    const snap = await db.collection('surveys').orderBy('createdAt', 'desc').get();
+    const list = [];
+    snap.forEach(doc => {
+      list.push({ id: doc.id, ...doc.data() });
+    });
+    
+    _lastSurveyData = list;
+    renderSurveyModal(list);
+  } catch (err) {
+    console.error("fetchSurveyData error:", err);
+    tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-rose-500">載入失敗：${err.message}</td></tr>`;
+  }
+}
+
+function renderSurveyModal(list) {
+  const countEl = document.getElementById('survey-stat-count');
+  const scoreUEl = document.getElementById('survey-stat-score-u');
+  const scoreLEl = document.getElementById('survey-stat-score-l');
+  const topInfoEl = document.getElementById('survey-stat-top-info');
+  const summaryEl = document.getElementById('survey-table-summary');
+  const tbody = document.getElementById('survey-table-body');
+  
+  if (countEl) countEl.textContent = `${list.length} 份`;
+  if (summaryEl) summaryEl.textContent = `共 ${list.length} 筆回覆`;
+  
+  if (!list.length) {
+    if (scoreUEl) scoreUEl.textContent = '--';
+    if (scoreLEl) scoreLEl.textContent = '--';
+    if (topInfoEl) topInfoEl.textContent = '尚無資料';
+    if (tbody) tbody.innerHTML = '<tr><td colspan="8" class="text-center py-12 text-slate-400 text-sm">目前尚無任何問卷填答紀錄</td></tr>';
+    return;
+  }
+  
+  let sumU = 0, sumL = 0;
+  const infoCount = {};
+  
+  list.forEach(item => {
+    sumU += (Number(item.scoreUnderstand) || 0);
+    sumL += (Number(item.scoreLayout) || 0);
+    if (Array.isArray(item.wantedInfo)) {
+      item.wantedInfo.forEach(inf => {
+        infoCount[inf] = (infoCount[inf] || 0) + 1;
+      });
+    }
+  });
+  
+  const avgU = (sumU / list.length).toFixed(1);
+  const avgL = (sumL / list.length).toFixed(1);
+  if (scoreUEl) scoreUEl.textContent = avgU;
+  if (scoreLEl) scoreLEl.textContent = avgL;
+  
+  // Find top wanted info
+  let topInfo = '--', maxInfCount = 0;
+  for (const [k, v] of Object.entries(infoCount)) {
+    if (v > maxInfCount) {
+      maxInfCount = v;
+      topInfo = `${k} (${v}票)`;
+    }
+  }
+  if (topInfoEl) topInfoEl.textContent = topInfo;
+  
+  // Render table rows
+  if (tbody) {
+    tbody.innerHTML = list.map(item => {
+      const timeStr = item.createdAt && item.createdAt.toDate ? 
+        item.createdAt.toDate().toLocaleString('zh-TW', { hour12: false }) : 
+        '--';
+      
+      const wantedStr = (item.wantedInfo || []).join(', ') + 
+        (item.wantedInfoOther ? ` (其他:${item.wantedInfoOther})` : '');
+      
+      return `
+        <tr class="hover:bg-slate-50/70 transition-colors">
+          <td class="px-3 py-2.5 text-slate-500 whitespace-nowrap">${timeStr}</td>
+          <td class="px-3 py-2.5 font-medium text-slate-800">${item.unit || '未填'}</td>
+          <td class="px-3 py-2.5 text-blue-600 font-semibold">${item.empId || '未填'}</td>
+          <td class="px-3 py-2.5 text-slate-600">${item.frequency || '--'}</td>
+          <td class="px-3 py-2.5 text-center font-bold text-blue-600">${item.scoreUnderstand || '--'}</td>
+          <td class="px-3 py-2.5 text-center font-bold text-indigo-600">${item.scoreLayout || '--'}</td>
+          <td class="px-3 py-2.5 text-slate-600 max-w-[200px] truncate" title="${wantedStr}">${wantedStr || '--'}</td>
+          <td class="px-3 py-2.5 text-slate-600 max-w-[220px] truncate" title="${item.feedback || ''}">${item.feedback || '--'}</td>
+        </tr>
+      `;
+    }).join('');
+  }
+}
+
+function exportSurveyExcel() {
+  if (!_lastSurveyData || !_lastSurveyData.length) {
+    alert('目前尚無問卷資料可供匯出！');
+    return;
+  }
+  
+  const exportRows = _lastSurveyData.map(item => {
+    const timeStr = item.createdAt && item.createdAt.toDate ? 
+      item.createdAt.toDate().toLocaleString('zh-TW', { hour12: false }) : 
+      '';
+    
+    return {
+      '填答時間': timeStr,
+      '所屬單位': item.unit || '',
+      '員工工號': item.empId || '',
+      '查看頻率': item.frequency || '',
+      '查看頻率原因備註': item.frequencyReason || '',
+      '內容理解度評分(1-5)': item.scoreUnderstand || '',
+      '內容理解度備註': item.scoreUnderstandOther || '',
+      '版面易讀度評分(1-5)': item.scoreLayout || '',
+      '版面易讀度備註': item.scoreLayoutOther || '',
+      '期望資訊需求': (item.wantedInfo || []).join('、'),
+      '其他期望資訊': item.wantedInfoOther || '',
+      '期望增加功能': (item.wantedFeatures || []).join('、'),
+      '其他期望功能': item.wantedFeaturesOther || '',
+      '其他意見或建議': item.feedback || ''
+    };
+  });
+  
+  const ws = XLSX.utils.json_to_sheet(exportRows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, "問卷回覆明細");
+  
+  const d = new Date();
+  const dateStr = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+  const filename = `採購電子週報使用需求問卷調查_${dateStr}.xlsx`;
+  XLSX.writeFile(wb, filename);
+}

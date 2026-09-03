@@ -1,0 +1,524 @@
+﻿<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>採購電子週報使用需求調查問卷 (A) | 微笑單車</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="firebase-config.js"></script>
+  <style>
+    * { font-family: 'Inter', 'PingFang TC', 'Microsoft JhengHei', sans-serif; }
+    .form-card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 1rem;
+      padding: 1.5rem;
+      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+      transition: all 0.2s;
+    }
+    .form-card:hover {
+      border-color: #cbd5e1;
+    }
+    .score-btn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem 0.5rem;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 0.75rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      background: #f8fafc;
+    }
+    .score-btn:hover {
+      background: #eff6ff;
+      border-color: #93c5fd;
+    }
+    .score-btn.active {
+      background: #eff6ff;
+      border-color: #2563eb;
+      color: #1d4ed8;
+      font-weight: 700;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+    .check-tag {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.625rem 1rem;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 0.75rem;
+      cursor: pointer;
+      background: white;
+      transition: all 0.15s;
+      font-size: 0.875rem;
+      color: #334155;
+    }
+    .check-tag:hover {
+      border-color: #94a3b8;
+      background: #f8fafc;
+    }
+    .check-tag.active {
+      border-color: #2563eb;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-weight: 600;
+    }
+    .radio-card {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 0.75rem;
+      cursor: pointer;
+      background: white;
+      transition: all 0.15s;
+      font-size: 0.875rem;
+    }
+    .radio-card:hover {
+      background: #f8fafc;
+      border-color: #94a3b8;
+    }
+    .radio-card.active {
+      border-color: #2563eb;
+      background: #eff6ff;
+      color: #1d4ed8;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen py-10 px-4">
+  <div class="max-w-2xl mx-auto space-y-6">
+
+    <!-- Header & 說明卡片 -->
+    <div class="bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-700 text-white rounded-2xl p-6 sm:p-8 shadow-lg relative overflow-hidden">
+      <div class="absolute -right-8 -bottom-8 w-36 h-36 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-10 h-10 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center text-xl">
+          📝
+        </div>
+        <div>
+          <p class="text-xs font-semibold text-blue-100 uppercase tracking-wider">微笑單車 經營TEAM採購</p>
+          <h1 class="text-xl sm:text-2xl font-bold">採購電子週報使用需求調查問卷 (A)</h1>
+        </div>
+      </div>
+      <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-xs sm:text-sm text-blue-50 leading-relaxed border border-white/10">
+        <p class="font-bold text-white mb-1.5 flex items-center gap-1.5">
+          <span>📌</span><span>問卷說明</span>
+        </p>
+        <p class="mb-2">為持續優化「採購電子週報」的內容與呈現方式，並了解各單位的實際使用需求，請協助完成以下問卷。您的每一份回饋，將作為後續系統優化及內容調整的重要參考。</p>
+        <p class="text-amber-200 font-medium">⏳ 本調查請於收到通知後，於 5 個工作日內完成填寫及回覆，感謝您的支持與配合！</p>
+      </div>
+    </div>
+
+    <!-- 表單本體 -->
+    <form id="survey-form" onsubmit="handleSurveySubmit(event)" class="space-y-6">
+
+      <!-- 一、基本資訊 -->
+      <div class="form-card">
+        <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+          <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">一</span>
+          基本資訊
+        </h2>
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1.5">
+              1. 所屬單位 <span class="text-rose-500">*</span>
+            </label>
+            <select id="f-unit" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3.5 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all">
+              <option value="">▼ 請選擇所屬單位</option>
+              <optgroup label="全台營運處">
+                <option value="台北營運處">台北營運處</option>
+                <option value="新北營運處">新北營運處</option>
+                <option value="桃園營運處">桃園營運處</option>
+                <option value="新竹營運處">新竹營運處</option>
+                <option value="苗栗營運處">苗栗營運處</option>
+                <option value="台中營運處">台中營運處</option>
+                <option value="彰化營運處">彰化營運處</option>
+                <option value="雲林營運處">雲林營運處</option>
+                <option value="嘉義營運處">嘉義營運處</option>
+                <option value="台南營運處">台南營運處</option>
+                <option value="高雄營運處">高雄營運處</option>
+                <option value="屏東營運處">屏東營運處</option>
+                <option value="宜蘭營運處">宜蘭營運處</option>
+                <option value="花蓮營運處">花蓮營運處</option>
+                <option value="台東營運處">台東營運處</option>
+              </optgroup>
+              <optgroup label="各廠處與總部">
+                <option value="台中廠處">台中廠處</option>
+                <option value="總部採購部">總部採購部</option>
+                <option value="經營TEAM">經營TEAM</option>
+                <option value="維修部">維修部</option>
+                <option value="工程部">工程部</option>
+                <option value="其他單位">其他單位</option>
+              </optgroup>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-slate-600 mb-1.5">
+              2. 填表人員工編號 <span class="text-rose-500">*</span>
+            </label>
+            <input id="f-empid" type="text" required placeholder="請填寫工號（如 Bxxx）" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all">
+          </div>
+        </div>
+      </div>
+
+      <!-- 二、採購電子週報使用情況 -->
+      <div class="form-card">
+        <h2 class="text-base font-bold text-slate-800 mb-2 flex items-center gap-2">
+          <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">二</span>
+          採購電子週報使用情況
+        </h2>
+        <p class="text-xs text-slate-500 mb-4">1. 您是否有定期查看「採購電子週報」？如未每次查看，請於下方「原因說明」簡要說明。</p>
+        
+        <div class="space-y-2.5" id="freq-group">
+          <label class="radio-card" onclick="selectRadio(this, 'freq')">
+            <input type="radio" name="freq" value="每次都有查看" required class="w-4 h-4 text-blue-600">
+            <span>每次都有查看</span>
+          </label>
+          <label class="radio-card" onclick="selectRadio(this, 'freq')">
+            <input type="radio" name="freq" value="約每二週查看一次" class="w-4 h-4 text-blue-600">
+            <span>約每二週查看一次</span>
+          </label>
+          <label class="radio-card" onclick="selectRadio(this, 'freq')">
+            <input type="radio" name="freq" value="約每三週查看一次" class="w-4 h-4 text-blue-600">
+            <span>約每三週查看一次</span>
+          </label>
+          <label class="radio-card" onclick="selectRadio(this, 'freq')">
+            <input type="radio" name="freq" value="約每月查看一次" class="w-4 h-4 text-blue-600">
+            <span>約每月查看一次</span>
+          </label>
+          <label class="radio-card" onclick="selectRadio(this, 'freq')">
+            <input type="radio" name="freq" value="其他" class="w-4 h-4 text-blue-600">
+            <span>其他 / 未定期查看</span>
+          </label>
+        </div>
+
+        <div class="mt-3">
+          <input id="f-freq-reason" type="text" placeholder="未每次查看之原因說明（選填）..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3.5 py-2 text-xs text-slate-700 placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-all">
+        </div>
+      </div>
+
+      <!-- 三、實際使用經驗評分 -->
+      <div class="form-card">
+        <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+          <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">三</span>
+          實際使用經驗評分
+        </h2>
+
+        <!-- 評分 1: 內容容易理解度 -->
+        <div class="mb-6">
+          <p class="text-xs font-semibold text-slate-700 mb-2">
+            1. 您對「採購電子週報」所發佈的內容是否容易理解？ <span class="text-rose-500">*</span>
+          </p>
+          <div class="grid grid-cols-5 gap-2" id="score-understand-group">
+            <div class="score-btn" onclick="setScore('understand', 5)">
+              <span class="text-xl mb-1">🤩</span>
+              <span class="text-xs font-bold">5 分</span>
+              <span class="text-[10px] text-slate-400 text-center scale-90">非常清楚</span>
+            </div>
+            <div class="score-btn" onclick="setScore('understand', 4)">
+              <span class="text-xl mb-1">🙂</span>
+              <span class="text-xs font-bold">4 分</span>
+              <span class="text-[10px] text-slate-400 text-center scale-90">大致清楚</span>
+            </div>
+            <div class="score-btn" onclick="setScore('understand', 3)">
+              <span class="text-xl mb-1">😐</span>
+              <span class="text-xs font-bold">3 分</span>
+              <span class="text-[10px] text-slate-400 text-center scale-90">普通</span>
+            </div>
+            <div class="score-btn" onclick="setScore('understand', 2)">
+              <span class="text-xl mb-1">🙁</span>
+              <span class="text-xs font-bold">2 分</span>
+              <span class="text-[10px] text-slate-400 text-center scale-90">不太清楚</span>
+            </div>
+            <div class="score-btn" onclick="setScore('understand', 1)">
+              <span class="text-xl mb-1">😣</span>
+              <span class="text-xs font-bold">1 分</span>
+              <span class="text-[10px] text-slate-400 text-center scale-90">完全不清楚</span>
+            </div>
+          </div>
+          <input type="hidden" id="f-score-understand" required>
+          <input id="f-score-understand-other" type="text" placeholder="評分備註或說明（選填）..." class="mt-2.5 w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-700 placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-all">
+        </div>
+
+        <!-- 評分 2: 版面閱讀容易度 -->
+        <div>
+          <p class="text-xs font-semibold text-slate-700 mb-2">
+            2. 您對「採購電子週報」所呈現的內容版面是否清楚、容易閱讀？ <span class="text-rose-500">*</span>
+          </p>
+          <div class="grid grid-cols-5 gap-2" id="score-layout-group">
+            <div class="score-btn" onclick="setScore('layout', 5)">
+              <span class="text-xl mb-1">✨</span>
+              <span class="text-xs font-bold">5 分</span>
+              <span class="text-[10px] text-slate-400 text-center scale-90">非常清楚</span>
+            </div>
+            <div class="score-btn" onclick="setScore('layout', 4)">
+              <span class="text-xl mb-1">👍</span>
+              <span class="text-xs font-bold">4 分</span>
+              <span class="text-[10px] text-slate-400 text-center scale-90">大致清楚</span>
+            </div>
+            <div class="score-btn" onclick="setScore('layout', 3)">
+              <span class="text-xl mb-1">👌</span>
+              <span class="text-xs font-bold">3 分</span>
+              <span class="text-[10px] text-slate-400 text-center scale-90">普通</span>
+            </div>
+            <div class="score-btn" onclick="setScore('layout', 2)">
+              <span class="text-xl mb-1">👀</span>
+              <span class="text-xs font-bold">2 分</span>
+              <span class="text-[10px] text-slate-400 text-center scale-90">不易閱讀</span>
+            </div>
+            <div class="score-btn" onclick="setScore('layout', 1)">
+              <span class="text-xl mb-1">🌧️</span>
+              <span class="text-xs font-bold">1 分</span>
+              <span class="text-[10px] text-slate-400 text-center scale-90">完全不清楚</span>
+            </div>
+          </div>
+          <input type="hidden" id="f-score-layout" required>
+          <input id="f-score-layout-other" type="text" placeholder="版面評分備註或說明（選填）..." class="mt-2.5 w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-700 placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-all">
+        </div>
+      </div>
+
+      <!-- 四、內容需求調查 -->
+      <div class="form-card">
+        <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
+          <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">四</span>
+          內容需求調查
+        </h2>
+
+        <!-- 需求 1: 最希望提供的資訊 -->
+        <div class="mb-5">
+          <p class="text-xs font-semibold text-slate-700 mb-2">1. 您最希望電子週報提供哪些資訊？（可複選）</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2" id="wanted-info-group">
+            <label class="check-tag" onclick="toggleCheck(this)">
+              <input type="checkbox" name="wanted_info" value="庫存及訂單資訊" class="w-4 h-4 text-blue-600 rounded">
+              <span>📦 庫存及訂單資訊</span>
+            </label>
+            <label class="check-tag" onclick="toggleCheck(this)">
+              <input type="checkbox" name="wanted_info" value="交期異常／延遲案件" class="w-4 h-4 text-blue-600 rounded">
+              <span>⚠️ 交期異常／延遲案件</span>
+            </label>
+            <label class="check-tag" onclick="toggleCheck(this)">
+              <input type="checkbox" name="wanted_info" value="缺料／急件資訊" class="w-4 h-4 text-blue-600 rounded">
+              <span>🚨 缺料／急件資訊</span>
+            </label>
+            <label class="check-tag" onclick="toggleCheck(this)">
+              <input type="checkbox" name="wanted_info" value="採購進度／案件追蹤" class="w-4 h-4 text-blue-600 rounded">
+              <span>📋 採購進度／案件追蹤</span>
+            </label>
+          </div>
+          <input id="f-wanted-info-other" type="text" placeholder="其他希望提供的資訊（選填）..." class="mt-2 w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-700 placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-all">
+        </div>
+
+        <!-- 需求 2: 希望增加的功能 -->
+        <div>
+          <p class="text-xs font-semibold text-slate-700 mb-2">2. 您對採購電子週報有任何建議或希望增加的功能嗎？（可複選）</p>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2" id="wanted-feat-group">
+            <label class="check-tag" onclick="toggleCheck(this)">
+              <input type="checkbox" name="wanted_feat" value="報表呈現方式" class="w-4 h-4 text-blue-600 rounded">
+              <span>📊 報表呈現方式</span>
+            </label>
+            <label class="check-tag" onclick="toggleCheck(this)">
+              <input type="checkbox" name="wanted_feat" value="版面／閱讀方式" class="w-4 h-4 text-blue-600 rounded">
+              <span>📱 版面／閱讀方式</span>
+            </label>
+            <label class="check-tag" onclick="toggleCheck(this)">
+              <input type="checkbox" name="wanted_feat" value="資訊內容" class="w-4 h-4 text-blue-600 rounded">
+              <span>💡 資訊內容</span>
+            </label>
+          </div>
+          <input id="f-wanted-feat-other" type="text" placeholder="其他希望增加的功能（選填）..." class="mt-2 w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-700 placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-all">
+        </div>
+      </div>
+
+      <!-- 五、其他意見或建議 -->
+      <div class="form-card">
+        <h2 class="text-base font-bold text-slate-800 mb-2 flex items-center gap-2">
+          <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">五</span>
+          其他意見或建議
+        </h2>
+        <p class="text-xs text-slate-500 mb-3">對「採購電子週報」或「佈告欄功能」，您還有其他建議或希望改善的地方嗎？</p>
+        <textarea id="f-feedback" rows="4" placeholder="歡迎留下您的寶貴建議與想法，採購團隊將會逐筆研讀並列入優化清單..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"></textarea>
+      </div>
+
+      <!-- 送出按鈕 -->
+      <div class="text-center pt-2">
+        <button type="submit" id="btn-submit" class="w-full sm:w-auto px-10 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-md shadow-blue-500/20 transition-all flex items-center justify-center gap-2 mx-auto cursor-pointer">
+          <span>確認送出問卷</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+        </button>
+        <p class="text-[11px] text-slate-400 mt-2">© 微笑單車股份有限公司 經營TEAM採購</p>
+      </div>
+    </form>
+
+    <!-- 提交完成畫面 -->
+    <div id="success-card" class="hidden form-card text-center py-12 px-6">
+      <div class="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center mx-auto mb-4 text-3xl shadow-sm">
+        ✓
+      </div>
+      <h2 class="text-xl font-bold text-slate-800 mb-2">感謝您的寶貴回饋！</h2>
+      <p class="text-sm text-slate-500 max-w-md mx-auto mb-6 leading-relaxed">
+        問卷已成功送出。您的每一項建議都將是推動採購電子週報與佈告欄功能持續精進的重要力量！
+      </p>
+      <div class="flex justify-center gap-3">
+        <a href="index.html" class="px-6 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-semibold transition-colors">
+          前往採購佈告欄
+        </a>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    // 初始化 Firebase
+    var db = null;
+    try {
+      if (typeof firebase !== 'undefined' && firebaseConfig) {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.firestore();
+      }
+    } catch(e) {
+      console.warn("Firebase init:", e);
+    }
+
+    // 評分選取
+    function setScore(type, score) {
+      document.getElementById(`f-score-${type}`).value = score;
+      const group = document.getElementById(`score-${type}-group`);
+      const buttons = group.querySelectorAll('.score-btn');
+      buttons.forEach((btn, index) => {
+        // 5, 4, 3, 2, 1
+        const btnScore = 5 - index;
+        if (btnScore === score) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    }
+
+    // 單選卡片
+    function selectRadio(el, groupName) {
+      const parent = document.getElementById(`${groupName}-group`);
+      parent.querySelectorAll('.radio-card').forEach(card => card.classList.remove('active'));
+      el.classList.add('active');
+      const radio = el.querySelector('input[type="radio"]');
+      if (radio) radio.checked = true;
+    }
+
+    // 複選標籤
+    function toggleCheck(el) {
+      const check = el.querySelector('input[type="checkbox"]');
+      if (check) {
+        setTimeout(() => {
+          if (check.checked) el.classList.add('active');
+          else el.classList.remove('active');
+        }, 10);
+      }
+    }
+
+    // 表單提交
+    async function handleSurveySubmit(e) {
+      e.preventDefault();
+
+      const unit = document.getElementById('f-unit').value.trim();
+      const empId = document.getElementById('f-empid').value.trim().toUpperCase();
+
+      const freqRadio = document.querySelector('input[name="freq"]:checked');
+      const frequency = freqRadio ? freqRadio.value : '';
+      const frequencyReason = document.getElementById('f-freq-reason').value.trim();
+
+      const scoreUnderstand = parseInt(document.getElementById('f-score-understand').value, 10);
+      const scoreUnderstandOther = document.getElementById('f-score-understand-other').value.trim();
+
+      const scoreLayout = parseInt(document.getElementById('f-score-layout').value, 10);
+      const scoreLayoutOther = document.getElementById('f-score-layout-other').value.trim();
+
+      if (!scoreUnderstand) {
+        alert('請為「內容是否容易理解」評分！');
+        document.getElementById('score-understand-group').scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+      if (!scoreLayout) {
+        alert('請為「版面是否清楚容易閱讀」評分！');
+        document.getElementById('score-layout-group').scrollIntoView({ behavior: 'smooth' });
+        return;
+      }
+
+      // 複選資訊需求
+      const wantedInfo = [];
+      document.querySelectorAll('input[name="wanted_info"]:checked').forEach(c => wantedInfo.push(c.value));
+      const wantedInfoOther = document.getElementById('f-wanted-info-other').value.trim();
+
+      // 複選功能需求
+      const wantedFeatures = [];
+      document.querySelectorAll('input[name="wanted_feat"]:checked').forEach(c => wantedFeatures.push(c.value));
+      const wantedFeaturesOther = document.getElementById('f-wanted-feat-other').value.trim();
+
+      const feedback = document.getElementById('f-feedback').value.trim();
+
+      const surveyData = {
+        unit: unit || '未指定',
+        empId: empId || '',
+        frequency: frequency || '未填寫',
+        frequencyReason: frequencyReason || '',
+        scoreUnderstand: scoreUnderstand,
+        scoreUnderstandOther: scoreUnderstandOther || '',
+        scoreLayout: scoreLayout,
+        scoreLayoutOther: scoreLayoutOther || '',
+        wantedInfo: wantedInfo,
+        wantedInfoOther: wantedInfoOther || '',
+        wantedFeatures: wantedFeatures,
+        wantedFeaturesOther: wantedFeaturesOther || '',
+        feedback: feedback || '',
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      const btn = document.getElementById('btn-submit');
+      btn.disabled = true;
+      btn.innerHTML = '<span>資料送出中...</span>';
+
+      try {
+        if (db) {
+          await db.collection('surveys').add(surveyData);
+        }
+        localStorage.setItem('has_submitted_procurement_survey', '1');
+        document.getElementById('survey-form').classList.add('hidden');
+        document.getElementById('success-card').classList.remove('hidden');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (err) {
+        console.error("Survey submission failed:", err);
+        alert('問卷提交發生異常，請稍後再試或聯繫採購管理員：' + err.message);
+        btn.disabled = false;
+        btn.innerHTML = '<span>確認送出問卷</span>';
+      }
+    }
+
+    // 自動預填（若有使用者身分）
+    window.addEventListener('DOMContentLoaded', () => {
+      try {
+        const uStr = localStorage.getItem('procurement_user');
+        if (uStr) {
+          const u = JSON.parse(uStr);
+          if (u.department && u.department !== '未指定') {
+            const unitSel = document.getElementById('f-unit');
+            for (let opt of unitSel.options) {
+              if (opt.value.includes(u.department) || u.department.includes(opt.value)) {
+                unitSel.value = opt.value;
+                break;
+              }
+            }
+          }
+        }
+      } catch(e) {}
+    });
+  </script>
+</body>
+</html>

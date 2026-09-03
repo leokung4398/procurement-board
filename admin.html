@@ -231,11 +231,16 @@
         <span class="font-bold tracking-wide">ℹ️ 系統與專案成果</span>
       </button>
 
-      <div class="mt-2">
-      <button onclick="showKPI()" class="w-full flex items-center justify-center gap-2 bg-indigo-50 text-indigo-600 border border-indigo-100 rounded-lg px-4 py-2 text-sm font-semibold hover:bg-indigo-100 transition-colors">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>績效統計
-      </button>
-    </div>      <div class="space-y-2 border border-slate-200 p-2 rounded-lg bg-slate-50 mt-2">
+            <div class="mt-2 flex flex-col gap-1.5">
+        <button onclick="showKPI()" class="w-full flex items-center justify-center gap-2 bg-indigo-50 text-indigo-600 border border-indigo-100 rounded-lg px-4 py-2 text-sm font-semibold hover:bg-indigo-100 transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          點閱績效統計
+        </button>
+        <button onclick="showSurveyModal()" class="w-full flex items-center justify-center gap-2 bg-blue-50 text-blue-600 border border-blue-100 rounded-lg px-4 py-2 text-sm font-semibold hover:bg-blue-100 transition-colors">
+          <span class="text-base">📝</span>
+          <span>使用需求問卷統計</span>
+        </button>
+      </div>      <div class="space-y-2 border border-slate-200 p-2 rounded-lg bg-slate-50 mt-2">
         <p class="text-[10px] font-semibold text-slate-500 uppercase">進階搜尋</p>
         <select id="admin-search-month" onchange="handleAdminSearch()" class="form-input text-xs py-1.5 px-2 w-full bg-white">
           <option value="">全部月份</option>
@@ -749,6 +754,12 @@
           <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>欄位對齊與一鍵跨欄置中：</strong>工具列提供「靠左、置中、靠右」對齊；選取橫向多個儲存格後，點擊「⊞ 跨欄置中」按鈕，即可瞬間完成合併儲存格與文字水平/垂直雙向置中。</p>
           <p class="text-sm leading-relaxed text-slate-600"><strong>32 色莫蘭迪商務色盤：</strong>色盤擴充為 4 大系列（灰階、商務重點、莫蘭迪柔和、高光醒目），並支援自訂顏色選擇器，選取後或點擊編輯區任意處皆能靈敏收合。</p>
         </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-blue-300 transition-colors">
+          <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">20</span>採購使用需求問卷系統與滿意度資料匯出</h4>
+          <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>獨立專屬問卷網頁 (survey.html)：</strong>系統建置了現代化獨立問卷頁面，忠實涵蓋「基本資訊、查看頻率、內容理解度評分、版面易讀度評分、資訊/功能需求調查、開放式建議」5 大構面，支援獨立網址跨渠道推播宣傳。</p>
+          <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>後台即時統計看板：</strong>管理員於側邊欄點擊「📝 使用需求問卷統計」，即可直觀檢視總回收份數、各題平均得分、最熱門需求排行與各單位填答明細。</p>
+          <p class="text-sm leading-relaxed text-slate-600"><strong>一鍵匯出 Excel：</strong>提供「匯出問卷 Excel」按鈕，可將所有原始回覆匯出為標準試算表，便於採購團隊製作分析簡報呈報主管。</p>
+        </div>
       </div>
 
       <!-- 專案開發成果內容 -->
@@ -1254,6 +1265,29 @@
             </div>
           </div>
         </div>
+        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(37,99,235,0.15)] hover:border-blue-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-500 to-indigo-600"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1 flex items-center gap-2">二十三、採購電子週報使用需求獨立問卷系統與統計看板建置 <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-0.5 rounded-full font-normal tracking-wide">2026-09-04</span></h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">採購需求：</span><br>
+                1. 依據《採購電子週報使用需求調查問卷 (A)》完整建立高質感、跨裝置響應式之獨立問卷專屬頁面 (survey.html)。<br>
+                2. 串接 Firebase Firestore 雲端資料庫，即時安全寫入調查回覆並防呆防連點。<br>
+                3. 管理後台新增「使用需求問卷統計」即時視覺化看板與一鍵匯出 Excel 功能。<br>
+                4. 應業務規劃，前台入口目前保持隱藏，支援單獨複製專屬連結於 Teams / Email 渠道進行精準推播。
+              </p>
+              <p class="text-xs text-blue-700 font-medium leading-relaxed mt-3 border-l-2 border-blue-400 pl-2">
+                💡 <span class="font-bold">專案成果：</span>落實獨立問卷專屬架構，具備微笑單車企業色與莫蘭迪質感互動，為採購團隊提供精準掌握全公司各單位真實使用需求與後續週報改版之關鍵決策數據支援！
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- 架構說明內容 -->
@@ -1528,7 +1562,7 @@
   </div>
 </div>
 
-<script src="js/admin.js?v=20260904_01"></script>
+<script src="js/admin.js?v=20260904_02"></script>
 <script>
   window.addEventListener('load', () => {
     setTimeout(async () => {
@@ -1647,6 +1681,90 @@
             <div class="flex items-center justify-between"><span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-yellow-400"></span>90% - 99%</span><span class="text-slate-600 font-medium">待提升</span></div>
             <div class="flex items-center justify-between"><span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-red-500"></span>< 90%</span><span class="text-slate-600 font-medium">未達標</span></div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- 問卷統計 Modal -->
+<div id="survey-modal" class="hidden fixed inset-0 z-[150] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm transition-all duration-300">
+  <div class="bg-white rounded-xl shadow-xl w-full max-w-5xl max-h-[90vh] flex flex-col mx-4 overflow-hidden">
+    <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center text-xl">
+          📝
+        </div>
+        <div>
+          <h2 class="text-lg font-bold text-slate-800">採購電子週報使用需求問卷統計</h2>
+          <p class="text-xs text-slate-500">Survey Feedback & Demand Analysis</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="exportSurveyExcel()" class="btn-s text-sm text-green-700 bg-green-50 border-green-200 hover:bg-green-100">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg> 匯出問卷 Excel
+        </button>
+        <a href="survey.html" target="_blank" class="btn-s text-sm text-blue-600 bg-blue-50 border-blue-200 hover:bg-blue-100">
+          開啟問卷網頁 ↗
+        </a>
+        <button onclick="closeSurveyModal()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-200 text-slate-500 transition-colors">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="flex-1 overflow-y-auto p-6 bg-slate-50/50 space-y-6">
+      <!-- 統計指標卡片 -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+          <p class="text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">總回收份數</p>
+          <div id="survey-stat-count" class="text-2xl font-bold text-slate-800">-- 份</div>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+          <p class="text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">內容容易理解度</p>
+          <div class="flex items-baseline gap-1.5">
+            <span id="survey-stat-score-u" class="text-2xl font-bold text-blue-600">--</span>
+            <span class="text-xs text-slate-400">/ 5.0 分</span>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+          <p class="text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">版面清楚易讀度</p>
+          <div class="flex items-baseline gap-1.5">
+            <span id="survey-stat-score-l" class="text-2xl font-bold text-indigo-600">--</span>
+            <span class="text-xs text-slate-400">/ 5.0 分</span>
+          </div>
+        </div>
+        <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm">
+          <p class="text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">最熱門資訊需求</p>
+          <div id="survey-stat-top-info" class="text-sm font-bold text-emerald-600 truncate">--</div>
+        </div>
+      </div>
+
+      <!-- 詳細清單表格 -->
+      <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
+        <div class="px-5 py-3 border-b border-slate-100 flex items-center justify-between">
+          <h3 class="text-sm font-bold text-slate-700">📋 各單位回覆明細</h3>
+          <span id="survey-table-summary" class="text-xs text-slate-400">共 0 筆</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-slate-50 border-b border-slate-200 text-slate-500 font-semibold uppercase">
+                <th class="px-3 py-2.5">填答時間</th>
+                <th class="px-3 py-2.5">單位</th>
+                <th class="px-3 py-2.5">工號</th>
+                <th class="px-3 py-2.5">查看頻率</th>
+                <th class="px-3 py-2.5 text-center">理解度</th>
+                <th class="px-3 py-2.5 text-center">易讀度</th>
+                <th class="px-3 py-2.5">期望資訊</th>
+                <th class="px-3 py-2.5">意見回饋</th>
+              </tr>
+            </thead>
+            <tbody id="survey-table-body" class="divide-y divide-slate-100">
+              <tr><td colspan="8" class="text-center py-8 text-slate-400">載入中...</td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
     </div>
