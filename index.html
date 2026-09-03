@@ -59,6 +59,29 @@
     }
     .ql-editor > p:first-child > br:first-child { display: none; }
     .ql-editor > p:last-child > br:last-child { display: none; }
+  
+    /* Rich Text & Pasted Table Normalization */
+    #bulletin-content-area table:not(.data-table), .pro-table {
+      width: 100% !important;
+      border-collapse: collapse !important;
+      margin: 8px 0 !important;
+      font-size: 0.875rem !important;
+      table-layout: auto !important;
+    }
+    #bulletin-content-area table:not(.data-table) td,
+    #bulletin-content-area table:not(.data-table) th,
+    .pro-table td, .pro-table th {
+      border: 1px solid #cbd5e1 !important;
+      padding: 6px 10px !important;
+      vertical-align: top;
+      word-break: break-word;
+    }
+    #bulletin-content-area table:not(.data-table) th,
+    .pro-table th {
+      background-color: #f8fafc !important;
+      font-weight: 600 !important;
+      color: #475569 !important;
+    }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen font-sans">

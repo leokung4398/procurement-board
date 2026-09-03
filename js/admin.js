@@ -871,22 +871,92 @@ function renderEd(){const b=S.cur;if(!b)return;document.getElementById('es').cla
 function renderSecs(){const c=document.getElementById('sc');const b=S.cur;const ptl=document.getElementById('toolbar-portal');if(ptl)ptl.innerHTML='';if(!b?.sections?.length){c.innerHTML='<div class="text-center py-10 text-slate-400 text-sm">尚未建立任何段落<br><span class="text-xs">點擊右上角「新增段落」</span></div>';return;}c.innerHTML=b.sections.map((s,i)=>bldSec(s,i)).join('');setTimeout(()=>{
   document.querySelectorAll('.quill-editor').forEach(el=>{
     if(el.classList.contains('tox-target')) return;
-    tinymce.init({
+        tinymce.init({
       target: el,
       language: 'zh-Hant',
       language_url: 'https://cdn.jsdelivr.net/npm/tinymce-i18n@26.8.2/langs6/zh-Hant.js',
       inline: true,
       menubar: false,
       plugins: 'table lists link image autolink searchreplace wordcount',
-      toolbar: 'undo redo | fontfamily fontsize | bold italic underline strikethrough | boxed circled | forecolor backcolor | lineheight | table | removeformat',
+      toolbar: 'undo redo | fontfamily fontsize | bold italic underline strikethrough | boxed circled | forecolor backcolor | alignleft aligncenter alignright alignjustify | merge_center table | lineheight removeformat',
       fixed_toolbar_container: '#toolbar-portal',
+      table_toolbar: 'tableprops tabledelete | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol | tablemergecells tablesplitcells | tablecellvalign',
+      table_grid: true,
+      table_default_attributes: {
+        class: 'pro-table'
+      },
+      table_default_styles: {
+        width: '100%',
+        borderCollapse: 'collapse'
+      },
+      table_responsive_width: true,
+      paste_data_images: true,
+      paste_as_text: false,
+      paste_postprocess: function(plugin, args) {
+        const tables = args.node.querySelectorAll('table');
+        tables.forEach(table => {
+          table.style.width = '100%';
+          table.style.borderCollapse = 'collapse';
+          table.style.margin = '8px 0';
+          table.removeAttribute('width');
+          const cells = table.querySelectorAll('td, th');
+          cells.forEach(cell => {
+            cell.removeAttribute('width');
+            cell.removeAttribute('height');
+            if (cell.style.width) cell.style.width = '';
+            if (cell.style.height) cell.style.height = '';
+            cell.style.border = '1px solid #cbd5e1';
+            cell.style.padding = '6px 10px';
+            cell.style.fontSize = '0.875rem';
+            cell.style.lineHeight = '1.4';
+          });
+          const headers = table.querySelectorAll('th');
+          headers.forEach(th => {
+            th.style.backgroundColor = '#f8fafc';
+            th.style.fontWeight = '600';
+            th.style.color = '#475569';
+          });
+        });
+      },
       font_size_formats: '6pt 8pt 9pt 10pt 11pt 12pt 14pt 16pt 18pt 20pt 22pt 24pt 26pt 28pt 32pt',
       font_family_formats: 'Inter="Inter", sans-serif; MingLiU="MingLiU", PMingLiU, serif; Microsoft JhengHei="Microsoft JhengHei", sans-serif; Monospace=monospace',
       line_height_formats: '1 1.5 2 2.5 3',
       color_map: [
-        '000000', 'Black', '444444', 'Dark Gray', '666666', 'Gray', '999999', 'Light Gray', 'cccccc', 'Very Light Gray', 'eeeeee', 'Extra Light Gray', 'f3f4f6', 'Tailwind Gray', 'ffffff', 'White',
-        'ff0000', 'Red', 'ff9900', 'Orange', 'ffff00', 'Yellow', '00ff00', 'Green', '00ffff', 'Cyan', '0000ff', 'Blue', '9900ff', 'Purple', 'ff00ff', 'Magenta'
+        '000000', '純黑',
+        '334155', '深藍灰 (Slate 700)',
+        '64748b', '中灰 (Slate 500)',
+        '94a3b8', '淡灰 (Slate 400)',
+        'cbd5e1', '框線灰 (Slate 300)',
+        'f1f5f9', '背景淡灰 (Slate 100)',
+        'f8fafc', '極淡灰 (Slate 50)',
+        'ffffff', '純白',
+        '1e3a8a', '深海軍藍',
+        '2563eb', '微笑藍 (Blue 600)',
+        '0284c7', '天空藍 (Sky 600)',
+        '0d9488', '松石綠 (Teal 600)',
+        '059669', '翡翠綠 (Emerald 600)',
+        'd97706', '警示琥珀 (Amber 600)',
+        'ea580c', '活力橙 (Orange 600)',
+        'dc2626', '緊急深紅 (Red 600)',
+        '6b6258', '莫蘭迪暖深灰',
+        'a89c93', '莫蘭迪奶咖',
+        'd4c9be', '莫蘭迪邊框米',
+        'f5f0eb', '莫蘭迪底色米',
+        '7a9e84', '莫蘭迪鼠尾草綠',
+        'e8ede9', '莫蘭迪淡綠底',
+        'b08080', '莫蘭迪玫瑰豆沙',
+        'f0e8e6', '莫蘭迪淡粉底',
+        'fef08a', '高光淡黃',
+        'bbf7d0', '高光淡綠',
+        'bfdbfe', '高光淡藍',
+        'fecdd3', '高光淡紅',
+        'fed7aa', '高光淡橙',
+        'ddd6fe', '高光淡紫',
+        'e9d5ff', '高光淡粉紫',
+        'fbcfe8', '高光淡洋紅'
       ],
+      color_cols: 8,
+      custom_colors: true,
       setup: function(editor) {
         editor.ui.registry.addButton('boxed', {
           text: '🄰',
@@ -898,6 +968,20 @@ function renderSecs(){const c=document.getElementById('sc');const b=S.cur;const 
           tooltip: '文字加圓圈',
           onAction: function () { editor.formatter.toggle('circled'); }
         });
+        editor.ui.registry.addButton('merge_center', {
+          icon: 'table-merge-cells',
+          tooltip: '跨欄置中 (合併選取並置中)',
+          onAction: function () {
+            editor.execCommand('mceTableMergeCells');
+            editor.execCommand('JustifyCenter');
+            const node = editor.selection.getNode();
+            const cell = node ? node.closest('td, th') : null;
+            if (cell) {
+              cell.style.textAlign = 'center';
+              cell.style.verticalAlign = 'middle';
+            }
+          }
+        });
         
         editor.on('init', function() {
           editor.formatter.register('boxed', { inline: 'span', styles: { border: '1px solid currentColor', padding: '0 4px', borderRadius: '4px' }, classes: 'ql-boxed' });
@@ -905,11 +989,28 @@ function renderSecs(){const c=document.getElementById('sc');const b=S.cur;const 
           const ptl = document.getElementById('toolbar-portal');
           const hint = document.getElementById('toolbar-hint');
           if (hint) hint.style.display = 'none';
+          
+          if (ptl && !ptl._boundPreventBlur) {
+            ptl._boundPreventBlur = true;
+            ptl.addEventListener('mousedown', function(e) {
+              if (!e.target.closest('input, textarea')) {
+                e.preventDefault();
+              }
+            });
+          }
         });
         
         editor.on('focus', function() {
+          window._activeTinyEditor = editor;
           const hint = document.getElementById('toolbar-hint');
           if (hint) hint.style.display = 'none';
+        });
+
+        editor.on('click', function() {
+          const popups = document.querySelectorAll('.tox-tinymce-aux .tox-pop, .tox-tinymce-aux .tox-menu');
+          if (popups.length > 0) {
+            document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', keyCode: 27, which: 27, bubbles: true }));
+          }
         });
         
         editor.on('input change undo redo execCommand paste', function() {
@@ -920,7 +1021,6 @@ function renderSecs(){const c=document.getElementById('sc');const b=S.cur;const 
           S.dirty=true;
         });
       },
-      paste_data_images: true,
       images_upload_handler: function (blobInfo, progress) {
         return new Promise(async (resolve, reject) => {
           try {
@@ -1692,4 +1792,17 @@ function exportKPIExcel() {
   
   const filename = `週報點閱績效統計_${data.monthStr.replace(/ /g, '')}.xlsx`;
   XLSX.writeFile(wb, filename);
+}
+
+
+if (!window._toxGlobalClickBound) {
+  window._toxGlobalClickBound = true;
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('.tox-tinymce-aux') && !e.target.closest('#toolbar-portal')) {
+      const popups = document.querySelectorAll('.tox-tinymce-aux .tox-pop, .tox-tinymce-aux .tox-menu');
+      if (popups.length > 0) {
+        document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', code: 'Escape', keyCode: 27, which: 27, bubbles: true }));
+      }
+    }
+  });
 }

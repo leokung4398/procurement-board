@@ -92,7 +92,27 @@
     .ql-snow .ql-picker.ql-size { width: 90px; }
     .ql-snow .ql-picker.ql-lineHeight { width: 70px; }
 
-    </style>
+    
+    /* TinyMCE & Excel Pasted Table Normalization */
+    .pro-table, .quill-editor table {
+      width: 100% !important;
+      border-collapse: collapse !important;
+      margin: 8px 0 !important;
+      font-size: 0.875rem !important;
+      table-layout: auto !important;
+    }
+    .pro-table td, .pro-table th, .quill-editor table td, .quill-editor table th {
+      border: 1px solid #cbd5e1 !important;
+      padding: 6px 10px !important;
+      vertical-align: top;
+      word-break: break-word;
+    }
+    .pro-table th, .quill-editor table th {
+      background-color: #f8fafc !important;
+      font-weight: 600 !important;
+      color: #475569 !important;
+    }
+  </style>
   <link rel="stylesheet" href="css/admin.css">
   <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
 
@@ -680,6 +700,12 @@
           <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>前台即時追蹤與完讀滿條：</strong>同仁在前台閱讀週報時，頁面最頂端會顯示漸層藍色進度條隨滑動即時推進；滑動至頁面最底端即自動認列為 100% 完整閱讀。<strong>凡已看滿 100% 的同仁，重新整理或日後再次點開該篇週報時，頂部進度條將直接常駐為 100% 滿條</strong>，提供直觀的完讀標示與成就感！</p>
           <p class="text-sm leading-relaxed text-slate-600"><strong>後台名冊與績效看板：</strong>後台「已讀狀態追蹤」名冊可即時查看每位人員的「閱讀完成率」百分比徽章；「點閱績效看板」與「匯出 Excel」同步新增各單位的「平均閱讀完成率」，杜絕僅點開即關閉之形式化簽到，精準掌握各廠處資訊落實狀況！</p>
         </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-300 transition-colors">
+          <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">19</span>進階表格排版、跨欄置中與莫蘭迪色盤操作</h4>
+          <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>Excel/Word 貼上自適應：</strong>同仁從 Excel 或 Word 複製表格後直接貼入編輯框，系統會自動去除微軟硬編碼寬度與雜亂樣式，秒轉為 100% 自適應標準邊框與排版，手機瀏覽絕不破版。</p>
+          <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>欄位對齊與一鍵跨欄置中：</strong>工具列提供「靠左、置中、靠右」對齊；選取橫向多個儲存格後，點擊「⊞ 跨欄置中」按鈕，即可瞬間完成合併儲存格與文字水平/垂直雙向置中。</p>
+          <p class="text-sm leading-relaxed text-slate-600"><strong>32 色莫蘭迪商務色盤：</strong>色盤擴充為 4 大系列（灰階、商務重點、莫蘭迪柔和、高光醒目），並支援自訂顏色選擇器，選取後或點擊編輯區任意處皆能靈敏收合。</p>
+        </div>
       </div>
 
       <!-- 專案開發成果內容 -->
@@ -1162,6 +1188,29 @@
             </div>
           </div>
         </div>
+        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1 flex items-center gap-2">二十二、表格與排版體驗極致調優：跨欄置中、貼上規格化與莫蘭迪專業色盤 <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-0.5 rounded-full font-normal tracking-wide">2026-09-03</span></h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">採購需求：</span><br>
+                1. 解決選取表格按鈕無法正常插入表格之焦點脫勾問題，並導入表格上下文浮動工具列。<br>
+                2. 解決直接複製貼上 Excel/Word 表格時固定寬度破版、樣式不一致之問題。<br>
+                3. 工具列擴充文字欄位水平對齊（靠左、置中、靠右、分散），並打造專屬「跨欄置中」一鍵功能。<br>
+                4. 修復色盤下拉卡住無法關閉問題，並擴充為 32 色商務與莫蘭迪柔和色系，支援完整自訂色盤選色器。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
+                💡 <span class="font-bold">專案成果：</span>深度重構 TinyMCE 工具列焦點管理與貼上攔截管道（Paste Post-processor），貼上外部試算表瞬間自適應標準化；新增一鍵「跨欄置中」媲美微軟 Excel 操作體驗；導入 32 色商務莫蘭迪專業色階與無死角關閉事件，全面打造企業級極致排版工作台！
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- 架構說明內容 -->
@@ -1436,7 +1485,7 @@
   </div>
 </div>
 
-<script src="js/admin.js?v=20260903_02"></script>
+<script src="js/admin.js?v=20260903_03"></script>
 <script>
   window.addEventListener('load', () => {
     setTimeout(async () => {
