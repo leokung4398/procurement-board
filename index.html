@@ -956,8 +956,13 @@ async function showKPI(monthOffset = 0) {
                   while (p.firstChild) p.parentNode.insertBefore(p.firstChild, p);
                   p.remove();
                 });
-                const row = doc.createElement('div');
-                if (li.getAttribute('style')) row.setAttribute('style', li.getAttribute('style'));
+                const row = doc.createElement('p');
+                row.style.lineHeight = '2';
+                row.style.fontSize = '12pt';
+                if (li.getAttribute('style')) {
+                  row.setAttribute('style', li.getAttribute('style'));
+                  row.style.lineHeight = '2';
+                }
                 while (li.firstChild) row.appendChild(li.firstChild);
                 container.appendChild(row);
               });
