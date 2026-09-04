@@ -918,6 +918,39 @@ function renderSecs(){const c=document.getElementById('sc');const b=S.cur;const 
             th.style.color = '#475569';
           });
         });
+
+        // 2. Sanitize Word list artifacts
+        const lists = args.node.querySelectorAll('ol, ul');
+        lists.forEach(list => {
+          const lis = list.querySelectorAll('li');
+          let hasManual = false;
+          lis.forEach(li => {
+            const txt = li.textContent.trim();
+            if (/^[•·\-\*]|^(?:📌|📢|✅|👉|\d+[\.、])/.test(txt)) hasManual = true;
+          });
+          if (hasManual) {
+            const container = list.ownerDocument.createElement('div');
+            container.className = 'space-y-1';
+            lis.forEach(li => {
+              li.querySelectorAll('p').forEach(p => {
+                while (p.firstChild) p.parentNode.insertBefore(p.firstChild, p);
+                p.remove();
+              });
+              const row = list.ownerDocument.createElement('div');
+              if (li.getAttribute('style')) row.setAttribute('style', li.getAttribute('style'));
+              while (li.firstChild) row.appendChild(li.firstChild);
+              container.appendChild(row);
+            });
+            list.parentNode.replaceChild(container, list);
+          } else {
+            lis.forEach(li => {
+              li.querySelectorAll('p').forEach(p => {
+                while (p.firstChild) p.parentNode.insertBefore(p.firstChild, p);
+                p.remove();
+              });
+            });
+          }
+        });
       },
       font_size_formats: '6pt 8pt 9pt 10pt 11pt 12pt 14pt 16pt 18pt 20pt 22pt 24pt 26pt 28pt 32pt',
       font_family_formats: 'Inter="Inter", sans-serif; MingLiU="MingLiU", PMingLiU, serif; Microsoft JhengHei="Microsoft JhengHei", sans-serif; Monospace=monospace',

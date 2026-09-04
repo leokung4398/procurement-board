@@ -94,6 +94,16 @@
 
     
     /* TinyMCE & Excel Pasted Table Normalization */
+        /* Fix paragraph tags inside list items causing unexpected line drops */
+    .ql-editor li p, .pro-table li p {
+      display: inline !important;
+      margin: 0 !important;
+    }
+    .ql-editor ol, .ql-editor ul {
+      padding-left: 1.25rem !important;
+      margin: 0.25rem 0 !important;
+    }
+
     .pro-table, .quill-editor table {
       width: 100% !important;
       border-collapse: collapse !important;
@@ -760,6 +770,11 @@
           <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>後台即時統計看板：</strong>管理員於側邊欄點擊「📝 使用需求問卷統計」，即可直觀檢視總回收份數、各題平均得分、最熱門需求排行與各單位填答明細。</p>
           <p class="text-sm leading-relaxed text-slate-600"><strong>一鍵匯出 Excel：</strong>提供「匯出問卷 Excel」按鈕，可將所有原始回覆匯出為標準試算表，便於採購團隊製作分析簡報呈報主管。</p>
         </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-blue-300 transition-colors">
+          <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">21</span>週報撤回安全機制與微軟清單排版保護</h4>
+          <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>一鍵撤回立即下架：</strong>管理員點擊「撤回發布」時，週報狀態即刻變更為「草稿 (draft)」，前台同仁端會同步瞬間下架隱藏，確保未定稿或需修正的週報絕不對外曝光。</p>
+          <p class="text-sm leading-relaxed text-slate-600"><strong>Word / Outlook 貼上排版防護：</strong>系統內建智慧濾網與 DOM 淨化機制，自動修復從 Word 貼入之段落與清單標籤，杜絕序號重複（如 1. 📌 1.）或文字落行，保證版面平整清爽。</p>
+        </div>
       </div>
 
       <!-- 專案開發成果內容 -->
@@ -1288,6 +1303,27 @@
             </div>
           </div>
         </div>
+        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(16,185,129,0.15)] hover:border-emerald-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-emerald-500 to-teal-600"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1 flex items-center gap-2">二十四、前台撤回安全過濾嚴格化與微軟清單排版自適應淨化 <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-0.5 rounded-full font-normal tracking-wide">2026-09-04</span></h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">採購需求：</span><br>
+                1. 修復管理員在後台點擊「撤回發布」後，前台仍因排除條件寬鬆而顯示草稿之邏輯漏洞，改為嚴格白名單發布判定。<br>
+                2. 解決由外部 Office/Word 貼入公告時自帶有序清單與微軟區塊段落，導致序號重疊（如 1. 📌 1.）與文字掉行破碎之排版異常。
+              </p>
+              <p class="text-xs text-emerald-700 font-medium leading-relaxed mt-3 border-l-2 border-emerald-400 pl-2">
+                💡 <span class="font-bold">專案成果：</span>落實前台「嚴格僅公開 published 狀態週報」之安全隱私機制，撤回立即對外下架；同時於前後台建立雙層 DOM 淨化與 inline 防禦，徹底根絕 Office 貼上之排版變形！
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- 架構說明內容 -->
@@ -1562,7 +1598,7 @@
   </div>
 </div>
 
-<script src="js/admin.js?v=20260904_02"></script>
+<script src="js/admin.js?v=20260904_03"></script>
 <script>
   window.addEventListener('load', () => {
     setTimeout(async () => {

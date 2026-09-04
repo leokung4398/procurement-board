@@ -51,6 +51,15 @@
       margin-top: 0 !important;
       margin-bottom: 0 !important;
     }
+    /* Fix paragraph tags inside list items causing unexpected line drops */
+    .ql-editor li p {
+      display: inline !important;
+      margin: 0 !important;
+    }
+    .ql-editor ol, .ql-editor ul {
+      padding-left: 1.25rem !important;
+      margin: 0.25rem 0 !important;
+    }
     .ql-editor > *:first-child {
       margin-top: 0 !important;
     }
@@ -252,7 +261,7 @@
           try {
             const r = await fetch('data.json');
             const j = await r.json();
-            return j.bulletins || [];
+            return (j.bulletins || []).filter(b => b.status === 'published');
           } catch (e) { return []; }
         }
         try {
@@ -261,7 +270,8 @@
           snap.forEach(doc => {
             const b = doc.data();
             restoreTablesFromFirestore(b);
-            if (b.status !== 'deleted') {
+            // 嚴格僅前台公開已發布 (published) 週報，草稿 (draft) 或已撤回不公開
+            if (b.status === 'published') {
               list.push(b);
             }
           });
@@ -277,7 +287,7 @@
           try {
             const r = await fetch('data.json');
             const j = await r.json();
-            return j.bulletins.find(b => b.id === id) || null;
+            return j.bulletins.find(b => b.id === id && b.status === 'published') || null;
           } catch (e) { return null; }
         }
         try {
@@ -285,7 +295,9 @@
           if (docSnap.exists) {
             const b = docSnap.data();
             restoreTablesFromFirestore(b);
-            return b;
+            if (b.status === 'published') {
+              return b;
+            }
           }
           return null;
         } catch (e) {
@@ -920,6 +932,50 @@ async function showKPI(monthOffset = 0) {
     
       function clnHtm(h) {
         if (!h) return '';
+
+        // 1. Sanitize Word list artifacts using DOMParser
+        try {
+          const parser = new DOMParser();
+          const doc = parser.parseFromString(h, 'text/html');
+          const lists = doc.querySelectorAll('ol, ul');
+          lists.forEach(list => {
+            const lis = list.querySelectorAll('li');
+            let hasManualMarkers = false;
+            lis.forEach(li => {
+              const txt = li.textContent.trim();
+              if (/^[•·\-\*]|^(?:📌|📢|✅|👉|\d+[\.、])/.test(txt)) {
+                hasManualMarkers = true;
+              }
+            });
+
+            if (hasManualMarkers) {
+              const container = doc.createElement('div');
+              container.className = 'space-y-1';
+              lis.forEach(li => {
+                li.querySelectorAll('p').forEach(p => {
+                  while (p.firstChild) p.parentNode.insertBefore(p.firstChild, p);
+                  p.remove();
+                });
+                const row = doc.createElement('div');
+                if (li.getAttribute('style')) row.setAttribute('style', li.getAttribute('style'));
+                while (li.firstChild) row.appendChild(li.firstChild);
+                container.appendChild(row);
+              });
+              list.parentNode.replaceChild(container, list);
+            } else {
+              lis.forEach(li => {
+                li.querySelectorAll('p').forEach(p => {
+                  while (p.firstChild) p.parentNode.insertBefore(p.firstChild, p);
+                  p.remove();
+                });
+              });
+            }
+          });
+          h = doc.body.innerHTML;
+        } catch (e) {
+          console.warn('clnHtm DOM sanitization error:', e);
+        }
+
         let r = h;
         let lastR = '';
         while (r !== lastR) {
