@@ -580,17 +580,28 @@ async function renderReadReceipts(id) {
   try {
     const { total, readers } = await DS.getReadReceipts(id);
     
-    const allUsers = S.whitelist || [];
+    let allUsers = S.whitelist || [];
+    if (allUsers.length === 0) {
+      allUsers = await DS.getWhitelist();
+      S.whitelist = allUsers;
+    }
 
     const b = S.cur && S.cur.id === id ? S.cur : await DS.getById(id);
     const targetEmails = (b && b.authorizedEmails && b.authorizedEmails.length > 0) 
       ? b.authorizedEmails 
       : allUsers.map(u => u.email);
     
-    const unread = allUsers.filter(u => 
-      targetEmails.includes(u.email) && 
-      !readers.find(r => r.email === u.email || r.displayName === u.name)
-    );
+    const targetEmailsLower = targetEmails.map(e => (e || '').trim().toLowerCase());
+    const readersEmailsLower = readers.map(r => (r.email || '').trim().toLowerCase());
+    const readersNames = readers.map(r => (r.displayName || '').trim());
+    
+    const unread = allUsers.filter(u => {
+      const uEmailLower = (u.email || '').trim().toLowerCase();
+      const uName = (u.name || '').trim();
+      const isTarget = targetEmailsLower.includes(uEmailLower);
+      const isRead = readersEmailsLower.includes(uEmailLower) || (uName && readersNames.includes(uName));
+      return isTarget && !isRead;
+    });
 
     countEl.innerHTML = `
       <span class="text-xs bg-indigo-50 text-indigo-600 px-2.5 py-1 rounded-full font-semibold border border-indigo-100">已讀: ${total} 人</span>
@@ -866,7 +877,7 @@ async function delAdmin(i) {
 
 function newBulletin(){if(S.dirty&&!confirm('有未儲存的修改，確定繼續？'))return;const now=new Date(),p=n=>String(n).padStart(2,'0'),ds=`${now.getFullYear()}-${p(now.getMonth()+1)}-${p(now.getDate())}`;S.cur={id:`${now.getFullYear()}-W${wk(now)}`,publishDate:ds,title:'經營TEAM採購｜本週重點摘要',periodStart:ds,periodEnd:ds,isPinned:false,status:'draft',version:1,sections:[]};S.dirty=false;renderEd();toast('已建立新週報草稿','in');}
 function wk(d){const j=new Date(d.getFullYear(),0,1);return Math.ceil((((d-j)/86400000)+j.getDay()+1)/7);}
-async function unpubBulletin(){if(!S.cur)return;if(!confirm('確定要撤回發布？撤回後前台將無法看見此週報。'))return;const pt=document.getElementById('pub-txt'),btn=document.getElementById('btn-unpub');btn.disabled=true;pt.textContent='撤回中...';try{const d={...S.cur,status:'draft',feedbackLog:S.fbs};await DS.save(d.id,d);await DS.addAuditLog(d.id, `管理員撤回了週報。`);S.dirty=false;const sb=document.getElementById('tb-status');sb.className='bdg-dft';sb.textContent='草稿';toast('週報已撤回發布！','ok');S.mmap=await DS.getMonths();renderSB();renderAuditLogs(d.id);renderEd();}catch(e){toast('撤回失敗：'+e.message,'er');}finally{btn.disabled=false;pt.textContent='正式發布';}}
+async function unpubBulletin(){if(!S.cur)return;if(!confirm('確定要撤回發布？撤回後前台將無法看見此週報。'))return;const pt=document.getElementById('pub-txt'),btn=document.getElementById('btn-unpub');btn.disabled=true;pt.textContent='撤回中...';try{const d={...S.cur,status:'draft',feedbackLog:S.fbs};if(S.cur.authorizedEmails)d.authorizedEmails=S.cur.authorizedEmails;await DS.save(d.id,d);await DS.addAuditLog(d.id, `管理員撤回了週報。`);S.dirty=false;const sb=document.getElementById('tb-status');sb.className='bdg-dft';sb.textContent='草稿';toast('週報已撤回發布！','ok');S.mmap=await DS.getMonths();renderSB();renderAuditLogs(d.id);renderEd();renderReadReceipts(d.id);}catch(e){toast('撤回失敗：'+e.message,'er');}finally{btn.disabled=false;pt.textContent='正式發布';}}
 function renderEd(){const b=S.cur;if(!b)return;document.getElementById('es').classList.add('hidden');document.getElementById('bf').classList.remove('hidden');document.getElementById('tb-acts').classList.remove('hidden');document.getElementById('tb-title').textContent=b.id||'新週報';const sb=document.getElementById('tb-status');sb.className=b.status==='published'?'bdg-pub':'bdg-dft';sb.textContent=b.status==='published'?'已發布':'草稿';sb.classList.remove('hidden');if(b.status==='published'){document.getElementById('btn-unpub').classList.remove('hidden');document.getElementById('btn-pub').classList.add('hidden');}else{document.getElementById('btn-unpub').classList.add('hidden');document.getElementById('btn-pub').classList.remove('hidden');}document.getElementById('f-id').value=b.id||'';document.getElementById('f-pd').value=b.publishDate||'';document.getElementById('f-ps').value=b.periodStart||'';document.getElementById('f-pe').value=b.periodEnd||'';document.getElementById('f-ti').value=b.title||'';document.getElementById('f-pin').checked=!!b.isPinned;renderSecs();}
 function renderSecs(){const c=document.getElementById('sc');const b=S.cur;const ptl=document.getElementById('toolbar-portal');if(ptl)ptl.innerHTML='';if(!b?.sections?.length){c.innerHTML='<div class="text-center py-10 text-slate-400 text-sm">尚未建立任何段落<br><span class="text-xs">點擊右上角「新增段落」</span></div>';return;}c.innerHTML=b.sections.map((s,i)=>bldSec(s,i)).join('');setTimeout(()=>{
   document.querySelectorAll('.quill-editor').forEach(el=>{
@@ -1438,14 +1449,27 @@ async function pubBulletin() {
     }
   }
 
-  document.getElementById('pub-wl-all').checked = true;
+  if (S.whitelist.length === 0) {
+    S.whitelist = await DS.getWhitelist();
+  }
+
+  const prevAuthLower = (S.cur.authorizedEmails && S.cur.authorizedEmails.length > 0)
+    ? S.cur.authorizedEmails.map(e => (e || '').trim().toLowerCase())
+    : null;
+
   const c = document.getElementById('pub-wl-list');
-  c.innerHTML = S.whitelist.map((w, i) => `
+  c.innerHTML = S.whitelist.map((w, i) => {
+    const isChecked = prevAuthLower ? prevAuthLower.includes((w.email || '').trim().toLowerCase()) : true;
+    return `
     <label class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-50 cursor-pointer border border-slate-100 transition-colors">
-      <input type="checkbox" class="pub-wl-cb w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500" value="${w.email}" checked data-email="${w.email}">
+      <input type="checkbox" class="pub-wl-cb w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500" value="${w.email}" ${isChecked ? 'checked' : ''} data-email="${w.email}">
       <div class="flex flex-col"><span class="text-sm font-semibold text-slate-700">${w.name}</span><span class="text-xs text-slate-400 mt-0.5">${w.email}</span></div>
     </label>
-  `).join('');
+  `;}).join('');
+
+  const allCbs = document.querySelectorAll('.pub-wl-cb');
+  const allChecked = Array.from(allCbs).length > 0 && Array.from(allCbs).every(cb => cb.checked);
+  document.getElementById('pub-wl-all').checked = allChecked;
 }
 
 function selectPubGroup(groupId) {
@@ -1547,6 +1571,7 @@ async function confirmPubBulletin() {
       }
     }
     
+    S.cur = d;
     S.dirty=false;
     const sb=document.getElementById('tb-status'); sb.className='bdg-pub'; sb.textContent='已發布';
     document.getElementById('btn-unpub').classList.remove('hidden');
@@ -1554,6 +1579,8 @@ async function confirmPubBulletin() {
     toast('🎉 週報已正式發布並寄出通知信！', 'ok');
     S.mmap = await DS.getMonths();
     renderSB();
+    renderReadReceipts(d.id);
+    renderAuditLogs(d.id);
     hidePubModal();
   } catch(e) { toast('發布失敗：'+e.message,'er'); } 
   finally { btn.disabled=false; btn.textContent='確認發布並寄信'; }

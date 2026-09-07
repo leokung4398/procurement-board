@@ -49,13 +49,13 @@
     /* True WYSIWYG: Match Backend TinyMCE Exact Line-Height and Spacing */
     .ql-editor {
       font-size: 0.875rem;
-      line-height: 2;
+      line-height: 2 !important;
       letter-spacing: 0.01em;
     }
     .ql-editor p {
       margin-top: 0 !important;
       margin-bottom: 0 !important;
-      line-height: inherit;
+      line-height: 2;
       padding: 0 !important;
     }
     .ql-editor span {
@@ -967,11 +967,11 @@ async function showKPI(monthOffset = 0) {
                   p.remove();
                 });
                 const row = doc.createElement('p');
-                row.style.lineHeight = '1.5';
+                row.style.lineHeight = '2';
                 row.style.fontSize = '12pt';
                 if (li.getAttribute('style')) {
                   row.setAttribute('style', li.getAttribute('style'));
-                  row.style.lineHeight = '1.5';
+                  row.style.lineHeight = '2';
                 }
                 while (li.firstChild) row.appendChild(li.firstChild);
                 container.appendChild(row);
