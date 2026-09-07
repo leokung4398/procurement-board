@@ -46,15 +46,25 @@
 
 
   <style>
-    /* Force remove any margins on paragraphs just to be absolutely certain */
+    /* True WYSIWYG: Match Backend TinyMCE Exact Line-Height and Spacing */
+    .ql-editor {
+      font-size: 0.875rem;
+      line-height: 2;
+      letter-spacing: 0.01em;
+    }
     .ql-editor p {
       margin-top: 0 !important;
       margin-bottom: 0 !important;
+      line-height: inherit;
+      padding: 0 !important;
     }
-    /* Fix paragraph tags inside list items causing unexpected line drops */
+    .ql-editor span {
+      line-height: inherit;
+    }
     .ql-editor li p {
       display: inline !important;
       margin: 0 !important;
+      line-height: inherit;
     }
     .ql-editor ol, .ql-editor ul {
       padding-left: 1.25rem !important;
@@ -957,11 +967,11 @@ async function showKPI(monthOffset = 0) {
                   p.remove();
                 });
                 const row = doc.createElement('p');
-                row.style.lineHeight = '2';
+                row.style.lineHeight = '1.5';
                 row.style.fontSize = '12pt';
                 if (li.getAttribute('style')) {
                   row.setAttribute('style', li.getAttribute('style'));
-                  row.style.lineHeight = '2';
+                  row.style.lineHeight = '1.5';
                 }
                 while (li.firstChild) row.appendChild(li.firstChild);
                 container.appendChild(row);
@@ -1057,7 +1067,7 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
                 return `
                   <div class="pl-2 pr-1 py-1 border-l-4 rounded-r-lg shadow-sm transition-all hover:shadow-md ${borderClass} group relative">
                     ${isHigh ? `<div class="absolute top-1 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 pointer-events-none"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-red-500 text-white shadow-sm">緊急</span></div>` : ''}
-                    <div ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].items[${itemIdx}].content" class="text-sm font-medium leading-relaxed outline-none whitespace-pre-wrap ql-editor !p-0 text-left">${clnHtm(item.content)}</div>
+                    <div ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].items[${itemIdx}].content" class="text-sm font-medium outline-none ql-editor !p-0 text-left">${clnHtm(item.content)}</div>
                   </div>
                 `;
               }).join('')}
@@ -1075,8 +1085,8 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
                       const isHigh = item.priority === 'high';
                       const borderClass = isHigh ? 'border-red-400 bg-red-50/30' : 'border-slate-300 bg-slate-50';
                       return `
-                        <div class="px-2 py-1 border-l-2 rounded-r bg-white text-slate-700 text-sm leading-relaxed border-l-4 ${borderClass} group relative">
-                          <div ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].subsections[${subIdx}].items[${itemIdx}].content" class="outline-none whitespace-pre-wrap ql-editor text-left !p-0">${clnHtm(item.content)}</div>
+                        <div class="px-2 py-1 border-l-2 rounded-r bg-white text-slate-700 text-sm border-l-4 ${borderClass} group relative">
+                          <div ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].subsections[${subIdx}].items[${itemIdx}].content" class="outline-none ql-editor text-left !p-0">${clnHtm(item.content)}</div>
                         </div>
                       `;
                     }).join('')}

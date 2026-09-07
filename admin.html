@@ -94,10 +94,24 @@
 
     
     /* TinyMCE & Excel Pasted Table Normalization */
-        /* Fix paragraph tags inside list items causing unexpected line drops */
-    .ql-editor li p, .pro-table li p {
+        /* Unified Typography & 1.5 Line-Height Standard */
+    .quill-editor, .ql-editor {
+      font-size: 0.875rem !important;
+      line-height: 1.5 !important;
+      letter-spacing: 0.015em;
+    }
+    .quill-editor p, .ql-editor p {
+      margin-top: 0 !important;
+      margin-bottom: 0.25rem !important;
+      line-height: 1.5 !important;
+    }
+    .quill-editor p:last-child, .ql-editor p:last-child {
+      margin-bottom: 0 !important;
+    }
+    .ql-editor li p, .quill-editor li p, .pro-table li p {
       display: inline !important;
       margin: 0 !important;
+      line-height: 1.5 !important;
     }
     .ql-editor ol, .ql-editor ul {
       padding-left: 1.25rem !important;
@@ -313,7 +327,7 @@
         </button>
       </div>
     </div>
-    <div class="px-6 py-6 max-w-5xl mx-auto">
+    <div class="px-6 py-6 max-w-6xl mx-auto">
       <div id="es" class="text-center py-16 text-slate-400">
         <svg class="w-16 h-16 mx-auto mb-4 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
         <h3 class="text-lg font-semibold mb-1">選擇或建立週報</h3>
