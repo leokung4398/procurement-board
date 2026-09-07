@@ -1713,26 +1713,57 @@ async function fetchKPIData(monthOffset) {
     }
   });
 
-  // 2. Get bulletins for the month
-  let start = new Date(targetYear, targetMonth, 1);
-  let end = new Date(targetYear, targetMonth + 1, 1);
-  
+  // 2. Get bulletins for the month by publishDate / monthKey (avoids composite index failure)
+  const targetMonthPrefix = `${targetYear}-${String(targetMonth + 1).padStart(2, '0')}`;
   const snapB = await db.collection('bulletins')
     .where('status', '==', 'published')
-    .where('createdAt', '>=', start)
-    .where('createdAt', '<', end)
     .get();
     
-  let bulletinCount = snapB.size;
   let bulletinIds = [];
-  snapB.forEach(d => bulletinIds.push(d.id));
+  snapB.forEach(d => {
+    const data = d.data();
+    const pDate = data.publishDate || (data.meta && data.meta.publishedAt ? data.meta.publishedAt.slice(0, 10) : '');
+    const mKey = data.monthKey || pDate.slice(0, 7);
+    if (mKey === targetMonthPrefix || pDate.startsWith(targetMonthPrefix)) {
+      bulletinIds.push(d.id);
+    }
+  });
+  let bulletinCount = bulletinIds.length;
 
-  // 3. Process reads
+  // 3. Process reads with support for primary contact multi-email & name matching
   const unitConfirmed = {};
   const unitTotalProgress = {};
   validUnits.forEach(u => {
     unitConfirmed[u] = 0;
     unitTotalProgress[u] = 0;
+  });
+
+  // Group primary contacts by unit
+  const primaryByUnit = {};
+  whitelist.forEach(w => {
+    const u = w.unit;
+    if (!u) return;
+    if (w.isPrimary) {
+      if (!primaryByUnit[u]) primaryByUnit[u] = [];
+      let found = primaryByUnit[u].find(p => p.name === w.name);
+      if (!found) {
+        found = { name: w.name, emails: new Set() };
+        primaryByUnit[u].push(found);
+      }
+      if (w.email) found.emails.add(w.email.trim().toLowerCase());
+    }
+  });
+
+  // Also link alternate emails of the same person in the same unit
+  whitelist.forEach(w => {
+    const u = w.unit;
+    if (!u || w.isPrimary) return;
+    if (primaryByUnit[u]) {
+      const found = primaryByUnit[u].find(p => p.name === w.name);
+      if (found && w.email) {
+        found.emails.add(w.email.trim().toLowerCase());
+      }
+    }
   });
 
   for (let bId of bulletinIds) {
@@ -1741,17 +1772,31 @@ async function fetchKPIData(monthOffset) {
     snapR.forEach(r => {
       const data = r.data();
       const prog = typeof data.readProgress === 'number' ? data.readProgress : 100;
-      readerMap.set(r.id.toLowerCase(), prog);
+      if (r.id) readerMap.set(r.id.toLowerCase(), prog);
+      if (data.email) readerMap.set(data.email.trim().toLowerCase(), prog);
+      if (data.displayName) readerMap.set(data.displayName.trim(), prog);
     });
     
-    whitelist.forEach(w => {
-      if (w.isPrimary && unitPrimaryCount[w.unit]) {
-        const email = w.email.toLowerCase();
-        if (readerMap.has(email)) {
-          unitConfirmed[w.unit]++;
-          unitTotalProgress[w.unit] += readerMap.get(email);
+    validUnits.forEach(u => {
+      const primaries = primaryByUnit[u] || [];
+      primaries.forEach(p => {
+        let hasRead = false;
+        let bestProg = 0;
+        for (let em of p.emails) {
+          if (readerMap.has(em)) {
+            hasRead = true;
+            bestProg = Math.max(bestProg, readerMap.get(em));
+          }
         }
-      }
+        if (!hasRead && p.name && readerMap.has(p.name)) {
+          hasRead = true;
+          bestProg = Math.max(bestProg, readerMap.get(p.name));
+        }
+        if (hasRead) {
+          unitConfirmed[u]++;
+          unitTotalProgress[u] += bestProg;
+        }
+      });
     });
   }
 
@@ -1764,7 +1809,7 @@ async function fetchKPIData(monthOffset) {
   validUnits.forEach(u => {
     let expected = unitPrimaryCount[u] * bulletinCount;
     let confirmed = unitConfirmed[u];
-    let unconfirmed = expected - confirmed;
+    let unconfirmed = Math.max(0, expected - confirmed);
     let rate = expected === 0 ? 0 : Math.round((confirmed / expected) * 100);
     let avgProgress = expected === 0 ? 0 : Math.round(unitTotalProgress[u] / expected);
     
