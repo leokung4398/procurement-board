@@ -1387,13 +1387,18 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
         const scrollHeight = docElem.scrollHeight;
         const clientHeight = window.innerHeight;
         const scrollTop = window.scrollY || docElem.scrollTop;
+        const distanceToBottom = scrollHeight - (scrollTop + clientHeight);
 
-        // 若內容小於等於一頁高度，直接判定 100%
-        if (scrollHeight <= clientHeight + 50) {
+        // 完讀判定容許機制：
+        // 1. 若內容小於一頁高度
+        // 2. 或滾動距離底部 <= 80px (忽略頁尾留白/版權資訊誤差)
+        // 3. 或滾動比例達到 90% 以上 (實質公告段落已全部閱讀完畢)
+        if (scrollHeight <= clientHeight + 50 || distanceToBottom <= 80) {
           currentBulletinProgress = 100;
         } else {
           // 以滑動到頁面最深處位置計算百分比 (10% ~ 100%)
-          const scrollPercent = Math.min(100, Math.max(10, Math.round(((scrollTop + clientHeight) / scrollHeight) * 100)));
+          let scrollPercent = Math.min(100, Math.max(10, Math.round(((scrollTop + clientHeight) / scrollHeight) * 100)));
+          if (scrollPercent >= 90) scrollPercent = 100;
           currentBulletinProgress = Math.max(currentBulletinProgress, scrollPercent);
         }
 
