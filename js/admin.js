@@ -656,9 +656,23 @@ async function renderReadReceipts(id) {
               let badgeCls = 'bg-emerald-50 text-emerald-700 border-emerald-200';
               if (prog < 50) badgeCls = 'bg-slate-100 text-slate-600 border-slate-200';
               else if (prog < 100) badgeCls = 'bg-amber-50 text-amber-700 border-amber-200';
+              
+              // 判定是否為主要窗口 (isPrimary)
+              const rEmail = (r.email || '').trim().toLowerCase();
+              const rName = (r.displayName || '').replace(/[\s\u3000]/g, '').toLowerCase();
+              const isPrimaryContact = allUsers.some(u => {
+                if (!u.isPrimary) return false;
+                const uEmail = (u.email || '').trim().toLowerCase();
+                const uName = (u.name || '').replace(/[\s\u3000]/g, '').toLowerCase();
+                return (uEmail && uEmail === rEmail) || (uName && (uName === rName || rName.includes(uName)));
+              });
+              const primaryBadge = isPrimaryContact 
+                ? `<span class="ml-1.5 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300 shadow-sm" title="單位主要窗口">⭐ 主要窗口</span>` 
+                : '';
+
               return `
-              <tr>
-                <td class="py-2 text-slate-700 font-medium">${xe(r.displayName)}</td>
+              <tr class="${isPrimaryContact ? 'bg-amber-50/20' : ''}">
+                <td class="py-2 text-slate-700 font-medium flex items-center">${xe(r.displayName)}${primaryBadge}</td>
                 <td class="py-2 text-slate-500 font-mono text-xs">${xe(r.email || '-')}</td>
                 <td class="py-2 text-slate-500">${xe(r.department)}</td>
                 <td class="py-2 text-center">
@@ -684,7 +698,12 @@ async function renderReadReceipts(id) {
           <span>⚠️ 未讀人員</span> ${toggleBtn}
         </div>
         <div id="unread-container" class="flex flex-wrap gap-2 ${hiddenCls}">
-          ${unread.map(u => `<span class="px-2.5 py-1 bg-rose-50 text-rose-600 rounded text-xs font-medium" title="${xe(u.email)}">${xe(u.name)}</span>`).join('')}
+          ${unread.map(u => {
+            const isPrimary = !!u.isPrimary;
+            const cls = isPrimary ? 'bg-amber-100 text-amber-900 border border-amber-300 font-bold' : 'bg-rose-50 text-rose-600 font-medium';
+            const star = isPrimary ? '⭐ ' : '';
+            return `<span class="px-2.5 py-1 ${cls} rounded text-xs flex items-center gap-1" title="${xe(u.email)}">${star}${xe(u.name)}${isPrimary ? ' (主要窗口)' : ''}</span>`;
+          }).join('')}
         </div>
       `;
     }
