@@ -802,84 +802,115 @@
       <div id="tab-achievements" class="about-tab-pane hidden flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/30 custom-scrollbar smooth-scroll-pane">
         <p class="text-sm text-slate-500 mb-2 font-medium tracking-wide">採購需求增補 & 專案成就</p>
         <!-- 專案開發成果分類圖例說明 (Category Legend) -->
-        <div class="p-5 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 text-white shadow-lg border border-slate-700/50 mb-6">
+        <div class="p-5 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 text-white shadow-lg border border-slate-700/50 mb-6 transition-all">
           <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-700/60">
             <div>
               <div class="flex items-center gap-2">
-                <span class="px-2.5 py-1 rounded-md bg-indigo-500/30 border border-indigo-400/40 text-indigo-300 text-xs font-bold tracking-wider uppercase">Taxonomy</span>
-                <h4 class="text-base font-bold text-white tracking-wide flex items-center gap-2">🎨 專案開發成果條例分類說明</h4>
+                <span class="px-2.5 py-1 rounded-md bg-indigo-500/30 border border-indigo-400/40 text-indigo-300 text-xs font-bold tracking-wider uppercase">Interactive Taxonomy</span>
+                <h4 class="text-base font-bold text-white tracking-wide flex items-center gap-2">🎨 專案開發成果條例分類與即時置頂</h4>
               </div>
               <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">
-                為利採購團隊與主管長官直觀掌握各階段開發之專業屬性，全系列 26 項里程碑卡片已全面依技術構面導入色彩識別體系：
+                全系列 26 項里程碑已依技術構面導入色彩體系。<span class="text-amber-300 font-medium">💡 點選下方任一分類按鈕，即可將該技術構面之成果卡片立即「置頂排列到最上方」</span>，便於長官與主管聚焦查閱！
               </p>
             </div>
-            <div class="flex-shrink-0 text-right hidden md:block">
-              <span class="text-xs bg-slate-800/80 px-3 py-1.5 rounded-full border border-slate-700 text-slate-300 font-mono">共 26 項里程碑全數納管</span>
+            <div class="flex items-center gap-2.5 flex-shrink-0">
+              <button id="cat-btn-all" onclick="filterMilestoneCat('all')" type="button" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-indigo-400/40 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 text-xs font-semibold transition-all shadow-sm cursor-pointer active:scale-95" title="還原至 1~26 項原始順序">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                <span>重置原始排序 (全部26項)</span>
+              </button>
             </div>
           </div>
 
-          <!-- 四大顏色條例 Grid -->
+          <!-- 四大顏色條例互動按鈕 Grid -->
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 mt-4">
-            <!-- 藍色 -->
-            <div class="flex items-start gap-3 p-3 rounded-xl bg-slate-800/60 border border-blue-500/30 hover:border-blue-400/60 transition-all">
-              <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-md shadow-blue-500/20">
+            <!-- 核心系統開發 (藍色) -->
+            <button id="cat-btn-core" onclick="filterMilestoneCat('core')" type="button" class="cat-filter-btn text-left flex items-start gap-3 p-3.5 rounded-xl bg-slate-800/70 border-2 border-blue-500/30 hover:border-blue-400 hover:bg-slate-800/90 hover:shadow-lg hover:shadow-blue-500/10 transition-all cursor-pointer group focus:outline-none">
+              <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform">
                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
               </div>
-              <div>
-                <div class="flex items-center gap-1.5 mb-1">
-                  <span class="w-2 h-2 rounded-full bg-blue-400"></span>
-                  <span class="text-xs font-bold text-blue-300">核心系統開發</span>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between mb-1">
+                  <div class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-blue-400"></span>
+                    <span class="text-xs font-bold text-blue-300 group-hover:text-blue-200 transition-colors">核心系統開發</span>
+                  </div>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">9 項</span>
                 </div>
-                <p class="text-[11px] text-slate-400 leading-snug">架構搭建、動態模板、問卷系統、附件上傳、信件通知等基礎功能。</p>
+                <p class="text-[11px] text-slate-400 group-hover:text-slate-300 leading-snug transition-colors">架構搭建、動態模板、問卷系統、附件上傳與郵件通知。</p>
+                <div class="mt-2 flex items-center gap-1 text-[10px] text-blue-400 font-semibold opacity-80 group-hover:opacity-100">
+                  <span>點擊置頂排序</span>
+                  <svg class="w-3 h-3 group-hover:translate-y-[-1px] transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+                </div>
               </div>
-            </div>
+            </button>
 
-            <!-- 綠色 -->
-            <div class="flex items-start gap-3 p-3 rounded-xl bg-slate-800/60 border border-emerald-500/30 hover:border-emerald-400/60 transition-all">
-              <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center flex-shrink-0 shadow-md shadow-emerald-500/20">
+            <!-- 資安權限控管 (綠色) -->
+            <button id="cat-btn-security" onclick="filterMilestoneCat('security')" type="button" class="cat-filter-btn text-left flex items-start gap-3 p-3.5 rounded-xl bg-slate-800/70 border-2 border-emerald-500/30 hover:border-emerald-400 hover:bg-slate-800/90 hover:shadow-lg hover:shadow-emerald-500/10 transition-all cursor-pointer group focus:outline-none">
+              <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center flex-shrink-0 shadow-md shadow-emerald-500/20 group-hover:scale-105 transition-transform">
                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
               </div>
-              <div>
-                <div class="flex items-center gap-1.5 mb-1">
-                  <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
-                  <span class="text-xs font-bold text-emerald-300">資安權限控管</span>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between mb-1">
+                  <div class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    <span class="text-xs font-bold text-emerald-300 group-hover:text-emerald-200 transition-colors">資安權限控管</span>
+                  </div>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">6 項</span>
                 </div>
-                <p class="text-[11px] text-slate-400 leading-snug">全局白名單、管理員防護、通訊錄整合、撤回立即下架與防竄改。</p>
+                <p class="text-[11px] text-slate-400 group-hover:text-slate-300 leading-snug transition-colors">全局白名單、管理員防護、通訊錄整合與立即下架。</p>
+                <div class="mt-2 flex items-center gap-1 text-[10px] text-emerald-400 font-semibold opacity-80 group-hover:opacity-100">
+                  <span>點擊置頂排序</span>
+                  <svg class="w-3 h-3 group-hover:translate-y-[-1px] transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+                </div>
               </div>
-            </div>
+            </button>
 
-            <!-- 橘黃色 -->
-            <div class="flex items-start gap-3 p-3 rounded-xl bg-slate-800/60 border border-amber-500/30 hover:border-amber-400/60 transition-all">
-              <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center flex-shrink-0 shadow-md shadow-orange-500/20">
+            <!-- 排版體驗優化 (橘黃色) -->
+            <button id="cat-btn-typesetting" onclick="filterMilestoneCat('typesetting')" type="button" class="cat-filter-btn text-left flex items-start gap-3 p-3.5 rounded-xl bg-slate-800/70 border-2 border-amber-500/30 hover:border-amber-400 hover:bg-slate-800/90 hover:shadow-lg hover:shadow-orange-500/10 transition-all cursor-pointer group focus:outline-none">
+              <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center flex-shrink-0 shadow-md shadow-orange-500/20 group-hover:scale-105 transition-transform">
                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"/></svg>
               </div>
-              <div>
-                <div class="flex items-center gap-1.5 mb-1">
-                  <span class="w-2 h-2 rounded-full bg-amber-400"></span>
-                  <span class="text-xs font-bold text-amber-300">排版體驗優化</span>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between mb-1">
+                  <div class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                    <span class="text-xs font-bold text-amber-300 group-hover:text-amber-200 transition-colors">排版體驗優化</span>
+                  </div>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">6 項</span>
                 </div>
-                <p class="text-[11px] text-slate-400 leading-snug">TinyMCE 核心、跨欄置中、莫蘭迪色盤、Word貼上防護與響應式 RWD。</p>
+                <p class="text-[11px] text-slate-400 group-hover:text-slate-300 leading-snug transition-colors">TinyMCE 核心、跨欄置中、莫蘭迪色盤與 RWD 適配。</p>
+                <div class="mt-2 flex items-center gap-1 text-[10px] text-amber-400 font-semibold opacity-80 group-hover:opacity-100">
+                  <span>點擊置頂排序</span>
+                  <svg class="w-3 h-3 group-hover:translate-y-[-1px] transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+                </div>
               </div>
-            </div>
+            </button>
 
-            <!-- 紫色 -->
-            <div class="flex items-start gap-3 p-3 rounded-xl bg-slate-800/60 border border-purple-500/30 hover:border-purple-400/60 transition-all">
-              <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-md shadow-purple-500/20">
+            <!-- 數據分析與落實 (紫色) -->
+            <button id="cat-btn-data" onclick="filterMilestoneCat('data')" type="button" class="cat-filter-btn text-left flex items-start gap-3 p-3.5 rounded-xl bg-slate-800/70 border-2 border-purple-500/30 hover:border-purple-400 hover:bg-slate-800/90 hover:shadow-lg hover:shadow-purple-500/10 transition-all cursor-pointer group focus:outline-none">
+              <div class="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-md shadow-purple-500/20 group-hover:scale-105 transition-transform">
                 <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
               </div>
-              <div>
-                <div class="flex items-center gap-1.5 mb-1">
-                  <span class="w-2 h-2 rounded-full bg-purple-400"></span>
-                  <span class="text-xs font-bold text-purple-300">數據分析與落實</span>
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center justify-between mb-1">
+                  <div class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-purple-400"></span>
+                    <span class="text-xs font-bold text-purple-300 group-hover:text-purple-200 transition-colors">數據分析與落實</span>
+                  </div>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">5 項</span>
                 </div>
-                <p class="text-[11px] text-slate-400 leading-snug">已讀追蹤、完成率運算、點閱 KPI 看板、SheetJS Excel 報表匯出與容錯引擎。</p>
+                <p class="text-[11px] text-slate-400 group-hover:text-slate-300 leading-snug transition-colors">已讀追蹤、完成率、KPI 看板、SheetJS Excel 報表匯出。</p>
+                <div class="mt-2 flex items-center gap-1 text-[10px] text-purple-400 font-semibold opacity-80 group-hover:opacity-100">
+                  <span>點擊置頂排序</span>
+                  <svg class="w-3 h-3 group-hover:translate-y-[-1px] transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+                </div>
               </div>
-            </div>
+            </button>
           </div>
         </div>
 
-        <div class="space-y-4">
-          <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(37,99,235,0.15)] hover:border-blue-200 transition-all duration-300 relative overflow-hidden">
+        <div id="milestones-container" class="space-y-4">
+          <div data-cat="core" data-orig-idx="1" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(37,99,235,0.15)] hover:border-blue-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-500 to-indigo-600"></div>
           <div class="flex gap-4">
             <div class="mt-0.5">
@@ -899,7 +930,7 @@
           </div>
         </div>
 
-          <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(37,99,235,0.15)] hover:border-blue-200 transition-all duration-300 relative overflow-hidden">
+          <div data-cat="core" data-orig-idx="2" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(37,99,235,0.15)] hover:border-blue-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-500 to-indigo-600"></div>
           <div class="flex gap-4">
             <div class="mt-0.5">
@@ -919,7 +950,7 @@
           </div>
         </div>
 
-          <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(37,99,235,0.15)] hover:border-blue-200 transition-all duration-300 relative overflow-hidden">
+          <div data-cat="core" data-orig-idx="3" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(37,99,235,0.15)] hover:border-blue-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-500 to-indigo-600"></div>
           <div class="flex gap-4">
             <div class="mt-0.5">
@@ -939,7 +970,7 @@
           </div>
         </div>
 
-          <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(147,51,234,0.15)] hover:border-purple-200 transition-all duration-300 relative overflow-hidden">
+          <div data-cat="core" data-orig-idx="4" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(147,51,234,0.15)] hover:border-purple-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-purple-500 to-indigo-600"></div>
           <div class="flex gap-4">
             <div class="mt-0.5">
@@ -959,7 +990,7 @@
           </div>
         </div>
 
-          <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(37,99,235,0.15)] hover:border-blue-200 transition-all duration-300 relative overflow-hidden">
+          <div data-cat="core" data-orig-idx="5" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(37,99,235,0.15)] hover:border-blue-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-500 to-indigo-600"></div>
           <div class="flex gap-4">
             <div class="mt-0.5">
@@ -979,7 +1010,7 @@
           </div>
         </div>
 
-          <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(37,99,235,0.15)] hover:border-blue-200 transition-all duration-300 relative overflow-hidden">
+          <div data-cat="core" data-orig-idx="6" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(37,99,235,0.15)] hover:border-blue-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-500 to-indigo-600"></div>
           <div class="flex gap-4">
             <div class="mt-0.5">
@@ -999,7 +1030,7 @@
           </div>
         </div>
 
-          <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+          <div data-cat="core" data-orig-idx="7" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
           <div class="flex gap-4">
             <div class="mt-0.5">
@@ -1019,7 +1050,7 @@
           </div>
         </div>
 
-          <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(37,99,235,0.15)] hover:border-blue-200 transition-all duration-300 relative overflow-hidden">
+          <div data-cat="core" data-orig-idx="8" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(37,99,235,0.15)] hover:border-blue-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-500 to-indigo-600"></div>
           <div class="flex gap-4">
             <div class="mt-0.5">
@@ -1039,7 +1070,7 @@
           </div>
         </div>
 
-          <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+          <div data-cat="core" data-orig-idx="9" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
           <div class="flex gap-4">
             <div class="mt-0.5">
@@ -1059,7 +1090,7 @@
           </div>
         </div>
 
-          <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+          <div data-cat="core" data-orig-idx="10" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
           <div class="flex gap-4">
             <div class="mt-0.5">
@@ -1079,7 +1110,7 @@
           </div>
         </div>
 
-          <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(37,99,235,0.15)] hover:border-blue-200 transition-all duration-300 relative overflow-hidden">
+          <div data-cat="core" data-orig-idx="11" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(37,99,235,0.15)] hover:border-blue-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-500 to-indigo-600"></div>
           <div class="flex gap-4">
             <div class="mt-0.5">
@@ -1099,7 +1130,7 @@
           </div>
         </div>
 
-          <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(16,185,129,0.15)] hover:border-emerald-200 transition-all duration-300 relative overflow-hidden">
+          <div data-cat="core" data-orig-idx="12" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(16,185,129,0.15)] hover:border-emerald-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-emerald-500 to-teal-600"></div>
           <div class="flex gap-4">
             <div class="mt-0.5">
@@ -1119,7 +1150,7 @@
           </div>
         </div>
 
-          <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(37,99,235,0.15)] hover:border-blue-200 transition-all duration-300 relative overflow-hidden">
+          <div data-cat="core" data-orig-idx="13" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(37,99,235,0.15)] hover:border-blue-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-500 to-indigo-600"></div>
           <div class="flex gap-4">
             <div class="mt-0.5">
@@ -1139,7 +1170,7 @@
           </div>
         </div>
 
-          <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+          <div data-cat="core" data-orig-idx="14" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
           <div class="flex gap-4">
             <div class="mt-0.5">
@@ -1158,7 +1189,7 @@
           </div>
         </div>
 
-          <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(16,185,129,0.15)] hover:border-emerald-200 transition-all duration-300 relative overflow-hidden">
+          <div data-cat="core" data-orig-idx="15" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(16,185,129,0.15)] hover:border-emerald-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-emerald-500 to-teal-600"></div>
           <div class="flex gap-4">
             <div class="mt-0.5">
@@ -1179,7 +1210,7 @@
           </div>
         </div>
 
-          <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(16,185,129,0.15)] hover:border-emerald-200 transition-all duration-300 relative overflow-hidden">
+          <div data-cat="core" data-orig-idx="16" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(16,185,129,0.15)] hover:border-emerald-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-emerald-500 to-teal-600"></div>
           <div class="flex gap-4">
             <div class="mt-0.5">
@@ -1200,7 +1231,7 @@
           </div>
         </div>
 
-          <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(147,51,234,0.15)] hover:border-purple-200 transition-all duration-300 relative overflow-hidden">
+          <div data-cat="core" data-orig-idx="17" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(147,51,234,0.15)] hover:border-purple-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-purple-500 to-indigo-600"></div>
           <div class="flex gap-4">
             <div class="mt-0.5">
@@ -1221,7 +1252,7 @@
           </div>
         </div>
 
-          <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(16,185,129,0.15)] hover:border-emerald-200 transition-all duration-300 relative overflow-hidden">
+          <div data-cat="core" data-orig-idx="18" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(16,185,129,0.15)] hover:border-emerald-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-emerald-500 to-teal-600"></div>
           <div class="flex gap-4">
             <div class="mt-0.5">
@@ -1242,7 +1273,7 @@
           </div>
         </div>
 
-          <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(147,51,234,0.15)] hover:border-purple-200 transition-all duration-300 relative overflow-hidden">
+          <div data-cat="core" data-orig-idx="19" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(147,51,234,0.15)] hover:border-purple-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-purple-500 to-indigo-600"></div>
           <div class="flex gap-4">
             <div class="mt-0.5">
@@ -1264,7 +1295,7 @@
           </div>
         </div>
 
-          <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+          <div data-cat="core" data-orig-idx="20" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
           <div class="flex gap-4">
             <div class="mt-0.5">
@@ -1287,7 +1318,7 @@
           </div>
         </div>
 
-          <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(147,51,234,0.15)] hover:border-purple-200 transition-all duration-300 relative overflow-hidden">
+          <div data-cat="core" data-orig-idx="21" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(147,51,234,0.15)] hover:border-purple-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-purple-500 to-indigo-600"></div>
           <div class="flex gap-4">
             <div class="mt-0.5">
@@ -1310,7 +1341,7 @@
           </div>
         </div>
 
-          <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+          <div data-cat="core" data-orig-idx="22" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
           <div class="flex gap-4">
             <div class="mt-0.5">
@@ -1332,7 +1363,7 @@
           </div>
         </div>
 
-          <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(37,99,235,0.15)] hover:border-blue-200 transition-all duration-300 relative overflow-hidden">
+          <div data-cat="core" data-orig-idx="23" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(37,99,235,0.15)] hover:border-blue-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-500 to-indigo-600"></div>
           <div class="flex gap-4">
             <div class="mt-0.5">
@@ -1354,7 +1385,7 @@
           </div>
         </div>
 
-          <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(16,185,129,0.15)] hover:border-emerald-200 transition-all duration-300 relative overflow-hidden">
+          <div data-cat="core" data-orig-idx="24" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(16,185,129,0.15)] hover:border-emerald-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-emerald-500 to-teal-600"></div>
           <div class="flex gap-4">
             <div class="mt-0.5">
@@ -1374,7 +1405,7 @@
           </div>
         </div>
 
-          <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(147,51,234,0.15)] hover:border-purple-200 transition-all duration-300 relative overflow-hidden">
+          <div data-cat="core" data-orig-idx="25" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(147,51,234,0.15)] hover:border-purple-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-purple-500 to-indigo-600"></div>
           <div class="flex gap-4">
             <div class="mt-0.5">
@@ -1395,7 +1426,7 @@
             </div>
           </div>
         </div>
-          <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(16,185,129,0.15)] hover:border-emerald-200 transition-all duration-300 relative overflow-hidden">
+          <div data-cat="core" data-orig-idx="26" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(16,185,129,0.15)] hover:border-emerald-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-emerald-500 to-teal-600"></div>
           <div class="flex gap-4">
             <div class="mt-0.5">
@@ -1916,6 +1947,127 @@
     </div>
   </div>
 </div>
+
+
+<script>
+  // 專案開發成果分類即時置頂與重置控制函式
+  let currentActiveCat = null;
+
+  function filterMilestoneCat(targetCat) {
+    const container = document.getElementById('milestones-container');
+    if (!container) return;
+
+    const cards = Array.from(container.querySelectorAll('.milestone-card'));
+    if (!cards.length) return;
+
+    // 若傳入 'all' 或是再次點選同一分類，則重置原始順序
+    if (targetCat === 'all' || currentActiveCat === targetCat) {
+      currentActiveCat = null;
+      // 依原始序號排序 1 -> 26
+      cards.sort((a, b) => {
+        const idxA = parseInt(a.getAttribute('data-orig-idx') || '0', 10);
+        const idxB = parseInt(b.getAttribute('data-orig-idx') || '0', 10);
+        return idxA - idxB;
+      });
+
+      // 清除置頂樣式與還原原始外觀
+      cards.forEach(card => {
+        container.appendChild(card);
+        card.classList.remove('ring-2', 'ring-blue-400', 'ring-emerald-400', 'ring-amber-400', 'ring-purple-400', 'shadow-lg');
+        card.style.opacity = '1';
+      });
+
+      updateCatButtonStyles(null);
+      return;
+    }
+
+    currentActiveCat = targetCat;
+
+    // 將目標類別排在最前方，其餘按原序號排在後方
+    cards.sort((a, b) => {
+      const isACat = a.getAttribute('data-cat') === targetCat;
+      const isBCat = b.getAttribute('data-cat') === targetCat;
+
+      if (isACat && !isBCat) return -1;
+      if (!isACat && isBCat) return 1;
+
+      // 若同屬於置頂類別或同屬於其他類別，保持原序號排列
+      const idxA = parseInt(a.getAttribute('data-orig-idx') || '0', 10);
+      const idxB = parseInt(b.getAttribute('data-orig-idx') || '0', 10);
+      return idxA - idxB;
+    });
+
+    // 重新 append 節點並加上視覺焦點回饋
+    const ringColors = {
+      'core': ['ring-2', 'ring-blue-400', 'shadow-lg'],
+      'security': ['ring-2', 'ring-emerald-400', 'shadow-lg'],
+      'typesetting': ['ring-2', 'ring-amber-400', 'shadow-lg'],
+      'data': ['ring-2', 'ring-purple-400', 'shadow-lg']
+    };
+
+    cards.forEach(card => {
+      container.appendChild(card);
+      // 清除前次高亮
+      card.classList.remove('ring-2', 'ring-blue-400', 'ring-emerald-400', 'ring-amber-400', 'ring-purple-400', 'shadow-lg');
+
+      if (card.getAttribute('data-cat') === targetCat) {
+        if (ringColors[targetCat]) {
+          card.classList.add(...ringColors[targetCat]);
+        }
+        card.style.opacity = '1';
+      } else {
+        card.style.opacity = '0.6'; // 其餘未置頂卡片微調半透明，讓長官視線聚焦於置頂項
+      }
+    });
+
+    updateCatButtonStyles(targetCat);
+
+    // 平滑滾動至容器頂部
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function updateCatButtonStyles(activeCat) {
+    const btns = {
+      'core': document.getElementById('cat-btn-core'),
+      'security': document.getElementById('cat-btn-security'),
+      'typesetting': document.getElementById('cat-btn-typesetting'),
+      'data': document.getElementById('cat-btn-data')
+    };
+
+    const activeClasses = {
+      'core': ['ring-2', 'ring-blue-400', 'border-blue-400', 'bg-blue-950/60', 'scale-[1.02]'],
+      'security': ['ring-2', 'ring-emerald-400', 'border-emerald-400', 'bg-emerald-950/60', 'scale-[1.02]'],
+      'typesetting': ['ring-2', 'ring-amber-400', 'border-amber-400', 'bg-amber-950/60', 'scale-[1.02]'],
+      'data': ['ring-2', 'ring-purple-400', 'border-purple-400', 'bg-purple-950/60', 'scale-[1.02]']
+    };
+
+    const allBtn = document.getElementById('cat-btn-all');
+    if (allBtn) {
+      if (!activeCat) {
+        allBtn.classList.add('bg-indigo-600', 'text-white', 'border-indigo-400');
+        allBtn.classList.remove('bg-indigo-600/30', 'text-indigo-200');
+      } else {
+        allBtn.classList.remove('bg-indigo-600', 'text-white');
+        allBtn.classList.add('bg-indigo-600/30', 'text-indigo-200');
+      }
+    }
+
+    Object.keys(btns).forEach(cat => {
+      const btn = btns[cat];
+      if (!btn) return;
+
+      // 移除所有 active 樣式
+      activeClasses[cat].forEach(cls => btn.classList.remove(cls));
+      btn.style.opacity = '1';
+
+      if (activeCat === cat) {
+        activeClasses[cat].forEach(cls => btn.classList.add(cls));
+      } else if (activeCat !== null) {
+        btn.style.opacity = '0.65';
+      }
+    });
+  }
+</script>
 
 </body>
 </html>
