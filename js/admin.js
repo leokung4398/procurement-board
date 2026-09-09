@@ -592,15 +592,37 @@ async function renderReadReceipts(id) {
       : allUsers.map(u => u.email);
     
     const targetEmailsLower = targetEmails.map(e => (e || '').trim().toLowerCase());
-    const readersEmailsLower = readers.map(r => (r.email || '').trim().toLowerCase());
-    const readersNames = readers.map(r => (r.displayName || '').trim());
+    
+    // 預處理已讀同仁資料，支援多層次寬容匹配
+    const readLookup = readers.map(r => {
+      const email = (r.email || '').trim().toLowerCase();
+      const emailPrefix = email ? email.split('@')[0] : '';
+      const name = (r.displayName || '').replace(/[\s\u3000]/g, '').toLowerCase();
+      return { email, emailPrefix, name, raw: r };
+    });
     
     const unread = allUsers.filter(u => {
       const uEmailLower = (u.email || '').trim().toLowerCase();
-      const uName = (u.name || '').trim();
+      const uPrefix = uEmailLower.split('@')[0];
+      const uName = (u.name || '').replace(/[\s\u3000]/g, '').toLowerCase();
+      
       const isTarget = targetEmailsLower.includes(uEmailLower);
-      const isRead = readersEmailsLower.includes(uEmailLower) || (uName && readersNames.includes(uName));
-      return isTarget && !isRead;
+      if (!isTarget) return false;
+
+      // 多維度匹配檢查：
+      // 1. Email 完全相同
+      // 2. Email 帳號前綴相同 (例如 rubychen2, janechuang)
+      // 3. 姓名相同 (去除空格後)
+      // 4. 特殊同音異字相容 (如 吳俊瑋 <-> 吳俊緯)
+      const isRead = readLookup.some(r => {
+        if (r.email && r.email === uEmailLower) return true;
+        if (r.emailPrefix && uPrefix && r.emailPrefix === uPrefix) return true;
+        if (r.name && uName && (r.name === uName || r.name.includes(uName) || uName.includes(r.name))) return true;
+        if ((uName === '吳俊緯' && r.name.includes('吳俊瑋')) || (uName === '吳俊瑋' && r.name.includes('吳俊緯'))) return true;
+        return false;
+      });
+
+      return !isRead;
     });
 
     countEl.innerHTML = `
@@ -621,6 +643,7 @@ async function renderReadReceipts(id) {
           <thead>
             <tr class="text-[10px] text-slate-400">
               <th class="pb-1.5 font-semibold">姓名</th>
+              <th class="pb-1.5 font-semibold">登入信箱 (Email)</th>
               <th class="pb-1.5 font-semibold">部門</th>
               <th class="pb-1.5 font-semibold text-center">閱讀完成率</th>
               <th class="pb-1.5 font-semibold">首次閱讀時間</th>
@@ -636,14 +659,15 @@ async function renderReadReceipts(id) {
               return `
               <tr>
                 <td class="py-2 text-slate-700 font-medium">${xe(r.displayName)}</td>
+                <td class="py-2 text-slate-500 font-mono text-xs">${xe(r.email || '-')}</td>
                 <td class="py-2 text-slate-500">${xe(r.department)}</td>
                 <td class="py-2 text-center">
                   <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold border ${badgeCls}">
                     ${prog === 100 ? '✓ ' : ''}${prog}%
                   </span>
                 </td>
-                <td class="py-2 text-slate-400">${r.readAt}</td>
-                <td class="py-2 text-slate-400">${r.lastViewedAt}</td>
+                <td class="py-2 text-slate-400 text-xs">${r.readAt}</td>
+                <td class="py-2 text-slate-400 text-xs">${r.lastViewedAt}</td>
               </tr>
             `;}).join('')}
           </tbody>
@@ -660,7 +684,7 @@ async function renderReadReceipts(id) {
           <span>⚠️ 未讀人員</span> ${toggleBtn}
         </div>
         <div id="unread-container" class="flex flex-wrap gap-2 ${hiddenCls}">
-          ${unread.map(u => `<span class="px-2.5 py-1 bg-rose-50 text-rose-600 rounded text-xs font-medium">${xe(u.name)}</span>`).join('')}
+          ${unread.map(u => `<span class="px-2.5 py-1 bg-rose-50 text-rose-600 rounded text-xs font-medium" title="${xe(u.email)}">${xe(u.name)}</span>`).join('')}
         </div>
       `;
     }
