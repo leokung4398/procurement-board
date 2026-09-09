@@ -790,6 +790,12 @@
           <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>一鍵撤回立即下架：</strong>管理員點擊「撤回發布」時，週報狀態即刻變更為「草稿 (draft)」，前台同仁端會同步瞬間下架隱藏，確保未定稿或需修正的週報絕不對外曝光。</p>
           <p class="text-sm leading-relaxed text-slate-600"><strong>Word / Outlook 貼上排版防護：</strong>系統內建智慧濾網與 DOM 淨化機制，自動修復從 Word 貼入之段落與清單標籤，杜絕序號重複（如 1. 📌 1.）或文字落行，保證版面平整清爽。</p>
         </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-emerald-300 transition-colors">
+          <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-sm">22</span>企業帳號強制登入與零資料防窺機制</h4>
+          <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>不開放訪客瀏覽：</strong>為貫徹機密資訊保護與 100% 精準已讀追蹤，系統已全面移除訪客瀏覽與略過按鈕。同仁進入前台必須使用 <code>@youbike.com.tw</code> 企業 Google 帳號進行身分驗證。</p>
+          <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>未登入前「零資料」防護：</strong>系統採用前端資料庫攔截機制，在通過身分驗證前，前台完全不向資料庫請求任何週報文字與料號交期，DOM 樹中完全空白，杜絕透過 F12 開發者工具竄改元素跳過驗證竊取機密之可能。</p>
+          <p class="text-sm leading-relaxed text-slate-600"><strong>本地安全留存（免重複登入）：</strong>驗證成功後，同仁的企業身分將安全留存於瀏覽器中，日常重新整理（F5）或再次造訪無需反覆登入，兼顧頂級資安防禦與極致流暢之使用體驗。</p>
+        </div>
       </div>
 
       <!-- 專案開發成果內容 -->
@@ -804,11 +810,11 @@
                 <h4 class="text-base font-bold text-white tracking-wide flex items-center gap-2">🎨 專案開發成果條例分類說明</h4>
               </div>
               <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">
-                為利採購團隊與主管長官直觀掌握各階段開發之專業屬性，全系列 25 項里程碑卡片已全面依技術構面導入色彩識別體系：
+                為利採購團隊與主管長官直觀掌握各階段開發之專業屬性，全系列 26 項里程碑卡片已全面依技術構面導入色彩識別體系：
               </p>
             </div>
             <div class="flex-shrink-0 text-right hidden md:block">
-              <span class="text-xs bg-slate-800/80 px-3 py-1.5 rounded-full border border-slate-700 text-slate-300 font-mono">共 25 項里程碑全數納管</span>
+              <span class="text-xs bg-slate-800/80 px-3 py-1.5 rounded-full border border-slate-700 text-slate-300 font-mono">共 26 項里程碑全數納管</span>
             </div>
           </div>
 
@@ -1385,6 +1391,27 @@
               </p>
               <p class="text-xs text-purple-700 font-medium leading-relaxed mt-3 border-l-2 border-purple-400 pl-2">
                 💡 <span class="font-bold">專案成果：</span>後台建置「多維度寬容匹配引擎」，結合 Email、帳號前綴、全半形中文去空格姓名與同音字交叉校驗，精準排除已讀同仁；前台增設「常駐未登入訪客警示橫幅」與 Header 身分徽章，徹底終結已閱畢卻誤列未讀的爭議！
+              </p>
+            </div>
+          </div>
+        </div>
+          <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(16,185,129,0.15)] hover:border-emerald-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-emerald-500 to-teal-600"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-emerald-600 group-hover:text-white transition-all duration-300 shadow-sm"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1 flex items-center gap-2">二十六、企業帳號強制登入防窺與零資料前端攔截機制 <span class="bg-emerald-50 text-emerald-700 border border-emerald-200/80 text-[10px] px-2 py-0.5 rounded-md font-semibold tracking-wide flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>資安權限</span> <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-0.5 rounded-full font-normal tracking-wide">2026-09-10</span></h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">採購需求：</span><br>
+                1. 全面取消「訪客身分閱覽」與「略過」選項，一律必須登入 <code>@youbike.com.tw</code> 企業帳號方能閱覽，落實 100% 機密控管。<br>
+                2. 防範使用者透過 F12 開發者工具竄改前端 DOM 元素繞過登入彈窗窺探週報內容之漏洞。<br>
+                3. 確保已登入同仁日常重新整理網頁（F5）或重複造訪時無須反覆登入，維持順暢體驗。<br>
+                4. 週報點閱績效看板（KPI）優質單位依「閱讀時間軸」精確排序，且當全台閱讀率皆達 100% 時，最低點閱單位自動友善留空。
+              </p>
+              <p class="text-xs text-emerald-700 font-medium leading-relaxed mt-3 border-l-2 border-emerald-400 pl-2">
+                💡 <span class="font-bold">專案成果：</span>前台導入「零資料前置攔截（Zero-Data Pre-gate）」機制，未登入前完全不向雲端資料庫請求任何週報內容，DOM 樹徹底清空，徹底杜絕 F12 竄改防線；同時結合安全 Token 留存實現免重複登入；前後台同步升級 KPI 時間軸排名演算法與達標留空保護，兼顧頂級資安防禦與人性化管理體驗！
               </p>
             </div>
           </div>
