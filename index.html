@@ -706,6 +706,27 @@ async function showKPI(monthOffset = 0) {
 
 
     async function loadData() {
+      // 1. 檢查企業身分：未登入前絕對不向資料庫讀取週報內容，DOM 中不留任何週報資料
+      const userStr = localStorage.getItem('procurement_user');
+      if (!userStr) {
+        updateAuthUI();
+        document.getElementById('user-modal').classList.remove('hidden');
+        document.getElementById('bulletin-content-area').innerHTML = `
+          <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-12 text-center max-w-lg mx-auto my-12">
+            <div class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            </div>
+            <h3 class="text-lg font-bold text-slate-800 mb-2">機密文件｜請先登入企業帳號</h3>
+            <p class="text-sm text-slate-500 mb-6 leading-relaxed">本採購週報包含內部交期與物料機密，須登入 @youbike.com.tw 帳號進行身份驗證後方可讀取。</p>
+            <button onclick="document.getElementById('user-modal').classList.remove('hidden')" class="btn-p px-6 py-2.5 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors shadow-sm inline-flex items-center gap-2 text-sm">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+              前往登入驗證
+            </button>
+          </div>
+        `;
+        return;
+      }
+
       try {
         // Fetch admins
         let adminList = [];
@@ -931,11 +952,15 @@ async function showKPI(monthOffset = 0) {
         } catch(e) {}
       }
       
-      if (state.activeBulletinId) {
-        await DS.markAsRead(state.activeBulletinId, userObj);
+      // 若尚未載入週報資料，則正式啟動載入程序
+      if (!state.data || !state.data.bulletins || state.data.bulletins.length === 0) {
+        await loadData();
+      } else {
+        if (state.activeBulletinId) {
+          await DS.markAsRead(state.activeBulletinId, userObj);
+        }
+        renderApp();
       }
-      // Re-render to check access control now that we are logged in
-      renderApp();
     }
 
     function toggleEditMode() {
