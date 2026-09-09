@@ -1776,9 +1776,11 @@ async function fetchKPIData(monthOffset) {
   // 3. Process reads with support for primary contact multi-email & name matching
   const unitConfirmed = {};
   const unitTotalProgress = {};
+  const unitFirstConfirmedTime = {};
   validUnits.forEach(u => {
     unitConfirmed[u] = 0;
     unitTotalProgress[u] = 0;
+    unitFirstConfirmedTime[u] = Infinity;
   });
 
   // Group primary contacts by unit
@@ -1815,9 +1817,21 @@ async function fetchKPIData(monthOffset) {
     snapR.forEach(r => {
       const data = r.data();
       const prog = typeof data.readProgress === 'number' ? data.readProgress : 100;
-      if (r.id) readerMap.set(r.id.toLowerCase(), prog);
-      if (data.email) readerMap.set(data.email.trim().toLowerCase(), prog);
-      if (data.displayName) readerMap.set(data.displayName.trim(), prog);
+      let timeMs = Infinity;
+      if (data.readAt && typeof data.readAt.toDate === 'function') {
+        timeMs = data.readAt.toDate().getTime();
+      } else if (data.readAt && data.readAt.seconds) {
+        timeMs = data.readAt.seconds * 1000;
+      } else if (data.readAt) {
+        timeMs = new Date(data.readAt).getTime() || Infinity;
+      } else if (data.lastViewedAt) {
+        timeMs = new Date(data.lastViewedAt).getTime() || Infinity;
+      }
+
+      const info = { prog, timeMs };
+      if (r.id) readerMap.set(r.id.toLowerCase(), info);
+      if (data.email) readerMap.set(data.email.trim().toLowerCase(), info);
+      if (data.displayName) readerMap.set(data.displayName.trim(), info);
     });
     
     validUnits.forEach(u => {
@@ -1825,19 +1839,27 @@ async function fetchKPIData(monthOffset) {
       primaries.forEach(p => {
         let hasRead = false;
         let bestProg = 0;
+        let earliestTime = Infinity;
         for (let em of p.emails) {
           if (readerMap.has(em)) {
             hasRead = true;
-            bestProg = Math.max(bestProg, readerMap.get(em));
+            const item = readerMap.get(em);
+            bestProg = Math.max(bestProg, item.prog);
+            if (item.timeMs < earliestTime) earliestTime = item.timeMs;
           }
         }
         if (!hasRead && p.name && readerMap.has(p.name)) {
           hasRead = true;
-          bestProg = Math.max(bestProg, readerMap.get(p.name));
+          const item = readerMap.get(p.name);
+          bestProg = Math.max(bestProg, item.prog);
+          if (item.timeMs < earliestTime) earliestTime = item.timeMs;
         }
         if (hasRead) {
           unitConfirmed[u]++;
           unitTotalProgress[u] += bestProg;
+          if (earliestTime < unitFirstConfirmedTime[u]) {
+            unitFirstConfirmedTime[u] = earliestTime;
+          }
         }
       });
     });
@@ -1855,7 +1877,8 @@ async function fetchKPIData(monthOffset) {
     let unconfirmed = Math.max(0, expected - confirmed);
     let rate = expected === 0 ? 0 : Math.round((confirmed / expected) * 100);
     let avgProgress = expected === 0 ? 0 : Math.round(unitTotalProgress[u] / expected);
-    
+    let firstTime = unitFirstConfirmedTime[u] || Infinity;
+
     totalExpected += expected;
     totalConfirmed += confirmed;
     totalProgressSum += unitTotalProgress[u];
@@ -1867,15 +1890,20 @@ async function fetchKPIData(monthOffset) {
       confirmed: confirmed,
       unconfirmed: unconfirmed,
       rate: rate,
-      avgProgress: avgProgress
+      avgProgress: avgProgress,
+      firstTime: firstTime
     });
   });
   
   let overallRate = totalExpected === 0 ? 0 : Math.round((totalConfirmed / totalExpected) * 100);
   let overallAvgProgress = totalExpected === 0 ? 0 : Math.round(totalProgressSum / (totalExpected || 1));
   
-  // Sort by rate descending
-  tableData.sort((a, b) => b.rate - a.rate);
+  // 排序優先順序：閱讀率高者在前；閱讀率相同時，以最先確認時間 (firstTime 越早/越小) 排序
+  tableData.sort((a, b) => {
+    if (b.rate !== a.rate) return b.rate - a.rate;
+    if (a.firstTime !== b.firstTime) return a.firstTime - b.firstTime;
+    return b.avgProgress - a.avgProgress;
+  });
   
   return {
     monthStr,
@@ -1912,8 +1940,18 @@ async function showKPI(monthOffset = 0) {
   if (data.tableData.length > 0) {
     document.getElementById('kpi-best-unit').innerText = data.tableData[0].unit;
     document.getElementById('kpi-best-rate').innerText = `${data.tableData[0].rate}%`;
-    document.getElementById('kpi-worst-unit').innerText = data.tableData[data.tableData.length - 1].unit;
-    document.getElementById('kpi-worst-rate').innerText = `${data.tableData[data.tableData.length - 1].rate}%`;
+    
+    // 若所有單位閱讀率皆達 100%（或全數達標平等），則「最低點閱單位」顯示留空 -- (全數達標)
+    const allPerfect = data.tableData.every(r => r.rate >= 100);
+    const worstUnit = data.tableData[data.tableData.length - 1];
+    
+    if (allPerfect || worstUnit.rate >= 100) {
+      document.getElementById('kpi-worst-unit').innerText = '無（全數達標 🎉）';
+      document.getElementById('kpi-worst-rate').innerText = '--';
+    } else {
+      document.getElementById('kpi-worst-unit').innerText = worstUnit.unit;
+      document.getElementById('kpi-worst-rate').innerText = `${worstUnit.rate}%`;
+    }
   } else {
     document.getElementById('kpi-best-unit').innerText = '--';
     document.getElementById('kpi-best-rate').innerText = '--%';
