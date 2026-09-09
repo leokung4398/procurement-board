@@ -1339,6 +1339,29 @@
             </div>
           </div>
         </div>
+        <div class="group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(59,130,246,0.15)] hover:border-blue-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-500 to-indigo-600"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-sm">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg>
+              </div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1 flex items-center gap-2">二十五、已讀追蹤多層次容錯引擎與無痕訪客防呆機制 <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-0.5 rounded-full font-normal tracking-wide">2026-09-09</span></h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">採購需求：</span><br>
+                1. 解決同仁反映已閱畢週報，但後台名冊仍滯留於「未讀人員」之判定脫勾痛點。<br>
+                2. 解決同仁使用 Google 帳號登入時因顯示英文暱稱（如 Jane Chuang、Zoey Lin）或同音異字（如 吳俊瑋/吳俊緯）導致姓名無法與中文名冊匹配之盲點。<br>
+                3. 防呆同仁於無痕模式（Incognito）或公用電腦瀏覽時因未登入而漏記已讀紀錄，前台需有主動警示橫幅。<br>
+                4. 後台已讀人員列表擴充顯示登入信箱 (Email)，讓採購人員一眼核實身分。
+              </p>
+              <p class="text-xs text-blue-700 font-medium leading-relaxed mt-3 border-l-2 border-blue-400 pl-2">
+                💡 <span class="font-bold">專案成果：</span>後台建置「多維度寬容匹配引擎」，結合 Email、帳號前綴、全半形中文去空格姓名與同音字交叉校驗，精準排除已讀同仁；前台增設「常駐未登入訪客警示橫幅」與 Header 身分徽章，徹底終結已閱畢卻誤列未讀的爭議！
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- 架構說明內容 -->
@@ -1553,6 +1576,23 @@
       <li><strong>完讀滿條常駐</strong>：已達 100% 者重開時直接常駐滿條，直觀標示通關狀態。</li>
       <li><strong>無感防抖節流</strong>：停止滾動 1.5 秒或離頁時自動回傳資料庫，節省流量。</li>
       <li><strong>全維度落實分析</strong>：後台名冊徽章與 KPI 看板同步呈現單位平均完成率。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="flex flex-col gap-3 mb-4">
+      <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+      </div>
+      <h3 class="font-bold text-slate-800 text-lg">多層次已讀容錯與無痕訪客防呆</h3>
+    </div>
+    <p class="text-sm text-slate-600 leading-relaxed mb-4">
+      全面解決同仁因 Google 帳號顯示英文暱稱或同音異字導致無法比對白名單中文姓名之痛點，並杜絕無痕模式未登入造成的誤判。
+    </p>
+    <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
+      <li><strong>多維度容錯匹配</strong>：結合完整信箱、帳號前綴、全半形去空格姓名與同音字交叉校驗。</li>
+      <li><strong>無痕訪客醒目提醒</strong>：前台常駐警示橫幅，提醒無痕同仁登入後方能列入已讀簽核。</li>
+      <li><strong>身分即時顯性化</strong>：前台 Header 即時呈現登入姓名與所屬單位，後台名冊透明列出登入 Email。</li>
     </ul>
   </div>
 
