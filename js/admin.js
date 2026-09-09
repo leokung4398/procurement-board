@@ -310,8 +310,16 @@ const DS = {
       const readers = [];
       snap.forEach(doc => {
         const data = doc.data();
-        if (data.readAt) data.readAt = data.readAt.toDate().toLocaleString('zh-TW');
-        if (data.lastViewedAt) data.lastViewedAt = data.lastViewedAt.toDate().toLocaleString('zh-TW');
+        if (data.readAt) {
+          try {
+            data.readAt = typeof data.readAt.toDate === 'function' ? data.readAt.toDate().toLocaleString('zh-TW') : new Date(data.readAt).toLocaleString('zh-TW');
+          } catch(e) { data.readAt = String(data.readAt); }
+        }
+        if (data.lastViewedAt) {
+          try {
+            data.lastViewedAt = typeof data.lastViewedAt.toDate === 'function' ? data.lastViewedAt.toDate().toLocaleString('zh-TW') : new Date(data.lastViewedAt).toLocaleString('zh-TW');
+          } catch(e) { data.lastViewedAt = String(data.lastViewedAt); }
+        }
         data.readProgress = typeof data.readProgress === 'number' ? data.readProgress : 100;
         readers.push(data);
       });
