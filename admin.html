@@ -94,17 +94,19 @@
 
     
     /* TinyMCE & Excel Pasted Table Normalization */
-    /* Unified Typography & Compact 1.28 Line-Height & Tight Spacing Standard */
+    /* Unified Typography & Compact 1.2 Line-Height & Controlled Spacing Standard */
     .quill-editor, .ql-editor {
       font-size: 0.875rem !important;
-      line-height: 1.28 !important;
-      letter-spacing: 0.005em;
+      line-height: 1.2 !important;
+      letter-spacing: 0.002em;
       color: #1e293b !important; /* 統一字體顏色 slate-800 */
+      padding-top: 3px !important;
+      padding-bottom: 2px !important;
     }
     .quill-editor p, .ql-editor p {
       margin-top: 0 !important;
-      margin-bottom: 0.15rem !important;
-      line-height: 1.28 !important;
+      margin-bottom: 0.1rem !important;
+      line-height: 1.2 !important;
       padding: 0 !important;
       color: inherit !important;
     }
@@ -114,7 +116,15 @@
     .ql-editor li p, .quill-editor li p, .pro-table li p {
       display: inline !important;
       margin: 0 !important;
-      line-height: 1.28 !important;
+      line-height: 1.2 !important;
+    }
+    .ql-boxed, span[style*="border"][style*="solid"] {
+      display: inline-block !important;
+      line-height: 1.15 !important;
+      vertical-align: baseline !important;
+      margin: 1px 2px !important;
+      padding: 1px 5px !important;
+      box-sizing: border-box !important;
     }
     .ql-editor ol, .ql-editor ul {
       padding-left: 1.25rem !important;

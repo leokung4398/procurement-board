@@ -46,17 +46,19 @@
 
 
   <style>
-    /* True WYSIWYG: Compact 1.28 Line-Height & Tight Spacing Standard across all bulletins */
+    /* True WYSIWYG: Compact 1.2 Line-Height & Controlled Spacing Standard */
     .ql-editor {
       font-size: 0.875rem;
-      line-height: 1.28 !important;
-      letter-spacing: 0.005em;
+      line-height: 1.2 !important;
+      letter-spacing: 0.002em;
       color: #1e293b !important; /* 統一字體顏色 slate-800 */
+      padding-top: 3px !important; /* 確保第一行文字與頂部有安全微距，框線不被遮擋 */
+      padding-bottom: 2px !important;
     }
     .ql-editor p {
       margin-top: 0 !important;
-      margin-bottom: 0.15rem !important;
-      line-height: 1.28 !important;
+      margin-bottom: 0.1rem !important; /* 每一行行距再縮短一些 */
+      line-height: 1.2 !important;
       padding: 0 !important;
       color: inherit !important;
     }
@@ -69,7 +71,16 @@
     .ql-editor li p {
       display: inline !important;
       margin: 0 !important;
-      line-height: 1.28 !important;
+      line-height: 1.2 !important;
+    }
+    /* 文字加框 (boxed) 與加圓圈 (circled) 樣式強化，確保上下框線完整不被切邊 */
+    .ql-boxed, span[style*="border"][style*="solid"] {
+      display: inline-block !important;
+      line-height: 1.15 !important;
+      vertical-align: baseline !important;
+      margin: 1px 2px !important;
+      padding: 1px 5px !important;
+      box-sizing: border-box !important;
     }
     .ql-editor ol, .ql-editor ul {
       padding-left: 1.25rem !important;
@@ -1011,9 +1022,36 @@ async function showKPI(monthOffset = 0) {
     /* =========================================
        2. UI Renderer
        ========================================= */
+    function getFilteredBulletins() {
+      if (!state.data || !state.data.bulletins) return [];
+      const mVal = state.searchMonth || (document.getElementById('search-month') ? document.getElementById('search-month').value : '');
+      const pVal = state.searchParent || (document.getElementById('search-parent') ? document.getElementById('search-parent').value : '');
+      const qVal = state.searchQuery || (document.getElementById('search-keyword') ? document.getElementById('search-keyword').value.trim().toLowerCase() : '');
+
+      return state.data.bulletins.filter(b => {
+        if (mVal) {
+          const m = (b.publishDate || '').slice(0, 7);
+          if (m !== mVal) return false;
+        }
+        if (pVal) {
+          if (!b.sections) return false;
+          const secs = Array.isArray(b.sections) ? b.sections : Object.values(b.sections);
+          const hasParent = secs.some(s => s.title === pVal);
+          if (!hasParent) return false;
+        }
+        if (qVal) {
+          const contentStr = JSON.stringify(b).toLowerCase();
+          if (!contentStr.includes(qVal)) return false;
+        }
+        return true;
+      });
+    }
+
     function renderApp() {
       if (!state.data) return;
-      renderTabs();
+      // 保持依據目前的 searchMonth 等條件取得篩選後的清單
+      const filtered = getFilteredBulletins();
+      renderTabs(filtered);
       renderActiveBulletin();
       renderFooter();
 
@@ -1035,48 +1073,26 @@ async function showKPI(monthOffset = 0) {
       state.searchParent = document.getElementById('search-parent').value;
       state.searchQuery = document.getElementById('search-keyword').value.trim().toLowerCase();
       
-      const filtered = state.data.bulletins.filter(b => {
-        // 月份過濾
-        if (state.searchMonth) {
-          const m = (b.publishDate || '').slice(0, 7);
-          if (m !== state.searchMonth) return false;
-        }
-        
-        // 母標題過濾
-        if (state.searchParent) {
-          if (!b.sections) return false;
-          const secs = Array.isArray(b.sections) ? b.sections : Object.values(b.sections);
-          const hasParent = secs.some(s => s.title === state.searchParent);
-          if (!hasParent) return false;
-        }
-        
-        // 關鍵字過濾
-        if (state.searchQuery) {
-          const contentStr = JSON.stringify(b).toLowerCase();
-          if (!contentStr.includes(state.searchQuery)) return false;
-        }
-        
-        return true;
-      });
+      const filtered = getFilteredBulletins();
       
-        // 確保目前選中的週報仍在篩選結果內，否則預設選取篩選後的第一筆
-        if (filtered.length > 0) {
-          const stillExists = filtered.find(b => b.id === state.activeBulletinId);
-          if (!stillExists) {
-            state.activeBulletinId = filtered[0].id;
-          }
+      // 確保目前選中的週報仍在篩選結果內，否則預設選取篩選後的第一筆
+      if (filtered.length > 0) {
+        const stillExists = filtered.find(b => b.id === state.activeBulletinId);
+        if (!stillExists) {
+          state.activeBulletinId = filtered[0].id;
         }
-        
-        renderTabs(filtered);
-        renderActiveBulletin();
       }
+      
+      renderTabs(filtered);
+      renderActiveBulletin();
+    }
 
     function renderTabs(filteredBulletins = null) {
       const container = document.getElementById('tabs-container');
       if (!container || !state.data.bulletins) return;
 
       if (!filteredBulletins) {
-        filteredBulletins = state.data.bulletins;
+        filteredBulletins = getFilteredBulletins();
       }
 
       if (filteredBulletins.length === 0) {
@@ -1128,11 +1144,11 @@ async function showKPI(monthOffset = 0) {
                   p.remove();
                 });
                 const row = doc.createElement('p');
-                row.style.lineHeight = '2';
+                row.style.lineHeight = '1.2';
                 row.style.fontSize = '12pt';
                 if (li.getAttribute('style')) {
                   row.setAttribute('style', li.getAttribute('style'));
-                  row.style.lineHeight = '2';
+                  row.style.lineHeight = '1.2';
                 }
                 while (li.firstChild) row.appendChild(li.firstChild);
                 container.appendChild(row);
@@ -1232,7 +1248,7 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
                   : (isEven ? 'border-blue-600 bg-blue-100/70 text-slate-900' : 'border-blue-400 bg-blue-50/50 text-slate-800');
 
                 return `
-                  <div class="pl-2.5 pr-2 py-1.5 border-l-4 rounded-r-lg shadow-sm transition-all hover:shadow-md ${borderClass} group relative">
+                  <div class="pl-3 pr-2.5 pt-2 pb-1.5 border-l-4 rounded-r-lg shadow-sm transition-all hover:shadow-md ${borderClass} group relative">
                     ${isHigh ? `<div class="absolute top-1 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 pointer-events-none"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-rose-500 text-white shadow-sm">緊急</span></div>` : ''}
                     <div ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].items[${itemIdx}].content" class="text-sm font-medium outline-none ql-editor !p-0 text-left">${clnHtm(item.content)}</div>
                   </div>
