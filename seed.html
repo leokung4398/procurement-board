@@ -14,7 +14,7 @@
     </style>
 </head>
 <body>
-    <h1>初始化關鍵字資料庫 (8大分類版本)</h1>
+    <h1>初始化關鍵字資料庫 (9大分類版本)</h1>
     <button id="seedBtn">點擊初始化 / 更新資料庫</button>
     <div id="progress-container"><div id="progress-bar"></div></div>
     <div id="status" style="margin-top:20px; font-weight:bold; font-size: 15px;"></div>
@@ -66,24 +66,31 @@
                 ].map((k, i) => ({ id: `kw5_${i+1}`, text: k, isActive: true, order: i+1 }))
             },
             {
-                id: "c6", name: "六、文件管理", isActive: true, order: 6,
+                id: "c6", name: "六、倉儲管理", isActive: true, order: 6,
                 keywords: [
-                    "表單範本", "作業文件", "規格文件", "圖面資料", "報告文件", "其他附件"
+                    "入庫作業通知", "出庫作業通知", "庫存異動通知", "盤點作業通知",
+                    "儲位調整通知", "呆滯料處理通知", "安全庫存預警", "退料入庫通知"
                 ].map((k, i) => ({ id: `kw6_${i+1}`, text: k, isActive: true, order: i+1 }))
             },
             {
-                id: "c7", name: "七、公告管理", isActive: true, order: 7,
+                id: "c7", name: "七、文件管理", isActive: true, order: 7,
+                keywords: [
+                    "表單範本", "作業文件", "規格文件", "圖面資料", "報告文件", "其他附件"
+                ].map((k, i) => ({ id: `kw7_${i+1}`, text: k, isActive: true, order: i+1 }))
+            },
+            {
+                id: "c8", name: "八、公告管理", isActive: true, order: 8,
                 keywords: [
                     "採購政策公告", "採購流程公告", "作業規範公告", "採購注意事項", "重要事項通知",
                     "其他採購公告", "系統維護通知", "系統功能更新", "操作說明公告", "權限異動通知",
                     "系統異常通知", "其他系統公告"
-                ].map((k, i) => ({ id: `kw7_${i+1}`, text: k, isActive: true, order: i+1 }))
+                ].map((k, i) => ({ id: `kw8_${i+1}`, text: k, isActive: true, order: i+1 }))
             },
             {
-                id: "c8", name: "八、其他", isActive: true, order: 8,
+                id: "c9", name: "九、其他", isActive: true, order: 9,
                 keywords: [
                     "流程異動通知", "作業調整通知", "特殊案件通知", "臨時事項通知", "跨部門協調事項"
-                ].map((k, i) => ({ id: `kw8_${i+1}`, text: k, isActive: true, order: i+1 }))
+                ].map((k, i) => ({ id: `kw9_${i+1}`, text: k, isActive: true, order: i+1 }))
             }
         ];
 

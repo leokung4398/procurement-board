@@ -94,17 +94,19 @@
 
     
     /* TinyMCE & Excel Pasted Table Normalization */
-    /* Unified Typography & Permanent 1.4 Line-Height Standard across all bulletins */
+    /* Unified Typography & Compact 1.28 Line-Height & Tight Spacing Standard */
     .quill-editor, .ql-editor {
       font-size: 0.875rem !important;
-      line-height: 1.4 !important;
-      letter-spacing: 0.015em;
+      line-height: 1.28 !important;
+      letter-spacing: 0.005em;
+      color: #1e293b !important; /* 統一字體顏色 slate-800 */
     }
     .quill-editor p, .ql-editor p {
       margin-top: 0 !important;
-      margin-bottom: 0.25rem !important;
-      line-height: 1.4 !important;
+      margin-bottom: 0.15rem !important;
+      line-height: 1.28 !important;
       padding: 0 !important;
+      color: inherit !important;
     }
     .quill-editor p:last-child, .ql-editor p:last-child {
       margin-bottom: 0 !important;
@@ -112,7 +114,7 @@
     .ql-editor li p, .quill-editor li p, .pro-table li p {
       display: inline !important;
       margin: 0 !important;
-      line-height: 1.4 !important;
+      line-height: 1.28 !important;
     }
     .ql-editor ol, .ql-editor ul {
       padding-left: 1.25rem !important;
@@ -272,18 +274,15 @@
         </select>
         <select id="admin-search-parent" onchange="handleAdminSearch()" class="form-input text-xs py-1.5 px-2 w-full bg-white">
           <option value="">全部類別</option>
-          <option value="採購作業進度">採購作業進度</option>
-          <option value="詢價／報價作業">詢價／報價作業</option>
-          <option value="訂單異動作業">訂單異動作業</option>
-          <option value="供應商管理作業">供應商管理作業</option>
-          <option value="交貨管理作業">交貨管理作業</option>
-          <option value="品質異常作業">品質異常作業</option>
-          <option value="工程變更作業">工程變更作業</option>
-          <option value="採購通知公告">採購通知公告</option>
-          <option value="其他異動作業">其他異動作業</option>
-          <option value="附件文件">附件文件</option>
-          <option value="供應商通知">供應商通知</option>
-          <option value="系統公告">系統公告</option>
+          <option value="一、採購管理">一、採購管理</option>
+          <option value="二、供應商管理">二、供應商管理</option>
+          <option value="三、品質管理">三、品質管理</option>
+          <option value="四、工程管理">四、工程管理</option>
+          <option value="五、物流管理">五、物流管理</option>
+          <option value="六、倉儲管理">六、倉儲管理</option>
+          <option value="七、文件管理">七、文件管理</option>
+          <option value="八、公告管理">八、公告管理</option>
+          <option value="九、其他">九、其他</option>
         </select>
         <input type="text" id="admin-search-keyword" oninput="handleAdminSearch()" class="form-input text-xs py-1.5 px-2 w-full bg-white" placeholder="關鍵字、料號...">
       </div>
@@ -790,6 +789,12 @@
           <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>一鍵撤回立即下架：</strong>管理員點擊「撤回發布」時，週報狀態即刻變更為「草稿 (draft)」，前台同仁端會同步瞬間下架隱藏，確保未定稿或需修正的週報絕不對外曝光。</p>
           <p class="text-sm leading-relaxed text-slate-600"><strong>Word / Outlook 貼上排版防護：</strong>系統內建智慧濾網與 DOM 淨化機制，自動修復從 Word 貼入之段落與清單標籤，杜絕序號重複（如 1. 📌 1.）或文字落行，保證版面平整清爽。</p>
         </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-300 transition-colors">
+          <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">22</span>區塊深淺雙層節奏、緊湊排版與倉儲架構擴充</h4>
+          <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>深淺交替雙層循環：</strong>公告重點項目（緊急與一般事項）自動套用「深 ➔ 淺」色彩循環交替，徹底消除多項目時的視覺混雜，閱讀邊界清晰直觀。</p>
+          <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>精緻緊湊字距行距與 13pt：</strong>行距由 1.4 收斂至 1.28，段落底距縮小至 2px，消除文字疏離感；TinyMCE 編輯器正式加入「13pt」字號選項，並統一全站字色為沉穩的高階灰黑 (#1e293b)。</p>
+          <p class="text-sm leading-relaxed text-slate-600"><strong>9 大主題管理架構：</strong>後台關鍵字資料庫正式擴充「六、倉儲管理」，原文件與公告類別順延，全面滿足供應鏈各構面之採購作業分類需求。</p>
+        </div>
         <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-emerald-300 transition-colors">
           <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-sm">22</span>企業帳號強制登入與零資料防窺機制</h4>
           <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>不開放訪客瀏覽：</strong>為貫徹機密資訊保護與 100% 精準已讀追蹤，系統已全面移除訪客瀏覽與略過按鈕。同仁進入前台必須使用 <code>@youbike.com.tw</code> 企業 Google 帳號進行身分驗證。</p>
@@ -810,13 +815,13 @@
                 <h4 class="text-base font-bold text-white tracking-wide flex items-center gap-2">🎨 專案開發成果條例分類與即時置頂</h4>
               </div>
               <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">
-                全系列 26 項里程碑已依技術構面導入色彩體系。<span class="text-amber-300 font-medium">💡 點選下方任一分類按鈕，即可將該技術構面之成果卡片立即「置頂排列到最上方」</span>，便於長官與主管聚焦查閱！
+                全系列 27 項里程碑已依技術構面導入色彩體系。<span class="text-amber-300 font-medium">💡 點選下方任一分類按鈕，即可將該技術構面之成果卡片立即「置頂排列到最上方」</span>，便於長官與主管聚焦查閱！
               </p>
             </div>
             <div class="flex items-center gap-2.5 flex-shrink-0">
               <button id="cat-btn-all" onclick="filterMilestoneCat('all')" type="button" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-indigo-400/40 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 text-xs font-semibold transition-all shadow-sm cursor-pointer active:scale-95" title="還原至 1~26 項原始順序">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                <span>重置原始排序 (全部26項)</span>
+                <span>重置原始排序 (全部27項)</span>
               </button>
             </div>
           </div>
@@ -876,7 +881,7 @@
                     <span class="w-2 h-2 rounded-full bg-amber-400"></span>
                     <span class="text-xs font-bold text-amber-300 group-hover:text-amber-200 transition-colors">排版體驗優化</span>
                   </div>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">6 項</span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">7 項</span>
                 </div>
                 <p class="text-[11px] text-slate-400 group-hover:text-slate-300 leading-snug transition-colors">TinyMCE 核心、跨欄置中、莫蘭迪色盤與 RWD 適配。</p>
                 <div class="mt-2 flex items-center gap-1 text-[10px] text-amber-400 font-semibold opacity-80 group-hover:opacity-100">
@@ -1443,6 +1448,28 @@
               </p>
               <p class="text-xs text-emerald-700 font-medium leading-relaxed mt-3 border-l-2 border-emerald-400 pl-2">
                 💡 <span class="font-bold">專案成果：</span>前台導入「零資料前置攔截（Zero-Data Pre-gate）」機制，未登入前完全不向雲端資料庫請求任何週報內容，DOM 樹徹底清空，徹底杜絕 F12 竄改防線；同時結合安全 Token 留存實現免重複登入；前後台同步升級 KPI 時間軸排名演算法與達標留空保護，兼顧頂級資安防禦與人性化管理體驗！
+              </p>
+            </div>
+          </div>
+        </div>
+          <div data-cat="typesetting" data-orig-idx="27" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1 flex items-center gap-2">二十七、公告區塊深淺雙層節奏、緊湊排版調優與 9 大主題架構擴充 <span class="bg-amber-50 text-amber-800 border border-amber-200/80 text-[10px] px-2 py-0.5 rounded-md font-semibold tracking-wide flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>排版體驗</span> <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-0.5 rounded-full font-normal tracking-wide">2026-09-10</span></h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">採購需求：</span><br>
+                1. 採購布告欄顏色區塊分隔：緊急事項（粉色系）與一般事項（藍色系）均不區分優先程度，透過「深 ➔ 淺」兩層交替循環做不同主題之區塊視覺邊界。<br>
+                2. 縮小行距並降低文字與段落間的間距，減少上下留白，提高版面資訊密度。<br>
+                3. 統一前台與後台文字字色為沉穩標準黑灰 (#1e293b)，前後台閱讀所見即所得。<br>
+                4. TinyMCE 富文本編輯器字型選單中擴充新增「13 號（13pt）」字級。<br>
+                5. 後台主題架構重新分配：擴增「六、倉儲管理」，後續文件與公告順延，正式升級為 9 大主題分類。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-300 pl-2">
+                💡 <span class="font-bold">專案成果：</span>落實前台重點公告項目的「Even/Odd 深淺雙層視覺交替系統」，主題斷落俐落鮮明；將全域行距收緊為 1.28 並標準化字色；編輯器加入 13pt 選項；雲端關鍵字資料庫正式擴編為 9 大主題分類，全方位強化採購發布與長官閱讀體驗！
               </p>
             </div>
           </div>

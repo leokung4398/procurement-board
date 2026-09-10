@@ -1014,7 +1014,7 @@ function renderSecs(){const c=document.getElementById('sc');const b=S.cur;const 
           }
         });
       },
-      font_size_formats: '6pt 8pt 9pt 10pt 11pt 12pt 14pt 16pt 18pt 20pt 22pt 24pt 26pt 28pt 32pt',
+      font_size_formats: '6pt 8pt 9pt 10pt 11pt 12pt 13pt 14pt 16pt 18pt 20pt 22pt 24pt 26pt 28pt 32pt',
       font_family_formats: 'Inter="Inter", sans-serif; MingLiU="MingLiU", PMingLiU, serif; Microsoft JhengHei="Microsoft JhengHei", sans-serif; Monospace=monospace',
       line_height_formats: '1 1.5 2 2.5 3',
       color_map: [
@@ -1166,7 +1166,7 @@ function bldItems(sec,si){
       <button onclick="addItm(${si})" class="btn-s text-xs py-1 px-2.5 text-blue-600 font-medium">＋ 新增公告</button>
     </div>
     ${items.map((item,ii)=>`
-      <div class="mb-3 p-3 bg-white rounded-lg border border-slate-200 shadow-sm border-l-4 ${item.priority==='high'?'border-l-red-500 bg-red-50/20':'border-l-blue-500 bg-blue-50/10'} relative group transition-all">
+      <div class="mb-3 p-3 rounded-lg border border-slate-200 shadow-sm border-l-4 ${item.priority==='high' ? (ii % 2 === 0 ? 'border-l-rose-500 bg-rose-100/75 text-slate-900' : 'border-l-rose-400 bg-rose-50/70 text-slate-800') : (ii % 2 === 0 ? 'border-l-blue-600 bg-blue-100/70 text-slate-900' : 'border-l-blue-400 bg-blue-50/50 text-slate-800')} relative group transition-all">
         <div class="flex items-center justify-between mb-2 pb-1.5 border-b border-slate-100">
           <div class="flex items-center gap-2">
             <span class="text-xs font-bold text-slate-400">#${ii+1}</span>
@@ -1185,7 +1185,7 @@ function bldItems(sec,si){
     ${!items.length?'<p class="text-xs text-slate-400 py-1">尚無公告項目</p>':''}
   </div>`;
 }function bldSubs(sec,si){const subs=sec.subsections||[];return`<div class="mb-3 pl-3 border-l-2 border-blue-100"><div class="flex items-center justify-between mb-1"><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">子段落</p><button onclick="addSub(${si})" class="text-xs text-blue-600 font-medium">＋ 新增子段落</button></div>${subs.map((sub,sbi)=>`<div class="mb-3 bg-slate-50 rounded-lg p-3"><div class="flex items-center gap-2 mb-2"><span class="text-xs text-slate-400 font-semibold">${sbi+1}.</span><input type="text" class="form-input flex-1 text-sm py-1" value="${xe(sub.title||'')}" placeholder="子段落標題..." oninput="uSub(${si},${sbi},'title',this.value)"><button onclick="rmSub(${si},${sbi})" class="bic d"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div>${(sub.items||[]).map((item,ii)=>`
-  <div class="mb-2.5 p-2.5 bg-white rounded-lg border border-slate-200 shadow-sm border-l-4 ${item.priority==='high'?'border-l-red-500 bg-red-50/20':'border-l-blue-500 bg-blue-50/10'} relative group transition-all">
+  <div class="mb-2.5 p-2.5 rounded-lg border border-slate-200 shadow-sm border-l-4 ${item.priority==='high' ? (ii % 2 === 0 ? 'border-l-rose-500 bg-rose-100/75 text-slate-900' : 'border-l-rose-400 bg-rose-50/70 text-slate-800') : (ii % 2 === 0 ? 'border-l-blue-600 bg-blue-100/70 text-slate-900' : 'border-l-blue-400 bg-blue-50/50 text-slate-800')} relative group transition-all">
     <div class="flex items-center justify-between mb-1.5 pb-1 border-b border-slate-100">
       <div class="flex items-center gap-2">
         <span class="text-xs font-bold text-slate-400">#${ii+1}</span>

@@ -46,17 +46,19 @@
 
 
   <style>
-    /* True WYSIWYG: Permanent 1.4 Line-Height Standard across all bulletins */
+    /* True WYSIWYG: Compact 1.28 Line-Height & Tight Spacing Standard across all bulletins */
     .ql-editor {
       font-size: 0.875rem;
-      line-height: 1.4 !important;
-      letter-spacing: 0.015em;
+      line-height: 1.28 !important;
+      letter-spacing: 0.005em;
+      color: #1e293b !important; /* 統一字體顏色 slate-800 */
     }
     .ql-editor p {
       margin-top: 0 !important;
-      margin-bottom: 0.25rem !important;
-      line-height: 1.4 !important;
+      margin-bottom: 0.15rem !important;
+      line-height: 1.28 !important;
       padding: 0 !important;
+      color: inherit !important;
     }
     .ql-editor p:last-child {
       margin-bottom: 0 !important;
@@ -67,7 +69,7 @@
     .ql-editor li p {
       display: inline !important;
       margin: 0 !important;
-      line-height: 1.4 !important;
+      line-height: 1.28 !important;
     }
     .ql-editor ol, .ql-editor ul {
       padding-left: 1.25rem !important;
@@ -196,18 +198,15 @@
       </select>
       <select id="search-parent" onchange="handleSearch()" class="form-input text-xs py-1.5 px-2 w-36 bg-slate-50">
         <option value="">全部類別</option>
-        <option value="採購作業進度">採購作業進度</option>
-        <option value="詢價／報價作業">詢價／報價作業</option>
-        <option value="訂單異動作業">訂單異動作業</option>
-        <option value="供應商管理作業">供應商管理作業</option>
-        <option value="交貨管理作業">交貨管理作業</option>
-        <option value="品質異常作業">品質異常作業</option>
-        <option value="工程變更作業">工程變更作業</option>
-        <option value="採購通知公告">採購通知公告</option>
-        <option value="其他異動作業">其他異動作業</option>
-        <option value="附件文件">附件文件</option>
-        <option value="供應商通知">供應商通知</option>
-        <option value="系統公告">系統公告</option>
+        <option value="一、採購管理">一、採購管理</option>
+        <option value="二、供應商管理">二、供應商管理</option>
+        <option value="三、品質管理">三、品質管理</option>
+        <option value="四、工程管理">四、工程管理</option>
+        <option value="五、物流管理">五、物流管理</option>
+        <option value="六、倉儲管理">六、倉儲管理</option>
+        <option value="七、文件管理">七、文件管理</option>
+        <option value="八、公告管理">八、公告管理</option>
+        <option value="九、其他">九、其他</option>
       </select>
       <input type="text" id="search-keyword" oninput="handleSearch()" class="form-input text-xs py-1.5 px-2 w-48 bg-slate-50" placeholder="搜尋標題、料號、廠商...">
       <button onclick="handleSearch()" class="bg-blue-600 text-white rounded px-3 py-1.5 text-xs font-semibold hover:bg-blue-700 shadow-sm transition-colors">搜尋</button>
@@ -1224,11 +1223,17 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
             <div class="space-y-1 mb-2">
               ${sec.items.map((item, itemIdx) => {
                 const isHigh = item.priority === 'high';
-                const borderClass = isHigh ? 'border-red-500 bg-red-50 text-red-900' : 'border-blue-500 bg-blue-50/50 text-slate-800';
-                const highlightBadge = isHigh ? `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-red-100 text-red-800">緊急</span>` : '';
+                const isEven = itemIdx % 2 === 0; // 0, 2, 4 為深色；1, 3, 5 為淺色
+                
+                // 緊急事項：深粉 (border-rose-500 bg-rose-100/75) vs 淺粉 (border-rose-400 bg-rose-50/70)
+                // 一般事項：深藍 (border-blue-600 bg-blue-100/70) vs 淺藍 (border-blue-400 bg-blue-50/50)
+                const borderClass = isHigh
+                  ? (isEven ? 'border-rose-500 bg-rose-100/75 text-slate-900' : 'border-rose-400 bg-rose-50/70 text-slate-800')
+                  : (isEven ? 'border-blue-600 bg-blue-100/70 text-slate-900' : 'border-blue-400 bg-blue-50/50 text-slate-800');
+
                 return `
-                  <div class="pl-2 pr-1 py-1 border-l-4 rounded-r-lg shadow-sm transition-all hover:shadow-md ${borderClass} group relative">
-                    ${isHigh ? `<div class="absolute top-1 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 pointer-events-none"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-red-500 text-white shadow-sm">緊急</span></div>` : ''}
+                  <div class="pl-2.5 pr-2 py-1.5 border-l-4 rounded-r-lg shadow-sm transition-all hover:shadow-md ${borderClass} group relative">
+                    ${isHigh ? `<div class="absolute top-1 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 pointer-events-none"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-rose-500 text-white shadow-sm">緊急</span></div>` : ''}
                     <div ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].items[${itemIdx}].content" class="text-sm font-medium outline-none ql-editor !p-0 text-left">${clnHtm(item.content)}</div>
                   </div>
                 `;
@@ -1245,9 +1250,12 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
                   <div class="space-y-1 mb-2">
                     ${sub.items.map((item, itemIdx) => {
                       const isHigh = item.priority === 'high';
-                      const borderClass = isHigh ? 'border-red-400 bg-red-50/30' : 'border-slate-300 bg-slate-50';
+                      const isEven = itemIdx % 2 === 0;
+                      const borderClass = isHigh
+                        ? (isEven ? 'border-rose-500 bg-rose-100/75 text-slate-900' : 'border-rose-400 bg-rose-50/70 text-slate-800')
+                        : (isEven ? 'border-blue-600 bg-blue-100/70 text-slate-900' : 'border-blue-400 bg-blue-50/50 text-slate-800');
                       return `
-                        <div class="px-2 py-1 border-l-2 rounded-r bg-white text-slate-700 text-sm border-l-4 ${borderClass} group relative">
+                        <div class="px-2.5 py-1.5 border-l-4 rounded-r shadow-sm transition-all hover:shadow-md ${borderClass} group relative">
                           <div ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].subsections[${subIdx}].items[${itemIdx}].content" class="outline-none ql-editor text-left !p-0">${clnHtm(item.content)}</div>
                         </div>
                       `;
