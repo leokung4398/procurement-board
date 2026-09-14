@@ -937,7 +937,7 @@ function renderSecs(){const c=document.getElementById('sc');const b=S.cur;const 
       inline: true,
       menubar: false,
       plugins: 'table lists link image autolink searchreplace wordcount',
-      toolbar: 'undo redo | fontfamily fontsize | bold italic underline strikethrough | boxed circled | forecolor backcolor | alignleft aligncenter alignright alignjustify | merge_center table | lineheight removeformat',
+      toolbar: 'undo redo | fontfamily fontsize | bold italic underline strikethrough | boxed circled | forecolor backcolor stdcolor | alignleft aligncenter alignright alignjustify | merge_center table | lineheight removeformat',
       fixed_toolbar_container: '#toolbar-portal',
       toolbar_mode: 'sliding',
       table_toolbar: 'tableprops tabledelete | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol | tablemergecells tablesplitcells | tablecellvalign',
@@ -1049,12 +1049,20 @@ function renderSecs(){const c=document.getElementById('sc');const b=S.cur;const 
         'fbcfe8', '高光淡洋紅'
       ],
       color_cols: 8,
-      custom_colors: true,
+      custom_colors: false,
       setup: function(editor) {
         editor.ui.registry.addButton('boxed', {
           text: '🄰',
           tooltip: '文字加框',
           onAction: function () { editor.formatter.toggle('boxed'); }
+        });
+                editor.ui.registry.addButton('stdcolor', {
+          icon: 'color-picker',
+          tooltip: '標準蜂巢色彩盤 (文字色彩/背景色彩)',
+          onAction: function () {
+            window._activeTinyEditor = editor;
+            openStdColorPicker('forecolor', '#000000');
+          }
         });
         editor.ui.registry.addButton('circled', {
           text: '⭕',
@@ -2193,3 +2201,144 @@ function exportSurveyExcel() {
   const filename = `採購電子週報使用需求問卷調查_${dateStr}.xlsx`;
   XLSX.writeFile(wb, filename);
 }
+
+
+// ==========================================
+// 標準蜂巢色彩選取器 (1:1 復刻圖 3 Windows/Office 標準色彩面板)
+// ==========================================
+window._stdColorState = {
+  activeType: 'forecolor', // 'forecolor' or 'hilitecolor'
+  activeEditor: null,
+  currentBookmark: null,
+  selectedColor: '#000000',
+  originalColor: '#000000'
+};
+
+function openStdColorPicker(type = 'forecolor', defaultColor = '#000000') {
+  const ed = window._activeTinyEditor;
+  if (!ed) return;
+  
+  window._stdColorState.activeType = type;
+  window._stdColorState.activeEditor = ed;
+  try {
+    window._stdColorState.currentBookmark = ed.selection.getBookmark(2, true);
+  } catch (e) {
+    window._stdColorState.currentBookmark = null;
+  }
+  
+  window._stdColorState.selectedColor = defaultColor;
+  window._stdColorState.originalColor = defaultColor;
+  
+  const modal = document.getElementById('std-color-modal');
+  if (!modal) return;
+  
+  updateStdColorPreview(defaultColor);
+  const currEl = document.getElementById('std-preview-curr');
+  if (currEl) currEl.style.backgroundColor = defaultColor;
+  
+  switchStdColorTab('standard');
+  modal.classList.remove('hidden');
+}
+
+function closeStdColorPicker() {
+  const modal = document.getElementById('std-color-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function switchStdColorTab(tab) {
+  const btnStd = document.getElementById('tab-btn-std');
+  const btnCust = document.getElementById('tab-btn-cust');
+  const paneStd = document.getElementById('tab-pane-std');
+  const paneCust = document.getElementById('tab-pane-cust');
+  
+  if (tab === 'standard') {
+    if (btnStd) { btnStd.classList.add('active'); }
+    if (btnCust) { btnCust.classList.remove('active'); }
+    if (paneStd) paneStd.classList.remove('hidden');
+    if (paneCust) paneCust.classList.add('hidden');
+  } else {
+    if (btnCust) { btnCust.classList.add('active'); }
+    if (btnStd) { btnStd.classList.remove('active'); }
+    if (paneCust) paneCust.classList.remove('hidden');
+    if (paneStd) paneStd.classList.add('hidden');
+  }
+}
+
+function selectStdColor(hex) {
+  window._stdColorState.selectedColor = hex;
+  updateStdColorPreview(hex);
+}
+
+function onStdNativeColorChange(hex) {
+  window._stdColorState.selectedColor = hex;
+  updateStdColorPreview(hex);
+  const input = document.getElementById('std-hex-input');
+  if (input) input.value = hex.replace('#', '').toUpperCase();
+}
+
+function onStdHexInputChange(val) {
+  const clean = val.replace(/[^0-9a-fA-F]/g, '');
+  if (clean.length === 6) {
+    const hex = '#' + clean.toUpperCase();
+    window._stdColorState.selectedColor = hex;
+    updateStdColorPreview(hex);
+    const nativePicker = document.getElementById('std-native-color-picker');
+    if (nativePicker) nativePicker.value = hex;
+  }
+}
+
+function updateStdColorPreview(hex) {
+  const newEl = document.getElementById('std-preview-new');
+  if (newEl) newEl.style.backgroundColor = hex;
+  const input = document.getElementById('std-hex-input');
+  if (input && document.activeElement !== input) input.value = hex.replace('#', '').toUpperCase();
+  const nativePicker = document.getElementById('std-native-color-picker');
+  if (nativePicker) nativePicker.value = hex;
+}
+
+function applyStdColorPicker() {
+  const ed = window._stdColorState.activeEditor;
+  const hex = window._stdColorState.selectedColor;
+  const cmd = window._stdColorState.activeType === 'hilitecolor' ? 'HiliteColor' : 'ForeColor';
+  
+  if (ed) {
+    ed.focus();
+    if (window._stdColorState.currentBookmark) {
+      try {
+        ed.selection.moveToBookmark(window._stdColorState.currentBookmark);
+      } catch (e) {}
+    }
+    ed.execCommand(cmd, false, hex);
+  }
+  closeStdColorPicker();
+}
+
+// 監聽蜂巢多邊形點擊
+document.addEventListener('DOMContentLoaded', () => {
+  const svg = document.getElementById('std-honeycomb-svg');
+  if (svg) {
+    svg.addEventListener('click', (e) => {
+      const target = e.target.closest('.std-hex-item');
+      if (target) {
+        const col = target.getAttribute('data-color');
+        if (col) selectStdColor(col);
+      }
+    });
+  }
+  
+  // 全域監聽 TinyMCE 色彩選取器底部的自訂顏色按鈕點擊
+  document.addEventListener('click', (e) => {
+    const customBtn = e.target.closest('.tox-swatches__picker-btn, [data-mce-color-picker], [aria-label*="Custom color"], [aria-label*="自訂顏色"]');
+    if (customBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      // 判斷是文字顏色還是背景顏色
+      let type = 'forecolor';
+      const openSplit = document.querySelector('.tox-split-button[data-alloy-tabstop="true"][aria-expanded="true"]');
+      if (openSplit && (openSplit.getAttribute('aria-label') || '').includes('背景')) {
+        type = 'hilitecolor';
+      }
+      openStdColorPicker(type, '#000000');
+    }
+  }, true);
+});
