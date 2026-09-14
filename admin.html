@@ -192,6 +192,38 @@
       margin: 0 1px !important;
     }
 
+    /* 確保色彩選擇器彈窗 (Custom Color Picker Dialog) 完整顯示，不被工具列橫向樣式干擾 */
+    .tox-dialog-wrap,
+    .tox-dialog {
+      max-width: 95vw !important;
+    }
+    .tox-dialog .tox-color-picker-container {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: nowrap !important;
+      gap: 16px !important;
+      min-width: 420px !important;
+      min-height: 240px !important;
+    }
+    .tox-dialog .tox-sv-palette {
+      width: 230px !important;
+      height: 210px !important;
+      flex-shrink: 0 !important;
+    }
+    .tox-dialog .tox-hue-slider {
+      width: 24px !important;
+      height: 210px !important;
+      flex-shrink: 0 !important;
+    }
+    .tox-dialog .tox-rgb-form,
+    .tox-dialog .tox-color-picker-container > div:last-child {
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: flex-start !important;
+      min-width: 130px !important;
+      gap: 6px !important;
+    }
+
   </style>
   <link rel="stylesheet" href="css/admin.css">
   <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
@@ -1776,7 +1808,7 @@
   </div>
 </div>
 
-<script src="js/admin.js?v=20260911_01"></script>
+<script src="js/admin.js?v=20260914_01"></script>
 <script>
   window.addEventListener('load', () => {
     setTimeout(async () => {
