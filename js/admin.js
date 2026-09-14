@@ -1012,7 +1012,7 @@ function renderSecs(){const c=document.getElementById('sc');const b=S.cur;const 
         });
       },
       font_size_formats: '6pt 8pt 9pt 10pt 11pt 12pt 13pt 14pt 16pt 18pt 20pt 22pt 24pt 26pt 28pt 32pt',
-      font_family_formats: 'Inter="Inter", sans-serif; MingLiU="MingLiU", PMingLiU, serif; Microsoft JhengHei="Microsoft JhengHei", sans-serif; Monospace=monospace',
+      font_family_formats: 'Inter=Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 微軟正黑體="Microsoft JhengHei", "PingFang TC", "Heiti TC", sans-serif; 新細明體="PMingLiU", "MingLiU", serif; 標楷體="DFKai-SB", "BiauKai", "Kaiti TC", serif; 微軟雅黑="Microsoft YaHei", "PingFang SC", sans-serif; Arial=Arial, Helvetica, sans-serif; Calibri=Calibri, Candara, Segoe, "Segoe UI", Optima, Arial, sans-serif; Times New Roman="Times New Roman", Times, serif; Segoe UI="Segoe UI", Tahoma, Geneva, Verdana, sans-serif; Georgia=Georgia, Garamond, "Times New Roman", serif; Consolas=Consolas, Menlo, Monaco, "Courier New", monospace',
       line_height_formats: '1 1.5 2 2.5 3',
       color_map: [
         '000000', '純黑',
