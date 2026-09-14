@@ -2264,9 +2264,22 @@ function switchStdColorTab(tab) {
   }
 }
 
-function selectStdColor(hex) {
+function selectStdColor(hex, el = null) {
   window._stdColorState.selectedColor = hex;
   updateStdColorPreview(hex);
+  
+  // 移動如圖 3 的黑白雙層選取框到目標色塊
+  if (el) {
+    const pts = el.getAttribute('points');
+    const group = document.getElementById('std-selection-group');
+    const outer = document.getElementById('std-hex-selector');
+    const inner = document.getElementById('std-hex-selector-inner');
+    if (group && outer && inner && pts) {
+      outer.setAttribute('points', pts);
+      inner.setAttribute('points', pts);
+      group.classList.remove('hidden');
+    }
+  }
 }
 
 function onStdNativeColorChange(hex) {
@@ -2321,7 +2334,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const target = e.target.closest('.std-hex-item');
       if (target) {
         const col = target.getAttribute('data-color');
-        if (col) selectStdColor(col);
+        if (col) selectStdColor(col, target);
       }
     });
   }

@@ -189,13 +189,22 @@
     }
     .std-hex-item {
       cursor: pointer;
-      transition: transform 0.08s ease, stroke 0.08s ease;
-      transform-origin: center;
+      stroke-linejoin: round;
     }
     .std-hex-item:hover {
-      transform: scale(1.15);
-      stroke: #000000 !important;
-      stroke-width: 1.5px !important;
+      filter: brightness(1.15);
+    }
+    #std-hex-selector {
+      pointer-events: none;
+      fill: none;
+      stroke: #000000;
+      stroke-width: 2.2px;
+    }
+    #std-hex-selector-inner {
+      pointer-events: none;
+      fill: none;
+      stroke: #ffffff;
+      stroke-width: 1.2px;
     }
     .std-color-tab-btn.active {
       background-color: #ffffff;
@@ -246,7 +255,12 @@
   <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm mx-4">
     <div class="text-center mb-6">
       <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-        <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+        <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>  <!-- 選取中色塊的黑白雙重高亮框 (如圖 3 所示) -->
+  <g id="std-selection-group" class="hidden">
+    <polygon id="std-hex-selector" points=""/>
+    <polygon id="std-hex-selector-inner" points=""/>
+  </g>
+</svg>
       </div>
       <h2 class="text-xl font-bold text-slate-800">採購週報管理後台</h2>
       <p class="text-sm text-slate-500 mt-1">微笑單車股份有限公司</p>
