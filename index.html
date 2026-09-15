@@ -42,7 +42,7 @@
   <!-- Quill CSS for rendering rich text -->
   <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
   
-  <link rel="stylesheet" href="css/index.css">
+  <link rel="stylesheet" href="css/index.css?v=1789454915">
 
 
   <style>
@@ -109,7 +109,7 @@
       width: 100% !important;
       height: auto !important;
       border-collapse: collapse !important;
-      margin: 4px 0 6px 0 !important;
+      margin: 2px 0 2px 0 !important;
       font-size: 0.875rem !important;
       table-layout: auto !important;
     }
@@ -125,7 +125,7 @@
     #bulletin-content-area table:not(.data-table) th,
     .pro-table td, .pro-table th {
       border: 1px solid #cbd5e1 !important;
-      padding: 5px 8px !important;
+      padding: 4px 6px !important;
       height: auto !important;
       vertical-align: top;
       word-break: break-word;
@@ -135,6 +135,20 @@
       background-color: #f8fafc !important;
       font-weight: 600 !important;
       color: #475569 !important;
+    }
+    /* 確保重點公告卡片與內容無多餘溢出捲軸及緊湊留白 */
+    .bulletin-item-card {
+      overflow: visible !important;
+    }
+    .bulletin-item-card .ql-editor {
+      overflow: visible !important;
+    }
+    .bulletin-item-card .ql-editor > *:last-child {
+      margin-bottom: 0 !important;
+    }
+    .bulletin-item-card .ql-editor table {
+      margin-top: 3px !important;
+      margin-bottom: 2px !important;
     }
   </style>
 </head>
@@ -1187,22 +1201,47 @@ async function showKPI(monthOffset = 0) {
           tables.forEach(tbl => {
             tbl.style.height = '';
             tbl.style.marginTop = '2px';
-            tbl.style.marginBottom = '4px';
+            tbl.style.marginBottom = '2px';
             tbl.querySelectorAll('tr, td, th').forEach(cell => {
               cell.style.height = '';
             });
+
+            // 如果 table 外層包了多層只有此 table 的無用 div，將其解除展開
+            let parent = tbl.parentElement;
+            while (parent && parent !== doc.body && parent.tagName.toLowerCase() === 'div' && parent.children.length === 1) {
+              const grandParent = parent.parentElement;
+              if (grandParent) {
+                grandParent.replaceChild(tbl, parent);
+                parent = grandParent;
+              } else {
+                break;
+              }
+            }
           });
 
-          // 3. 遞迴移除無意義的空 div / 空 p
+          // 3. 遞迴移除無意義的空 div / 空 p / 空 span / 空 br
           let emptyFound = true;
           while (emptyFound) {
             emptyFound = false;
-            doc.querySelectorAll('div, p').forEach(el => {
-              if (el.children.length === 0 && (!el.textContent || !el.textContent.replace(/[\s\u00A0]/g, ''))) {
+            doc.querySelectorAll('div, p, span').forEach(el => {
+              // 若元素無子節點，且內容僅為空白字符或 nbsp
+              if (el.children.length === 0 && (!el.textContent || !el.textContent.replace(/[\s\u00A0\r\n\t]/g, ''))) {
                 el.remove();
                 emptyFound = true;
               }
             });
+          }
+
+          // 4. 清理末尾孤立的 br 或空節點
+          while (doc.body.lastChild) {
+            const lc = doc.body.lastChild;
+            if (lc.nodeType === 3 && !lc.textContent.trim()) {
+              lc.remove();
+            } else if (lc.nodeType === 1 && (lc.tagName.toLowerCase() === 'br' || (!lc.textContent.replace(/[\s\u00A0\r\n\t]/g, '') && lc.children.length === 0))) {
+              lc.remove();
+            } else {
+              break;
+            }
           }
 
           h = doc.body.innerHTML;
