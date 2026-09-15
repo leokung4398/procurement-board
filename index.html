@@ -42,7 +42,7 @@
   <!-- Quill CSS for rendering rich text -->
   <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
   
-  <link rel="stylesheet" href="css/index.css?v=1789456524">
+  <link rel="stylesheet" href="css/index.css?v=1789457928">
 
 
   <style>
@@ -139,12 +139,19 @@
     /* 確保重點公告卡片與內容無多餘溢出捲軸及緊湊留白 */
     .bulletin-item-card {
       overflow: visible !important;
+      padding-top: 6px !important;
+      padding-bottom: 6px !important;
     }
     .bulletin-item-card .ql-editor {
       overflow: visible !important;
+      padding: 0 !important;
     }
-    .bulletin-item-card .ql-editor > *:last-child {
+    .bulletin-item-card .ql-editor > *:last-child,
+    .bulletin-item-card .ql-editor *:last-child,
+    .ql-editor > *:last-child,
+    .ql-editor *:last-child {
       margin-bottom: 0 !important;
+      padding-bottom: 0 !important;
     }
     .bulletin-item-card .ql-editor table {
       margin-top: 4px !important;
@@ -1255,17 +1262,33 @@ async function showKPI(monthOffset = 0) {
           // 清理多餘連續的 br
           doc.querySelectorAll('br + br').forEach(b => b.remove());
 
-          // 4. 清理末尾孤立的 br 或空節點
-          while (doc.body.lastChild) {
-            const lc = doc.body.lastChild;
-            if (lc.nodeType === 3 && !lc.textContent.trim()) {
-              lc.remove();
-            } else if (lc.nodeType === 1 && (lc.tagName.toLowerCase() === 'br' || (!lc.textContent.replace(/[\s\u00A0\r\n\t]/g, '') && lc.children.length === 0))) {
-              lc.remove();
-            } else {
-              break;
+          // 4. 清理末尾孤立的 br、空文字節點或只有空白字元的區塊
+          function trimTrailingEmptyNodes(parent) {
+            while (parent.lastChild) {
+              const lc = parent.lastChild;
+              if (lc.nodeType === 3) { // 文字節點
+                if (!lc.textContent.replace(/[\s\u00A0\r\n\t]/g, '')) {
+                  lc.remove();
+                } else {
+                  break;
+                }
+              } else if (lc.nodeType === 1) { // 元素節點
+                const tag = lc.tagName.toLowerCase();
+                if (tag === 'br') {
+                  lc.remove();
+                } else if (!lc.textContent.replace(/[\s\u00A0\r\n\t]/g, '') && !lc.querySelector('img, table, iframe')) {
+                  lc.remove();
+                } else {
+                  // 遞迴清理末尾子元素的內部末尾
+                  trimTrailingEmptyNodes(lc);
+                  break;
+                }
+              } else {
+                break;
+              }
             }
           }
+          trimTrailingEmptyNodes(doc.body);
 
           h = doc.body.innerHTML;
         } catch (e) {
@@ -1286,6 +1309,7 @@ async function showKPI(monthOffset = 0) {
           r = r.replace(/(?:\s*<(?:p|div)[^>]*>(?:<br\s*\/?>|&nbsp;|\s)*<\/(?:p|div)>\s*)+$/gi, '');
           r = r.replace(/(?:\s*<br\s*\/?>\s*)+$/gi, '');
           r = r.replace(/(?:<br\s*\/?>|&nbsp;|\s)+(<\/(?:p|div)>\s*)$/gi, '');
+          r = r.replace(/(?:&nbsp;|\s)+$/gi, '');
         }
         
         // 清理緊接在 </table> 後面的無意義空白元素
@@ -1299,7 +1323,7 @@ async function showKPI(monthOffset = 0) {
         r = r.replace(/<\/p>\s*<br\s*\/?>/gi, '</p>');
         r = r.replace(/<br\s*\/?>\s*<div/gi, '<div');
         
-        return r;
+        return r.trim();
       }
 
       async function renderActiveBulletin() {
@@ -1368,7 +1392,7 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
                   : (isEven ? 'border-blue-600 bg-blue-100/70 text-slate-900' : 'border-blue-400 bg-blue-50/50 text-slate-800');
 
                 return `
-                  <div class="pl-3 pr-2.5 pt-2 pb-1.5 border-l-4 rounded-r-lg shadow-sm transition-all hover:shadow-md ${borderClass} group relative">
+                  <div class="bulletin-item-card pl-3 pr-2.5 pt-2 pb-1.5 border-l-4 rounded-r-lg shadow-sm transition-all hover:shadow-md ${borderClass} group relative">
                     ${isHigh ? `<div class="absolute top-1 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 pointer-events-none"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-semibold bg-rose-500 text-white shadow-sm">緊急</span></div>` : ''}
                     <div ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].items[${itemIdx}].content" class="text-sm font-medium outline-none ql-editor !p-0 text-left">${clnHtm(item.content)}</div>
                   </div>
@@ -1391,7 +1415,7 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
                         ? (isEven ? 'border-rose-500 bg-rose-100/75 text-slate-900' : 'border-rose-400 bg-rose-50/70 text-slate-800')
                         : (isEven ? 'border-blue-600 bg-blue-100/70 text-slate-900' : 'border-blue-400 bg-blue-50/50 text-slate-800');
                       return `
-                        <div class="px-2.5 py-1.5 border-l-4 rounded-r shadow-sm transition-all hover:shadow-md ${borderClass} group relative">
+                        <div class="bulletin-item-card px-2.5 py-1.5 border-l-4 rounded-r shadow-sm transition-all hover:shadow-md ${borderClass} group relative">
                           <div ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].subsections[${subIdx}].items[${itemIdx}].content" class="outline-none ql-editor text-left !p-0">${clnHtm(item.content)}</div>
                         </div>
                       `;
