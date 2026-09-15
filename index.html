@@ -42,7 +42,7 @@
   <!-- Quill CSS for rendering rich text -->
   <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
   
-  <link rel="stylesheet" href="css/index.css?v=1789454915">
+  <link rel="stylesheet" href="css/index.css?v=1789456524">
 
 
   <style>
@@ -147,8 +147,28 @@
       margin-bottom: 0 !important;
     }
     .bulletin-item-card .ql-editor table {
-      margin-top: 3px !important;
+      margin-top: 4px !important;
       margin-bottom: 2px !important;
+    }
+    /* 控制段落與空行高度為精確一個中文字節 */
+    .ql-editor > div, .ql-editor > p {
+      margin-top: 0 !important;
+      margin-bottom: 0.35em !important;
+      line-height: 1.3 !important;
+    }
+    .ql-editor div:empty,
+    .ql-editor p:empty,
+    .ql-editor > br {
+      display: none !important;
+      height: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    /* 緊鄰標題與列表項目的行距緊縮 */
+    .ql-editor .space-y-1 > div,
+    .ql-editor .space-y-1 > p {
+      margin-top: 0.2em !important;
+      margin-bottom: 0.2em !important;
     }
   </style>
 </head>
@@ -1232,6 +1252,9 @@ async function showKPI(monthOffset = 0) {
             });
           }
 
+          // 清理多餘連續的 br
+          doc.querySelectorAll('br + br').forEach(b => b.remove());
+
           // 4. 清理末尾孤立的 br 或空節點
           while (doc.body.lastChild) {
             const lc = doc.body.lastChild;
@@ -1267,6 +1290,14 @@ async function showKPI(monthOffset = 0) {
         
         // 清理緊接在 </table> 後面的無意義空白元素
         r = r.replace(/(<\/table>\s*)(?:<(?:div|p)[^>]*>(?:&nbsp;|\s|<br\s*\/?>)*<\/(?:div|p)>\s*)+/gi, '$1');
+        
+        // 5. 針對標題與列表間的嵌套多餘 div 進行解除與間距標準化（標準一個中文字節高）
+        r = r.replace(/<div>\s*<div>(<span[^>]*><strong>📋.*?<\/strong><\/span>)<\/div>\s*<div>\s*<div>\s*(<table)/gi, '<div class="mt-2.5 mb-1">$1</div>$2');
+        
+        // 針對標題與條目間有多餘空行、或末尾多出空行的情況進行折疊
+        r = r.replace(/<\/p>\s*<div class="space-y-1">/gi, '</p><div>');
+        r = r.replace(/<\/p>\s*<br\s*\/?>/gi, '</p>');
+        r = r.replace(/<br\s*\/?>\s*<div/gi, '<div');
         
         return r;
       }
