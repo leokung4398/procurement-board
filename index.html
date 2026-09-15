@@ -42,7 +42,7 @@
   <!-- Quill CSS for rendering rich text -->
   <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
   
-  <link rel="stylesheet" href="css/index.css?v=1789457928">
+  <link rel="stylesheet" href="css/index.css?v=1789523338">
 
 
   <style>
@@ -177,6 +177,13 @@
       margin-top: 0.2em !important;
       margin-bottom: 0.2em !important;
     }
+    /* 未登入時背景不可穿透高斯模糊與鎖定 */
+    .page-blurred {
+      filter: blur(8px) grayscale(20%);
+      pointer-events: none !important;
+      user-select: none !important;
+      transition: filter 0.3s ease;
+    }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen font-sans">
@@ -220,7 +227,7 @@
     </div>
   </div>
 
-  <div class="max-w-6xl mx-auto px-4 py-8">
+  <div id="app-main-container" class="max-w-6xl mx-auto px-4 py-8">
     <!-- Header -->
     <header class="bg-white rounded-lg shadow-sm p-6 mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
       <div>
@@ -230,6 +237,11 @@
         <p class="text-sm text-slate-500 mt-1">提供本週重點摘要、交期異動與物料狀況明細</p>
       </div>
       <div class="flex items-center gap-3">
+        <!-- 尊榮已完讀金徽章 (閱讀完成時動態顯示) -->
+        <div id="user-read-badge" class="hidden items-center gap-1.5 bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-white px-3.5 py-1.5 rounded-full text-xs font-bold shadow-md ring-1 ring-amber-300/60 transition-all duration-300">
+          <span class="text-sm">👑</span>
+          <span id="user-read-badge-text">本期已完讀</span>
+        </div>
         <!-- 登入狀態識別標籤 -->
         <div id="user-info-badge" class="hidden items-center gap-2 bg-indigo-50 border border-indigo-200 px-3 py-1.5 rounded-full text-xs font-semibold text-indigo-700 shadow-sm">
           <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
@@ -865,8 +877,14 @@ async function showKPI(monthOffset = 0) {
       const infoName = document.getElementById('user-info-name');
       const btnLogin = document.getElementById('btn-login');
       const btnLogout = document.getElementById('btn-logout');
+      const readBadge = document.getElementById('user-read-badge');
+      const readBadgeText = document.getElementById('user-read-badge-text');
+      const mainContainer = document.getElementById('app-main-container');
 
       if (userStr) {
+        // 已登入：移除背景不可穿透模糊
+        if (mainContainer) mainContainer.classList.remove('page-blurred');
+
         try {
           const user = JSON.parse(userStr);
           if (infoBadge && infoName) {
@@ -879,11 +897,34 @@ async function showKPI(monthOffset = 0) {
             btnLogout.classList.remove('hidden');
             btnLogout.classList.add('flex');
           }
+
+          // 判斷當前週報完讀狀態，呈現尊榮金徽章
+          if (state.activeBulletinId && readBadge) {
+            const isRead = parseInt(localStorage.getItem('progress_' + state.activeBulletinId) || '0', 10) >= 100;
+            if (isRead) {
+              if (readBadgeText) readBadgeText.textContent = `${state.activeBulletinId} 已完讀`;
+              readBadge.classList.remove('hidden');
+              readBadge.classList.add('inline-flex');
+            } else {
+              readBadge.classList.add('hidden');
+              readBadge.classList.remove('inline-flex');
+            }
+          } else if (readBadge) {
+            readBadge.classList.add('hidden');
+            readBadge.classList.remove('inline-flex');
+          }
         } catch(e) {}
       } else {
+        // 未登入：背景鎖定並高斯模糊，強制同仁透過 Modal 完成企業驗證
+        if (mainContainer) mainContainer.classList.add('page-blurred');
+
         if (infoBadge) {
           infoBadge.classList.add('hidden');
           infoBadge.classList.remove('flex');
+        }
+        if (readBadge) {
+          readBadge.classList.add('hidden');
+          readBadge.classList.remove('inline-flex');
         }
         if (btnLogin) {
           btnLogin.classList.remove('hidden');
@@ -896,6 +937,52 @@ async function showKPI(monthOffset = 0) {
       }
     }
 
+    async function confirmBulletinRead(bulletinId) {
+      if (!bulletinId) return;
+      const userStr = localStorage.getItem('procurement_user');
+      if (!userStr) {
+        document.getElementById('user-modal').classList.remove('hidden');
+        return;
+      }
+      const user = JSON.parse(userStr);
+
+      // 1. 本地立即鎖定 100%
+      try {
+        localStorage.setItem('progress_' + bulletinId, '100');
+        localStorage.setItem('has_read_' + bulletinId, '1');
+      } catch(e) {}
+      currentBulletinProgress = 100;
+
+      // 2. 頂部閱讀進度條拉滿
+      const bar = document.getElementById('reading-progress-bar');
+      if (bar) bar.style.width = '100%';
+
+      // 3. 更新底端按鈕狀態
+      const btn = document.getElementById('btn-confirm-read');
+      if (btn) {
+        btn.disabled = true;
+        btn.className = 'w-full max-w-md mx-auto py-3.5 px-6 rounded-xl font-bold text-sm md:text-base flex items-center justify-center gap-2.5 transition-all duration-300 bg-slate-100 text-slate-400 border border-slate-200 cursor-default shadow-none';
+        btn.innerHTML = '<span>✅ 本期週報已確認閱畢</span>';
+      }
+
+      // 4. 同步至 Firestore
+      try {
+        await DS.markAsRead(bulletinId, user, 100);
+      } catch(err) {
+        console.error('confirmBulletinRead Firestore error:', err);
+      }
+
+      // 5. 更新 Header 尊榮徽章
+      updateAuthUI();
+
+      // 6. 介面視覺反饋提示
+      if (typeof toast === 'function') {
+        toast('👑 感謝您的閱畢打卡！已成功為您點亮尊榮已完讀徽章。', 'ok');
+      } else {
+        alert('🎉 您已完成本期週報閱讀打卡！已於頂部點亮尊榮完讀徽章。');
+      }
+    }
+
     async function checkUserIdentity() {
       updateAuthUI();
       if (!DS.isConfigured()) return;
@@ -903,28 +990,23 @@ async function showKPI(monthOffset = 0) {
       if (userStr) {
         const user = JSON.parse(userStr);
         if (state.activeBulletinId) {
-          // 1. 本地防干擾快取：若此瀏覽器已標記閱讀過，不再重複跳出彈窗
-          const localRead = localStorage.getItem('has_read_' + state.activeBulletinId);
-          if (localRead === '1') {
-            DS.markAsRead(state.activeBulletinId, user);
-            return;
-          }
-
           const uid = user.userId || user.uid || (user.email ? user.email.replace(/[@.]/g, '_') : null);
           const res = uid ? await DS.hasRead(state.activeBulletinId, uid) : { hasRead: false, readProgress: 0 };
-          if (!res.hasRead) {
-            // Unread! Show the unread modal reminder
-            const b = state.data.bulletins.find(x => x.id === state.activeBulletinId);
-            document.getElementById('unread-bulletin-title').textContent = b ? b.title : '最新緊急公告';
-            document.getElementById('unread-modal').classList.remove('hidden');
-          } else {
+          
+          if (res.hasRead) {
             try { localStorage.setItem('has_read_' + state.activeBulletinId, '1'); } catch(e) {}
             if (res.readProgress >= 100) {
               try { localStorage.setItem('progress_' + state.activeBulletinId, '100'); } catch(e) {}
               currentBulletinProgress = 100;
               const bar = document.getElementById('reading-progress-bar');
               if (bar) bar.style.width = '100%';
+              updateAuthUI();
             }
+          } else {
+            // Unread! Show the unread modal reminder
+            const b = state.data ? state.data.bulletins.find(x => x.id === state.activeBulletinId) : null;
+            document.getElementById('unread-bulletin-title').textContent = b ? b.title : '最新緊急公告';
+            document.getElementById('unread-modal').classList.remove('hidden');
           }
           // Mark as read in Firestore
           DS.markAsRead(state.activeBulletinId, user);
@@ -1561,6 +1643,35 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
               </section>
             `;
           })()}
+          ${(() => {
+            const isRead = parseInt(localStorage.getItem('progress_' + bulletin.id) || '0', 10) >= 100;
+            return `
+              <div id="reading-confirm-card" class="bg-gradient-to-br from-white to-slate-50 rounded-2xl p-6 md:p-8 border border-slate-200/80 shadow-md text-center my-8 transition-all">
+                <div class="max-w-xl mx-auto space-y-4">
+                  <div class="inline-flex items-center justify-center w-12 h-12 rounded-full ${isRead ? 'bg-amber-100 text-amber-600' : 'bg-blue-100 text-blue-600'} mb-1">
+                    <span class="text-2xl">${isRead ? '👑' : '📖'}</span>
+                  </div>
+                  <div>
+                    <h4 class="text-base md:text-lg font-bold text-slate-800">
+                      ${isRead ? '🎉 您已完成本期週報閱讀' : '📋 本期週報閱讀確認'}
+                    </h4>
+                    <p class="text-xs md:text-sm text-slate-500 mt-1">
+                      ${isRead ? '系統已成功記錄您的閱畢打卡紀錄，頂部已點亮尊榮完讀徽章。' : '請詳細閱畢以上各項物料、交期與重點通知後，點擊下方按鈕完成本期閱讀打卡。'}
+                    </p>
+                  </div>
+                  <div class="pt-2">
+                    <button id="btn-confirm-read" onclick="confirmBulletinRead('${e(bulletin.id)}')" ${isRead ? 'disabled' : ''} class="w-full max-w-md mx-auto py-3.5 px-6 rounded-xl font-bold text-sm md:text-base flex items-center justify-center gap-2.5 transition-all duration-300 ${
+                      isRead 
+                        ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-default shadow-none' 
+                        : 'bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-500 hover:from-blue-700 hover:via-indigo-700 hover:to-teal-600 text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] cursor-pointer ring-2 ring-indigo-300/40'
+                    }">
+                      <span>${isRead ? '✅ 本期週報已確認閱畢' : '✅ 確認已閱讀本期週報內容 (點擊打卡)'}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            `;
+          })()}
         </div>
       `;
       setupReadingProgressTracker();
@@ -1631,7 +1742,11 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
         const u = JSON.parse(uStr);
         DS.markAsRead(state.activeBulletinId, u, currentBulletinProgress);
         if (currentBulletinProgress >= 100) {
-          try { localStorage.setItem('progress_' + state.activeBulletinId, '100'); } catch(e) {}
+          try { 
+            localStorage.setItem('progress_' + state.activeBulletinId, '100'); 
+            localStorage.setItem('has_read_' + state.activeBulletinId, '1');
+          } catch(e) {}
+          updateAuthUI();
         }
       }
       window.syncReadingProgress = syncReadingProgress;
