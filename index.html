@@ -54,6 +54,15 @@
       color: #1e293b !important; /* 統一字體顏色 slate-800 */
       padding-top: 3px !important; /* 確保第一行文字與頂部有安全微距，框線不被遮擋 */
       padding-bottom: 2px !important;
+      height: auto !important;
+      min-height: unset !important;
+      overflow: visible !important;
+      overflow-y: visible !important;
+      overflow-x: visible !important;
+    }
+    .ql-editor div {
+      margin: 0 !important;
+      padding: 0 !important;
     }
     .ql-editor p {
       margin-top: 0 !important;
@@ -98,10 +107,15 @@
     /* Rich Text & Pasted Table Normalization */
     #bulletin-content-area table:not(.data-table), .pro-table {
       width: 100% !important;
+      height: auto !important;
       border-collapse: collapse !important;
       margin: 4px 0 6px 0 !important;
       font-size: 0.875rem !important;
       table-layout: auto !important;
+    }
+    #bulletin-content-area table:not(.data-table) tr,
+    .pro-table tr {
+      height: auto !important;
     }
     .ql-editor > div:empty,
     .ql-editor p:empty {
@@ -111,7 +125,8 @@
     #bulletin-content-area table:not(.data-table) th,
     .pro-table td, .pro-table th {
       border: 1px solid #cbd5e1 !important;
-      padding: 6px 10px !important;
+      padding: 5px 8px !important;
+      height: auto !important;
       vertical-align: top;
       word-break: break-word;
     }
@@ -1167,12 +1182,35 @@ async function showKPI(monthOffset = 0) {
               });
             }
           });
+          // 2. 清除表格上的固定高度行內樣式，並清理表格儲存格中寫死的 height
+          const tables = doc.querySelectorAll('table');
+          tables.forEach(tbl => {
+            tbl.style.height = '';
+            tbl.style.marginTop = '2px';
+            tbl.style.marginBottom = '4px';
+            tbl.querySelectorAll('tr, td, th').forEach(cell => {
+              cell.style.height = '';
+            });
+          });
+
+          // 3. 遞迴移除無意義的空 div / 空 p
+          let emptyFound = true;
+          while (emptyFound) {
+            emptyFound = false;
+            doc.querySelectorAll('div, p').forEach(el => {
+              if (el.children.length === 0 && (!el.textContent || !el.textContent.replace(/[\s\u00A0]/g, ''))) {
+                el.remove();
+                emptyFound = true;
+              }
+            });
+          }
+
           h = doc.body.innerHTML;
         } catch (e) {
           console.warn('clnHtm DOM sanitization error:', e);
         }
 
-        // 2. 清理開頭、結尾以及中間多餘的空白段落 (包含 <p>&nbsp;</p>, <div>&nbsp;</div>, 空 div)
+        // 4. 清理開頭、結尾以及中間多餘的空白段落 (包含 <p>&nbsp;</p>, <div>&nbsp;</div>, 空 div)
         let r = h;
         let lastR = '';
         while (r !== lastR) {
