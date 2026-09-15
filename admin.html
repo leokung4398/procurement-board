@@ -134,9 +134,13 @@
     .pro-table, .quill-editor table {
       width: 100% !important;
       border-collapse: collapse !important;
-      margin: 8px 0 !important;
+      margin: 4px 0 6px 0 !important;
       font-size: 0.875rem !important;
       table-layout: auto !important;
+    }
+    .quill-editor > div:empty,
+    .quill-editor p:empty {
+      display: none !important;
     }
     .pro-table td, .pro-table th, .quill-editor table td, .quill-editor table th {
       border: 1px solid #cbd5e1 !important;
@@ -1806,7 +1810,7 @@
   </div>
 </div>
 
-<script src="js/admin.js?v=1789398426"></script>
+<script src="js/admin.js?v=1789446857"></script>
 <script>
   window.addEventListener('load', () => {
     setTimeout(async () => {

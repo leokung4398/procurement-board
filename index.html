@@ -99,9 +99,13 @@
     #bulletin-content-area table:not(.data-table), .pro-table {
       width: 100% !important;
       border-collapse: collapse !important;
-      margin: 8px 0 !important;
+      margin: 4px 0 6px 0 !important;
       font-size: 0.875rem !important;
       table-layout: auto !important;
+    }
+    .ql-editor > div:empty,
+    .ql-editor p:empty {
+      display: none !important;
     }
     #bulletin-content-area table:not(.data-table) td,
     #bulletin-content-area table:not(.data-table) th,
@@ -1168,17 +1172,25 @@ async function showKPI(monthOffset = 0) {
           console.warn('clnHtm DOM sanitization error:', e);
         }
 
+        // 2. 清理開頭、結尾以及中間多餘的空白段落 (包含 <p>&nbsp;</p>, <div>&nbsp;</div>, 空 div)
         let r = h;
         let lastR = '';
         while (r !== lastR) {
           lastR = r;
-          r = r.replace(/^(?:\s*<p[^>]*>(?:<br\s*\/?>|&nbsp;|\s)*<\/p>\s*)+/gi, '');
+          // 清理開頭空白
+          r = r.replace(/^(?:\s*<(?:p|div)[^>]*>(?:<br\s*\/?>|&nbsp;|\s)*<\/(?:p|div)>\s*)+/gi, '');
           r = r.replace(/^(?:\s*<br\s*\/?>\s*)+/gi, '');
-          r = r.replace(/^(?:\s*)(<p[^>]*>)(?:\s*<br\s*\/?>|&nbsp;|\s)+/gi, '');
-          r = r.replace(/(?:\s*<p[^>]*>(?:<br\s*\/?>|&nbsp;|\s)*<\/p>\s*)+$/gi, '');
+          r = r.replace(/^(?:\s*)(<(?:p|div)[^>]*>)(?:\s*<br\s*\/?>|&nbsp;|\s)+/gi, '');
+          
+          // 清理結尾空白 (包含連續的 <div>&nbsp;</div> 或 <p>&nbsp;</p>)
+          r = r.replace(/(?:\s*<(?:p|div)[^>]*>(?:<br\s*\/?>|&nbsp;|\s)*<\/(?:p|div)>\s*)+$/gi, '');
           r = r.replace(/(?:\s*<br\s*\/?>\s*)+$/gi, '');
-          r = r.replace(/(?:<br\s*\/?>|&nbsp;|\s)+(<\/p>\s*)$/gi, '');
+          r = r.replace(/(?:<br\s*\/?>|&nbsp;|\s)+(<\/(?:p|div)>\s*)$/gi, '');
         }
+        
+        // 清理緊接在 </table> 後面的無意義空白元素
+        r = r.replace(/(<\/table>\s*)(?:<(?:div|p)[^>]*>(?:&nbsp;|\s|<br\s*\/?>)*<\/(?:div|p)>\s*)+/gi, '$1');
+        
         return r;
       }
 

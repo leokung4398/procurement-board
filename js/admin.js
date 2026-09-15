@@ -1593,18 +1593,68 @@ async function confirmPubBulletin() {
       const mustReadCb = document.getElementById('pub-must-read');
       if (mustReadCb && mustReadCb.checked) {
         let importantItems = [];
+        
+        // 專門用於將富文本內容安全轉換為優美電子郵件 HTML 的處理函式
+        function formatContentForEmail(htmlContent) {
+          if (!htmlContent) return '';
+          try {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlContent, 'text/html');
+            
+            // 1. 處理表格：保留結構並加上 Outlook / 郵件客戶端通用的內聯樣式
+            doc.querySelectorAll('table').forEach(tbl => {
+              tbl.setAttribute('style', 'width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 13px; font-family: "Microsoft JhengHei", sans-serif;');
+              tbl.setAttribute('border', '1');
+              tbl.setAttribute('cellpadding', '6');
+              tbl.setAttribute('cellspacing', '0');
+              tbl.querySelectorAll('th').forEach(th => {
+                th.setAttribute('style', 'background-color: #f1f5f9; color: #1e293b; font-weight: bold; padding: 6px 8px; border: 1px solid #cbd5e1; text-align: left; font-size: 12px;');
+              });
+              tbl.querySelectorAll('td').forEach(td => {
+                td.setAttribute('style', 'padding: 6px 8px; border: 1px solid #cbd5e1; color: #334155; vertical-align: top; font-size: 12px;');
+              });
+            });
+            
+            // 2. 處理圖片：限制最大寬度與邊距
+            doc.querySelectorAll('img').forEach(img => {
+              img.setAttribute('style', 'max-width: 100%; max-height: 400px; display: block; margin: 8px 0; border-radius: 4px;');
+            });
+
+            // 3. 處理段落與換行：將 </p>, </div>, </h1>~</h6> 結尾補上 <br>
+            doc.querySelectorAll('p, div, h1, h2, h3, h4, h5, h6').forEach(el => {
+              if (el.tagName.toLowerCase() !== 'div' || !el.querySelector('table')) {
+                const br = doc.createElement('br');
+                el.parentNode.insertBefore(br, el.nextSibling);
+              }
+            });
+
+            // 取出處理後的 HTML 並剝除危險標籤
+            let out = doc.body.innerHTML;
+            
+            // 移除不支援或多餘的標籤，但保留 table, thead, tbody, tr, th, td, img, br, strong, b, span, a
+            out = out.replace(/<(?!\/?(?:table|thead|tbody|tr|th|td|colgroup|col|img|br|strong|b|span|a|font))[^>]+>/gi, '');
+            
+            // 清理連續過多的 <br>
+            out = out.replace(/(?:<br\s*\/?>\s*){3,}/gi, '<br><br>');
+            return out.trim();
+          } catch(err) {
+            console.error('formatContentForEmail error:', err);
+            return htmlContent.replace(/<[^>]+>/g, '').trim();
+          }
+        }
+
         (d.sections || []).forEach(sec => {
           (sec.items || []).forEach(item => {
             if (item.priority === 'high' && item.content) {
-              let plain = item.content.replace(/<\/(p|div|h[1-6])>/gi, '<br>').replace(/<img[^>]+src="([^">]+)"[^>]*>/gi, '|||IMG_$1|||').replace(/<br\s*\/?>/gi, '|||BR|||').replace(/<[^>]+>/g, '').replace(/\|\|\|IMG_([^|]+)\|\|\|/g, '<br><img src="$1" style="max-width: 100%; max-height: 400px; display: block; margin: 10px 0; border-radius: 4px;"><br>').replace(/\|\|\|BR\|\|\|/g, '<br>').trim();
-              if(plain) importantItems.push(plain);
+              let formatted = formatContentForEmail(item.content);
+              if (formatted) importantItems.push(formatted);
             }
           });
           (sec.subsections || []).forEach(sub => {
             (sub.items || []).forEach(item => {
               if (item.priority === 'high' && item.content) {
-                let plain = item.content.replace(/<\/(p|div|h[1-6])>/gi, '<br>').replace(/<img[^>]+src="([^">]+)"[^>]*>/gi, '|||IMG_$1|||').replace(/<br\s*\/?>/gi, '|||BR|||').replace(/<[^>]+>/g, '').replace(/\|\|\|IMG_([^|]+)\|\|\|/g, '<br><img src="$1" style="max-width: 100%; max-height: 400px; display: block; margin: 10px 0; border-radius: 4px;"><br>').replace(/\|\|\|BR\|\|\|/g, '<br>').trim();
-                if(plain) importantItems.push(plain);
+                let formatted = formatContentForEmail(item.content);
+                if (formatted) importantItems.push(formatted);
               }
             });
           });
