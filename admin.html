@@ -619,38 +619,61 @@
         </div>
 
         <!-- 發信群組管理 -->
-        <div id="tab-groups" class="settings-tab-pane hidden flex-1 flex flex-col h-full">
-          <div class="p-5 border-b border-slate-100">
-            <h4 class="text-lg font-bold text-slate-800 mb-2">發信群組管理</h4>
-            <p class="text-xs text-slate-500 mb-4">建立部門或職務群組，發布週報時可一鍵全選整個群組的人員。</p>
-            <div class="flex items-center gap-2">
-              <input type="text" id="grp-name" placeholder="群組名稱 (例: 長官群、資訊部)" class="form-input flex-1">
-              <button onclick="addGroup()" class="btn-p">建立群組</button>
+        <div id="tab-groups" class="settings-tab-pane hidden flex-1 flex flex-col h-full bg-slate-50/40">
+          <!-- 頂部：標題與建立群組卡片 -->
+          <div class="p-5 border-b border-slate-200/80 bg-white space-y-3.5">
+            <div>
+              <div class="flex items-center gap-2">
+                <span class="w-1.5 h-4 bg-indigo-600 rounded-full"></span>
+                <h4 class="text-base font-bold text-slate-800">發信群組管理</h4>
+              </div>
+              <p class="text-xs text-slate-500 mt-1">建立部門或職務群組，發布週報時可一鍵快速勾選整個群組的人員。</p>
+            </div>
+            <!-- 建立新群組輸入列 -->
+            <div class="bg-slate-50/70 border border-slate-200/80 rounded-xl p-3 flex items-center gap-2 shadow-xs">
+              <div class="relative flex-1">
+                <input type="text" id="grp-name" placeholder="輸入新群組名稱 (例: 長官群、資訊部、營運主管群...)" class="form-input w-full text-xs py-2 pl-3 pr-3 bg-white">
+              </div>
+              <button onclick="addGroup()" class="btn-p text-xs py-2 px-4 rounded-lg shadow-sm whitespace-nowrap flex items-center gap-1.5">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                <span>建立群組</span>
+              </button>
             </div>
           </div>
+
+          <!-- 下方主體：左側群組列表 + 右側成員管理 -->
           <div class="flex-1 flex overflow-hidden">
-            <div class="w-1/3 border-r border-slate-200 flex flex-col">
-              <div class="p-3 border-b border-slate-100">
-                <input type="text" id="grp-list-search" oninput="renderGroupList()" placeholder="搜尋群組..." class="form-input w-full text-xs">
-              </div>
-              <div class="flex-1 overflow-y-auto p-3" id="group-list">
-              <!-- 群組列表 -->
-            </div>
-            </div>
-            <div class="w-2/3 flex flex-col h-full">
-              <div class="p-3 border-b border-slate-200 bg-slate-50 flex flex-col gap-2">
-                <div class="flex justify-between items-center font-semibold text-sm text-slate-700">
-                  <span id="group-detail-title">請選擇左側群組</span>
-                  <span class="text-xs text-slate-500 font-normal">勾選加入群組</span>
+            <!-- 左側群組清單欄位 (1/3) -->
+            <div class="w-1/3 border-r border-slate-200/80 bg-white flex flex-col">
+              <div class="p-3 border-b border-slate-100 bg-slate-50/50">
+                <div class="relative">
+                  <input type="text" id="grp-list-search" oninput="renderGroupList()" placeholder="搜尋群組..." class="form-input w-full pl-8 pr-2.5 py-1.5 text-xs bg-white">
+                  <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 </div>
-                <div class="relative mt-1">
-                  <input type="text" id="grp-search" oninput="renderGroupMembers()" placeholder="搜尋聯絡人..." class="form-input w-full pl-8 text-xs py-1.5">
+              </div>
+              <div class="flex-1 overflow-y-auto p-2.5 space-y-1" id="group-list">
+                <!-- 群組列表動態渲染 -->
+              </div>
+            </div>
+
+            <!-- 右側成員管理面板 (2/3) -->
+            <div class="w-2/3 flex flex-col h-full bg-slate-50/30">
+              <div class="p-3.5 border-b border-slate-200/80 bg-white flex flex-col gap-2">
+                <div class="flex justify-between items-center">
+                  <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                    <span id="group-detail-title" class="font-bold text-sm text-slate-800">請選擇左側群組</span>
+                  </div>
+                  <span class="text-xs text-slate-400 font-normal">勾選成員自動加入/移出</span>
+                </div>
+                <div class="relative mt-0.5">
+                  <input type="text" id="grp-search" oninput="renderGroupMembers()" placeholder="搜尋聯絡人姓名或信箱..." class="form-input w-full pl-8 pr-3 text-xs py-1.5 bg-slate-50/60 border-slate-200">
                   <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 </div>
               </div>
               <div class="flex-1 overflow-y-auto p-4" id="group-members">
-                <!-- 成員勾選列表 -->
-                <div class="text-center text-slate-400 mt-10 text-sm">請先在「郵件通訊錄」新增名單，再到此處分配群組。</div>
+                <!-- 成員勾選列表 (支援雙欄或精巧卡片) -->
+                <div class="text-center text-slate-400 mt-12 text-xs">請先在「郵件通訊錄」新增名單，再到此處分配群組。</div>
               </div>
             </div>
           </div>
@@ -1910,7 +1933,7 @@
   </div>
 </div>
 
-<script src="js/admin.js?v=1789571600"></script>
+<script src="js/admin.js?v=1789572000"></script>
 <script>
   window.addEventListener('load', () => {
     setTimeout(async () => {

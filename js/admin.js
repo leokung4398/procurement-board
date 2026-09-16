@@ -815,19 +815,39 @@ async function delGroup(id) {
 function renderGroupList() {
   const c = document.getElementById('group-list');
   if (!c) return;
-  if (S.mailGroups.length === 0) {
-    c.innerHTML = '<div class="text-center text-slate-400 mt-5 text-sm">尚無群組</div>';
+  const searchEl = document.getElementById('grp-list-search');
+  const kw = searchEl ? searchEl.value.trim().toLowerCase() : '';
+  
+  let list = S.mailGroups;
+  if (kw) {
+    list = list.filter(g => (g.name || '').toLowerCase().includes(kw));
+  }
+
+  if (list.length === 0) {
+    c.innerHTML = '<div class="text-center text-slate-400 py-8 text-xs bg-slate-50/60 rounded-xl border border-dashed border-slate-200">尚無符合群組</div>';
     return;
   }
-  c.innerHTML = S.mailGroups.map(g => `
-    <div onclick="selectGroup('${g.id}')" class="p-3 mb-1.5 rounded-lg cursor-pointer transition-colors border ${g.id === currentGroupId ? 'bg-blue-50 border-blue-200 text-blue-700 shadow-sm font-semibold' : 'bg-white border-transparent text-slate-600 hover:bg-slate-100'} flex items-center justify-between text-sm">
-      <span class="truncate">${xe(g.name)}</span>
-      <div class="flex items-center gap-2">
-        <span class="text-xs bg-white px-2 py-0.5 rounded-full shadow-sm text-slate-500">${g.emails.length}</span>
-        <button onclick="event.stopPropagation(); delGroup('${g.id}')" class="text-red-400 hover:text-red-600">🗑️</button>
+  c.innerHTML = list.map(g => {
+    const isSelected = g.id === currentGroupId;
+    return `
+      <div onclick="selectGroup('${g.id}')" class="group p-2.5 rounded-xl cursor-pointer transition-all duration-150 border ${
+        isSelected 
+          ? 'bg-indigo-50/70 border-indigo-200 text-indigo-900 shadow-xs font-semibold ring-1 ring-indigo-200/50' 
+          : 'bg-white border-slate-200/70 text-slate-700 hover:bg-slate-50 hover:border-indigo-100 shadow-xs'
+      } flex items-center justify-between text-xs">
+        <div class="flex items-center gap-2 min-w-0 flex-1">
+          <span class="w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-indigo-600' : 'bg-slate-300 group-hover:bg-indigo-400'} flex-shrink-0"></span>
+          <span class="truncate">${xe(g.name)}</span>
+        </div>
+        <div class="flex items-center gap-1.5 flex-shrink-0">
+          <span class="text-[11px] font-mono px-2 py-0.5 rounded-full ${isSelected ? 'bg-indigo-100/90 text-indigo-700 font-bold' : 'bg-slate-100 text-slate-500'}">${g.emails.length}</span>
+          <button onclick="event.stopPropagation(); delGroup('${g.id}')" class="w-6 h-6 rounded-md flex items-center justify-center text-slate-300 hover:text-rose-600 hover:bg-rose-50 transition-colors" title="刪除此群組">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          </button>
+        </div>
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 function selectGroup(id) {
   currentGroupId = id;
@@ -835,7 +855,7 @@ function selectGroup(id) {
   const g = S.mailGroups.find(x => x.id === id);
   if (!g) return;
   const t = document.getElementById('group-detail-title');
-  if (t) t.textContent = g.name + ' - 成員管理';
+  if (t) t.textContent = `${g.name} (${g.emails.length} 位成員)`;
   renderGroupMembers();
 }
 function renderGroupMembers() {
@@ -849,22 +869,42 @@ function renderGroupMembers() {
   
   let list = S.whitelist;
   if(kw) {
-    list = list.filter(w => w.name.toLowerCase().includes(kw) || w.email.toLowerCase().includes(kw));
+    list = list.filter(w => (w.name || '').toLowerCase().includes(kw) || (w.email || '').toLowerCase().includes(kw) || (w.unit || '').toLowerCase().includes(kw));
   }
 
   if (list.length === 0) {
-    c.innerHTML = '<div class="text-center text-slate-400 mt-10 text-sm">無符合條件的名單</div>';
+    c.innerHTML = '<div class="col-span-full text-center text-slate-400 py-10 text-xs bg-white rounded-xl border border-dashed border-slate-200">無符合條件的名單</div>';
     return;
   }
-  c.innerHTML = list.map(w => {
-    const isMember = g.emails.includes(w.email);
-    return `
-      <label class="flex items-center gap-3 p-3 mb-1.5 rounded-lg border ${isMember ? 'border-blue-200 bg-blue-50/30' : 'border-slate-100 bg-white hover:bg-slate-50'} cursor-pointer transition-colors">
-        <input type="checkbox" class="w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500" ${isMember ? 'checked' : ''} onchange="toggleGroupMember('${w.email}', this.checked)">
-        <div class="flex flex-col"><span class="text-sm font-semibold text-slate-700">${xe(w.name)}</span><span class="text-xs text-slate-400">${xe(w.email)}</span></div>
-      </label>
-    `;
-  }).join('');
+  c.innerHTML = `
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+      ${list.map(w => {
+        const isMember = g.emails.includes(w.email);
+        const regionBadge = w.region ? `<span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] bg-slate-100 text-slate-500 border border-slate-200">${xe(w.region)}</span>` : '';
+        const unitBadge = w.unit ? `<span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] bg-blue-50 text-blue-600 border border-blue-100">${xe(w.unit)}</span>` : '';
+        const primaryBadge = w.isPrimary ? `<span class="text-[10px] text-amber-600 font-bold">⭐</span>` : '';
+        
+        return `
+          <label class="flex items-center gap-2.5 p-2.5 rounded-xl border cursor-pointer transition-all duration-150 ${
+            isMember 
+              ? 'border-indigo-200 bg-white shadow-xs ring-1 ring-indigo-200/50' 
+              : 'border-slate-200/70 bg-white/70 hover:bg-white hover:border-slate-300'
+          }">
+            <input type="checkbox" class="w-4 h-4 rounded text-indigo-600 border-slate-300 focus:ring-indigo-500 flex-shrink-0 cursor-pointer" ${isMember ? 'checked' : ''} onchange="toggleGroupMember('${xe(w.email)}', this.checked)">
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center gap-1.5 truncate">
+                <span class="text-xs font-bold text-slate-800">${xe(w.name)}</span>
+                ${primaryBadge}
+                ${regionBadge}
+                ${unitBadge}
+              </div>
+              <div class="text-[11px] text-slate-400 truncate font-mono mt-0.5">${xe(w.email)}</div>
+            </div>
+          </label>
+        `;
+      }).join('')}
+    </div>
+  `;
 }
 async function toggleGroupMember(email, isChecked) {
   const g = S.mailGroups.find(x => x.id === currentGroupId);
