@@ -990,6 +990,22 @@ async function showKPI(monthOffset = 0) {
       if (userStr) {
         const user = JSON.parse(userStr);
         if (state.activeBulletinId) {
+          // 1. 本地已讀快取優先防干擾：若本地已打卡完讀或已標記閱讀過，絕不彈出未讀提醒視窗
+          const localRead = localStorage.getItem('has_read_' + state.activeBulletinId);
+          const localProgress = parseInt(localStorage.getItem('progress_' + state.activeBulletinId) || '0', 10);
+          if (localRead === '1' || localProgress >= 100) {
+            document.getElementById('unread-modal').classList.add('hidden');
+            if (localProgress >= 100) {
+              currentBulletinProgress = 100;
+              const bar = document.getElementById('reading-progress-bar');
+              if (bar) bar.style.width = '100%';
+            }
+            updateAuthUI();
+            DS.markAsRead(state.activeBulletinId, user);
+            return;
+          }
+
+          // 2. 向雲端 Firestore 確認歷史閱讀進度
           const uid = user.userId || user.uid || (user.email ? user.email.replace(/[@.]/g, '_') : null);
           const res = uid ? await DS.hasRead(state.activeBulletinId, uid) : { hasRead: false, readProgress: 0 };
           
@@ -1000,10 +1016,11 @@ async function showKPI(monthOffset = 0) {
               currentBulletinProgress = 100;
               const bar = document.getElementById('reading-progress-bar');
               if (bar) bar.style.width = '100%';
-              updateAuthUI();
             }
+            document.getElementById('unread-modal').classList.add('hidden');
+            updateAuthUI();
           } else {
-            // Unread! Show the unread modal reminder
+            // 確實未讀！彈出新公告提醒視窗
             const b = state.data ? state.data.bulletins.find(x => x.id === state.activeBulletinId) : null;
             document.getElementById('unread-bulletin-title').textContent = b ? b.title : '最新緊急公告';
             document.getElementById('unread-modal').classList.remove('hidden');
