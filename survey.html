@@ -5,133 +5,325 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>採購電子週報使用需求調查問卷 (A) | 微笑單車</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
   <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
   <script src="firebase-config.js"></script>
+
   <style>
-    * { font-family: 'Inter', 'PingFang TC', 'Microsoft JhengHei', sans-serif; }
-    .form-card {
-      background: white;
-      border: 1px solid #e2e8f0;
-      border-radius: 1rem;
-      padding: 1.5rem;
-      box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
-      transition: all 0.2s;
+    * { 
+      font-family: 'Noto Sans TC', 'Fredoka', -apple-system, BlinkMacSystemFont, sans-serif; 
     }
-    .form-card:hover {
-      border-color: #cbd5e1;
+
+    /* 黏土風暖色調漸層底色 - 營造溫暖舒適無壓力的填寫氛圍 */
+    body {
+      background: radial-gradient(circle at 15% 15%, #fffaf0 0%, #fff3e0 40%, #f4f6fa 100%);
+      min-height: 100vh;
+      color: #334155;
+    }
+
+    /* 3D 黏土柔和圓角厚實卡片效果 (Soft Clay Card) */
+    .clay-card {
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(14px);
+      border: 2px solid #fed7aa;
+      border-radius: 2rem;
+      padding: 1.75rem;
+      box-shadow: 
+        0 14px 28px -6px rgba(251, 146, 60, 0.12),
+        0 8px 16px -4px rgba(0, 0, 0, 0.04),
+        inset 0 -4px 6px rgba(253, 186, 116, 0.2);
+      transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+    }
+    .clay-card:hover {
+      transform: translateY(-2px);
+      border-color: #fb923c;
+      box-shadow: 
+        0 20px 36px -8px rgba(251, 146, 60, 0.18),
+        0 10px 20px -4px rgba(0, 0, 0, 0.06),
+        inset 0 -4px 8px rgba(253, 186, 116, 0.3);
+    }
+
+    /* 黏土立體膠囊徽章 (Clay Badge) */
+    .clay-badge {
+      background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);
+      color: white;
+      font-weight: 800;
+      border-radius: 9999px;
+      padding: 0.35rem 1.1rem;
+      font-size: 0.82rem;
+      letter-spacing: 0.04em;
+      box-shadow: 
+        0 4px 10px rgba(234, 88, 12, 0.28),
+        inset 0 -2px 4px rgba(194, 65, 12, 0.35),
+        inset 0 2px 4px rgba(255, 255, 255, 0.35);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    /* 黏土立體插圖相框 (Clay Photo Frame) */
+    .clay-photo-frame {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      border-radius: 1.5rem;
+      margin-bottom: 1.25rem;
+      border: 3px solid #ffedd5;
+      box-shadow: 
+        0 10px 24px rgba(251, 146, 60, 0.12),
+        inset 0 0 12px rgba(0, 0, 0, 0.04);
+      transition: all 0.3s ease;
+    }
+    .clay-photo-frame:hover {
+      transform: scale(1.015);
+      border-color: #fdba74;
+    }
+
+    /* 黏土立體評分膠囊按鈕 (1~5分) */
+    .clay-score-group {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 0.65rem;
     }
     .score-btn {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 0.75rem 0.5rem;
-      border: 1.5px solid #e2e8f0;
-      border-radius: 0.75rem;
+      padding: 0.95rem 0.5rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 1.25rem;
       cursor: pointer;
-      transition: all 0.15s;
-      background: #f8fafc;
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      user-select: none;
+      box-shadow: 
+        0 4px 8px rgba(0, 0, 0, 0.03),
+        inset 0 -3px 0 #e2e8f0;
     }
     .score-btn:hover {
-      background: #eff6ff;
-      border-color: #93c5fd;
+      background: linear-gradient(180deg, #fff7ed 0%, #ffedd5 100%);
+      border-color: #fdba74;
+      transform: translateY(-2px);
+      box-shadow: 
+        0 6px 12px rgba(251, 146, 60, 0.15),
+        inset 0 -3px 0 #fed7aa;
     }
     .score-btn.active {
-      background: #eff6ff;
-      border-color: #2563eb;
-      color: #1d4ed8;
-      font-weight: 700;
-      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+      background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);
+      border-color: #c2410c;
+      color: #ffffff;
+      font-weight: 800;
+      box-shadow: 
+        0 8px 18px rgba(234, 88, 12, 0.35),
+        inset 0 -3px 0 #9a3412,
+        inset 0 2px 4px rgba(255, 255, 255, 0.3);
+      transform: translateY(-3px) scale(1.03);
     }
-    .check-tag {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      padding: 0.625rem 1rem;
-      border: 1.5px solid #e2e8f0;
-      border-radius: 0.75rem;
-      cursor: pointer;
-      background: white;
-      transition: all 0.15s;
-      font-size: 0.875rem;
-      color: #334155;
+    .score-btn.active span {
+      color: #ffffff !important;
     }
-    .check-tag:hover {
-      border-color: #94a3b8;
-      background: #f8fafc;
-    }
-    .check-tag.active {
-      border-color: #2563eb;
-      background: #eff6ff;
-      color: #1d4ed8;
-      font-weight: 600;
-    }
+
+    /* 黏土立體單選卡片 (Radio Card) */
     .radio-card {
       display: flex;
       align-items: center;
-      gap: 0.75rem;
-      padding: 0.75rem 1rem;
-      border: 1.5px solid #e2e8f0;
-      border-radius: 0.75rem;
+      gap: 0.85rem;
+      padding: 0.95rem 1.25rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 1.35rem;
       cursor: pointer;
-      background: white;
-      transition: all 0.15s;
-      font-size: 0.875rem;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      font-size: 0.92rem;
+      color: #334155;
+      font-weight: 500;
+      box-shadow: 
+        0 4px 8px rgba(0, 0, 0, 0.02),
+        inset 0 -3px 0 #e2e8f0;
     }
     .radio-card:hover {
-      background: #f8fafc;
-      border-color: #94a3b8;
+      background: linear-gradient(180deg, #fffaf5 0%, #ffedd5 100%);
+      border-color: #fdba74;
+      transform: translateY(-2px);
+      box-shadow: 
+        0 8px 16px rgba(251, 146, 60, 0.12),
+        inset 0 -3px 0 #fed7aa;
     }
     .radio-card.active {
-      border-color: #2563eb;
-      background: #eff6ff;
-      color: #1d4ed8;
-      font-weight: 600;
+      border-color: #ea580c;
+      background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+      color: #9a3412;
+      font-weight: 700;
+      box-shadow: 
+        0 6px 14px rgba(234, 88, 12, 0.16),
+        inset 0 -3px 0 #fdba74,
+        inset 0 1px 3px rgba(255, 255, 255, 0.7);
+      transform: translateY(-1px);
+    }
+    .radio-card input[type="radio"] {
+      margin-top: 0.05rem;
+      accent-color: #ea580c;
+      width: 1.2rem;
+      height: 1.2rem;
+    }
+
+    /* 黏土立體複選膠囊 (Check Tag) */
+    .check-tag {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.85rem 1.15rem;
+      border: 2px solid #e2e8f0;
+      border-radius: 1.25rem;
+      cursor: pointer;
+      background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      font-size: 0.9rem;
+      color: #334155;
+      font-weight: 500;
+      box-shadow: 
+        0 4px 8px rgba(0, 0, 0, 0.02),
+        inset 0 -3px 0 #e2e8f0;
+    }
+    .check-tag:hover {
+      background: linear-gradient(180deg, #fffaf5 0%, #ffedd5 100%);
+      border-color: #fdba74;
+      transform: translateY(-2px);
+      box-shadow: 
+        0 8px 16px rgba(251, 146, 60, 0.12),
+        inset 0 -3px 0 #fed7aa;
+    }
+    .check-tag.active {
+      border-color: #ea580c;
+      background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+      color: #9a3412;
+      font-weight: 700;
+      box-shadow: 
+        0 6px 14px rgba(234, 88, 12, 0.16),
+        inset 0 -3px 0 #fdba74,
+        inset 0 1px 3px rgba(255, 255, 255, 0.7);
+      transform: translateY(-1px);
+    }
+    .check-tag input[type="checkbox"] {
+      margin-top: 0.05rem;
+      accent-color: #ea580c;
+      width: 1.15rem;
+      height: 1.15rem;
+    }
+
+    /* 柔和圓潤立體輸入框 (Clay Input) */
+    .clay-input {
+      background: #f8fafc;
+      border: 2px solid #e2e8f0;
+      border-radius: 1.15rem;
+      padding: 0.75rem 1rem;
+      font-size: 0.92rem;
+      color: #1e293b;
+      outline: none;
+      transition: all 0.2s ease;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.03);
+    }
+    .clay-input:focus {
+      background: #ffffff;
+      border-color: #fb923c;
+      box-shadow: 0 0 0 3px rgba(251, 146, 60, 0.18);
+    }
+
+    /* 黏土立體大按鈕 */
+    .clay-submit-btn {
+      background: linear-gradient(135deg, #fb923c 0%, #ea580c 100%);
+      color: #ffffff;
+      border-radius: 9999px;
+      padding: 1rem 3rem;
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      border: none;
+      cursor: pointer;
+      box-shadow: 
+        0 8px 20px rgba(234, 88, 12, 0.35),
+        inset 0 -4px 0 #9a3412,
+        inset 0 2px 4px rgba(255, 255, 255, 0.35);
+      transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+    .clay-submit-btn:hover {
+      transform: translateY(-3px) scale(1.02);
+      box-shadow: 
+        0 12px 26px rgba(234, 88, 12, 0.42),
+        inset 0 -4px 0 #9a3412,
+        inset 0 2px 6px rgba(255, 255, 255, 0.45);
+    }
+    .clay-submit-btn:active {
+      transform: translateY(1px);
+      box-shadow: 
+        0 4px 10px rgba(234, 88, 12, 0.3),
+        inset 0 -2px 0 #9a3412;
     }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800 min-h-screen py-10 px-4">
-  <div class="max-w-2xl mx-auto space-y-6">
+<body class="py-10 px-4">
+  <div class="max-w-2xl mx-auto space-y-7">
 
-    <!-- Header & 說明卡片 -->
-    <div class="bg-gradient-to-br from-blue-600 via-indigo-600 to-blue-700 text-white rounded-2xl p-6 sm:p-8 shadow-lg relative overflow-hidden">
-      <div class="absolute -right-8 -bottom-8 w-36 h-36 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
-      <div class="flex items-center gap-3 mb-4">
-        <div class="w-10 h-10 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center text-xl">
-          📝
-        </div>
-        <div>
-          <p class="text-xs font-semibold text-blue-100 uppercase tracking-wider">微笑單車 經營TEAM採購</p>
-          <h1 class="text-xl sm:text-2xl font-bold">採購電子週報使用需求調查問卷 (A)</h1>
+    <!-- Header & 說明卡片 (Clay Hero Card) -->
+    <div class="clay-card !p-0 overflow-hidden border-2 border-orange-200">
+      <!-- 3D 黏土主視覺插圖 -->
+      <div class="relative overflow-hidden bg-gradient-to-b from-orange-100/50 to-amber-50">
+        <img src="images/survey/hero.jpg" alt="採購電子週報使用需求調查" class="w-full h-56 sm:h-64 object-cover">
+        <div class="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent"></div>
+        <div class="absolute bottom-4 left-5 right-5 text-white drop-shadow-md">
+          <span class="inline-block px-3 py-1 bg-amber-400/90 backdrop-blur-sm text-slate-900 rounded-full text-xs font-black tracking-wider uppercase mb-1 shadow-sm">
+            微笑單車 經營TEAM採購
+          </span>
+          <h1 class="text-xl sm:text-2xl font-black text-white">採購電子週報使用需求調查 (A)</h1>
         </div>
       </div>
-      <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 text-xs sm:text-sm text-blue-50 leading-relaxed border border-white/10">
-        <p class="font-bold text-white mb-1.5 flex items-center gap-1.5">
-          <span>📌</span><span>問卷說明</span>
-        </p>
-        <p class="mb-2">為持續優化「採購電子週報」的內容與呈現方式，並了解各單位的實際使用需求，請協助完成以下問卷。您的每一份回饋，將作為後續系統優化及內容調整的重要參考。</p>
-        <p class="text-amber-200 font-medium">⏳ 本調查請於收到通知後，於 5 個工作日內完成填寫及回覆，感謝您的支持與配合！</p>
+      
+      <!-- 說明文案區塊 -->
+      <div class="p-5 sm:p-6 bg-white/90">
+        <div class="bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl p-4 sm:p-5 border border-orange-200 text-xs sm:text-sm text-slate-700 leading-relaxed space-y-2">
+          <p class="font-black text-orange-950 flex items-center gap-2 text-sm sm:text-base">
+            <span class="text-lg">🎈</span><span>問卷說明與溫馨小語</span>
+          </p>
+          <p>
+            親愛的同仁您好！為了持續優化「採購電子週報」的內容豐富度與閱讀體驗，並深入掌握各單位的實際工作需求，請協助撥冗完成本份問卷。這是一份輕鬆、溫馨的回饋調查，您的每一筆想法都是推動我們進步最珍貴的寶藏！
+          </p>
+          <div class="pt-1.5 flex items-center gap-2 text-amber-800 font-bold text-xs">
+            <span class="text-base">⏳</span>
+            <span>溫馨提醒：請於收到通知後 5 個工作日內完成填寫回覆，衷心感謝您的暖心支持！</span>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- 表單本體 -->
-    <form id="survey-form" onsubmit="handleSurveySubmit(event)" class="space-y-6">
+    <form id="survey-form" onsubmit="handleSurveySubmit(event)" class="space-y-7">
 
       <!-- 一、基本資訊 -->
-      <div class="form-card">
-        <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
-          <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">一</span>
-          基本資訊
-        </h2>
+      <div class="clay-card">
+        <!-- 3D 黏土卡片頂部插圖 -->
+        <img src="images/survey/sec1_info.jpg" alt="基本資訊" class="clay-photo-frame">
+        
+        <div class="flex items-center gap-2.5 mb-4">
+          <span class="clay-badge">
+            <span>壹</span><span>基本資訊</span>
+          </span>
+          <span class="text-xs font-semibold text-orange-600/80">請填寫您的單位與工號</span>
+        </div>
+
         <div class="space-y-4">
           <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1.5">
+            <label class="block text-xs font-bold text-slate-700 mb-2">
               1. 所屬單位 <span class="text-rose-500">*</span>
             </label>
-            <select id="f-unit" required class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3.5 py-2.5 text-sm text-slate-800 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all">
+            <select id="f-unit" required class="clay-input w-full cursor-pointer">
               <option value="">▼ 請選擇所屬單位</option>
               <optgroup label="全台營運處">
                 <option value="台北營運處">台北營運處</option>
@@ -162,214 +354,241 @@
           </div>
 
           <div>
-            <label class="block text-xs font-semibold text-slate-600 mb-1.5">
+            <label class="block text-xs font-bold text-slate-700 mb-2">
               2. 填表人員工編號 <span class="text-rose-500">*</span>
             </label>
-            <input id="f-empid" type="text" required placeholder="請填寫工號（如 Bxxx）" class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3.5 py-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all">
+            <input id="f-empid" type="text" required placeholder="請填寫工號（如 Bxxx）" class="clay-input w-full placeholder-slate-400">
           </div>
         </div>
       </div>
 
       <!-- 二、採購電子週報使用情況 -->
-      <div class="form-card">
-        <h2 class="text-base font-bold text-slate-800 mb-2 flex items-center gap-2">
-          <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">二</span>
-          採購電子週報使用情況
-        </h2>
-        <p class="text-xs text-slate-500 mb-4">1. 您是否有定期查看「採購電子週報」？如未每次查看，請於下方「原因說明」簡要說明。</p>
+      <div class="clay-card">
+        <!-- 3D 黏土卡片頂部插圖 -->
+        <img src="images/survey/sec2_freq.jpg" alt="使用情況" class="clay-photo-frame">
+
+        <div class="flex items-center gap-2.5 mb-2">
+          <span class="clay-badge">
+            <span>貳</span><span>使用情況</span>
+          </span>
+          <span class="text-xs font-semibold text-orange-600/80">了解您的閱讀頻率</span>
+        </div>
+        <p class="text-xs text-slate-600 mb-4">您平時是否有定期查看「採購電子週報」？如未每次查看，歡迎於下方原因欄隨手說明。</p>
         
         <div class="space-y-2.5" id="freq-group">
           <label class="radio-card" onclick="selectRadio(this, 'freq')">
-            <input type="radio" name="freq" value="每次都有查看" required class="w-4 h-4 text-blue-600">
-            <span>每次都有查看</span>
+            <input type="radio" name="freq" value="每次都有查看" required>
+            <span>🌟 每次都有查看（忠實讀者）</span>
           </label>
           <label class="radio-card" onclick="selectRadio(this, 'freq')">
-            <input type="radio" name="freq" value="約每二週查看一次" class="w-4 h-4 text-blue-600">
-            <span>約每二週查看一次</span>
+            <input type="radio" name="freq" value="約每二週查看一次">
+            <span>📅 約每二週查看一次</span>
           </label>
           <label class="radio-card" onclick="selectRadio(this, 'freq')">
-            <input type="radio" name="freq" value="約每三週查看一次" class="w-4 h-4 text-blue-600">
-            <span>約每三週查看一次</span>
+            <input type="radio" name="freq" value="約每三週查看一次">
+            <span>☕ 約每三週查看一次</span>
           </label>
           <label class="radio-card" onclick="selectRadio(this, 'freq')">
-            <input type="radio" name="freq" value="約每月查看一次" class="w-4 h-4 text-blue-600">
-            <span>約每月查看一次</span>
+            <input type="radio" name="freq" value="約每月查看一次">
+            <span>🌱 約每月查看一次</span>
           </label>
           <label class="radio-card" onclick="selectRadio(this, 'freq')">
-            <input type="radio" name="freq" value="其他" class="w-4 h-4 text-blue-600">
-            <span>其他 / 未定期查看</span>
+            <input type="radio" name="freq" value="其他">
+            <span>💭 其他 / 目前較少定期查看</span>
           </label>
         </div>
 
-        <div class="mt-3">
-          <input id="f-freq-reason" type="text" placeholder="未每次查看之原因說明（選填）..." class="w-full bg-slate-50 border border-slate-300 rounded-lg px-3.5 py-2 text-xs text-slate-700 placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-all">
+        <div class="mt-3.5">
+          <input id="f-freq-reason" type="text" placeholder="未每次查看之原因說明（選填，如公務忙碌、尚未養成習慣等）..." class="clay-input w-full text-xs">
         </div>
       </div>
 
       <!-- 三、實際使用經驗評分 -->
-      <div class="form-card">
-        <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
-          <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">三</span>
-          實際使用經驗評分
-        </h2>
+      <div class="clay-card">
+        <!-- 3D 黏土卡片頂部插圖 -->
+        <img src="images/survey/sec3_score.jpg" alt="使用經驗評分" class="clay-photo-frame">
+
+        <div class="flex items-center gap-2.5 mb-4">
+          <span class="clay-badge">
+            <span>參</span><span>經驗評分</span>
+          </span>
+          <span class="text-xs font-semibold text-orange-600/80">給我們真實的回饋星星</span>
+        </div>
 
         <!-- 評分 1: 內容容易理解度 -->
-        <div class="mb-6">
-          <p class="text-xs font-semibold text-slate-700 mb-2">
-            1. 您對「採購電子週報」所發佈的內容是否容易理解？ <span class="text-rose-500">*</span>
+        <div class="mb-7 pb-6 border-b border-orange-100">
+          <p class="text-xs font-bold text-slate-800 mb-3 flex items-center gap-1.5">
+            <span>1. 您對「採購電子週報」所發佈的內容是否容易理解？</span>
+            <span class="text-rose-500">*</span>
           </p>
-          <div class="grid grid-cols-5 gap-2" id="score-understand-group">
+          <div class="clay-score-group" id="score-understand-group">
             <div class="score-btn" onclick="setScore('understand', 5)">
-              <span class="text-xl mb-1">🤩</span>
+              <span class="text-2xl mb-1">🤩</span>
               <span class="text-xs font-bold">5 分</span>
               <span class="text-[10px] text-slate-400 text-center scale-90">非常清楚</span>
             </div>
             <div class="score-btn" onclick="setScore('understand', 4)">
-              <span class="text-xl mb-1">🙂</span>
+              <span class="text-2xl mb-1">🙂</span>
               <span class="text-xs font-bold">4 分</span>
               <span class="text-[10px] text-slate-400 text-center scale-90">大致清楚</span>
             </div>
             <div class="score-btn" onclick="setScore('understand', 3)">
-              <span class="text-xl mb-1">😐</span>
+              <span class="text-2xl mb-1">😐</span>
               <span class="text-xs font-bold">3 分</span>
               <span class="text-[10px] text-slate-400 text-center scale-90">普通</span>
             </div>
             <div class="score-btn" onclick="setScore('understand', 2)">
-              <span class="text-xl mb-1">🙁</span>
+              <span class="text-2xl mb-1">🙁</span>
               <span class="text-xs font-bold">2 分</span>
               <span class="text-[10px] text-slate-400 text-center scale-90">不太清楚</span>
             </div>
             <div class="score-btn" onclick="setScore('understand', 1)">
-              <span class="text-xl mb-1">😣</span>
+              <span class="text-2xl mb-1">😣</span>
               <span class="text-xs font-bold">1 分</span>
               <span class="text-[10px] text-slate-400 text-center scale-90">完全不清楚</span>
             </div>
           </div>
           <input type="hidden" id="f-score-understand" required>
-          <input id="f-score-understand-other" type="text" placeholder="評分備註或說明（選填）..." class="mt-2.5 w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-700 placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-all">
+          <input id="f-score-understand-other" type="text" placeholder="評分備註或想告訴我們的說明（選填）..." class="clay-input mt-3 w-full text-xs">
         </div>
 
         <!-- 評分 2: 版面閱讀容易度 -->
         <div>
-          <p class="text-xs font-semibold text-slate-700 mb-2">
-            2. 您對「採購電子週報」所呈現的內容版面是否清楚、容易閱讀？ <span class="text-rose-500">*</span>
+          <p class="text-xs font-bold text-slate-800 mb-3 flex items-center gap-1.5">
+            <span>2. 您對「採購電子週報」所呈現的版面設計是否清晰、容易閱讀？</span>
+            <span class="text-rose-500">*</span>
           </p>
-          <div class="grid grid-cols-5 gap-2" id="score-layout-group">
+          <div class="clay-score-group" id="score-layout-group">
             <div class="score-btn" onclick="setScore('layout', 5)">
-              <span class="text-xl mb-1">✨</span>
+              <span class="text-2xl mb-1">✨</span>
               <span class="text-xs font-bold">5 分</span>
-              <span class="text-[10px] text-slate-400 text-center scale-90">非常清楚</span>
+              <span class="text-[10px] text-slate-400 text-center scale-90">極度舒適</span>
             </div>
             <div class="score-btn" onclick="setScore('layout', 4)">
-              <span class="text-xl mb-1">👍</span>
+              <span class="text-2xl mb-1">👍</span>
               <span class="text-xs font-bold">4 分</span>
-              <span class="text-[10px] text-slate-400 text-center scale-90">大致清楚</span>
+              <span class="text-[10px] text-slate-400 text-center scale-90">清晰好讀</span>
             </div>
             <div class="score-btn" onclick="setScore('layout', 3)">
-              <span class="text-xl mb-1">👌</span>
+              <span class="text-2xl mb-1">👌</span>
               <span class="text-xs font-bold">3 分</span>
-              <span class="text-[10px] text-slate-400 text-center scale-90">普通</span>
+              <span class="text-[10px] text-slate-400 text-center scale-90">普通尚可</span>
             </div>
             <div class="score-btn" onclick="setScore('layout', 2)">
-              <span class="text-xl mb-1">👀</span>
+              <span class="text-2xl mb-1">👀</span>
               <span class="text-xs font-bold">2 分</span>
-              <span class="text-[10px] text-slate-400 text-center scale-90">不易閱讀</span>
+              <span class="text-[10px] text-slate-400 text-center scale-90">有點吃力</span>
             </div>
             <div class="score-btn" onclick="setScore('layout', 1)">
-              <span class="text-xl mb-1">🌧️</span>
+              <span class="text-2xl mb-1">🌧️</span>
               <span class="text-xs font-bold">1 分</span>
-              <span class="text-[10px] text-slate-400 text-center scale-90">完全不清楚</span>
+              <span class="text-[10px] text-slate-400 text-center scale-90">需要大改</span>
             </div>
           </div>
           <input type="hidden" id="f-score-layout" required>
-          <input id="f-score-layout-other" type="text" placeholder="版面評分備註或說明（選填）..." class="mt-2.5 w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-700 placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-all">
+          <input id="f-score-layout-other" type="text" placeholder="版面評分備註或排版建議（選填）..." class="clay-input mt-3 w-full text-xs">
         </div>
       </div>
 
-      <!-- 四、內容需求調查 -->
-      <div class="form-card">
-        <h2 class="text-base font-bold text-slate-800 mb-4 flex items-center gap-2">
-          <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">四</span>
-          內容需求調查
-        </h2>
+      <!-- 四、內容需求與功能期待 -->
+      <div class="clay-card">
+        <!-- 3D 黏土卡片頂部插圖 -->
+        <img src="images/survey/sec4_wishlist.jpg" alt="內容需求與功能期待" class="clay-photo-frame">
+
+        <div class="flex items-center gap-2.5 mb-4">
+          <span class="clay-badge">
+            <span>肆</span><span>需求願望</span>
+          </span>
+          <span class="text-xs font-semibold text-orange-600/80">讓我們知道您想看什麼</span>
+        </div>
 
         <!-- 需求 1: 最希望提供的資訊 -->
-        <div class="mb-5">
-          <p class="text-xs font-semibold text-slate-700 mb-2">1. 您最希望電子週報提供哪些資訊？（可複選）</p>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2" id="wanted-info-group">
+        <div class="mb-6 pb-6 border-b border-orange-100">
+          <p class="text-xs font-bold text-slate-800 mb-2.5">1. 您最希望電子週報深入報導或新增哪些資訊？（可複選）</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5" id="wanted-info-group">
             <label class="check-tag" onclick="toggleCheck(this)">
-              <input type="checkbox" name="wanted_info" value="庫存及訂單資訊" class="w-4 h-4 text-blue-600 rounded">
-              <span>📦 庫存及訂單資訊</span>
+              <input type="checkbox" name="wanted_info" value="庫存及訂單資訊">
+              <span>📦 庫存及訂單即時資訊</span>
             </label>
             <label class="check-tag" onclick="toggleCheck(this)">
-              <input type="checkbox" name="wanted_info" value="交期異常／延遲案件" class="w-4 h-4 text-blue-600 rounded">
-              <span>⚠️ 交期異常／延遲案件</span>
+              <input type="checkbox" name="wanted_info" value="交期異常／延遲案件">
+              <span>⚠️ 交期異常／延遲警戒案件</span>
             </label>
             <label class="check-tag" onclick="toggleCheck(this)">
-              <input type="checkbox" name="wanted_info" value="缺料／急件資訊" class="w-4 h-4 text-blue-600 rounded">
-              <span>🚨 缺料／急件資訊</span>
+              <input type="checkbox" name="wanted_info" value="缺料／急件資訊">
+              <span>🚨 缺料／關鍵急件資訊</span>
             </label>
             <label class="check-tag" onclick="toggleCheck(this)">
-              <input type="checkbox" name="wanted_info" value="採購進度／案件追蹤" class="w-4 h-4 text-blue-600 rounded">
-              <span>📋 採購進度／案件追蹤</span>
+              <input type="checkbox" name="wanted_info" value="採購進度／案件追蹤">
+              <span>📋 採購進度／案件追蹤看板</span>
             </label>
           </div>
-          <input id="f-wanted-info-other" type="text" placeholder="其他希望提供的資訊（選填）..." class="mt-2 w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-700 placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-all">
+          <input id="f-wanted-info-other" type="text" placeholder="其他希望提供的資訊（選填）..." class="clay-input mt-2.5 w-full text-xs">
         </div>
 
         <!-- 需求 2: 希望增加的功能 -->
         <div>
-          <p class="text-xs font-semibold text-slate-700 mb-2">2. 您對採購電子週報有任何建議或希望增加的功能嗎？（可複選）</p>
-          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2" id="wanted-feat-group">
+          <p class="text-xs font-bold text-slate-800 mb-2.5">2. 您對採購電子週報系統有任何期待或希望增加的新功能嗎？（可複選）</p>
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5" id="wanted-feat-group">
             <label class="check-tag" onclick="toggleCheck(this)">
-              <input type="checkbox" name="wanted_feat" value="報表呈現方式" class="w-4 h-4 text-blue-600 rounded">
-              <span>📊 報表呈現方式</span>
+              <input type="checkbox" name="wanted_feat" value="報表呈現方式">
+              <span>📊 視覺化報表分析</span>
             </label>
             <label class="check-tag" onclick="toggleCheck(this)">
-              <input type="checkbox" name="wanted_feat" value="版面／閱讀方式" class="w-4 h-4 text-blue-600 rounded">
-              <span>📱 版面／閱讀方式</span>
+              <input type="checkbox" name="wanted_feat" value="版面／閱讀方式">
+              <span>📱 行動版友善介面</span>
             </label>
             <label class="check-tag" onclick="toggleCheck(this)">
-              <input type="checkbox" name="wanted_feat" value="資訊內容" class="w-4 h-4 text-blue-600 rounded">
-              <span>💡 資訊內容</span>
+              <input type="checkbox" name="wanted_feat" value="資訊內容">
+              <span>💡 客製化關鍵字訂閱</span>
             </label>
           </div>
-          <input id="f-wanted-feat-other" type="text" placeholder="其他希望增加的功能（選填）..." class="mt-2 w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-700 placeholder-slate-400 focus:outline-none focus:border-blue-500 transition-all">
+          <input id="f-wanted-feat-other" type="text" placeholder="其他希望增加的功能（選填）..." class="clay-input mt-2.5 w-full text-xs">
         </div>
       </div>
 
       <!-- 五、其他意見或建議 -->
-      <div class="form-card">
-        <h2 class="text-base font-bold text-slate-800 mb-2 flex items-center gap-2">
-          <span class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">五</span>
-          其他意見或建議
-        </h2>
-        <p class="text-xs text-slate-500 mb-3">對「採購電子週報」或「佈告欄功能」，您還有其他建議或希望改善的地方嗎？</p>
-        <textarea id="f-feedback" rows="4" placeholder="歡迎留下您的寶貴建議與想法，採購團隊將會逐筆研讀並列入優化清單..." class="w-full bg-slate-50 border border-slate-300 rounded-lg p-3 text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all"></textarea>
+      <div class="clay-card">
+        <!-- 3D 黏土卡片頂部插圖 -->
+        <img src="images/survey/sec5_feedback.jpg" alt="意見與建議" class="clay-photo-frame">
+
+        <div class="flex items-center gap-2.5 mb-2">
+          <span class="clay-badge">
+            <span>伍</span><span>悄悄話信箱</span>
+          </span>
+          <span class="text-xs font-semibold text-orange-600/80">傾聽您心底最真實的聲音</span>
+        </div>
+        <p class="text-xs text-slate-600 mb-3">對「採購電子週報」或「佈告欄功能」，還有任何想建議或改善的地方嗎？任何天馬行空的想法都非常歡迎！</p>
+        <textarea id="f-feedback" rows="4" placeholder="歡迎寫下您的悄悄話、建議與想法，採購團隊會細細閱讀並努力化為現實..." class="clay-input w-full text-sm leading-relaxed"></textarea>
       </div>
 
       <!-- 送出按鈕 -->
-      <div class="text-center pt-2">
-        <button type="submit" id="btn-submit" class="w-full sm:w-auto px-10 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-md shadow-blue-500/20 transition-all flex items-center justify-center gap-2 mx-auto cursor-pointer">
-          <span>確認送出問卷</span>
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+      <div class="text-center pt-3 pb-6">
+        <button type="submit" id="btn-submit" class="clay-submit-btn">
+          <span>💖 確認送出問卷回饋</span>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
         </button>
-        <p class="text-[11px] text-slate-400 mt-2">© 微笑單車股份有限公司 經營TEAM採購</p>
+        <p class="text-xs text-slate-400 mt-3 font-medium">© 微笑單車股份有限公司 經營TEAM採購 · 感謝您的參與</p>
       </div>
     </form>
 
-    <!-- 提交完成畫面 -->
-    <div id="success-card" class="hidden form-card text-center py-12 px-6">
-      <div class="w-16 h-16 rounded-full bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center mx-auto mb-4 text-3xl shadow-sm">
-        ✓
+    <!-- 提交完成畫面 (Success Card) -->
+    <div id="success-card" class="hidden clay-card text-center py-10 px-6 space-y-4">
+      <img src="images/survey/success_thanks.jpg" alt="感謝您的回饋" class="w-full max-w-md mx-auto rounded-3xl border-4 border-amber-200 shadow-xl mb-4">
+      
+      <div class="inline-block px-4 py-1.5 bg-emerald-100 text-emerald-800 rounded-full text-xs font-bold tracking-wide">
+        ✓ 問卷已順利送達
       </div>
-      <h2 class="text-xl font-bold text-slate-800 mb-2">感謝您的寶貴回饋！</h2>
-      <p class="text-sm text-slate-500 max-w-md mx-auto mb-6 leading-relaxed">
-        問卷已成功送出。您的每一項建議都將是推動採購電子週報與佈告欄功能持續精進的重要力量！
+      
+      <h2 class="text-2xl font-black text-slate-800">萬分感謝您的寶貴回饋！🎉</h2>
+      
+      <p class="text-sm text-slate-600 max-w-md mx-auto leading-relaxed">
+        您所填寫的每一條寶貴建議，都已經安全送達經營TEAM採購團隊。我們將把這些溫暖的回饋化為週報與佈告欄系統不斷前進的動力！
       </p>
-      <div class="flex justify-center gap-3">
-        <a href="index.html" class="px-6 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-sm font-semibold transition-colors">
-          前往採購佈告欄
+
+      <div class="pt-3">
+        <a href="index.html" class="clay-submit-btn !py-3 !px-8 text-sm">
+          🚲 返回採購佈告欄首頁
         </a>
       </div>
     </div>
@@ -442,12 +661,12 @@
       const scoreLayoutOther = document.getElementById('f-score-layout-other').value.trim();
 
       if (!scoreUnderstand) {
-        alert('請為「內容是否容易理解」評分！');
+        alert('請為「內容是否容易理解」給予評分喔！');
         document.getElementById('score-understand-group').scrollIntoView({ behavior: 'smooth' });
         return;
       }
       if (!scoreLayout) {
-        alert('請為「版面是否清楚容易閱讀」評分！');
+        alert('請為「版面設計是否清晰容易閱讀」給予評分喔！');
         document.getElementById('score-layout-group').scrollIntoView({ behavior: 'smooth' });
         return;
       }
@@ -483,7 +702,7 @@
 
       const btn = document.getElementById('btn-submit');
       btn.disabled = true;
-      btn.innerHTML = '<span>資料送出中...</span>';
+      btn.innerHTML = '<span>資料傳遞中... ✨</span>';
 
       try {
         if (db) {
@@ -497,7 +716,7 @@
         console.error("Survey submission failed:", err);
         alert('問卷提交發生異常，請稍後再試或聯繫採購管理員：' + err.message);
         btn.disabled = false;
-        btn.innerHTML = '<span>確認送出問卷</span>';
+        btn.innerHTML = '<span>💖 確認送出問卷回饋</span>';
       }
     }
 
@@ -515,6 +734,9 @@
                 break;
               }
             }
+          }
+          if (u.empId && !document.getElementById('f-empid').value) {
+            document.getElementById('f-empid').value = u.empId;
           }
         }
       } catch(e) {}
