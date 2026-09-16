@@ -506,82 +506,116 @@
 
 
         <!-- 郵件通訊錄 -->
-        <div id="tab-whitelist" class="settings-tab-pane hidden flex-1 flex flex-col h-full">
-          <div class="p-5 border-b border-slate-100 relative">
-            <div class="flex items-center justify-between mb-2">
-              <h4 class="text-lg font-bold text-slate-800">郵件通訊錄</h4>
-              <button onclick="toggleBatchMode()" id="btn-batch-mode" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold px-3 py-1.5 rounded transition-colors">批次管理</button>
-            </div>
-            <p class="text-xs text-slate-500 mb-4">在此建立採購相關的所有收件人名單。這些名單可用於發布週報，也可供加入群組。</p>
-            <div class="flex items-center gap-2 mb-3">
-              <div class="flex flex-col gap-2 w-full">
+        <div id="tab-whitelist" class="settings-tab-pane hidden flex-1 flex flex-col h-full bg-slate-50/40">
+          <!-- 頂部區塊：標題與新增卡片 -->
+          <div class="p-5 border-b border-slate-200/80 bg-white space-y-4">
+            <!-- 標題列 -->
+            <div class="flex items-center justify-between">
+              <div>
                 <div class="flex items-center gap-2">
-                  <select id="wl-region" class="form-input flex-1 text-sm px-2">
-                    <option value="">(地區)</option>
-                    <option value="工程處">工程處</option>
-                    <option value="經營Team">經營Team</option>
-                    <option value="台北">台北</option>
-                    <option value="新北">新北</option>
-                    <option value="桃園">桃園</option>
-                    <option value="新竹">新竹</option>
-                    <option value="苗栗">苗栗</option>
-                    <option value="台中">台中</option>
-                    <option value="嘉義">嘉義</option>
-                    <option value="台南">台南</option>
-                    <option value="高雄">高雄</option>
-                    <option value="屏東">屏東</option>
-                  </select>
-                  <input type="text" id="wl-unit" placeholder="單位 (如: 台中營運處)" class="form-input flex-1 text-sm">
-                  <input type="text" id="wl-name" placeholder="姓名" class="form-input flex-1 text-sm">
-                  <input type="email" id="wl-email" placeholder="信箱" class="form-input flex-[2] text-sm">
+                  <span class="w-1.5 h-4 bg-indigo-600 rounded-full"></span>
+                  <h4 class="text-base font-bold text-slate-800">郵件通訊錄</h4>
                 </div>
-                <div class="flex items-center justify-between mt-1">
-                  <div class="flex items-center gap-4">
-                    <label class="flex items-center gap-1 cursor-pointer text-xs font-medium text-amber-600 whitespace-nowrap bg-amber-50 px-2 py-1 rounded border border-amber-200">
-                      <input type="checkbox" id="wl-primary" class="rounded w-3.5 h-3.5 text-amber-600">
-                      ⭐ 主要聯絡人
+                <p class="text-xs text-slate-500 mt-1">建立採購相關之收件名單，發布週報時可快速載入或加入指定群組。</p>
+              </div>
+              <button onclick="toggleBatchMode()" id="btn-batch-mode" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold px-3 py-1.5 rounded-lg border border-slate-200/70 transition-all flex items-center gap-1.5 shadow-xs">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+                <span>批次管理</span>
+              </button>
+            </div>
+
+            <!-- 建立新聯絡人卡片容器 -->
+            <div class="bg-slate-50/70 border border-slate-200/80 rounded-xl p-3.5 shadow-xs">
+              <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <span class="text-indigo-600">＋</span> <span>建立 / 編輯聯絡人</span>
+              </div>
+              <div class="space-y-2.5">
+                <div class="grid grid-cols-12 gap-2">
+                  <div class="col-span-12 sm:col-span-2">
+                    <select id="wl-region" class="form-input w-full text-xs py-2 px-2.5 bg-white">
+                      <option value="">(地區)</option>
+                      <option value="工程處">工程處</option>
+                      <option value="經營Team">經營Team</option>
+                      <option value="台北">台北</option>
+                      <option value="新北">新北</option>
+                      <option value="桃園">桃園</option>
+                      <option value="新竹">新竹</option>
+                      <option value="苗栗">苗栗</option>
+                      <option value="台中">台中</option>
+                      <option value="嘉義">嘉義</option>
+                      <option value="台南">台南</option>
+                      <option value="高雄">高雄</option>
+                      <option value="屏東">屏東</option>
+                    </select>
+                  </div>
+                  <div class="col-span-12 sm:col-span-3">
+                    <input type="text" id="wl-unit" placeholder="單位 (例: 台中營運處)" class="form-input w-full text-xs py-2 px-2.5 bg-white">
+                  </div>
+                  <div class="col-span-12 sm:col-span-3">
+                    <input type="text" id="wl-name" placeholder="聯絡人姓名" class="form-input w-full text-xs py-2 px-2.5 bg-white">
+                  </div>
+                  <div class="col-span-12 sm:col-span-4">
+                    <input type="email" id="wl-email" placeholder="電子郵件 (Email)" class="form-input w-full text-xs py-2 px-2.5 bg-white">
+                  </div>
+                </div>
+
+                <div class="flex items-center justify-between pt-1">
+                  <div class="flex items-center gap-3">
+                    <label class="flex items-center gap-1.5 cursor-pointer text-xs font-medium text-amber-700 bg-amber-50/80 hover:bg-amber-100/60 px-2.5 py-1 rounded-lg border border-amber-200/80 transition-colors shadow-xs">
+                      <input type="checkbox" id="wl-primary" class="rounded w-3.5 h-3.5 text-amber-600 focus:ring-amber-500">
+                      <span>⭐ 主要聯絡人</span>
                     </label>
-                    <label class="flex items-center gap-1 cursor-pointer text-xs font-medium text-slate-600 whitespace-nowrap">
-                      <input type="checkbox" id="wl-receive" class="rounded w-3.5 h-3.5 text-blue-600" checked>
-                      接收信件
+                    <label class="flex items-center gap-1.5 cursor-pointer text-xs font-medium text-slate-600 bg-white hover:bg-slate-100/70 px-2.5 py-1 rounded-lg border border-slate-200/80 transition-colors shadow-xs">
+                      <input type="checkbox" id="wl-receive" class="rounded w-3.5 h-3.5 text-blue-600 focus:ring-blue-500" checked>
+                      <span>接收信件通知</span>
                     </label>
                   </div>
                   <div class="flex items-center gap-2">
-                    <button onclick="addWL()" id="wl-btn" class="btn-p ml-1">新增</button>
+                    <button onclick="addWL()" id="wl-btn" class="btn-p text-xs py-1.5 px-4 rounded-lg shadow-sm">
+                      新增
+                    </button>
                   </div>
                 </div>
               </div>
             </div>
-            <!-- 搜尋與批次操作列 -->
-            <div class="flex items-center gap-2 pt-3 border-t border-slate-100">
-              <select id="wl-filter-region" onchange="renderWL()" class="form-input w-28 text-sm px-2">
-                <option value="">所有地區</option>
-                <option value="台北">台北</option>
-                <option value="新北">新北</option>
-                <option value="桃園">桃園</option>
-                <option value="新竹">新竹</option>
-                <option value="苗栗">苗栗</option>
-                <option value="台中">台中</option>
-                <option value="嘉義">嘉義</option>
-                <option value="台南">台南</option>
-                <option value="高雄">高雄</option>
-                <option value="屏東">屏東</option>
-              </select>
-              <div class="flex-1 relative">
-                <input type="text" id="wl-search" oninput="renderWL()" placeholder="搜尋姓名或信箱..." class="form-input w-full pl-8 text-sm">
-                <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+
+            <!-- 篩選、搜尋與批次操作工具列 -->
+            <div class="flex flex-wrap items-center gap-2.5 pt-1">
+              <div class="w-32 flex-shrink-0">
+                <select id="wl-filter-region" onchange="renderWL()" class="form-input w-full text-xs py-1.5 px-2 bg-slate-50/60 border-slate-200">
+                  <option value="">全部地區</option>
+                  <option value="工程處">工程處</option>
+                  <option value="經營Team">經營Team</option>
+                  <option value="台北">台北</option>
+                  <option value="新北">新北</option>
+                  <option value="桃園">桃園</option>
+                  <option value="新竹">新竹</option>
+                  <option value="苗栗">苗栗</option>
+                  <option value="台中">台中</option>
+                  <option value="嘉義">嘉義</option>
+                  <option value="台南">台南</option>
+                  <option value="高雄">高雄</option>
+                  <option value="屏東">屏東</option>
+                </select>
               </div>
-              <div id="batch-actions" class="hidden flex items-center gap-2">
-                <button onclick="openBatchGroupModal()" class="text-sm bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold px-3 py-2 rounded transition-colors shadow-sm flex items-center gap-1">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>批次加入群組
+              <div class="flex-1 min-w-[200px] relative">
+                <input type="text" id="wl-search" oninput="renderWL()" placeholder="搜尋姓名或信箱..." class="form-input w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50/60 border-slate-200">
+                <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+              </div>
+              <div id="batch-actions" class="hidden flex items-center gap-2 flex-shrink-0">
+                <button onclick="openBatchGroupModal()" class="text-xs bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold px-3 py-1.5 rounded-lg border border-indigo-200/80 transition-colors shadow-xs flex items-center gap-1.5">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                  <span>批次加入群組</span>
                 </button>
-                <button onclick="batchDeleteWL()" class="text-sm bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold px-3 py-2 rounded transition-colors shadow-sm flex items-center gap-1">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>批次刪除
+                <button onclick="batchDeleteWL()" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold px-3 py-1.5 rounded-lg border border-rose-200/80 transition-colors shadow-xs flex items-center gap-1.5">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                  <span>批次刪除</span>
                 </button>
               </div>
             </div>
           </div>
-          <div class="flex-1 overflow-y-auto p-5 bg-slate-50/30" id="wl-list"></div>
+          <!-- 聯絡人清單列表 -->
+          <div class="flex-1 overflow-y-auto p-4 space-y-2" id="wl-list"></div>
         </div>
 
         <!-- 發信群組管理 -->
@@ -1876,7 +1910,7 @@
   </div>
 </div>
 
-<script src="js/admin.js?v=1789478607"></script>
+<script src="js/admin.js?v=1789569800"></script>
 <script>
   window.addEventListener('load', () => {
     setTimeout(async () => {

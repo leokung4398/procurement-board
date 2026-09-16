@@ -1458,29 +1458,51 @@ function renderWL() {
   }
   
   if (list.length === 0) {
-    c.innerHTML = '<div class="text-center text-slate-400 mt-10 text-sm">找不到符合條件的名單</div>';
+    c.innerHTML = '<div class="text-center text-slate-400 py-12 text-sm bg-white rounded-xl border border-dashed border-slate-200">找不到符合條件的通訊名單</div>';
     return;
   }
   
   c.innerHTML = list.map((w) => {
     const origIdx = S.whitelist.findIndex(x => x.email === w.email);
-    const regionBadge = w.region ? `<span class="ml-2 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-600 border border-slate-200">${w.region}</span>` : '';
-    const unitBadge = w.unit ? `<span class="ml-1 inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-600 border border-blue-100">${w.unit}</span>` : '';
-    const primaryBadge = w.isPrimary ? `<span class="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-200 shadow-sm" title="主要聯絡人">⭐ 主要</span>` : '';
-    const receiveBadge = (w.receiveEmail !== false) ? `<span class="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-green-50 text-green-600 border border-green-100">收信</span>` : `<span class="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-50 text-slate-400 border border-slate-100" title="不收信">停用</span>`;
+    const regionBadge = w.region ? `<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium bg-slate-100 text-slate-600 border border-slate-200/80">${xe(w.region)}</span>` : '';
+    const unitBadge = w.unit ? `<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium bg-blue-50 text-blue-600 border border-blue-100">${xe(w.unit)}</span>` : '';
+    const primaryBadge = w.isPrimary ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200 shadow-xs" title="主要聯絡窗口">⭐ 主要</span>` : '';
+    const receiveBadge = (w.receiveEmail !== false) 
+      ? `<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium bg-emerald-50 text-emerald-600 border border-emerald-100">收信</span>` 
+      : `<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium bg-slate-50 text-slate-400 border border-slate-100" title="暫停接收">停用</span>`;
+    
     return `
-      <div class="flex items-center gap-3 p-3 mb-2 ${w.isPrimary ? 'bg-amber-50/30 border-amber-200' : 'bg-white border-slate-200'} rounded-lg border hover:border-blue-300 transition-colors">
-        ${isBatchMode ? `
-          <input type="checkbox" onchange="toggleWLCb('${w.email}', this.checked)" class="w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500" ${selectedWL.includes(w.email) ? 'checked' : ''}>
-        ` : ''}
-        <div class="flex-1 min-w-0">
-          <div class="font-medium text-slate-800 text-sm truncate flex items-center">${w.name}${primaryBadge}${regionBadge}${unitBadge}${receiveBadge}</div>
-          <div class="text-xs text-slate-500 truncate">${w.email}</div>
+      <div class="group flex items-center justify-between gap-3 p-3 bg-white rounded-xl border transition-all duration-150 ${
+        w.isPrimary 
+          ? 'border-amber-200/90 shadow-xs bg-gradient-to-r from-amber-50/20 to-white hover:border-amber-300' 
+          : 'border-slate-200/80 hover:border-indigo-200 hover:shadow-xs'
+      }">
+        <div class="flex items-center gap-3 min-w-0 flex-1">
+          ${isBatchMode ? `
+            <input type="checkbox" onchange="toggleWLCb('${xe(w.email)}', this.checked)" class="w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500 cursor-pointer" ${selectedWL.includes(w.email) ? 'checked' : ''}>
+          ` : ''}
+          <div class="min-w-0 flex-1">
+            <div class="flex flex-wrap items-center gap-1.5 mb-1">
+              <span class="font-bold text-slate-800 text-sm tracking-tight">${xe(w.name)}</span>
+              ${primaryBadge}
+              ${regionBadge}
+              ${unitBadge}
+              ${receiveBadge}
+            </div>
+            <div class="text-xs text-slate-400 font-mono truncate flex items-center gap-1">
+              <svg class="w-3 h-3 text-slate-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+              <span>${xe(w.email)}</span>
+            </div>
+          </div>
         </div>
         ${!isBatchMode ? `
-          <div class="flex gap-1 flex-shrink-0">
-            <button onclick="editWL(${origIdx})" class="text-blue-500 hover:bg-blue-50 p-1.5 rounded" title="修改"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg></button>
-            <button onclick="rmWL(${origIdx})" class="text-red-500 hover:bg-red-50 p-1.5 rounded" title="刪除"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+          <div class="flex items-center gap-1 flex-shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
+            <button onclick="editWL(${origIdx})" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors" title="修改聯絡人">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+            </button>
+            <button onclick="rmWL(${origIdx})" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors" title="刪除">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
           </div>
         ` : ''}
       </div>
