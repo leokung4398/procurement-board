@@ -237,10 +237,17 @@
         <p class="text-sm text-slate-500 mt-1">提供本週重點摘要、交期異動與物料狀況明細</p>
       </div>
       <div class="flex items-center gap-3">
-        <!-- 尊榮已完讀金徽章 (閱讀完成時動態顯示) -->
-        <div id="user-read-badge" class="hidden items-center gap-1.5 bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-600 text-white px-3.5 py-1.5 rounded-full text-xs font-bold shadow-md ring-1 ring-amber-300/60 transition-all duration-300">
-          <span class="text-sm">👑</span>
-          <span id="user-read-badge-text">本期已完讀</span>
+        <!-- 尊榮已完讀金徽章 (精簡純皇冠設計，hover 浮現已閱讀提示) -->
+        <div id="user-read-badge" class="group relative hidden items-center justify-center w-8 h-8 rounded-full bg-gradient-to-tr from-amber-500 via-yellow-400 to-amber-600 text-white shadow-md ring-2 ring-amber-300/60 hover:scale-110 hover:shadow-lg transition-all duration-300 cursor-pointer">
+          <span class="text-base select-none leading-none">👑</span>
+          <!-- Hover Tooltip -->
+          <div class="pointer-events-none absolute bottom-full mb-2 left-1/2 -translate-x-1/2 opacity-0 group-hover:opacity-100 transition-all duration-200 z-50 whitespace-nowrap">
+            <div class="bg-slate-900/90 text-white text-[11px] font-semibold px-2.5 py-1 rounded-lg shadow-xl backdrop-blur-sm border border-slate-700/50 flex items-center gap-1.5">
+              <span class="text-amber-400">✨</span>
+              <span id="user-read-badge-text">已閱讀完畢</span>
+            </div>
+            <div class="w-2 h-2 bg-slate-900/90 rotate-45 mx-auto -mt-1 border-r border-b border-slate-700/50"></div>
+          </div>
         </div>
         <!-- 登入狀態識別標籤 -->
         <div id="user-info-badge" class="hidden items-center gap-2 bg-indigo-50 border border-indigo-200 px-3 py-1.5 rounded-full text-xs font-semibold text-indigo-700 shadow-sm">
@@ -957,12 +964,16 @@ async function showKPI(monthOffset = 0) {
       const bar = document.getElementById('reading-progress-bar');
       if (bar) bar.style.width = '100%';
 
-      // 3. 更新底端按鈕狀態
+      // 3. 更新底端按鈕與卡片狀態
       const btn = document.getElementById('btn-confirm-read');
       if (btn) {
         btn.disabled = true;
-        btn.className = 'w-full max-w-md mx-auto py-3.5 px-6 rounded-xl font-bold text-sm md:text-base flex items-center justify-center gap-2.5 transition-all duration-300 bg-slate-100 text-slate-400 border border-slate-200 cursor-default shadow-none';
-        btn.innerHTML = '<span>✅ 本期週報已確認閱畢</span>';
+        btn.className = 'w-full sm:w-auto px-5 py-2 rounded-lg font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 bg-slate-100 text-slate-400 border border-slate-200/80 cursor-default shadow-none';
+        btn.innerHTML = '<span>已完成本期打卡</span>';
+      }
+      const card = document.getElementById('reading-confirm-card');
+      if (card) {
+        card.className = 'mt-6 mb-4 p-4 rounded-xl border transition-all duration-300 bg-slate-50/80 border-slate-200/80';
       }
 
       // 4. 同步至 Firestore
@@ -1663,26 +1674,37 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
           ${(() => {
             const isRead = parseInt(localStorage.getItem('progress_' + bulletin.id) || '0', 10) >= 100;
             return `
-              <div id="reading-confirm-card" class="bg-gradient-to-br from-white to-slate-50 rounded-2xl p-6 md:p-8 border border-slate-200/80 shadow-md text-center my-8 transition-all">
-                <div class="max-w-xl mx-auto space-y-4">
-                  <div class="inline-flex items-center justify-center w-12 h-12 rounded-full ${isRead ? 'bg-amber-100 text-amber-600' : 'bg-blue-100 text-blue-600'} mb-1">
-                    <span class="text-2xl">${isRead ? '👑' : '📖'}</span>
-                  </div>
-                  <div>
-                    <h4 class="text-base md:text-lg font-bold text-slate-800">
-                      ${isRead ? '🎉 您已完成本期週報閱讀' : '📋 本期週報閱讀確認'}
-                    </h4>
-                    <p class="text-xs md:text-sm text-slate-500 mt-1">
-                      ${isRead ? '系統已成功記錄您的閱畢打卡紀錄，頂部已點亮尊榮完讀徽章。' : '請詳細閱畢以上各項物料、交期與重點通知後，點擊下方按鈕完成本期閱讀打卡。'}
-                    </p>
-                  </div>
-                  <div class="pt-2">
-                    <button id="btn-confirm-read" onclick="confirmBulletinRead('${e(bulletin.id)}')" ${isRead ? 'disabled' : ''} class="w-full max-w-md mx-auto py-3.5 px-6 rounded-xl font-bold text-sm md:text-base flex items-center justify-center gap-2.5 transition-all duration-300 ${
-                      isRead 
-                        ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-default shadow-none' 
-                        : 'bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-500 hover:from-blue-700 hover:via-indigo-700 hover:to-teal-600 text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.99] cursor-pointer ring-2 ring-indigo-300/40'
+              <div id="reading-confirm-card" class="mt-6 mb-4 p-4 rounded-xl border transition-all duration-300 ${
+                isRead 
+                  ? 'bg-slate-50/80 border-slate-200/80' 
+                  : 'bg-white border-slate-200 shadow-sm hover:border-indigo-200'
+              }">
+                <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+                  <div class="flex items-center gap-3 min-w-0 text-center sm:text-left">
+                    <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                      isRead ? 'bg-amber-50 text-amber-500 border border-amber-200/60' : 'bg-indigo-50 text-indigo-600 border border-indigo-100'
                     }">
-                      <span>${isRead ? '✅ 本期週報已確認閱畢' : '✅ 確認已閱讀本期週報內容 (點擊打卡)'}</span>
+                      <span class="text-lg leading-none">${isRead ? '👑' : '📋'}</span>
+                    </div>
+                    <div>
+                      <div class="flex items-center justify-center sm:justify-start gap-2">
+                        <h4 class="text-sm font-bold text-slate-800">
+                          ${isRead ? '本期週報閱讀確認' : '閱讀打卡確認'}
+                        </h4>
+                        ${isRead ? '<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200/70 px-2 py-0.5 rounded-full">✓ 已閱畢</span>' : ''}
+                      </div>
+                      <p class="text-xs text-slate-500 mt-0.5">
+                        ${isRead ? '系統已成功記錄您的閱畢紀錄，頂部已點亮尊榮皇冠徽章。' : '閱畢重點通知與異動明細後，請點擊右側按鈕完成閱讀打卡。'}
+                      </p>
+                    </div>
+                  </div>
+                  <div class="flex-shrink-0 w-full sm:w-auto">
+                    <button id="btn-confirm-read" onclick="confirmBulletinRead('${e(bulletin.id)}')" ${isRead ? 'disabled' : ''} class="w-full sm:w-auto px-5 py-2 rounded-lg font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 ${
+                      isRead 
+                        ? 'bg-slate-100 text-slate-400 border border-slate-200/80 cursor-default shadow-none' 
+                        : 'bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-500 hover:from-blue-700 hover:via-indigo-700 hover:to-teal-600 text-white shadow hover:shadow-md active:scale-95 cursor-pointer ring-1 ring-indigo-300/30'
+                    }">
+                      <span>${isRead ? '已完成本期打卡' : '確認已閱讀完畢 (打卡)'}</span>
                     </button>
                   </div>
                 </div>
