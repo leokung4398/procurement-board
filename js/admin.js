@@ -1458,7 +1458,7 @@ function renderWL() {
   }
   
   if (list.length === 0) {
-    c.innerHTML = '<div class="text-center text-slate-400 py-12 text-sm bg-white rounded-xl border border-dashed border-slate-200">找不到符合條件的通訊名單</div>';
+    c.innerHTML = '<div class="col-span-full text-center text-slate-400 py-12 text-sm bg-white rounded-xl border border-dashed border-slate-200">找不到符合條件的通訊名單</div>';
     return;
   }
   
