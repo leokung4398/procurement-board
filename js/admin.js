@@ -1316,13 +1316,28 @@ let tempKw = [];
     function hideKM() { document.getElementById('km').classList.add('hidden'); }
     function renderKMCats() {
       const c = document.getElementById('km-cat-list');
-      c.innerHTML = tempKw.map(cat => `<div onclick="selKMCat('${cat.id}')" class="p-3 mb-1.5 rounded-lg cursor-pointer transition-colors border ${cat.id===curKwId ? 'bg-blue-50 border-blue-200 text-blue-700 shadow-sm font-semibold' : 'bg-white border-transparent text-slate-600 hover:bg-slate-100 hover:border-slate-200'} flex items-center justify-between text-sm"><span class="truncate">${cat.name}</span><span class="text-xs bg-white px-2 py-0.5 rounded-full shadow-sm text-slate-500">${(cat.keywords||[]).length}</span></div>`).join('');
+      c.innerHTML = tempKw.map(cat => {
+        const isSelected = cat.id === curKwId;
+        return `
+          <div onclick="selKMCat('${cat.id}')" class="group p-2.5 rounded-xl cursor-pointer transition-all duration-150 border ${
+            isSelected 
+              ? 'bg-blue-50/80 border-blue-200 text-blue-900 shadow-xs font-bold ring-1 ring-blue-200/50' 
+              : 'bg-white border-slate-200/70 text-slate-700 hover:bg-slate-50 hover:border-blue-100 shadow-xs'
+          } flex items-center justify-between text-xs">
+            <div class="flex items-center gap-2 min-w-0 flex-1">
+              <span class="w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-blue-600' : 'bg-slate-300 group-hover:bg-blue-400'} flex-shrink-0"></span>
+              <span class="truncate">${xe(cat.name)}</span>
+            </div>
+            <span class="text-[11px] font-mono px-2 py-0.5 rounded-full ${isSelected ? 'bg-blue-100 text-blue-700 font-bold' : 'bg-slate-100 text-slate-500'} flex-shrink-0">${(cat.keywords||[]).length}</span>
+          </div>
+        `;
+      }).join('');
     }
     function selKMCat(id) {
       curKwId = id;
       renderKMCats();
       const cat = tempKw.find(c => c.id === id);
-      document.getElementById('km-kw-title').textContent = cat ? cat.name + ' - 子標題管理' : '';
+      document.getElementById('km-kw-title').textContent = cat ? `${cat.name} (${(cat.keywords||[]).length} 個子標題)` : '請選擇左側母標題';
       renderKWs();
     }
     function renderKWs() {
@@ -1330,20 +1345,28 @@ let tempKw = [];
       const cat = tempKw.find(cat => cat.id === curKwId);
       if (!cat) return;
       if (!cat.keywords || cat.keywords.length === 0) {
-        c.innerHTML = '<div class="text-center text-slate-400 mt-10 text-sm">尚無任何關鍵字子標題</div>';
+        c.innerHTML = '<div class="text-center text-slate-400 py-12 text-xs bg-white rounded-xl border border-dashed border-slate-200">尚無任何關鍵字子標題，可點擊右上角新增</div>';
         return;
       }
       cat.keywords.sort((a,b)=>a.order-b.order);
       c.innerHTML = cat.keywords.map((k, i) => `
-        <div class="flex items-center gap-3 bg-white p-3 mb-2 rounded-lg border border-slate-200 shadow-sm hover:border-blue-300 transition-colors group">
-          <div class="cursor-move text-slate-300 hover:text-slate-500">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        <div class="flex items-center gap-3 bg-white p-2.5 rounded-xl border border-slate-200/80 shadow-xs hover:border-indigo-200 hover:shadow-sm transition-all group">
+          <div class="cursor-move text-slate-300 hover:text-slate-500 flex-shrink-0" title="拖移排序">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
           </div>
-          <input type="text" class="form-input flex-1 font-medium text-sm border-transparent hover:border-slate-200 focus:border-blue-400 bg-transparent focus:bg-white" value="${k.text}" onchange="uKWText('${k.id}', this.value)">
-          <div class="flex items-center gap-2 border-l border-slate-100 pl-3">
-            <button onclick="tgKWActive('${k.id}')" class="px-3 py-1 rounded text-xs font-semibold ${k.isActive !== false ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-500'}">${k.isActive !== false ? '啟用中' : '已停用'}</button>
-            <button onclick="mvKWUp('${k.id}')" class="p-1 rounded hover:bg-slate-100 text-slate-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg></button>
-            <button onclick="mvKWDn('${k.id}')" class="p-1 rounded hover:bg-slate-100 text-slate-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></button>
+          <div class="flex-1 min-w-0">
+            <input type="text" class="w-full font-semibold text-xs text-slate-800 border border-transparent hover:border-slate-200 focus:border-blue-400 rounded-lg px-2.5 py-1.5 bg-transparent focus:bg-white transition-all outline-none" value="${xe(k.text)}" onchange="uKWText('${k.id}', this.value)" placeholder="輸入子標題關鍵字名稱...">
+          </div>
+          <div class="flex items-center gap-1.5 border-l border-slate-100 pl-3 flex-shrink-0">
+            <button onclick="tgKWActive('${k.id}')" class="px-2.5 py-1 rounded-md text-[11px] font-semibold transition-colors ${k.isActive !== false ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/80' : 'bg-slate-100 text-slate-500 border border-slate-200'}">
+              ${k.isActive !== false ? '● 啟用中' : '○ 已停用'}
+            </button>
+            <button onclick="mvKWUp('${k.id}')" class="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors" title="上移">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+            </button>
+            <button onclick="mvKWDn('${k.id}')" class="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors" title="下移">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
           </div>
         </div>
       `).join('');
