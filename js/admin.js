@@ -931,15 +931,29 @@ function hideAdminList() { document.getElementById('admin-modal').classList.add(
 function renderAdminList() {
   const c = document.getElementById('am-list');
   if (S.admins.length === 0) {
-    c.innerHTML = '<tr><td colspan="3" class="px-3 py-4 text-center text-slate-400">目前尚無管理員，請新增</td></tr>';
+    c.innerHTML = '<tr><td colspan="3" class="px-4 py-8 text-center text-slate-400 text-xs">目前尚無自訂管理員，請於上方新增</td></tr>';
     return;
   }
   c.innerHTML = S.admins.map((u, i) => `
-    <tr>
-      <td class="px-3 py-2 text-slate-700 font-medium">${xe(u.name)}</td>
-      <td class="px-3 py-2 text-slate-500">${xe(u.email)}</td>
-      <td class="px-3 py-2 text-center">
-        <button onclick="delAdmin(${i})" class="text-rose-500 hover:text-rose-700"><svg class="w-4 h-4 inline" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></button>
+    <tr class="hover:bg-slate-50/70 transition-colors group">
+      <td class="px-4 py-3 text-slate-800 font-bold text-xs">
+        <div class="flex items-center gap-2">
+          <div class="w-6 h-6 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center text-[10px] font-bold flex-shrink-0">
+            ${xe(u.name ? u.name.charAt(0).toUpperCase() : 'A')}
+          </div>
+          <span>${xe(u.name)}</span>
+        </div>
+      </td>
+      <td class="px-4 py-3 text-slate-500 font-mono text-xs">
+        <div class="flex items-center gap-1.5 text-slate-600">
+          <svg class="w-3.5 h-3.5 text-slate-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+          <span>${xe(u.email)}</span>
+        </div>
+      </td>
+      <td class="px-4 py-3 text-center">
+        <button onclick="delAdmin(${i})" class="w-7 h-7 rounded-lg inline-flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors" title="移除管理員">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+        </button>
       </td>
     </tr>
   `).join('');
