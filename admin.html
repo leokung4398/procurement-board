@@ -273,12 +273,7 @@
   <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm mx-4">
     <div class="text-center mb-6">
       <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-        <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>  <!-- 選取中色塊的黑白雙重高亮框 (如圖 3 所示) -->
-  <g id="std-selection-group" class="hidden">
-    <polygon id="std-hex-selector" points=""/>
-    <polygon id="std-hex-selector-inner" points=""/>
-  </g>
-</svg>
+        <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
       </div>
       <h2 class="text-xl font-bold text-slate-800">採購週報管理後台</h2>
       <p class="text-sm text-slate-500 mt-1">微笑單車股份有限公司</p>
@@ -294,156 +289,327 @@
   </div>
 </div>
 <div id="tc"></div>
-<div class="flex h-screen">
-  <aside id="sidebar" class="w-64 bg-white border-r border-slate-200 flex flex-col flex-shrink-0">
-    <div class="px-5 py-5 border-b border-slate-100">
+<div class="flex h-screen overflow-hidden bg-slate-100">
+  <!-- 左側導航欄 (Sidebar) 升級為精緻 72 (288px) 寬度、高階微陰影與質感分組 -->
+  <aside id="sidebar" class="w-72 bg-white border-r border-slate-200/90 flex flex-col flex-shrink-0 shadow-sm z-20">
+    <!-- 品牌識別區 -->
+    <div class="px-5 py-4 border-b border-slate-100/90 bg-gradient-to-r from-slate-900 to-slate-800 text-white flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        <div class="w-9 h-9 rounded-xl bg-blue-600/90 flex items-center justify-center shadow-md shadow-blue-500/30 border border-blue-400/30">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
         </div>
-        <div><p class="text-sm font-bold text-slate-800">採購週報</p><p class="text-xs text-slate-500">管理後台</p></div>
+        <div>
+          <div class="flex items-center gap-1.5">
+            <span class="text-sm font-bold tracking-tight text-white">採購週報後台</span>
+            <span class="text-[10px] bg-blue-500/30 text-blue-200 px-1.5 py-0.5 rounded border border-blue-400/30 font-semibold uppercase">PRO</span>
+          </div>
+          <p class="text-[11px] text-slate-400">微笑單車管理系統</p>
+        </div>
       </div>
+      <a href="index.html" target="_blank" class="text-slate-400 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/10" title="開啟前台查看">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+      </a>
     </div>
-    <div class="px-4 py-4 border-b border-slate-100 space-y-3">
-      <button onclick="newBulletin()" class="btn-p w-full justify-center text-sm">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>新增週報
-      </button>
-      <button onclick="openSettingsModal()" class="btn-s w-full justify-center text-sm text-slate-600 border-slate-200 bg-slate-50 hover:bg-slate-100 mt-2">
-        <span class="font-bold tracking-wide">⚙️ 系統設定中心</span>
-      </button>
-      <button onclick="openAboutModal()" class="btn-s w-full justify-center text-sm text-amber-600 border-amber-200 bg-amber-50 hover:bg-amber-100 mt-2 relative overflow-hidden group">
-        <div class="absolute inset-0 bg-white/40 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-12"></div>
-        <span class="font-bold tracking-wide">ℹ️ 系統與專案成果</span>
+
+    <!-- 核心操作按鈕群組 -->
+    <div class="p-3.5 space-y-2 border-b border-slate-100 bg-slate-50/50">
+      <!-- 主要行動：新增週報 -->
+      <button onclick="newBulletin()" class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold text-sm shadow-md shadow-blue-600/20 hover:shadow-lg hover:shadow-blue-600/30 hover:-translate-y-0.5 transition-all duration-200">
+        <svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        <span>新增採購週報</span>
       </button>
 
-            <div class="mt-2 flex flex-col gap-1.5">
-        <button onclick="showKPI()" class="w-full flex items-center justify-center gap-2 bg-indigo-50 text-indigo-600 border border-indigo-100 rounded-lg px-4 py-2 text-sm font-semibold hover:bg-indigo-100 transition-colors">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
-          點閱績效統計
+      <!-- 次要設定與成果專區 (精緻分組卡片) -->
+      <div class="grid grid-cols-2 gap-1.5 pt-1">
+        <button onclick="openSettingsModal()" class="flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-lg text-xs font-semibold text-slate-700 bg-white hover:bg-slate-100/80 border border-slate-200 shadow-xs hover:border-slate-300 transition-all">
+          <span>⚙️</span>
+          <span>設定中心</span>
         </button>
-        <button onclick="showSurveyModal()" class="w-full flex items-center justify-center gap-2 bg-blue-50 text-blue-600 border border-blue-100 rounded-lg px-4 py-2 text-sm font-semibold hover:bg-blue-100 transition-colors">
-          <span class="text-base">📝</span>
-          <span>使用需求問卷統計</span>
+        <button onclick="openAboutModal()" class="flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-lg text-xs font-semibold text-amber-700 bg-amber-50/80 hover:bg-amber-100/80 border border-amber-200/80 shadow-xs hover:border-amber-300 transition-all relative overflow-hidden group">
+          <div class="absolute inset-0 bg-white/40 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-500 skew-x-12"></div>
+          <span>ℹ️</span>
+          <span>專案成果</span>
         </button>
-      </div>      <div class="space-y-2 border border-slate-200 p-2 rounded-lg bg-slate-50 mt-2">
-        <p class="text-[10px] font-semibold text-slate-500 uppercase">進階搜尋</p>
-        <select id="admin-search-month" onchange="handleAdminSearch()" class="form-input text-xs py-1.5 px-2 w-full bg-white">
-          <option value="">全部月份</option>
-        </select>
-        <select id="admin-search-parent" onchange="handleAdminSearch()" class="form-input text-xs py-1.5 px-2 w-full bg-white">
-          <option value="">全部類別</option>
-          <option value="一、採購管理">一、採購管理</option>
-          <option value="二、供應商管理">二、供應商管理</option>
-          <option value="三、品質管理">三、品質管理</option>
-          <option value="四、工程管理">四、工程管理</option>
-          <option value="五、物流管理">五、物流管理</option>
-          <option value="六、倉儲管理">六、倉儲管理</option>
-          <option value="七、文件管理">七、文件管理</option>
-          <option value="八、公告管理">八、公告管理</option>
-          <option value="九、其他">九、其他</option>
-        </select>
-        <input type="text" id="admin-search-keyword" oninput="handleAdminSearch()" class="form-input text-xs py-1.5 px-2 w-full bg-white" placeholder="關鍵字、料號...">
+      </div>
+
+      <!-- 統計分析快捷入口 (雙欄並排精簡美觀) -->
+      <div class="grid grid-cols-2 gap-1.5">
+        <button onclick="showKPI()" class="flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-lg text-xs font-semibold text-indigo-700 bg-indigo-50/80 hover:bg-indigo-100/80 border border-indigo-200/80 shadow-xs transition-all">
+          <svg class="w-3.5 h-3.5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          <span>點閱績效</span>
+        </button>
+        <button onclick="showSurveyModal()" class="flex items-center justify-center gap-1.5 py-2 px-2.5 rounded-lg text-xs font-semibold text-sky-700 bg-sky-50/80 hover:bg-sky-100/80 border border-sky-200/80 shadow-xs transition-all">
+          <span>📝</span>
+          <span>問卷統計</span>
+        </button>
+      </div>
+
+      <!-- 進階搜尋過濾卡片 -->
+      <div class="mt-2.5 bg-white border border-slate-200/90 rounded-xl p-2.5 shadow-xs space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+            <svg class="w-3 h-3 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            歷史篩選與搜尋
+          </span>
+        </div>
+        <div class="grid grid-cols-2 gap-1.5">
+          <select id="admin-search-month" onchange="handleAdminSearch()" class="form-input text-xs py-1.5 px-2 bg-slate-50/60 border-slate-200 rounded-lg">
+            <option value="">全部月份</option>
+          </select>
+          <select id="admin-search-parent" onchange="handleAdminSearch()" class="form-input text-xs py-1.5 px-2 bg-slate-50/60 border-slate-200 rounded-lg">
+            <option value="">全部類別</option>
+            <option value="一、採購管理">一、採購管理</option>
+            <option value="二、供應商管理">二、供應商管理</option>
+            <option value="三、品質管理">三、品質管理</option>
+            <option value="四、工程管理">四、工程管理</option>
+            <option value="五、物流管理">五、物流管理</option>
+            <option value="六、倉儲管理">六、倉儲管理</option>
+            <option value="七、文件管理">七、文件管理</option>
+            <option value="八、公告管理">八、公告管理</option>
+            <option value="九、其他">九、其他</option>
+          </select>
+        </div>
+        <div class="relative">
+          <input type="text" id="admin-search-keyword" oninput="handleAdminSearch()" class="form-input text-xs py-1.5 pl-7 pr-2 w-full bg-slate-50/60 border-slate-200 rounded-lg" placeholder="搜尋關鍵字、料號、標題...">
+          <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </div>
       </div>
     </div>
         
-    <nav class="flex-1 px-3 py-3">
-      <p class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-2 mb-2">歷史歸檔</p>
-      <div id="sbm"><div class="text-center py-8 text-slate-400 text-sm">載入中...</div></div>
-    </nav>
-    <div class="px-5 py-4 border-t border-slate-100 flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center"><span class="text-xs font-bold text-blue-600">A</span></div>
-        <div><p class="text-xs font-semibold text-slate-700">採購管理員</p><p class="text-[11px] text-slate-400">admin</p></div>
+    <!-- 歷史歸檔導覽列表 -->
+    <nav class="flex-1 px-3 py-3 overflow-y-auto">
+      <div class="flex items-center justify-between px-2 mb-2">
+        <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">歷史週報歸檔</p>
       </div>
-      <button onclick="showHandover()" class="text-slate-400 hover:text-amber-500 transition-colors" title="系統交接設定">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+      <div id="sbm" class="space-y-1">
+        <div class="text-center py-8 text-slate-400 text-xs flex flex-col items-center gap-2">
+          <span class="spn text-slate-400"></span>
+          <span>資料載入中...</span>
+        </div>
+      </div>
+    </nav>
+
+    <!-- 底部管理員與交接資訊欄 -->
+    <div class="px-4 py-3 border-t border-slate-100 bg-slate-50/80 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-600 to-indigo-500 text-white flex items-center justify-center font-bold text-xs shadow-sm ring-2 ring-white">
+          A
+        </div>
+        <div>
+          <p class="text-xs font-bold text-slate-700">採購管理員</p>
+          <div class="flex items-center gap-1.5 text-[10px] text-emerald-600 font-medium">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>在線管理中</span>
+          </div>
+        </div>
+      </div>
+      <button onclick="showHandover()" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-amber-600 hover:bg-amber-50 transition-all" title="系統交接與聯絡資訊">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
       </button>
     </div>
   </aside>
-  <main id="main-content" class="flex-1 bg-slate-50">
-    <div id="tb" class="sticky top-0 z-10 bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between gap-4">
-      <div class="flex items-center gap-3">
-        <span id="tb-title" class="text-sm font-semibold text-slate-700">請選擇或新增週報</span>
+
+  <!-- 右側主要工作台 (Main Content) -->
+  <main id="main-content" class="flex-1 flex flex-col min-w-0 bg-slate-50/80 overflow-y-auto">
+    <!-- 頂部吸頂操作列 (Sticky Topbar) 升級為高階毛玻璃與微投影 -->
+    <div id="tb" class="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200/80 px-6 py-3.5 flex items-center justify-between gap-4 shadow-xs">
+      <div class="flex items-center gap-3 min-w-0">
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-blue-600 ring-4 ring-blue-50"></span>
+          <span id="tb-title" class="text-base font-bold text-slate-800 truncate">請選擇或新增週報</span>
+        </div>
         <span id="tb-status" class="bdg-dft hidden"></span>
       </div>
-      <div id="tb-acts" class="flex items-center gap-2 hidden">
-        <button id="btn-dft" onclick="saveDraft()" class="btn-s text-sm">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>儲存草稿
+
+      <!-- 操作按鈕群組 (編輯特定週報時呈現) -->
+      <div id="tb-acts" class="flex items-center gap-2.5 hidden">
+        <button id="btn-dft" onclick="saveDraft()" class="btn-s text-xs py-2 px-3.5" title="儲存為草稿暫存">
+          <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+          <span>儲存草稿</span>
         </button>
-        <button onclick="cloneBulletin()" class="btn-s text-sm">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>複製新增
+        <button onclick="cloneBulletin()" class="btn-s text-xs py-2 px-3.5" title="複製此份週報所有內容建立新週報">
+          <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+          <span>複製新增</span>
         </button>
-        <button onclick="delBulletin()" class="btn-d text-sm">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>刪除
+        <button onclick="delBulletin()" class="btn-d text-xs py-2 px-3.5" title="刪除此份週報">
+          <svg class="w-4 h-4 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          <span>刪除</span>
         </button>
-        <button id="btn-unpub" onclick="unpubBulletin()" class="btn-s text-sm text-rose-600 border-rose-200 bg-rose-50 hover:bg-rose-100 hidden">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>撤回發布
+        <button id="btn-unpub" onclick="unpubBulletin()" class="btn-s text-xs py-2 px-3.5 text-rose-600 border-rose-200 bg-rose-50/80 hover:bg-rose-100/80 hidden" title="取消前台發布狀態回退至草稿">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span>撤回發布</span>
         </button>
-        <button id="btn-pub" onclick="pubBulletin()" class="btn-ok text-sm">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
-          <span id="pub-txt">正式發布</span><span id="pub-spn" class="spn hidden"></span>
+        <button id="btn-pub" onclick="pubBulletin()" class="btn-ok text-xs py-2 px-4 shadow-sm" title="確認無誤並發送 Email 通知">
+          <svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          <span id="pub-txt">正式發布</span>
+          <span id="pub-spn" class="spn hidden"></span>
         </button>
       </div>
     </div>
-    <div class="px-6 py-6 max-w-6xl mx-auto">
-      <div id="es" class="text-center py-16 text-slate-400">
-        <svg class="w-16 h-16 mx-auto mb-4 opacity-30" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-        <h3 class="text-lg font-semibold mb-1">選擇或建立週報</h3>
-        <p class="text-sm">從左側選擇歷史週報，或點擊「新增週報」。</p>
-      </div>
-      <div id="bf" class="hidden space-y-6">
-        <section class="bg-white rounded-xl border border-slate-200 shadow-sm">
-          <div class="px-5 py-4 border-b border-slate-100">
-            <h2 class="text-sm font-semibold text-slate-700 flex items-center gap-2">
-              <span class="w-5 h-5 bg-blue-100 rounded text-blue-600 flex items-center justify-center text-xs font-bold">A</span>基本資訊
-            </h2>
+
+    <!-- 內容容器 -->
+    <div class="px-6 py-6 max-w-6xl w-full mx-auto">
+      <!-- 狀態 1：未選取週報時的儀表板歡迎狀態 (Welcome Dashboard Hero) 徹底告別單調空白 -->
+      <div id="es" class="py-8">
+        <!-- 頂部歡迎卡片 -->
+        <div class="relative overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-blue-900 rounded-3xl p-8 sm:p-10 text-white shadow-xl shadow-slate-900/10 mb-8 border border-slate-800">
+          <!-- 背景幾何裝飾光暈 -->
+          <div class="absolute -right-16 -top-16 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl pointer-events-none"></div>
+          <div class="absolute right-1/3 -bottom-16 w-64 h-64 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
+          
+          <div class="relative z-10 max-w-2xl">
+            <div class="inline-flex items-center gap-2 bg-blue-500/20 text-blue-300 border border-blue-400/30 px-3 py-1 rounded-full text-xs font-semibold mb-4 backdrop-blur-sm">
+              <span class="w-2 h-2 rounded-full bg-blue-400 animate-ping"></span>
+              <span>採購智慧中台 · 全方位管理</span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white mb-2">
+              歡迎使用微笑單車採購週報管理系統 👋
+            </h1>
+            <p class="text-sm sm:text-base text-slate-300 leading-relaxed mb-6 font-normal">
+              透過左側功能面板，您可以即時撰寫、排版與正式發布每週採購重點報告，或是即時管理群組通訊錄與查閱同仁問卷數據。
+            </p>
+
+            <div class="flex flex-wrap items-center gap-3">
+              <button onclick="newBulletin()" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-blue-500 hover:bg-blue-600 text-white font-semibold text-sm shadow-md shadow-blue-500/30 transition-all hover:-translate-y-0.5">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                <span>立即建立新週報</span>
+              </button>
+              <button onclick="openSettingsModal()" class="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white border border-white/20 font-medium text-sm transition-all backdrop-blur-sm">
+                <span>⚙️ 開啟設定中心</span>
+              </button>
+            </div>
           </div>
-          <div class="p-5 grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div><label class="block text-xs font-medium text-slate-500 mb-1">週別 ID *</label><input id="f-id" type="text" class="form-input" placeholder="e.g. 2026-W30" oninput="fc()"></div>
-            <div><label class="block text-xs font-medium text-slate-500 mb-1">發布日期 *</label><input id="f-pd" type="date" class="form-input" oninput="fc()"></div>
-            <div><label class="block text-xs font-medium text-slate-500 mb-1">期間起</label><input id="f-ps" type="date" class="form-input" oninput="fc()"></div>
-            <div><label class="block text-xs font-medium text-slate-500 mb-1">期間迄</label><input id="f-pe" type="date" class="form-input" oninput="fc()"></div>
-            <div class="md:col-span-2"><label class="block text-xs font-medium text-slate-500 mb-1">標題</label><input id="f-ti" type="text" class="form-input" placeholder="e.g. 經營TEAM採購｜本週重點摘要" oninput="fc()"></div>
-            <div class="flex items-center gap-2"><input id="f-pin" type="checkbox" class="w-4 h-4 text-blue-600 rounded" onchange="fc()"><label for="f-pin" class="text-sm text-slate-600 font-medium">置頂此週報</label></div>
+        </div>
+
+        <!-- 快速功能導引三卡片 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+          <!-- 卡片 1 -->
+          <div class="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-xs hover:shadow-md transition-shadow">
+            <div class="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl mb-4 border border-blue-100">
+              📋
+            </div>
+            <h3 class="text-base font-bold text-slate-800 mb-1.5">週報編輯與即時發布</h3>
+            <p class="text-xs text-slate-500 leading-relaxed mb-4">
+              支援多種標準作業範本、Word 風格富文本、精確表格編輯與附件上傳，正式發布自動寄信通知。
+            </p>
+            <span class="text-xs text-blue-600 font-semibold flex items-center gap-1">從左側歸檔點擊載入週報 →</span>
+          </div>
+
+          <!-- 卡片 2 -->
+          <div class="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-xs hover:shadow-md transition-shadow">
+            <div class="w-11 h-11 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl mb-4 border border-indigo-100">
+              📊
+            </div>
+            <h3 class="text-base font-bold text-slate-800 mb-1.5">點閱追蹤與效益統計</h3>
+            <p class="text-xs text-slate-500 leading-relaxed mb-4">
+              深入掌握全台各營運處同仁對週報的開信與點閱反饋，即時統計已讀進度與歷史觸及成果。
+            </p>
+            <button onclick="showKPI()" class="text-xs text-indigo-600 font-semibold hover:underline inline-flex items-center gap-1">查看點閱指標儀表板 →</button>
+          </div>
+
+          <!-- 卡片 3 -->
+          <div class="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-xs hover:shadow-md transition-shadow">
+            <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl mb-4 border border-amber-100">
+              👥
+            </div>
+            <h3 class="text-base font-bold text-slate-800 mb-1.5">發信群組與權限中心</h3>
+            <p class="text-xs text-slate-500 leading-relaxed mb-4">
+              靈活調度各營運區域收件人通訊錄、發信白名單、管理員名冊與採購常見關鍵字資料庫。
+            </p>
+            <button onclick="openSettingsModal()" class="text-xs text-amber-600 font-semibold hover:underline inline-flex items-center gap-1">進入系統設定中心 →</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 狀態 2：編輯表單區塊 (Section A, B, C, D) 升級為精緻立體卡片 -->
+      <div id="bf" class="hidden space-y-6">
+        <!-- Section A: 基本資訊 -->
+        <section class="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
+          <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/60 flex items-center justify-between">
+            <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2.5">
+              <span class="w-6 h-6 bg-blue-600 text-white rounded-lg flex items-center justify-center text-xs font-bold shadow-xs">A</span>
+              <span>基本資訊與發布檔期</span>
+            </h2>
+            <span class="text-xs text-slate-400 font-normal">設定週別 ID 與置頂屬性</span>
+          </div>
+          <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-5">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1.5">週別 ID <span class="text-rose-500">*</span></label>
+              <input id="f-id" type="text" class="form-input" placeholder="例如：2026-W30" oninput="fc()">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1.5">發布日期 <span class="text-rose-500">*</span></label>
+              <input id="f-pd" type="date" class="form-input" oninput="fc()">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1.5">資料統計期間 (起)</label>
+              <input id="f-ps" type="date" class="form-input" oninput="fc()">
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1.5">資料統計期間 (迄)</label>
+              <input id="f-pe" type="date" class="form-input" oninput="fc()">
+            </div>
+            <div class="md:col-span-2">
+              <label class="block text-xs font-bold text-slate-600 mb-1.5">週報主標題</label>
+              <input id="f-ti" type="text" class="form-input text-base font-semibold" placeholder="例如：經營TEAM採購｜本週重點摘要" oninput="fc()">
+            </div>
+            <div class="md:col-span-2 pt-1 flex items-center">
+              <label class="inline-flex items-center gap-2.5 cursor-pointer bg-slate-50 hover:bg-slate-100/80 px-4 py-2.5 rounded-xl border border-slate-200 transition-colors">
+                <input id="f-pin" type="checkbox" class="w-4 h-4 text-blue-600 rounded focus:ring-blue-500" onchange="fc()">
+                <span class="text-xs text-slate-700 font-semibold">📌 將此週報在前台進行置頂顯示</span>
+              </label>
+            </div>
           </div>
         </section>
-        <section class="bg-white rounded-xl border border-slate-200 shadow-sm">
-          <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between sticky top-0 bg-white/95 backdrop-blur-sm z-10 shadow-sm">
+
+        <!-- Section B: 段落內容管理 -->
+        <section class="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
+          <div class="px-6 py-4 border-b border-slate-100 bg-white/95 backdrop-blur-md flex items-center justify-between sticky top-0 z-10 shadow-xs">
             <div class="flex items-center gap-3 flex-1 min-w-0 mr-4">
-              <h2 class="text-sm font-semibold text-slate-700 flex items-center gap-2 shrink-0"><span class="w-5 h-5 bg-blue-100 rounded text-blue-600 flex items-center justify-center text-xs font-bold">B</span>段落內容管理</h2>
+              <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2.5 shrink-0">
+                <span class="w-6 h-6 bg-indigo-600 text-white rounded-lg flex items-center justify-center text-xs font-bold shadow-xs">B</span>
+                <span>段落內容管理</span>
+              </h2>
               <div class="text-xs text-slate-400 font-medium shrink-0" id="toolbar-hint">✨ 點擊下方文字框啟用編輯工具</div>
               <div id="toolbar-portal" class="flex items-center flex-1 min-w-0"></div>
             </div>
-            <button onclick="showModal()" class="btn-s text-xs py-1.5 px-3">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>新增段落
+            <button onclick="showModal()" class="btn-s text-xs py-2 px-3.5 bg-indigo-50/80 text-indigo-700 border-indigo-200 hover:bg-indigo-100 transition-colors font-semibold">
+              <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              <span>新增段落</span>
             </button>
           </div>
           <div id="sc"></div>
         </section>
-        <section class="bg-white rounded-xl border border-slate-200 shadow-sm">
-          <div class="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
-            <h2 class="text-sm font-semibold text-slate-700 flex items-center gap-2">
-              <span class="w-5 h-5 bg-indigo-100 rounded text-indigo-600 flex items-center justify-center text-xs font-bold">C</span>已讀狀態追蹤
+
+        <!-- Section C: 已讀狀態追蹤 -->
+        <section class="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
+          <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/60 flex items-center justify-between">
+            <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2.5">
+              <span class="w-6 h-6 bg-sky-600 text-white rounded-lg flex items-center justify-center text-xs font-bold shadow-xs">C</span>
+              <span>已讀狀態追蹤</span>
             </h2>
             <div id="read-count" class="flex items-center gap-2">
-              <span class="text-xs bg-indigo-50 text-indigo-600 px-2.5 py-1 rounded-full font-semibold border border-indigo-100">已讀: 0 人</span>
-              <span class="text-xs bg-slate-50 text-slate-500 px-2.5 py-1 rounded-full font-medium border border-slate-200">未讀: 0 人</span>
+              <span class="text-xs bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-bold border border-indigo-100">已讀: 0 人</span>
+              <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-medium border border-slate-200">未讀: 0 人</span>
             </div>
           </div>
-          <div class="p-5">
-            <div id="read-list" class="text-xs text-slate-500 max-h-48 overflow-y-auto space-y-2">
+          <div class="p-6">
+            <div id="read-list" class="text-xs text-slate-500 max-h-48 overflow-y-auto space-y-2 custom-scrollbar">
               載入中...
             </div>
           </div>
         </section>
-        <section class="bg-white rounded-xl border border-slate-200 shadow-sm">
-          <div class="px-5 py-4 border-b border-slate-100">
-            <h2 class="text-sm font-semibold text-slate-700 flex items-center gap-2">
-              <span class="w-5 h-5 bg-purple-100 rounded text-purple-600 flex items-center justify-center text-xs font-bold">D</span>發送與操作紀錄
+
+        <!-- Section D: 發送與操作紀錄 -->
+        <section class="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
+          <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/60 flex items-center justify-between">
+            <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2.5">
+              <span class="w-6 h-6 bg-purple-600 text-white rounded-lg flex items-center justify-center text-xs font-bold shadow-xs">D</span>
+              <span>發送與操作紀錄日誌</span>
             </h2>
           </div>
-          <div class="p-5">
-            <div id="audit-list" class="text-xs text-slate-500 max-h-48 overflow-y-auto space-y-2">
+          <div class="p-6">
+            <div id="audit-list" class="text-xs text-slate-500 max-h-48 overflow-y-auto space-y-2 custom-scrollbar">
               載入中...
             </div>
           </div>
@@ -451,7 +617,6 @@
       </div>
     </div>
   </main>
-</div>
 </div>
 <div id="sm" class="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4" onclick="if(event.target===this)hideModal()">
   <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md">
@@ -2539,6 +2704,11 @@
 <polygon class="std-hex-item" points="183.8,257.2 183.8,264.8 177.3,268.5 170.8,264.8 170.8,257.2 177.3,253.5" fill="#373737" data-color="#373737" stroke="#ffffff" stroke-width="0.5"/>
 <polygon class="std-hex-item" points="207.2,257.2 207.2,264.8 200.7,268.5 194.2,264.8 194.2,257.2 200.7,253.5" fill="#272727" data-color="#272727" stroke="#ffffff" stroke-width="0.5"/>
 <polygon class="std-hex-item" points="230.6,257.2 230.6,264.8 224.1,268.5 217.6,264.8 217.6,257.2 224.1,253.5" fill="#171717" data-color="#171717" stroke="#ffffff" stroke-width="0.5"/>
+              <!-- 選取中色塊的黑白雙重高亮框 -->
+              <g id="std-selection-group" class="hidden">
+                <polygon id="std-hex-selector" points=""/>
+                <polygon id="std-hex-selector-inner" points=""/>
+              </g>
             </svg>
           </div>
 
