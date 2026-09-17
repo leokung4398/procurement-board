@@ -2123,35 +2123,41 @@ async function showKPI(monthOffset = 0) {
   
   let html = '';
   data.tableData.forEach(row => {
-    let light = '';
-    let statusText = '';
-    if (row.rate >= 100) { light = 'bg-green-500'; statusText = '已達標'; }
-    else if (row.rate >= 90) { light = 'bg-yellow-400'; statusText = '待提升'; }
-    else { light = 'bg-red-500'; statusText = '未達標'; }
+    let lightBadge = '';
+    if (row.rate >= 100) {
+      lightBadge = '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200"><span class="w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-emerald-200"></span>已達標</span>';
+    } else if (row.rate >= 90) {
+      lightBadge = '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200"><span class="w-2 h-2 rounded-full bg-amber-400 ring-2 ring-amber-200"></span>待提升</span>';
+    } else {
+      lightBadge = '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200"><span class="w-2 h-2 rounded-full bg-rose-500 ring-2 ring-rose-200"></span>未達標</span>';
+    }
     
     html += `
-      <tr class="hover:bg-slate-50 transition-colors">
-        <td class="px-4 py-3 text-sm font-medium text-slate-800">${row.unit}</td>
-        <td class="px-4 py-3 text-sm text-slate-600 text-center">${row.bulletins}</td>
-        <td class="px-4 py-3 text-sm text-slate-600 text-center">${row.expected}</td>
-        <td class="px-4 py-3 text-sm text-slate-600 text-center">${row.confirmed}</td>
-        <td class="px-4 py-3 text-sm text-slate-600 text-center">${row.unconfirmed}</td>
-        <td class="px-4 py-3 text-sm font-bold text-slate-700 text-right">${row.rate}%</td>
-        <td class="px-4 py-3 text-sm font-semibold text-slate-700 text-right">
-          <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold ${row.avgProgress >= 90 ? 'bg-emerald-50 text-emerald-700' : (row.avgProgress >= 70 ? 'bg-amber-50 text-amber-700' : 'bg-slate-100 text-slate-600')}">
+      <tr class="hover:bg-slate-50/80 transition-colors">
+        <td class="px-5 py-3.5 text-sm font-bold text-slate-800">
+          <div class="flex items-center gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+            <span>${row.unit}</span>
+          </div>
+        </td>
+        <td class="px-4 py-3.5 text-sm text-slate-600 text-center font-medium">${row.bulletins}</td>
+        <td class="px-4 py-3.5 text-sm text-slate-600 text-center font-medium">${row.expected}</td>
+        <td class="px-4 py-3.5 text-sm text-emerald-600 text-center font-bold">${row.confirmed}</td>
+        <td class="px-4 py-3.5 text-sm ${row.unconfirmed > 0 ? 'text-rose-500 font-bold' : 'text-slate-400'} text-center">${row.unconfirmed}</td>
+        <td class="px-4 py-3.5 text-sm font-extrabold ${row.rate >= 100 ? 'text-emerald-600' : (row.rate >= 90 ? 'text-amber-600' : 'text-rose-600')} text-right">${row.rate}%</td>
+        <td class="px-4 py-3.5 text-sm font-semibold text-slate-700 text-right">
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold ${row.avgProgress >= 90 ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : (row.avgProgress >= 70 ? 'bg-amber-50 text-amber-700 border border-amber-100' : 'bg-slate-100 text-slate-600')}">
             ${row.avgProgress}%
           </span>
         </td>
-        <td class="px-4 py-3 text-sm text-center">
-          <div class="inline-flex items-center gap-1.5" title="${statusText}">
-            <span class="w-3.5 h-3.5 rounded-full ${light} shadow-sm border border-black/10"></span>
-          </div>
+        <td class="px-5 py-3.5 text-sm text-center">
+          ${lightBadge}
         </td>
       </tr>
     `;
   });
   
-  if(html === '') html = '<tr><td colspan="8" class="text-center py-8 text-slate-400">尚無資料</td></tr>';
+  if(html === '') html = '<tr><td colspan="8" class="text-center py-12 text-slate-400 text-xs">尚無統計數據</td></tr>';
   document.getElementById('kpi-table-body').innerHTML = html;
 }
 
