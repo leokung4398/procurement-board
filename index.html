@@ -761,29 +761,35 @@ async function showKPI(monthOffset = 0) {
   
   let html = '';
   data.tableData.forEach(row => {
-    let light = '';
-    let statusText = '';
-    if (row.rate >= 100) { light = 'bg-green-500'; statusText = '已達標'; }
-    else if (row.rate >= 90) { light = 'bg-yellow-400'; statusText = '待提升'; }
-    else { light = 'bg-red-500'; statusText = '未達標'; }
+    let lightBadge = '';
+    if (row.rate >= 100) {
+      lightBadge = '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200"><span class="w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-emerald-200"></span>已達標</span>';
+    } else if (row.rate >= 90) {
+      lightBadge = '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200"><span class="w-2 h-2 rounded-full bg-amber-400 ring-2 ring-amber-200"></span>待提升</span>';
+    } else {
+      lightBadge = '<span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-200"><span class="w-2 h-2 rounded-full bg-rose-500 ring-2 ring-rose-200"></span>未達標</span>';
+    }
     
     html += `
-      <tr class="hover:bg-slate-50 transition-colors">
-        <td class="px-4 py-3 text-sm font-medium text-slate-800">${row.unit}</td>
-        <td class="px-4 py-3 text-sm text-slate-600 text-center">${row.bulletins}</td>
-        <td class="px-4 py-3 text-sm text-slate-600 text-center">${row.expected}</td>
-        <td class="px-4 py-3 text-sm text-slate-600 text-center">${row.confirmed}</td>
-        <td class="px-4 py-3 text-sm text-slate-600 text-center">${row.unconfirmed}</td>
-        <td class="px-4 py-3 text-sm font-bold text-slate-700 text-right">${row.rate}%</td>
-        <td class="px-4 py-3 text-sm font-semibold text-slate-700 text-right">
-          <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold ${row.avgProgress >= 90 ? 'bg-emerald-50 text-emerald-700' : (row.avgProgress >= 70 ? 'bg-amber-50 text-amber-700' : 'bg-slate-100 text-slate-600')}">
+      <tr class="hover:bg-slate-50/80 transition-colors">
+        <td class="px-5 py-3.5 text-sm font-bold text-slate-800">
+          <div class="flex items-center gap-2">
+            <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>
+            <span>${row.unit}</span>
+          </div>
+        </td>
+        <td class="px-4 py-3.5 text-sm text-slate-600 text-center font-medium">${row.bulletins}</td>
+        <td class="px-4 py-3.5 text-sm text-slate-600 text-center font-medium">${row.expected}</td>
+        <td class="px-4 py-3.5 text-sm text-emerald-600 text-center font-bold">${row.confirmed}</td>
+        <td class="px-4 py-3.5 text-sm ${row.unconfirmed > 0 ? 'text-rose-500 font-bold' : 'text-slate-400'} text-center">${row.unconfirmed}</td>
+        <td class="px-4 py-3.5 text-sm font-extrabold ${row.rate >= 100 ? 'text-emerald-600' : (row.rate >= 90 ? 'text-amber-600' : 'text-rose-600')} text-right">${row.rate}%</td>
+        <td class="px-4 py-3.5 text-sm font-semibold text-slate-700 text-right">
+          <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold ${row.avgProgress >= 90 ? 'bg-emerald-50 text-emerald-700 border border-emerald-100' : (row.avgProgress >= 70 ? 'bg-amber-50 text-amber-700 border border-amber-100' : 'bg-slate-100 text-slate-600')}">
             ${row.avgProgress}%
           </span>
         </td>
-        <td class="px-4 py-3 text-sm text-center">
-          <div class="inline-flex items-center gap-1.5" title="${statusText}">
-            <span class="w-3.5 h-3.5 rounded-full ${light} shadow-sm border border-black/10"></span>
-          </div>
+        <td class="px-5 py-3.5 text-sm text-center">
+          ${lightBadge}
         </td>
       </tr>
     `;
@@ -2133,92 +2139,169 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
     });
   </script>
 
-<!-- 績效統計 Modal -->
+<!-- 績效統計 Modal (精美重新排版) -->
 <div id="kpi-modal" class="hidden fixed inset-0 z-[150] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm transition-all duration-300">
-  <div class="bg-white rounded-xl shadow-xl w-full max-w-5xl max-h-[90vh] flex flex-col mx-4 overflow-hidden">
-    <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/50">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
-          <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[92vh] flex flex-col mx-4 overflow-hidden border border-slate-200/80">
+    <!-- 頂部標題列 -->
+    <div class="flex items-center justify-between px-7 py-5 border-b border-slate-100 bg-gradient-to-r from-slate-50 via-white to-indigo-50/30">
+      <div class="flex items-center gap-3.5">
+        <div class="w-11 h-11 bg-gradient-to-tr from-indigo-600 to-blue-500 rounded-xl flex items-center justify-center shadow-md shadow-indigo-500/20 text-white">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
         </div>
         <div>
-          <h2 class="text-lg font-bold text-slate-800">週報點閱績效統計</h2>
-          <p class="text-xs text-slate-500">Weekly KPI Summary</p>
+          <div class="flex items-center gap-2">
+            <h2 class="text-lg font-bold text-slate-800 tracking-tight">週報點閱績效統計</h2>
+            <span class="text-[11px] bg-indigo-50 text-indigo-700 font-semibold px-2 py-0.5 rounded-full border border-indigo-100">全台營運處追蹤</span>
+          </div>
+          <p class="text-xs text-slate-500 mt-0.5">即時掌握各單位主要聯絡人閱畢與回饋進度 · Weekly KPI Summary</p>
         </div>
       </div>
-      <div class="flex items-center gap-2">
-        <button onclick="closeKPIModal()" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-slate-200 text-slate-500 transition-colors">
+      <div class="flex items-center gap-2.5">
+        <button onclick="exportKPIExcel()" class="btn-s text-xs py-2 px-3.5 text-emerald-700 bg-emerald-50/80 border-emerald-200/90 hover:bg-emerald-100/90 font-semibold shadow-xs">
+          <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+          <span>匯出 Excel 報表</span>
+        </button>
+        <button onclick="closeKPIModal()" class="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
         </button>
       </div>
     </div>
     
-    <div class="px-6 py-3 border-b border-slate-100 bg-white flex items-center gap-4">
-      <div class="flex bg-slate-100 p-1 rounded-lg">
-        <button id="kpi-tab-0" onclick="showKPI(0)" class="px-4 py-1.5 text-sm font-semibold rounded-md transition-colors bg-white text-blue-600 shadow-sm">本月</button>
-        <button id="kpi-tab-1" onclick="showKPI(-1)" class="px-4 py-1.5 text-sm font-semibold rounded-md transition-colors text-slate-500 hover:text-slate-700">上月</button>
+    <!-- 篩選列：月份切換 -->
+    <div class="px-7 py-3 border-b border-slate-100 bg-white flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="flex bg-slate-100/90 p-1 rounded-xl border border-slate-200/60 shadow-inner">
+          <button id="kpi-tab-0" onclick="showKPI(0)" class="px-4 py-1.5 text-sm font-semibold rounded-md transition-colors bg-white text-blue-600 shadow-sm">本月</button>
+          <button id="kpi-tab-1" onclick="showKPI(-1)" class="px-4 py-1.5 text-sm font-semibold rounded-md transition-colors text-slate-500 hover:text-slate-700">上月</button>
+        </div>
+        <div class="flex items-center gap-1.5 text-slate-400 text-xs">
+          <span>📅 統計週期：</span>
+          <span id="kpi-month-label" class="text-sm font-bold text-slate-800">載入中...</span>
+        </div>
       </div>
-      <span id="kpi-month-label" class="text-sm font-semibold text-slate-700">載入中...</span>
+      <div class="text-[11px] text-slate-400 font-medium">
+        ※ 依據每週採購週報發布之主要聯絡人閱畢簽核紀錄自動統計
+      </div>
     </div>
 
-    <div class="flex-1 overflow-y-auto p-6 bg-slate-50/50">
-      <div id="kpi-warning" class="hidden mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg flex items-start gap-2">
-        <span class="text-yellow-600">⚠️</span>
-        <div class="text-sm text-yellow-800">
-          <strong>提醒：</strong>下列單位尚未設定⭐主要聯絡人，暫不列入本次統計。<br>
-          <span id="kpi-missing-units" class="font-semibold"></span>
+    <!-- 主體內容滾動區 -->
+    <div class="flex-1 overflow-y-auto p-7 bg-slate-50/70 space-y-6">
+      <!-- 未設定聯絡人之警示區塊 -->
+      <div id="kpi-warning" class="hidden p-4 bg-amber-50/90 border border-amber-200/90 rounded-2xl flex items-start gap-3 shadow-xs">
+        <div class="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center text-sm shrink-0 mt-0.5">
+          ⚠️
+        </div>
+        <div class="text-xs text-amber-900 leading-relaxed">
+          <strong class="font-bold text-amber-950">待設定單位提醒：</strong>下列單位尚未在通訊錄指定 <span class="text-amber-700 font-semibold">⭐ 主要聯絡人</span>，暫不列入本次閱畢完成度計算：<br>
+          <span id="kpi-missing-units" class="font-bold text-amber-800 mt-1 inline-block"></span>
         </div>
       </div>
       
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div class="bg-blue-600 text-white rounded-xl p-5 shadow-sm">
-          <div class="text-blue-100 text-sm font-medium mb-1">全台總閱讀率</div>
-          <div id="kpi-total-rate" class="text-3xl font-bold">--%</div>
-        </div>
-        <div class="bg-white border border-green-200 rounded-xl p-5 shadow-sm flex flex-col justify-between">
-          <div class="text-green-600 text-sm font-bold mb-1">優質點閱單位</div>
-          <div class="flex justify-between items-end">
-            <div id="kpi-best-unit" class="text-lg font-bold text-slate-800">--</div>
-            <div id="kpi-best-rate" class="text-xl font-bold text-green-500">--%</div>
+      <!-- 三大核心指標卡片 (KPI Stat Cards) -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+        <!-- 卡片 1: 全台總閱讀率 -->
+        <div class="relative overflow-hidden bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-700 text-white rounded-2xl p-6 shadow-md shadow-blue-600/20 flex flex-col justify-between">
+          <div class="absolute -right-6 -bottom-6 w-28 h-28 bg-white/10 rounded-full blur-xl pointer-events-none"></div>
+          <div>
+            <div class="flex items-center justify-between text-blue-100 text-xs font-semibold uppercase tracking-wider mb-2">
+              <span>全台總閱讀率</span>
+              <span class="text-base">📈</span>
+            </div>
+            <div id="kpi-total-rate" class="text-4xl font-extrabold tracking-tight">--%</div>
           </div>
+          <p class="text-[11px] text-blue-100/80 mt-3 pt-3 border-t border-white/10">各營運單位指定窗口總體閱畢比例</p>
         </div>
-        <div class="bg-white border border-red-200 rounded-xl p-5 shadow-sm flex flex-col justify-between">
-          <div class="text-red-500 text-sm font-bold mb-1">最低點閱單位</div>
-          <div class="flex justify-between items-end">
-            <div id="kpi-worst-unit" class="text-lg font-bold text-slate-800">--</div>
-            <div id="kpi-worst-rate" class="text-xl font-bold text-red-500">--%</div>
+
+        <!-- 卡片 2: 優質點閱單位 -->
+        <div class="bg-white border border-emerald-200/80 rounded-2xl p-6 shadow-xs flex flex-col justify-between hover:shadow-sm transition-shadow">
+          <div>
+            <div class="flex items-center justify-between text-emerald-600 text-xs font-bold uppercase tracking-wider mb-2">
+              <span class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                優質點閱單位
+              </span>
+              <span class="text-base">🏆</span>
+            </div>
+            <div class="flex justify-between items-baseline mt-1">
+              <div id="kpi-best-unit" class="text-xl font-bold text-slate-800 truncate pr-2">--</div>
+              <div id="kpi-best-rate" class="text-2xl font-extrabold text-emerald-600">--%</div>
+            </div>
           </div>
+          <p class="text-[11px] text-slate-400 mt-3 pt-3 border-t border-slate-100">本月閱讀率與確認進度最優之營運單位</p>
+        </div>
+
+        <!-- 卡片 3: 最低點閱單位 -->
+        <div class="bg-white border border-rose-200/80 rounded-2xl p-6 shadow-xs flex flex-col justify-between hover:shadow-sm transition-shadow">
+          <div>
+            <div class="flex items-center justify-between text-rose-500 text-xs font-bold uppercase tracking-wider mb-2">
+              <span class="flex items-center gap-1.5">
+                <span class="w-2 h-2 rounded-full bg-rose-500"></span>
+                最低點閱單位
+              </span>
+              <span class="text-base">🎯</span>
+            </div>
+            <div class="flex justify-between items-baseline mt-1">
+              <div id="kpi-worst-unit" class="text-xl font-bold text-slate-800 truncate pr-2">--</div>
+              <div id="kpi-worst-rate" class="text-2xl font-extrabold text-rose-500">--%</div>
+            </div>
+          </div>
+          <p class="text-[11px] text-slate-400 mt-3 pt-3 border-t border-slate-100">需要採購窗口主動關心或提醒簽核之單位</p>
         </div>
       </div>
       
-      <div class="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-sm">
-        <table class="w-full text-left border-collapse">
-          <thead>
-            <tr class="bg-slate-50 border-b border-slate-200">
-              <th class="px-4 py-3 text-xs font-semibold text-slate-500 uppercase">單位</th>
-              <th class="px-4 py-3 text-xs font-semibold text-slate-500 uppercase text-center">佈告數</th>
-              <th class="px-4 py-3 text-xs font-semibold text-slate-500 uppercase text-center">應閱讀</th>
-              <th class="px-4 py-3 text-xs font-semibold text-slate-500 uppercase text-center">已確認</th>
-              <th class="px-4 py-3 text-xs font-semibold text-slate-500 uppercase text-center">未確認</th>
-              <th class="px-4 py-3 text-xs font-semibold text-slate-500 uppercase text-right">閱讀率</th>
-              <th class="px-4 py-3 text-xs font-semibold text-slate-500 uppercase text-right">平均完成率</th>
-              <th class="px-4 py-3 text-xs font-semibold text-slate-500 uppercase text-center">狀態</th>
-            </tr>
-          </thead>
-          <tbody id="kpi-table-body" class="divide-y divide-slate-100">
-            <tr><td colspan="8" class="text-center py-8 text-slate-400">載入中...</td></tr>
-          </tbody>
-        </table>
+      <!-- 各單位點閱明細表 (Data Table) -->
+      <div class="bg-white rounded-2xl border border-slate-200/90 overflow-hidden shadow-xs">
+        <div class="px-6 py-3.5 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <span class="w-1.5 h-4 bg-indigo-600 rounded-full"></span>
+            <h3 class="text-xs font-bold text-slate-800 uppercase tracking-wider">各營運處點閱明細清單</h3>
+          </div>
+          <span class="text-[11px] text-slate-400">點擊表格右上角可直接匯出全量 Excel</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="bg-slate-50/80 border-b border-slate-200 text-slate-500 text-xs uppercase font-semibold">
+                <th class="px-5 py-3.5">單位名稱</th>
+                <th class="px-4 py-3.5 text-center">當月佈告數</th>
+                <th class="px-4 py-3.5 text-center">應閱讀</th>
+                <th class="px-4 py-3.5 text-center">已確認</th>
+                <th class="px-4 py-3.5 text-center">未確認</th>
+                <th class="px-4 py-3.5 text-right">閱讀率</th>
+                <th class="px-4 py-3.5 text-right">平均完成率</th>
+                <th class="px-5 py-3.5 text-center">簽核狀態</th>
+              </tr>
+            </thead>
+            <tbody id="kpi-table-body" class="divide-y divide-slate-100 text-sm">
+              <tr><td colspan="8" class="text-center py-12 text-slate-400 text-xs">資料載入中，請稍候...</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
       
-      <div class="mt-4 flex gap-4">
-        <div class="bg-white border border-slate-200 rounded-lg p-4 text-sm w-64 shadow-sm">
-          <div class="font-bold text-slate-700 mb-2 border-b pb-2">燈號說明</div>
-          <div class="space-y-2">
-            <div class="flex items-center justify-between"><span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-green-500"></span>≥ 100%</span><span class="text-slate-600 font-medium">已達標</span></div>
-            <div class="flex items-center justify-between"><span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-yellow-400"></span>90% - 99%</span><span class="text-slate-600 font-medium">待提升</span></div>
-            <div class="flex items-center justify-between"><span class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-red-500"></span>< 90%</span><span class="text-slate-600 font-medium">未達標</span></div>
+      <!-- 底部圖例說明區 (Legend Card) -->
+      <div class="flex items-center justify-between flex-wrap gap-4 pt-1">
+        <div class="bg-white border border-slate-200/90 rounded-xl px-5 py-3 text-xs shadow-xs flex items-center gap-6">
+          <span class="font-bold text-slate-700 flex items-center gap-1.5">
+            <span class="text-sm">🚦</span> 燈號判讀說明：
+          </span>
+          <div class="flex items-center gap-5">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-emerald-500 ring-2 ring-emerald-100"></span>
+              <span class="text-slate-600 font-semibold">≥ 100% (已達標)</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-amber-400 ring-2 ring-amber-100"></span>
+              <span class="text-slate-600 font-semibold">90% - 99% (待提升)</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-rose-500 ring-2 ring-rose-100"></span>
+              <span class="text-slate-600 font-semibold">&lt; 90% (未達標)</span>
+            </div>
           </div>
+        </div>
+        <div class="text-[11px] text-slate-400">
+          * 閱讀率以「各週報主要聯絡人簽核人次 ÷ 應閱讀人次」即時計算
         </div>
       </div>
     </div>
