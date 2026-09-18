@@ -1171,6 +1171,11 @@
           <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>長條和諧漸層按鈕：</strong>週報正文最底端配置高雅商務微漸層按鈕（藍 ➔ 靛 ➔ 青綠），與莫蘭迪風格完美融合不突兀。同仁詳細閱畢後點擊「✅ 確認已閱讀本期週報內容 (點擊打卡)」，系統即刻以 100% 回傳至雲端資料庫並鎖定按鈕避免重複點擊。</p>
           <p class="text-sm leading-relaxed text-slate-600"><strong>頂部尊榮已完讀金徽章：</strong>完成閱讀打卡或滑動深度滿 100% 後，Header 姓名處即刻點亮專屬「👑 2026-WXX 已完讀」琥珀金光輝微漸層徽章，賦予窗口同仁高度尊榮成就感與明確視覺回饋，切換週報時即時聯動！</p>
         </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-purple-300 transition-colors">
+          <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-sm">26</span>雲端打卡同步防護、動態 Loading 與異常自動回滾</h4>
+          <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>非同步雲端確認機制：</strong>同仁點擊「確認已閱讀完畢 (打卡)」時，按鈕立即進入「同步打卡中...」旋轉動畫並鎖定防重複連點。系統嚴格等待雲端 Firestore 資料庫寫入成功回傳後，方鎖定本地已讀與點亮尊榮徽章，杜絕斷線虛假標記。</p>
+          <p class="text-sm leading-relaxed text-slate-600"><strong>異常安全回滾與重試：</strong>若遇網路瞬斷或請求逾時，系統自動捕捉異常並彈出警示，按鈕瞬間回滾為可點擊狀態，保障同仁隨時能順利重新打卡；若遇歷史週報或跨區漏登，管理員可由後台專用腳本進行安全精準補登。</p>
+        </div>
       </div>
 
       <!-- 專案開發成果內容 -->
@@ -1185,13 +1190,13 @@
                 <h4 class="text-base font-bold text-white tracking-wide flex items-center gap-2">🎨 專案開發成果條例分類與即時置頂</h4>
               </div>
               <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">
-                全系列 30 項里程碑已依技術構面導入色彩體系。<span class="text-amber-300 font-medium">💡 點選下方任一分類按鈕，即可將該技術構面之成果卡片立即「置頂排列到最上方」</span>，便於長官與主管聚焦查閱！
+                全系列 31 項里程碑已依技術構面導入色彩體系。<span class="text-amber-300 font-medium">💡 點選下方任一分類按鈕，即可將該技術構面之成果卡片立即「置頂排列到最上方」</span>，便於長官與主管聚焦查閱！
               </p>
             </div>
             <div class="flex items-center gap-2.5 flex-shrink-0">
-              <button id="cat-btn-all" onclick="filterMilestoneCat('all')" type="button" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-indigo-400/40 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 text-xs font-semibold transition-all shadow-sm cursor-pointer active:scale-95" title="還原至 1~30 項原始順序">
+              <button id="cat-btn-all" onclick="filterMilestoneCat('all')" type="button" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-indigo-400/40 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 text-xs font-semibold transition-all shadow-sm cursor-pointer active:scale-95" title="還原至 1~31 項原始順序">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                <span>重置原始排序 (全部30項)</span>
+                <span>重置原始排序 (全部31項)</span>
               </button>
             </div>
           </div>
@@ -1272,9 +1277,9 @@
                     <span class="w-2 h-2 rounded-full bg-purple-400"></span>
                     <span class="text-xs font-bold text-purple-300 group-hover:text-purple-200 transition-colors">數據分析與落實</span>
                   </div>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">6 項</span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">7 項</span>
                 </div>
-                <p class="text-[11px] text-slate-400 group-hover:text-slate-300 leading-snug transition-colors">已讀追蹤、完成率、KPI 看板、SheetJS Excel 報表匯出。</p>
+                <p class="text-[11px] text-slate-400 group-hover:text-slate-300 leading-snug transition-colors">已讀追蹤、完成率、打卡防護、KPI 看板與 Excel 匯出。</p>
                 <div class="mt-2 flex items-center gap-1 text-[10px] text-purple-400 font-semibold opacity-80 group-hover:opacity-100">
                   <span>點擊置頂排序</span>
                   <svg class="w-3 h-3 group-hover:translate-y-[-1px] transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
@@ -1904,6 +1909,29 @@
               </p>
               <p class="text-xs text-blue-700 font-medium leading-relaxed mt-3 border-l-2 border-blue-400 pl-2">
                 💡 <span class="font-bold">專案成果：</span>完成後台系統設定中心 5 大模組全方位商務卡片化升級：通訊錄升級為雙欄高密度卡片網格（可視數量倍增）；群組與關鍵字建立雙層清晰導覽與狀態膠囊徽章；管理員名單結合個人頭像圓章與安全橫條；交接設定採高雅莫蘭迪卡片居中呈現，全系統達致媲美頂級 SaaS 軟體之後台交互體驗！
+              </p>
+            </div>
+          </div>
+        </div>
+
+          <!-- 里程碑三十一：週報已讀打卡雲端同步防護、動態回饋與補登機制 -->
+          <div data-cat="data" data-orig-idx="31" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(147,51,234,0.15)] hover:border-purple-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-purple-500 to-indigo-600"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-purple-600 group-hover:text-white transition-all duration-300 shadow-sm"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1 flex items-center gap-2">三十一、週報已讀打卡雲端同步防護、動態回饋與補登機制 <span class="bg-purple-50 text-purple-800 border border-purple-200/80 text-[10px] px-2 py-0.5 rounded-md font-semibold tracking-wide flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>數據落實</span> <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-0.5 rounded-full font-normal tracking-wide">2026-09-18</span></h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">採購需求：</span><br>
+                1. 排查窗口同仁（如營運部同仁）反映已閱讀並打卡，但後台已讀名冊卻未列出之問題，查明根因並落實紀錄精準補登。<br>
+                2. 解決前台打卡時因網路波動或瀏覽器切換分頁導致「本地狀態已亮但雲端未寫入（Silent Failure）」之不同步漏洞。<br>
+                3. 前台打卡按鈕點擊時需提供動態防重複連點與 Loading 反饋，且必須在雲端資料庫確實寫入成功後才鎖定狀態與點亮徽章。<br>
+                4. 若遇到伺服器逾時或網路中斷，必須自動回滾按鈕並跳出明確提示，不讓同仁誤判已打卡完成。
+              </p>
+              <p class="text-xs text-purple-700 font-medium leading-relaxed mt-3 border-l-2 border-purple-400 pl-2">
+                💡 <span class="font-bold">專案成果：</span>前台全面升級「非同步雲端寫入驗證機制（Cloud-First Verification）」，點擊瞬間顯示旋轉 Loading 並禁用連點；嚴格等待 Firestore 成功回傳後方鎖定本地 100% 滿條與尊榮徽章；若發生異常自動無損回滾按鈕並提示同仁重試；同時透過後台精準腳本順利為營運部同仁補登 2026-W38 已讀紀錄，達成雲端數據 100% 實時閉環！
               </p>
             </div>
           </div>
