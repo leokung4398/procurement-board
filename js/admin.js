@@ -2510,3 +2510,211 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }, true);
 });
+
+// ==========================================
+// 手動補登閱讀打卡功能 (Manual Read Backfill)
+// ==========================================
+async function openManualReadModal() {
+  const modal = document.getElementById('manual-read-modal');
+  if (!modal) return;
+
+  const bId = S.cur ? S.cur.id : null;
+  if (!bId) {
+    if (typeof toast === 'function') toast('⚠️ 請先選擇或建立一篇週報，再進行補登操作。', 'er');
+    else alert('請先選擇或建立一篇週報，再進行補登操作。');
+    return;
+  }
+
+  // 顯示當前週報 ID
+  const idEl = document.getElementById('m-read-bulletin-id');
+  if (idEl) {
+    idEl.innerHTML = `
+      <span>${xe(bId)}</span>
+      <span class="text-[10px] text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">${S.cur.title ? xe(S.cur.title) : '當前週報'}</span>
+    `;
+  }
+
+  const selectEl = document.getElementById('m-read-user-select');
+  if (selectEl) {
+    selectEl.innerHTML = '<option value="">載入名冊與已讀狀態中...</option>';
+    selectEl.disabled = true;
+  }
+
+  modal.classList.remove('hidden');
+
+  try {
+    // 獲取通訊錄與目前已讀清單
+    let allUsers = S.whitelist || [];
+    if (allUsers.length === 0) {
+      allUsers = await DS.getWhitelist();
+      S.whitelist = allUsers;
+    }
+
+    const { readers } = await DS.getReadReceipts(bId);
+
+    // 建立已讀比對查找表
+    const readLookup = readers.map(r => {
+      const email = (r.email || '').trim().toLowerCase();
+      const emailPrefix = email ? email.split('@')[0] : '';
+      const name = (r.displayName || '').replace(/[\s\u3000]/g, '').toLowerCase();
+      return { email, emailPrefix, name, raw: r };
+    });
+
+    // 標記每位通訊錄同仁是否已讀
+    const userListWithStatus = allUsers.map(u => {
+      const uEmailLower = (u.email || '').trim().toLowerCase();
+      const uPrefix = uEmailLower.split('@')[0];
+      const uName = (u.name || '').replace(/[\s\u3000]/g, '').toLowerCase();
+
+      const existingReader = readLookup.find(r => {
+        if (r.email && r.email === uEmailLower) return true;
+        if (r.emailPrefix && uPrefix && r.emailPrefix === uPrefix) return true;
+        if (r.name && uName && (r.name === uName || r.name.includes(uName) || uName.includes(r.name))) return true;
+        if ((uName === '吳俊緯' && r.name.includes('吳俊瑋')) || (uName === '吳俊瑋' && r.name.includes('吳俊緯'))) return true;
+        return false;
+      });
+
+      return {
+        ...u,
+        isAlreadyRead: !!existingReader,
+        currentProgress: existingReader ? existingReader.raw.readProgress : 0
+      };
+    });
+
+    // 未讀同仁排在最前面，同狀態則依部門與名稱排序
+    userListWithStatus.sort((a, b) => {
+      if (a.isAlreadyRead !== b.isAlreadyRead) {
+        return a.isAlreadyRead ? 1 : -1;
+      }
+      const deptA = a.unit || a.department || '';
+      const deptB = b.unit || b.department || '';
+      if (deptA !== deptB) return deptA.localeCompare(deptB, 'zh-TW');
+      return (a.name || '').localeCompare(b.name || '', 'zh-TW');
+    });
+
+    let optsHtml = '<option value="">-- 請選擇要補登打卡的同仁 --</option>';
+    let lastGroup = null;
+
+    userListWithStatus.forEach(u => {
+      const groupLabel = u.unit || u.department || '未分組';
+      const statusText = u.isAlreadyRead ? `[已讀 ${u.currentProgress}%]` : '[未讀]';
+      const primaryTag = u.isPrimary ? ' ⭐主要窗口' : '';
+      
+      optsHtml += `
+        <option value="${xe(JSON.stringify(u))}">
+          ${statusText} ${xe(groupLabel)} - ${xe(u.name || u.email)}${primaryTag} (${xe(u.email)})
+        </option>
+      `;
+    });
+
+    if (selectEl) {
+      selectEl.innerHTML = optsHtml;
+      selectEl.disabled = false;
+    }
+  } catch (err) {
+    console.error('openManualReadModal error:', err);
+    if (selectEl) {
+      selectEl.innerHTML = '<option value="">名冊載入失敗，請稍後重試</option>';
+    }
+  }
+}
+
+function closeManualReadModal() {
+  const modal = document.getElementById('manual-read-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
+async function submitManualRead() {
+  const bId = S.cur ? S.cur.id : null;
+  if (!bId) {
+    toast('⚠️ 查無目標週報 ID', 'er');
+    return;
+  }
+
+  const selectEl = document.getElementById('m-read-user-select');
+  const progressEl = document.getElementById('m-read-progress');
+  const btn = document.getElementById('btn-submit-manual-read');
+
+  if (!selectEl || !selectEl.value) {
+    toast('⚠️ 請先選擇要補登打卡的同仁！', 'er');
+    return;
+  }
+
+  let selectedUser;
+  try {
+    selectedUser = JSON.parse(selectEl.value);
+  } catch(e) {
+    toast('⚠️ 使用者資料格式解析異常', 'er');
+    return;
+  }
+
+  const progress = parseInt(progressEl ? progressEl.value : '100', 10) || 100;
+  const userEmail = (selectedUser.email || '').trim();
+  const userName = selectedUser.name || (userEmail ? userEmail.split('@')[0] : '同仁');
+  const userDept = selectedUser.unit || selectedUser.department || '未指定';
+
+  // 決定 Document ID：若有特定 uid 優先使用，否則以 Email 正規化安全字元作為 ID
+  const docId = selectedUser.userId || selectedUser.uid || (userEmail ? userEmail.replace(/[@.]/g, '_') : null);
+
+  if (!docId) {
+    toast('⚠️ 無法取得該同仁的唯一識別碼 (Email 或 UID)', 'er');
+    return;
+  }
+
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `
+      <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+      </svg>
+      <span>補登寫入中...</span>
+    `;
+  }
+
+  try {
+    const receiptRef = db.collection('bulletins').doc(bId).collection('readReceipts').doc(docId);
+    const docSnap = await receiptRef.get();
+
+    const timestamp = firebase.firestore.FieldValue.serverTimestamp();
+    const backfillNote = `[管理員手動補登] ${new Date().toLocaleString('zh-TW')}`;
+
+    if (docSnap.exists) {
+      await receiptRef.update({
+        readProgress: progress,
+        lastViewedAt: timestamp,
+        note: backfillNote
+      });
+    } else {
+      await receiptRef.set({
+        userId: docId,
+        email: userEmail,
+        displayName: userName,
+        department: userDept,
+        readProgress: progress,
+        readAt: timestamp,
+        lastViewedAt: timestamp,
+        note: backfillNote
+      });
+    }
+
+    toast(`✅ 成功為 ${userName} (${userDept}) 補登本期已讀打卡 (${progress}%)！`, 'ok');
+    closeManualReadModal();
+
+    // 即時刷新 Section C 已讀狀態列表
+    if (typeof renderReadReceipts === 'function') {
+      await renderReadReceipts(bId);
+    }
+  } catch (err) {
+    console.error('submitManualRead error:', err);
+    toast(`⚠️ 補登失敗: ${err.message || err}`, 'er');
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = `
+        <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+        <span>確認補登</span>
+      `;
+    }
+  }
+}

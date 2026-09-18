@@ -588,9 +588,15 @@
               <span class="w-6 h-6 bg-sky-600 text-white rounded-lg flex items-center justify-center text-xs font-bold shadow-xs">C</span>
               <span>已讀狀態追蹤</span>
             </h2>
-            <div id="read-count" class="flex items-center gap-2">
-              <span class="text-xs bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-bold border border-indigo-100">已讀: 0 人</span>
-              <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-medium border border-slate-200">未讀: 0 人</span>
+            <div class="flex items-center gap-2.5">
+              <div id="read-count" class="flex items-center gap-2">
+                <span class="text-xs bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full font-bold border border-indigo-100">已讀: 0 人</span>
+                <span class="text-xs bg-slate-100 text-slate-600 px-3 py-1 rounded-full font-medium border border-slate-200">未讀: 0 人</span>
+              </div>
+              <button type="button" onclick="openManualReadModal()" class="btn-s text-xs py-1 px-3 bg-sky-50 text-sky-700 border-sky-200 hover:bg-sky-100 transition-colors font-semibold flex items-center gap-1.5 shadow-xs" title="為同仁手動補登打卡紀錄">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                <span>手動補登已讀</span>
+              </button>
             </div>
           </div>
           <div class="p-6">
@@ -1169,12 +1175,13 @@
         <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-indigo-300 transition-colors">
           <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-sm">25</span>底端一鍵完讀漸層打卡按鈕與尊榮完讀金徽章</h4>
           <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>長條和諧漸層按鈕：</strong>週報正文最底端配置高雅商務微漸層按鈕（藍 ➔ 靛 ➔ 青綠），與莫蘭迪風格完美融合不突兀。同仁詳細閱畢後點擊「✅ 確認已閱讀本期週報內容 (點擊打卡)」，系統即刻以 100% 回傳至雲端資料庫並鎖定按鈕避免重複點擊。</p>
-          <p class="text-sm leading-relaxed text-slate-600"><strong>頂部尊榮已完讀金徽章：</strong>完成閱讀打卡或滑動深度滿 100% 後，Header 姓名處即刻點亮專屬「👑 2026-WXX 已完讀」琥珀金光輝微漸層徽章，賦予窗口同仁高度尊榮成就感與明確視覺回饋，切換週報時即時聯動！</p>
+          <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>頂部尊榮已完讀金徽章：</strong>完成閱讀打卡或滑動深度滿 100% 後，Header 姓名處即刻點亮專屬「👑 2026-WXX 已完讀」琥珀金光輝微漸層徽章，賦予窗口同仁高度尊榮成就感與明確視覺回饋，切換週報時即時聯動！</p>
         </div>
         <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-purple-300 transition-colors">
-          <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-sm">26</span>雲端打卡同步防護、動態 Loading 與異常自動回滾</h4>
+          <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-sm">26</span>雲端打卡同步防護、動態 Loading 與後台手動補登功能</h4>
           <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>非同步雲端確認機制：</strong>同仁點擊「確認已閱讀完畢 (打卡)」時，按鈕立即進入「同步打卡中...」旋轉動畫並鎖定防重複連點。系統嚴格等待雲端 Firestore 資料庫寫入成功回傳後，方鎖定本地已讀與點亮尊榮徽章，杜絕斷線虛假標記。</p>
-          <p class="text-sm leading-relaxed text-slate-600"><strong>異常安全回滾與重試：</strong>若遇網路瞬斷或請求逾時，系統自動捕捉異常並彈出警示，按鈕瞬間回滾為可點擊狀態，保障同仁隨時能順利重新打卡；若遇歷史週報或跨區漏登，管理員可由後台專用腳本進行安全精準補登。</p>
+          <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>異常安全回滾與重試：</strong>若遇網路瞬斷或請求逾時，系統自動捕捉異常並彈出警示，按鈕瞬間回滾為可點擊狀態，保障同仁隨時能順利重新打卡。</p>
+          <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>後台手動補登介面：</strong>後台「C 已讀狀態追蹤」右上角配置「＋ 手動補登已讀」按鈕。若遇特殊跨區反映或離線閱畢，管理員可開啟彈窗直接選取未讀同仁、設定完成度百分比，一鍵將打卡紀錄安全補登至雲端資料庫並即時刷新 KPI 統計！</p>
         </div>
       </div>
 
@@ -1922,16 +1929,17 @@
               <div class="w-6 h-6 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-purple-600 group-hover:text-white transition-all duration-300 shadow-sm"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
             </div>
             <div>
-              <h3 class="text-sm font-bold text-slate-800 mb-1 flex items-center gap-2">三十一、週報已讀打卡雲端同步防護、動態回饋與補登機制 <span class="bg-purple-50 text-purple-800 border border-purple-200/80 text-[10px] px-2 py-0.5 rounded-md font-semibold tracking-wide flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>數據落實</span> <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-0.5 rounded-full font-normal tracking-wide">2026-09-18</span></h3>
+              <h3 class="text-sm font-bold text-slate-800 mb-1 flex items-center gap-2">三十一、週報已讀打卡雲端同步防護、動態回饋與後台手動補登系統 <span class="bg-purple-50 text-purple-800 border border-purple-200/80 text-[10px] px-2 py-0.5 rounded-md font-semibold tracking-wide flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>數據落實</span> <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-0.5 rounded-full font-normal tracking-wide">2026-09-18</span></h3>
               <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
                 <span class="font-semibold text-slate-600">採購需求：</span><br>
                 1. 排查窗口同仁（如營運部同仁）反映已閱讀並打卡，但後台已讀名冊卻未列出之問題，查明根因並落實紀錄精準補登。<br>
                 2. 解決前台打卡時因網路波動或瀏覽器切換分頁導致「本地狀態已亮但雲端未寫入（Silent Failure）」之不同步漏洞。<br>
                 3. 前台打卡按鈕點擊時需提供動態防重複連點與 Loading 反饋，且必須在雲端資料庫確實寫入成功後才鎖定狀態與點亮徽章。<br>
-                4. 若遇到伺服器逾時或網路中斷，必須自動回滾按鈕並跳出明確提示，不讓同仁誤判已打卡完成。
+                4. 若遇到伺服器逾時或網路中斷，必須自動回滾按鈕並跳出明確提示，不讓同仁誤判已打卡完成。<br>
+                5. 後台管理員需具備自主「手動補登」已讀之視覺化介面，可由名單快速選取未讀同仁一鍵補登，無需手動執行腳本。
               </p>
               <p class="text-xs text-purple-700 font-medium leading-relaxed mt-3 border-l-2 border-purple-400 pl-2">
-                💡 <span class="font-bold">專案成果：</span>前台全面升級「非同步雲端寫入驗證機制（Cloud-First Verification）」，點擊瞬間顯示旋轉 Loading 並禁用連點；嚴格等待 Firestore 成功回傳後方鎖定本地 100% 滿條與尊榮徽章；若發生異常自動無損回滾按鈕並提示同仁重試；同時透過後台精準腳本順利為營運部同仁補登 2026-W38 已讀紀錄，達成雲端數據 100% 實時閉環！
+                💡 <span class="font-bold">專案成果：</span>前台全面升級「非同步雲端寫入驗證機制（Cloud-First Verification）」，點擊瞬間顯示旋轉 Loading 並禁用連點，嚴格等待 Firestore 成功回傳後方鎖定本地 100% 滿條與尊榮徽章；若發生異常自動無損回滾按鈕並提示同仁重試；同時後台已讀追蹤區塊正式上線「＋ 手動補登已讀」專屬 Modal 視窗，提供直觀未讀同仁選單與完成度設定，一鍵寫入雲端並即刻刷新 KPI 績效與名冊，全方位落實閱讀追蹤數據閉環！
               </p>
             </div>
           </div>
@@ -2507,6 +2515,75 @@
           </table>
         </div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- 手動補登打卡 Modal (Manual Read Backfill) -->
+<div id="manual-read-modal" class="hidden fixed inset-0 z-[160] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm transition-all duration-300">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md flex flex-col mx-4 overflow-hidden border border-slate-200/90 animate-in fade-in zoom-in duration-200">
+    <!-- 頂部標題列 -->
+    <div class="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-gradient-to-r from-sky-50 via-white to-blue-50/40">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 bg-sky-600 text-white rounded-xl flex items-center justify-center shadow-sm shadow-sky-600/30">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <div>
+          <h3 class="text-base font-bold text-slate-800">手動補登閱讀打卡</h3>
+          <p class="text-xs text-slate-500 mt-0.5">為指定同仁於本期週報登錄閱畢紀錄</p>
+        </div>
+      </div>
+      <button onclick="closeManualReadModal()" type="button" class="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <!-- 表單內容 -->
+    <div class="p-6 space-y-4 text-xs">
+      <div>
+        <label class="block font-bold text-slate-700 mb-1.5">目標週報期數</label>
+        <div id="m-read-bulletin-id" class="form-input bg-slate-50 text-slate-600 font-mono font-semibold select-none flex items-center justify-between">
+          <span>--</span>
+          <span class="text-[10px] text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">當前編輯週報</span>
+        </div>
+      </div>
+
+      <div>
+        <label class="block font-bold text-slate-700 mb-1.5">選擇補登同仁 <span class="text-rose-500">*</span></label>
+        <select id="m-read-user-select" class="form-input text-xs csel cursor-pointer">
+          <option value="">載入名單中...</option>
+        </select>
+        <p class="text-[11px] text-slate-400 mt-1">※ 優先列出本期尚未打卡之同仁名單（依部門排序）</p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block font-bold text-slate-700 mb-1.5">閱讀完成進度</label>
+          <select id="m-read-progress" class="form-input text-xs csel">
+            <option value="100" selected>100% (完全閱畢打卡)</option>
+            <option value="80">80% (大部分閱畢)</option>
+            <option value="50">50% (部分閱畢)</option>
+            <option value="10">10% (已開啟)</option>
+          </select>
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1.5">補登操作人員</label>
+          <input type="text" id="m-read-operator" class="form-input bg-slate-50 text-slate-600 text-xs font-medium" value="採購管理員 (手動補登)" readonly>
+        </div>
+      </div>
+
+      <div class="p-3 bg-sky-50/80 rounded-xl border border-sky-200 text-sky-800 text-[11px] leading-relaxed">
+        💡 <strong>系統提示：</strong>補登確認後將直接同步寫入雲端 Firestore 資料庫，後台已讀名冊與點閱績效統計（KPI 看板）將即時連動更新該同仁之閱畢狀態。
+      </div>
+    </div>
+
+    <!-- 底部動作按鈕 -->
+    <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/60 flex items-center justify-end gap-2.5">
+      <button onclick="closeManualReadModal()" type="button" class="btn-s text-xs py-2 px-4">取消</button>
+      <button id="btn-submit-manual-read" onclick="submitManualRead()" type="button" class="btn-p text-xs py-2 px-4 bg-sky-600 hover:bg-sky-700 border-none shadow-sm">
+        <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+        <span>確認補登</span>
+      </button>
     </div>
   </div>
 </div>
