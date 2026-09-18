@@ -418,9 +418,9 @@
         }
       },
       async markAsRead(bulletinId, user, progress = null) {
-        if (!this.isConfigured() || !bulletinId || !user) return;
+        if (!this.isConfigured() || !bulletinId || !user) return { success: false, error: '未初始化或缺少使用者資訊' };
         const uid = user.userId || user.uid || (user.email ? user.email.replace(/[@.]/g, '_') : null);
-        if (!uid) return;
+        if (!uid) return { success: false, error: '缺少有效使用者識別碼' };
         try {
           const userRef = db.collection('bulletins').doc(bulletinId).collection('readReceipts').doc(uid);
           const docSnap = await userRef.get();
@@ -449,8 +449,10 @@
             await userRef.set(newDoc);
           }
           try { localStorage.setItem('has_read_' + bulletinId, '1'); } catch(e) {}
+          return { success: true };
         } catch (e) {
           console.error("markAsRead error:", e);
+          return { success: false, error: e };
         }
       },
       async hasRead(bulletinId, userId) {
@@ -959,44 +961,86 @@ async function showKPI(monthOffset = 0) {
       }
       const user = JSON.parse(userStr);
 
-      // 1. 本地立即鎖定 100%
-      try {
-        localStorage.setItem('progress_' + bulletinId, '100');
-        localStorage.setItem('has_read_' + bulletinId, '1');
-      } catch(e) {}
-      currentBulletinProgress = 100;
-
-      // 2. 頂部閱讀進度條拉滿
-      const bar = document.getElementById('reading-progress-bar');
-      if (bar) bar.style.width = '100%';
-
-      // 3. 更新底端按鈕與卡片狀態
       const btn = document.getElementById('btn-confirm-read');
+      const card = document.getElementById('reading-confirm-card');
+
+      // 1. 防重複點擊與 Loading 動態回饋
       if (btn) {
         btn.disabled = true;
-        btn.className = 'w-full sm:w-auto px-5 py-2 rounded-lg font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 bg-slate-100 text-slate-400 border border-slate-200/80 cursor-default shadow-none';
-        btn.innerHTML = '<span>已完成本期打卡</span>';
-      }
-      const card = document.getElementById('reading-confirm-card');
-      if (card) {
-        card.className = 'p-4 rounded-xl border transition-all duration-300 bg-slate-50/80 border-slate-200/80';
+        btn.dataset.originalHtml = btn.innerHTML;
+        btn.dataset.originalClass = btn.className;
+        btn.className = 'w-full sm:w-auto px-5 py-2 rounded-lg font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 bg-indigo-500 text-white shadow-none cursor-wait opacity-90';
+        btn.innerHTML = `
+          <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+          </svg>
+          <span>同步打卡中...</span>
+        `;
       }
 
-      // 4. 同步至 Firestore
+      // 2. 同步寫入至雲端 Firestore
       try {
-        await DS.markAsRead(bulletinId, user, 100);
+        const res = await DS.markAsRead(bulletinId, user, 100);
+        if (res && res.success) {
+          // 雲端寫入成功：鎖定本地快取與狀態
+          try {
+            localStorage.setItem('progress_' + bulletinId, '100');
+            localStorage.setItem('has_read_' + bulletinId, '1');
+          } catch(e) {}
+          currentBulletinProgress = 100;
+
+          // 頂部閱讀進度條拉滿
+          const bar = document.getElementById('reading-progress-bar');
+          if (bar) bar.style.width = '100%';
+
+          // 更新底端按鈕與卡片狀態
+          if (btn) {
+            btn.disabled = true;
+            btn.className = 'w-full sm:w-auto px-5 py-2 rounded-lg font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 bg-slate-100 text-slate-400 border border-slate-200/80 cursor-default shadow-none';
+            btn.innerHTML = '<span>已完成本期打卡</span>';
+          }
+          if (card) {
+            card.className = 'p-4 rounded-xl border transition-all duration-300 bg-slate-50/80 border-slate-200/80';
+          }
+
+          // 更新 Header 尊榮徽章
+          updateAuthUI();
+
+          // 成功提示
+          if (typeof toast === 'function') {
+            toast('👑 感謝您的閱畢打卡！雲端已成功同步並點亮尊榮已完讀徽章。', 'ok');
+          } else {
+            alert('🎉 您已完成本期週報閱讀打卡！已於頂部點亮尊榮完讀徽章。');
+          }
+        } else {
+          // 雲端寫入回傳失敗，回滾按鈕並提示
+          const errMsg = (res && res.error) ? (res.error.message || res.error) : '伺服器無回應';
+          console.warn('confirmBulletinRead failed:', errMsg);
+          if (btn) {
+            btn.disabled = false;
+            btn.className = btn.dataset.originalClass || 'w-full sm:w-auto px-5 py-2 rounded-lg font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-500 text-white shadow hover:shadow-md cursor-pointer';
+            btn.innerHTML = btn.dataset.originalHtml || '<span>確認已閱讀完畢 (打卡)</span>';
+          }
+          if (typeof toast === 'function') {
+            toast('⚠️ 雲端打卡同步未完成，請檢查網路連線後再次點擊打卡。', 'er');
+          } else {
+            alert('⚠️ 雲端打卡同步未成功，請確認網路連線正常後再次點擊。');
+          }
+        }
       } catch(err) {
-        console.error('confirmBulletinRead Firestore error:', err);
-      }
-
-      // 5. 更新 Header 尊榮徽章
-      updateAuthUI();
-
-      // 6. 介面視覺反饋提示
-      if (typeof toast === 'function') {
-        toast('👑 感謝您的閱畢打卡！已成功為您點亮尊榮已完讀徽章。', 'ok');
-      } else {
-        alert('🎉 您已完成本期週報閱讀打卡！已於頂部點亮尊榮完讀徽章。');
+        console.error('confirmBulletinRead error:', err);
+        // 異常處理：復原按鈕狀態
+        if (btn) {
+          btn.disabled = false;
+          btn.className = btn.dataset.originalClass || 'w-full sm:w-auto px-5 py-2 rounded-lg font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-500 text-white shadow hover:shadow-md cursor-pointer';
+          btn.innerHTML = btn.dataset.originalHtml || '<span>確認已閱讀完畢 (打卡)</span>';
+        }
+        if (typeof toast === 'function') {
+          toast('⚠️ 網路連線異常，打卡尚未同步至雲端，請稍後重試。', 'er');
+        } else {
+          alert('⚠️ 網路連線異常，打卡尚未同步至雲端，請稍後重試。');
+        }
       }
     }
 
@@ -1007,7 +1051,7 @@ async function showKPI(monthOffset = 0) {
       if (userStr) {
         const user = JSON.parse(userStr);
         if (state.activeBulletinId) {
-          // 1. 本地已讀快取優先防干擾：若本地已打卡完讀或已標記閱讀過，絕不彈出未讀提醒視窗
+          // 1. 本地已讀快取：若本地已打卡完讀，先確保介面流暢不卡頓
           const localRead = localStorage.getItem('has_read_' + state.activeBulletinId);
           const localProgress = parseInt(localStorage.getItem('progress_' + state.activeBulletinId) || '0', 10);
           if (localRead === '1' || localProgress >= 100) {
@@ -1018,6 +1062,7 @@ async function showKPI(monthOffset = 0) {
               if (bar) bar.style.width = '100%';
             }
             updateAuthUI();
+            // 在背景向 Firestore 同步更新最後觀看時間
             DS.markAsRead(state.activeBulletinId, user);
             return;
           }
@@ -1042,7 +1087,7 @@ async function showKPI(monthOffset = 0) {
             document.getElementById('unread-bulletin-title').textContent = b ? b.title : '最新緊急公告';
             document.getElementById('unread-modal').classList.remove('hidden');
           }
-          // Mark as read in Firestore
+          // 背景標記閱讀狀態
           DS.markAsRead(state.activeBulletinId, user);
         }
       } else {
@@ -1678,7 +1723,7 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
             `;
           })()}
           ${(() => {
-            const isRead = parseInt(localStorage.getItem('progress_' + bulletin.id) || '0', 10) >= 100;
+            const isRead = (parseInt(localStorage.getItem('progress_' + bulletin.id) || '0', 10) >= 100) && (localStorage.getItem('has_read_' + bulletin.id) === '1');
             return `
               <div id="reading-confirm-card" class="p-4 rounded-xl border transition-all duration-300 ${
                 isRead 
