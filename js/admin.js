@@ -759,7 +759,28 @@ async function renderAuditLogs(id) {
   }
 }
 
-function openSettingsModal() { document.getElementById('settings-modal').classList.remove('hidden'); switchSettingsTab('tab-frontend'); }
+async function showHandover() {
+  const modal = document.getElementById('settings-modal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    switchSettingsTab('tab-handover');
+  } else {
+    // 容錯備援
+    const oldModal = document.getElementById('handover-modal');
+    if (oldModal) oldModal.classList.remove('hidden');
+  }
+}
+
+function hideHandover() {
+  const oldModal = document.getElementById('handover-modal');
+  if (oldModal) oldModal.classList.add('hidden');
+  closeSettingsModal();
+}
+
+function openSettingsModal() {
+  document.getElementById('settings-modal').classList.remove('hidden');
+  switchSettingsTab('tab-whitelist');
+}
 function closeSettingsModal() { document.getElementById('settings-modal').classList.add('hidden'); }
 function switchSettingsTab(t) {
   document.querySelectorAll('.settings-tab-pane').forEach(el => el.classList.add('hidden'));
@@ -1820,12 +1841,20 @@ async function loadHandoverConfig() {
 }
 
 async function showHandover() {
-  document.getElementById('handover-modal').classList.remove('hidden');
-  await loadHandoverConfig();
+  const modal = document.getElementById('settings-modal');
+  if (modal) {
+    modal.classList.remove('hidden');
+    switchSettingsTab('tab-handover');
+  } else {
+    const oldModal = document.getElementById('handover-modal');
+    if (oldModal) oldModal.classList.remove('hidden');
+  }
 }
 
 function hideHandover() {
-  document.getElementById('handover-modal').classList.add('hidden');
+  const oldModal = document.getElementById('handover-modal');
+  if (oldModal) oldModal.classList.add('hidden');
+  closeSettingsModal();
 }
 
 async function saveHandover() {
