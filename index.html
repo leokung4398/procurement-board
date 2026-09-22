@@ -42,7 +42,7 @@
   <!-- Quill CSS for rendering rich text -->
   <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
   
-  <link rel="stylesheet" href="css/index.css?v=1789724000">
+  <link rel="stylesheet" href="css/index.css?v=1789725000">
 
 
   <style>
@@ -423,12 +423,38 @@
       },
       async markAsRead(bulletinId, user, progress = null) {
         if (!this.isConfigured() || !bulletinId || !user) return { success: false, error: '未初始化或缺少使用者資訊' };
+        // 兼容多種 uid 格式
         const uid = user.userId || user.uid || (user.email ? user.email.replace(/[@.]/g, '_') : null);
         if (!uid) return { success: false, error: '缺少有效使用者識別碼' };
         try {
           const userRef = db.collection('bulletins').doc(bulletinId).collection('readReceipts').doc(uid);
-          const docSnap = await userRef.get();
-          if (docSnap.exists) {
+          
+          // 若為 100% 打卡確認，使用 set({ ... }, { merge: true }) 避免讀取逾時或權限阻擋
+          if (progress !== null && progress >= 100) {
+            const confirmDoc = {
+              userId: uid,
+              email: user.email || '',
+              displayName: user.displayName || user.name || (user.email ? user.email.split('@')[0] : '同仁'),
+              department: user.department || '未指定',
+              readProgress: 100,
+              confirmed: true,
+              confirmedAt: firebase.firestore.FieldValue.serverTimestamp(),
+              lastViewedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            await userRef.set(confirmDoc, { merge: true });
+            
+            try { 
+              localStorage.setItem('has_confirmed_' + bulletinId, '1');
+              localStorage.setItem('has_read_' + bulletinId, '1'); 
+              localStorage.setItem('progress_' + bulletinId, '100');
+              localStorage.setItem('dismissed_unread_' + bulletinId, '1');
+            } catch(e) {}
+            return { success: true };
+          }
+
+          // 一般進度心跳（非打卡）
+          const docSnap = await userRef.get().catch(() => null);
+          if (docSnap && docSnap.exists) {
             const updateData = {
               lastViewedAt: firebase.firestore.FieldValue.serverTimestamp()
             };
@@ -436,12 +462,6 @@
               const currentProgress = docSnap.data().readProgress || 0;
               if (progress > currentProgress) {
                 updateData.readProgress = Math.min(100, Math.round(progress));
-              }
-              if (progress >= 100) {
-                updateData.confirmed = true;
-                if (!docSnap.data().confirmedAt) {
-                  updateData.confirmedAt = firebase.firestore.FieldValue.serverTimestamp();
-                }
               }
             }
             await userRef.update(updateData);
@@ -456,18 +476,7 @@
               readAt: firebase.firestore.FieldValue.serverTimestamp(),
               lastViewedAt: firebase.firestore.FieldValue.serverTimestamp()
             };
-            if (initialProgress >= 100) {
-              newDoc.confirmed = true;
-              newDoc.confirmedAt = firebase.firestore.FieldValue.serverTimestamp();
-            }
-            await userRef.set(newDoc);
-          }
-          if (progress >= 100) {
-            try { 
-              localStorage.setItem('has_confirmed_' + bulletinId, '1');
-              localStorage.setItem('has_read_' + bulletinId, '1'); 
-              localStorage.setItem('progress_' + bulletinId, '100');
-            } catch(e) {}
+            await userRef.set(newDoc, { merge: true });
           }
           return { success: true };
         } catch (e) {
@@ -1042,32 +1051,37 @@ async function showKPI(monthOffset = 0) {
             alert('🎉 您已完成本期週報閱讀打卡！已於頂部點亮尊榮完讀徽章。');
           }
         } else {
-          // 雲端寫入回傳失敗，回滾按鈕並提示
-          const errMsg = (res && res.error) ? (res.error.message || res.error) : '伺服器無回應';
+          // 雲端寫入回傳失敗，回滾按鈕並提供精確資訊
+          const errMsg = (res && res.error) ? (res.error.message || String(res.error)) : '連線逾時或暫無回應';
           console.warn('confirmBulletinRead failed:', errMsg);
           if (btn) {
             btn.disabled = false;
             btn.className = btn.dataset.originalClass || 'w-full sm:w-auto px-5 py-2 rounded-lg font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-500 text-white shadow hover:shadow-md cursor-pointer';
             btn.innerHTML = btn.dataset.originalHtml || '<span>確認已閱讀完畢 (打卡)</span>';
           }
+          const userHint = errMsg.includes('permission-denied') 
+            ? '⚠️ 您的登入驗證可能已過期，請重新登入後再次點擊打卡。'
+            : `⚠️ 雲端打卡同步未成功 (${errMsg})，請確認網路連線正常後再次點擊。`;
           if (typeof toast === 'function') {
-            toast('⚠️ 雲端打卡同步未完成，請檢查網路連線後再次點擊打卡。', 'er');
+            toast(userHint, 'er');
           } else {
-            alert('⚠️ 雲端打卡同步未成功，請確認網路連線正常後再次點擊。');
+            alert(userHint);
           }
         }
       } catch(err) {
         console.error('confirmBulletinRead error:', err);
+        const errMsg = err ? (err.message || String(err)) : '網路連線異常';
         // 異常處理：復原按鈕狀態
         if (btn) {
           btn.disabled = false;
           btn.className = btn.dataset.originalClass || 'w-full sm:w-auto px-5 py-2 rounded-lg font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-500 text-white shadow hover:shadow-md cursor-pointer';
           btn.innerHTML = btn.dataset.originalHtml || '<span>確認已閱讀完畢 (打卡)</span>';
         }
+        const userHint = `⚠️ 網路連線或伺服器異常 (${errMsg})，打卡尚未同步至雲端，請稍後重試。`;
         if (typeof toast === 'function') {
-          toast('⚠️ 網路連線異常，打卡尚未同步至雲端，請稍後重試。', 'er');
+          toast(userHint, 'er');
         } else {
-          alert('⚠️ 網路連線異常，打卡尚未同步至雲端，請稍後重試。');
+          alert(userHint);
         }
       }
     }
