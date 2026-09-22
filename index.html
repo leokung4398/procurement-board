@@ -42,7 +42,7 @@
   <!-- Quill CSS for rendering rich text -->
   <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
   
-  <link rel="stylesheet" href="css/index.css?v=1789720688">
+  <link rel="stylesheet" href="css/index.css?v=1789723000">
 
 
   <style>
@@ -891,7 +891,10 @@ async function showKPI(monthOffset = 0) {
           state.searchMonth = mArr[0];
         }
 
-        if (bulletins.length > 0) {
+        const initialFiltered = getFilteredBulletins();
+        if (initialFiltered.length > 0) {
+          state.activeBulletinId = initialFiltered[0].id;
+        } else if (bulletins.length > 0) {
           state.activeBulletinId = bulletins[0].id;
         }
         
@@ -1266,13 +1269,42 @@ async function showKPI(monthOffset = 0) {
     /* =========================================
        2. UI Renderer
        ========================================= */
+    function isUserAuthorizedForBulletin(b, userEmail, isAdmin) {
+      if (isAdmin) return true;
+      if (b.isHidden) return false;
+      if (b.audienceType === 'custom' || (b.authorizedEmails && b.authorizedEmails.length > 0 && b.audienceType !== 'all')) {
+        const authEmails = (b.authorizedEmails || []).map(e => (e || '').trim().toLowerCase());
+        if (!userEmail || !authEmails.includes(userEmail)) {
+          return false;
+        }
+      }
+      return true;
+    }
+
     function getFilteredBulletins() {
       if (!state.data || !state.data.bulletins) return [];
       const mVal = state.searchMonth || (document.getElementById('search-month') ? document.getElementById('search-month').value : '');
       const pVal = state.searchParent || (document.getElementById('search-parent') ? document.getElementById('search-parent').value : '');
       const qVal = state.searchQuery || (document.getElementById('search-keyword') ? document.getElementById('search-keyword').value.trim().toLowerCase() : '');
 
+      const userStr = localStorage.getItem('procurement_user');
+      let userEmail = '';
+      if (userStr) {
+        try {
+          userEmail = (JSON.parse(userStr).email || '').trim().toLowerCase();
+        } catch(e) {}
+      }
+
+      const adminEmails = ['leokung@youbike.com.tw', 'sunnyting@youbike.com.tw', 'gb4398@giantcycling.com'];
+      const isAdmin = (state.admins || []).some(a => (a.email || '').toLowerCase() === userEmail) ||
+                      adminEmails.includes(userEmail);
+
       return state.data.bulletins.filter(b => {
+        // 權限過濾：隱藏週報與特定人員觀看限定
+        if (!isUserAuthorizedForBulletin(b, userEmail, isAdmin)) {
+          return false;
+        }
+
         if (mVal) {
           const m = (b.publishDate || '').slice(0, 7);
           if (m !== mVal) return false;
@@ -1527,13 +1559,49 @@ async function showKPI(monthOffset = 0) {
         return;
       }
 
-      // 權限控管檢查
+      // 權限控管檢查 (隱藏週報與特定人員授權)
       const userStr = localStorage.getItem('procurement_user');
-      
-      // 權限檢查已統一在登入時由全局白名單處理 (frontendGoogleLogin)
-      // 只要能登入，就能觀看所有已發布的佈告欄
-      
-      
+      let userEmail = '';
+      if (userStr) {
+        try {
+          userEmail = (JSON.parse(userStr).email || '').trim().toLowerCase();
+        } catch(e) {}
+      }
+      const adminEmails = ['leokung@youbike.com.tw', 'sunnyting@youbike.com.tw', 'gb4398@giantcycling.com'];
+      const isAdmin = (state.admins || []).some(a => (a.email || '').toLowerCase() === userEmail) ||
+                      adminEmails.includes(userEmail);
+
+      if (!isUserAuthorizedForBulletin(bulletin, userEmail, isAdmin)) {
+        if (bulletin.isHidden) {
+          container.innerHTML = `
+            <div class="text-center py-24 bg-white rounded-2xl border border-slate-200 shadow-xs max-w-xl mx-auto my-12 p-8">
+              <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-100 text-slate-500 mb-4 shadow-inner">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18"/></svg>
+              </div>
+              <h3 class="text-xl font-bold text-slate-800">此週報目前暫不開放檢視</h3>
+              <p class="text-slate-500 text-sm mt-2 leading-relaxed">
+                本期週報已被採購管理員設定為「暫時隱藏」。<br>
+                若有專案校對或業務調閱需求，請聯繫採購窗口。
+              </p>
+            </div>
+          `;
+        } else {
+          container.innerHTML = `
+            <div class="text-center py-24 bg-white rounded-2xl border border-slate-200 shadow-xs max-w-xl mx-auto my-12 p-8">
+              <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-amber-100 text-amber-600 mb-4 shadow-inner">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+              </div>
+              <h3 class="text-xl font-bold text-slate-800">專屬授權週報｜權限保護中</h3>
+              <p class="text-slate-500 text-sm mt-2 leading-relaxed">
+                此期週報設定為特定業務專屬，僅授權同仁具備閱覽權限。<br>
+                您目前的登入帳號（${userEmail || '未登入'}）未在本次授權名單中。
+              </p>
+            </div>
+          `;
+        }
+        return;
+      }
+
       let watermarkHtml = '';
       if (bulletin.isConfidential) {
         const uStr = localStorage.getItem('procurement_user');

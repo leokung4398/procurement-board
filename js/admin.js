@@ -547,7 +547,18 @@ function renderSB() {
           <span>${fmtMo(mk)}</span><span class="text-xs text-slate-400">${filteredMmap[mk].length} 份</span>
         </button>
         <div id="mo-${mk}" class="${a ? '' : 'hidden'} mt-0.5 space-y-0.5">
-          ${filteredMmap[mk].map(b => `<button class="sb-bb ${S.cur?.id === b.id ? 'act' : ''}" onclick="loadB('${b.id}')">${b.id}</button>`).join('')}
+          ${filteredMmap[mk].map(b => {
+            const isAct = S.cur?.id === b.id;
+            const isHid = !!b.isHidden;
+            const isRestricted = b.audienceType === 'custom' || (b.authorizedEmails && b.authorizedEmails.length > 0 && b.audienceType !== 'all');
+            let badge = '';
+            if (isHid) {
+              badge += '<span class="ml-1 text-[10px] bg-rose-100 text-rose-700 px-1.5 py-0.2 rounded font-bold">隱藏</span>';
+            } else if (isRestricted) {
+              badge += '<span class="ml-1 text-[10px] bg-amber-100 text-amber-700 px-1.5 py-0.2 rounded font-bold">限定</span>';
+            }
+            return `<button class="sb-bb ${isAct ? 'act' : ''} flex items-center justify-between" onclick="loadB('${b.id}')"><span class="truncate">${b.id}</span><span>${badge}</span></button>`;
+          }).join('')}
         </div>
       </div>
     `;
@@ -998,10 +1009,60 @@ async function delAdmin(i) {
   toast('已刪除', 'ok');
 }
 
-function newBulletin(){if(S.dirty&&!confirm('有未儲存的修改，確定繼續？'))return;const now=new Date(),p=n=>String(n).padStart(2,'0'),ds=`${now.getFullYear()}-${p(now.getMonth()+1)}-${p(now.getDate())}`;S.cur={id:`${now.getFullYear()}-W${wk(now)}`,publishDate:ds,title:'經營TEAM採購｜本週重點摘要',periodStart:ds,periodEnd:ds,isPinned:false,status:'draft',version:1,sections:[]};S.dirty=false;renderEd();toast('已建立新週報草稿','in');}
+function newBulletin(){
+  if(S.dirty&&!confirm('有未儲存的修改，確定繼續？'))return;
+  const now=new Date(),p=n=>String(n).padStart(2,'0'),ds=`${now.getFullYear()}-${p(now.getMonth()+1)}-${p(now.getDate())}`;
+  S.cur={
+    id:`${now.getFullYear()}-W${wk(now)}`,
+    publishDate:ds,
+    title:'經營TEAM採購｜本週重點摘要',
+    periodStart:ds,
+    periodEnd:ds,
+    isPinned:false,
+    isHidden:false,
+    audienceType:'all',
+    authorizedEmails:[],
+    status:'draft',
+    version:1,
+    sections:[]
+  };
+  S.dirty=false;
+  renderEd();
+  toast('已建立新週報草稿','in');
+}
 function wk(d){const j=new Date(d.getFullYear(),0,1);return Math.ceil((((d-j)/86400000)+j.getDay()+1)/7);}
 async function unpubBulletin(){if(!S.cur)return;if(!confirm('確定要撤回發布？撤回後前台將無法看見此週報。'))return;const pt=document.getElementById('pub-txt'),btn=document.getElementById('btn-unpub');btn.disabled=true;pt.textContent='撤回中...';try{const d={...S.cur,status:'draft',feedbackLog:S.fbs};if(S.cur.authorizedEmails)d.authorizedEmails=S.cur.authorizedEmails;await DS.save(d.id,d);await DS.addAuditLog(d.id, `管理員撤回了週報。`);S.dirty=false;const sb=document.getElementById('tb-status');sb.className='bdg-dft';sb.textContent='草稿';toast('週報已撤回發布！','ok');S.mmap=await DS.getMonths();renderSB();renderAuditLogs(d.id);renderEd();renderReadReceipts(d.id);}catch(e){toast('撤回失敗：'+e.message,'er');}finally{btn.disabled=false;pt.textContent='正式發布';}}
-function renderEd(){const b=S.cur;if(!b)return;document.getElementById('es').classList.add('hidden');document.getElementById('bf').classList.remove('hidden');document.getElementById('tb-acts').classList.remove('hidden');document.getElementById('tb-title').textContent=b.id||'新週報';const sb=document.getElementById('tb-status');sb.className=b.status==='published'?'bdg-pub':'bdg-dft';sb.textContent=b.status==='published'?'已發布':'草稿';sb.classList.remove('hidden');if(b.status==='published'){document.getElementById('btn-unpub').classList.remove('hidden');document.getElementById('btn-pub').classList.add('hidden');}else{document.getElementById('btn-unpub').classList.add('hidden');document.getElementById('btn-pub').classList.remove('hidden');}document.getElementById('f-id').value=b.id||'';document.getElementById('f-pd').value=b.publishDate||'';document.getElementById('f-ps').value=b.periodStart||'';document.getElementById('f-pe').value=b.periodEnd||'';document.getElementById('f-ti').value=b.title||'';document.getElementById('f-pin').checked=!!b.isPinned;renderSecs();}
+function renderEd(){
+  const b=S.cur;if(!b)return;
+  document.getElementById('es').classList.add('hidden');
+  document.getElementById('bf').classList.remove('hidden');
+  document.getElementById('tb-acts').classList.remove('hidden');
+  document.getElementById('tb-title').textContent=b.id||'新週報';
+  const sb=document.getElementById('tb-status');
+  sb.className=b.status==='published'?'bdg-pub':'bdg-dft';
+  sb.textContent=b.status==='published'?'已發布':'草稿';
+  sb.classList.remove('hidden');
+  if(b.status==='published'){
+    document.getElementById('btn-unpub').classList.remove('hidden');
+    document.getElementById('btn-pub').classList.add('hidden');
+  }else{
+    document.getElementById('btn-unpub').classList.add('hidden');
+    document.getElementById('btn-pub').classList.remove('hidden');
+  }
+  document.getElementById('f-id').value=b.id||'';
+  document.getElementById('f-pd').value=b.publishDate||'';
+  document.getElementById('f-ps').value=b.periodStart||'';
+  document.getElementById('f-pe').value=b.periodEnd||'';
+  document.getElementById('f-ti').value=b.title||'';
+  document.getElementById('f-pin').checked=!!b.isPinned;
+  if(document.getElementById('f-hidden')) document.getElementById('f-hidden').checked=!!b.isHidden;
+  
+  // 載入閱讀觀看權限設定
+  const audType = b.audienceType || (b.authorizedEmails && b.authorizedEmails.length > 0 ? 'custom' : 'all');
+  setAudienceType(audType, false);
+  
+  renderSecs();
+}
 function renderSecs(){const c=document.getElementById('sc');const b=S.cur;const ptl=document.getElementById('toolbar-portal');if(ptl)ptl.innerHTML='';if(!b?.sections?.length){c.innerHTML='<div class="text-center py-10 text-slate-400 text-sm">尚未建立任何段落<br><span class="text-xs">點擊右上角「新增段落」</span></div>';return;}c.innerHTML=b.sections.map((s,i)=>bldSec(s,i)).join('');setTimeout(()=>{
   document.querySelectorAll('.quill-editor').forEach(el=>{
     if(el.classList.contains('tox-target')) return;
@@ -1280,7 +1341,24 @@ function bldItems(sec,si){
     </div>
     <div class="w-full quill-editor bg-white border border-slate-200 rounded min-h-[60px] p-2 text-sm text-slate-800" data-path="sections[${si}].subsections[${sbi}].items[${ii}].content">${item.content||''}</div>
   </div>
-`).join('')}<button onclick="addSI(${si},${sbi})" class="text-xs text-blue-500 mt-1">＋ 新增條目</button></div>`).join('')}</div>`;}function bldOT(orders,si,field,label){return`<div class="mb-3"><div class="flex items-center justify-between mb-1"><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">${label}</p><button onclick="addRow(${si},'${field}')" class="text-xs text-blue-600 font-medium">＋ 新增列</button><button onclick="rmSecTable(${si}, '${field}')" class="text-xs text-red-500 font-medium ml-3 flex items-center gap-1 hover:text-red-700"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg> 刪除表格</button></div><div class="overflow-x-auto rounded-lg border border-slate-200"><table class="data-table w-full text-xs min-w-[640px]"><thead><tr><th>供應商</th><th>訂單號</th><th>行號</th><th>料號</th><th>品名</th><th>數量</th><th>原交期</th><th>新交期</th><th>倉庫</th><th style="width:28px"></th></tr></thead><tbody>${(orders||[]).map((o,ri)=>`<tr><td><input value="${xe(o.supplierName||'')}" onchange="uRow(${si},'${field}',${ri},'supplierName',this.value)"></td><td><input value="${xe(o.poNumber||'')}" onchange="uRow(${si},'${field}',${ri},'poNumber',this.value)"></td><td><input value="${xe(o.lineNumber||'')}" style="width:45px" onchange="uRow(${si},'${field}',${ri},'lineNumber',this.value)"></td><td><input value="${xe(o.partNumber||'')}" onchange="uRow(${si},'${field}',${ri},'partNumber',this.value)"></td><td><input value="${xe(o.itemName||'')}" onchange="uRow(${si},'${field}',${ri},'itemName',this.value)"></td><td><input type="number" value="${o.quantity||''}" style="width:55px" onchange="uRow(${si},'${field}',${ri},'quantity',parseInt(this.value)||0)"></td><td><input type="date" value="${xe(o.originalDelivery||'')}" onchange="uRow(${si},'${field}',${ri},'originalDelivery',this.value)"></td><td><input value="${xe(o.newDelivery||'')}" onchange="uRow(${si},'${field}',${ri},'newDelivery',this.value)"></td><td><input value="${xe(o.warehouseName||'')}" onchange="uRow(${si},'${field}',${ri},'warehouseName',this.value)"></td><td><button onclick="rmRow(${si},'${field}',${ri})" class="bic d"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></td></tr>`).join('')}</tbody></table></div></div>`;}function bldRT(records,si){return`<div class="mb-3"><div class="flex items-center justify-between mb-1"><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">返修紀錄</p><button onclick="addRep(${si})" class="text-xs text-blue-600 font-medium">＋ 新增</button><button onclick="rmSecTable(${si}, 'repairRecords')" class="text-xs text-red-500 font-medium ml-3 flex items-center gap-1 hover:text-red-700"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg> 刪除表格</button></div><div class="overflow-x-auto rounded-lg border border-slate-200"><table class="data-table w-full text-xs min-w-[560px]"><thead><tr><th>供應商</th><th>返修單位</th><th>返修日</th><th>追蹤號</th><th>異常類型</th><th>品名</th><th>數量</th><th></th></tr></thead><tbody>${(records||[]).map((r,ri)=>`<tr><td><input value="${xe(r.supplierName||'')}" onchange="uRep(${si},${ri},'supplierName',this.value)"></td><td><input value="${xe(r.repairUnit||'')}" onchange="uRep(${si},${ri},'repairUnit',this.value)"></td><td><input type="date" value="${xe(r.repairDate||'')}" onchange="uRep(${si},${ri},'repairDate',this.value)"></td><td><input value="${xe(r.trackingNumber||'')}" onchange="uRep(${si},${ri},'trackingNumber',this.value)"></td><td><input value="${xe(r.faultType||'')}" onchange="uRep(${si},${ri},'faultType',this.value)"></td><td><input value="${xe(r.faultModel||'')}" onchange="uRep(${si},${ri},'faultModel',this.value)"></td><td><input type="number" value="${r.quantity||''}" style="width:55px" onchange="uRep(${si},${ri},'quantity',parseInt(this.value)||0)"></td><td><button onclick="rmRep(${si},${ri})" class="bic d"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></td></tr>`).join('')}</tbody></table></div></div>`;}function bldPT(items,si){return`<div class="mb-3"><div class="flex items-center justify-between mb-1"><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">漲價料件</p><button onclick="addPrc(${si})" class="text-xs text-blue-600 font-medium">＋ 新增</button><button onclick="rmSecTable(${si}, 'priceChangeItems')" class="text-xs text-red-500 font-medium ml-3 flex items-center gap-1 hover:text-red-700"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg> 刪除表格</button></div><div class="overflow-x-auto rounded-lg border border-slate-200"><table class="data-table w-full text-xs"><thead><tr><th>供應商</th><th>品號</th><th>品名/說明</th><th></th></tr></thead><tbody>${(items||[]).map((it,ri)=>`<tr><td><input value="${xe(it.supplierName||'')}" onchange="uPrc(${si},${ri},'supplierName',this.value)"></td><td><input value="${xe(it.partNumber||'')}" onchange="uPrc(${si},${ri},'partNumber',this.value)"></td><td><input value="${xe(it.description||'')}" onchange="uPrc(${si},${ri},'description',this.value)"></td><td><button onclick="rmPrc(${si},${ri})" class="bic d"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></td></tr>`).join('')}</tbody></table></div></div>`;}function bldFiles(sec,si){const files=sec.files||[];return`<div class="mt-3 pt-3 border-t border-slate-100"><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">📎 附件</p>${files.map((f,fi)=>`<div class="flex items-center gap-2 bg-slate-50 rounded-lg px-3 py-2 mb-1.5 text-xs"><span class="text-slate-400">📄</span><input class="flex-1 bg-transparent border-none outline-none text-blue-600 font-medium text-xs" value="${xe(f.fileName||'')}" onchange="uFile(${si},${fi},'fileName',this.value)"><button onclick="rmFile(${si},${fi})" class="text-red-400 hover:text-red-600">🗑️</button></div>`).join('')}<label class="inline-flex items-center gap-1.5 mt-1 text-xs text-blue-600 hover:text-blue-800 cursor-pointer font-medium"><span>＋ 上傳附件</span><input type="file" class="hidden" onchange="upFile(this,${si})"></label><span class="text-[11px] text-slate-400 ml-2">最大 20MB</span></div>`;}function renderFBL(){const c=document.getElementById('fll');if(!S.fbs.length){c.innerHTML='<p style="color:var(--morandi-subtle);font-size:.8rem;text-align:center;padding:1rem 0">目前尚無回饋項目</p>';return;}c.innerHTML=S.fbs.map(item=>`<div class="feedback-item"><div>${item.isCompleted?`<div class="fi-done"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7a9e84" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>`:'<div class="fi-pend"></div>'}</div><div class="flex-1 min-w-0"><p style="font-size:.85rem;color:var(--morandi-text);font-weight:500;line-height:1.5">${xe(item.item)}</p>${!item.isCompleted&&item.reason?`<span class="fb-reason">${xe(item.reason)}</span>`:''}<p style="font-size:.72rem;color:var(--morandi-subtle);margin-top:.25rem">${fmtD(item.createdAt)}</p></div><button onclick="rmFB('${item.id}')" class="bic d flex-shrink-0"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div>`).join('');}function fc(){if(!S.cur)return;S.dirty=true;S.cur.id=document.getElementById('f-id').value.trim();S.cur.publishDate=document.getElementById('f-pd').value;S.cur.periodStart=document.getElementById('f-ps').value;S.cur.periodEnd=document.getElementById('f-pe').value;S.cur.title=document.getElementById('f-ti').value.trim();S.cur.isPinned=document.getElementById('f-pin').checked;}async function saveDraft(){if(!S.cur)return;fc();document.getElementById('btn-dft').disabled=true;try{await DS.save(S.cur.id,{...S.cur,status:'draft',feedbackLog:S.fbs});S.dirty=false;const sb=document.getElementById('tb-status');sb.className='bdg-dft';sb.textContent='草稿';toast('草稿已儲存 ✓','ok');S.mmap=await DS.getMonths();renderSB();}catch(e){toast('儲存失敗：'+e.message,'er');}finally{document.getElementById('btn-dft').disabled=false;}}async function pubBulletin(){if(!S.cur)return;if(!confirm('確定要正式發布？'))return;fc();const pt=document.getElementById('pub-txt'),ps=document.getElementById('pub-spn'),btn=document.getElementById('btn-pub');btn.disabled=true;pt.textContent='發布中...';ps.classList.remove('hidden');try{const d={...S.cur,status:'published',feedbackLog:S.fbs};await DS.save(d.id,d);await NS.notify(d);S.dirty=false;const sb=document.getElementById('tb-status');sb.className='bdg-pub';sb.textContent='已發布';toast('🎉 週報已正式發布！','ok');S.mmap=await DS.getMonths();renderSB();}catch(e){toast('發布失敗：'+e.message,'er');}finally{btn.disabled=false;pt.textContent='正式發布';ps.classList.add('hidden');}}async function cloneBulletin(){if(!S.cur)return;const c=JSON.parse(JSON.stringify(S.cur));const now=new Date();c.id=`${now.getFullYear()}-W${wk(now)}-copy`;c.status='draft';c.version=1;c.isPinned=false;S.cur=c;S.fbs=[];S.dirty=true;renderEd();toast(`已複製為新草稿：${c.id}`,'in');}async function delBulletin(){if(!S.cur)return;if(!confirm(`確定刪除「${S.cur.id}」？`))return;try{await DS.del(S.cur.id);S.cur=null;S.dirty=false;document.getElementById('es').classList.remove('hidden');document.getElementById('bf').classList.add('hidden');document.getElementById('tb-acts').classList.add('hidden');document.getElementById('tb-title').textContent='請選擇或新增週報';document.getElementById('tb-status').classList.add('hidden');S.mmap=await DS.getMonths();renderSB();toast('週報已刪除','ok');}catch(e){toast('刪除失敗：'+e.message,'er');}}function showModal(){document.getElementById('sm').classList.remove('hidden');document.getElementById('tl').innerHTML=S.tpls.map(t=>`<button onclick="addTpl('${t.id}')" class="w-full text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:border-blue-300 hover:bg-blue-50 transition-all flex items-center gap-3 text-sm mb-1.5"><span class="text-xl">${t.i}</span><span class="font-medium text-slate-700">${t.t}</span></button>`).join('');}function hideModal(){document.getElementById('sm').classList.add('hidden');}function addTpl(tid){
+`).join('')}<button onclick="addSI(${si},${sbi})" class="text-xs text-blue-500 mt-1">＋ 新增條目</button></div>`).join('')}</div>`;}function bldOT(orders,si,field,label){return`<div class="mb-3"><div class="flex items-center justify-between mb-1"><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">${label}</p><button onclick="addRow(${si},'${field}')" class="text-xs text-blue-600 font-medium">＋ 新增列</button><button onclick="rmSecTable(${si}, '${field}')" class="text-xs text-red-500 font-medium ml-3 flex items-center gap-1 hover:text-red-700"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg> 刪除表格</button></div><div class="overflow-x-auto rounded-lg border border-slate-200"><table class="data-table w-full text-xs min-w-[640px]"><thead><tr><th>供應商</th><th>訂單號</th><th>行號</th><th>料號</th><th>品名</th><th>數量</th><th>原交期</th><th>新交期</th><th>倉庫</th><th style="width:28px"></th></tr></thead><tbody>${(orders||[]).map((o,ri)=>`<tr><td><input value="${xe(o.supplierName||'')}" onchange="uRow(${si},'${field}',${ri},'supplierName',this.value)"></td><td><input value="${xe(o.poNumber||'')}" onchange="uRow(${si},'${field}',${ri},'poNumber',this.value)"></td><td><input value="${xe(o.lineNumber||'')}" style="width:45px" onchange="uRow(${si},'${field}',${ri},'lineNumber',this.value)"></td><td><input value="${xe(o.partNumber||'')}" onchange="uRow(${si},'${field}',${ri},'partNumber',this.value)"></td><td><input value="${xe(o.itemName||'')}" onchange="uRow(${si},'${field}',${ri},'itemName',this.value)"></td><td><input type="number" value="${o.quantity||''}" style="width:55px" onchange="uRow(${si},'${field}',${ri},'quantity',parseInt(this.value)||0)"></td><td><input type="date" value="${xe(o.originalDelivery||'')}" onchange="uRow(${si},'${field}',${ri},'originalDelivery',this.value)"></td><td><input value="${xe(o.newDelivery||'')}" onchange="uRow(${si},'${field}',${ri},'newDelivery',this.value)"></td><td><input value="${xe(o.warehouseName||'')}" onchange="uRow(${si},'${field}',${ri},'warehouseName',this.value)"></td><td><button onclick="rmRow(${si},'${field}',${ri})" class="bic d"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></td></tr>`).join('')}</tbody></table></div></div>`;}function bldRT(records,si){return`<div class="mb-3"><div class="flex items-center justify-between mb-1"><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">返修紀錄</p><button onclick="addRep(${si})" class="text-xs text-blue-600 font-medium">＋ 新增</button><button onclick="rmSecTable(${si}, 'repairRecords')" class="text-xs text-red-500 font-medium ml-3 flex items-center gap-1 hover:text-red-700"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg> 刪除表格</button></div><div class="overflow-x-auto rounded-lg border border-slate-200"><table class="data-table w-full text-xs min-w-[560px]"><thead><tr><th>供應商</th><th>返修單位</th><th>返修日</th><th>追蹤號</th><th>異常類型</th><th>品名</th><th>數量</th><th></th></tr></thead><tbody>${(records||[]).map((r,ri)=>`<tr><td><input value="${xe(r.supplierName||'')}" onchange="uRep(${si},${ri},'supplierName',this.value)"></td><td><input value="${xe(r.repairUnit||'')}" onchange="uRep(${si},${ri},'repairUnit',this.value)"></td><td><input type="date" value="${xe(r.repairDate||'')}" onchange="uRep(${si},${ri},'repairDate',this.value)"></td><td><input value="${xe(r.trackingNumber||'')}" onchange="uRep(${si},${ri},'trackingNumber',this.value)"></td><td><input value="${xe(r.faultType||'')}" onchange="uRep(${si},${ri},'faultType',this.value)"></td><td><input value="${xe(r.faultModel||'')}" onchange="uRep(${si},${ri},'faultModel',this.value)"></td><td><input type="number" value="${r.quantity||''}" style="width:55px" onchange="uRep(${si},${ri},'quantity',parseInt(this.value)||0)"></td><td><button onclick="rmRep(${si},${ri})" class="bic d"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></td></tr>`).join('')}</tbody></table></div></div>`;}function bldPT(items,si){return`<div class="mb-3"><div class="flex items-center justify-between mb-1"><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">漲價料件</p><button onclick="addPrc(${si})" class="text-xs text-blue-600 font-medium">＋ 新增</button><button onclick="rmSecTable(${si}, 'priceChangeItems')" class="text-xs text-red-500 font-medium ml-3 flex items-center gap-1 hover:text-red-700"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg> 刪除表格</button></div><div class="overflow-x-auto rounded-lg border border-slate-200"><table class="data-table w-full text-xs"><thead><tr><th>供應商</th><th>品號</th><th>品名/說明</th><th></th></tr></thead><tbody>${(items||[]).map((it,ri)=>`<tr><td><input value="${xe(it.supplierName||'')}" onchange="uPrc(${si},${ri},'supplierName',this.value)"></td><td><input value="${xe(it.partNumber||'')}" onchange="uPrc(${si},${ri},'partNumber',this.value)"></td><td><input value="${xe(it.description||'')}" onchange="uPrc(${si},${ri},'description',this.value)"></td><td><button onclick="rmPrc(${si},${ri})" class="bic d"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></td></tr>`).join('')}</tbody></table></div></div>`;}function bldFiles(sec,si){const files=sec.files||[];return`<div class="mt-3 pt-3 border-t border-slate-100"><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">📎 附件</p>${files.map((f,fi)=>`<div class="flex items-center gap-2 bg-slate-50 rounded-lg px-3 py-2 mb-1.5 text-xs"><span class="text-slate-400">📄</span><input class="flex-1 bg-transparent border-none outline-none text-blue-600 font-medium text-xs" value="${xe(f.fileName||'')}" onchange="uFile(${si},${fi},'fileName',this.value)"><button onclick="rmFile(${si},${fi})" class="text-red-400 hover:text-red-600">🗑️</button></div>`).join('')}<label class="inline-flex items-center gap-1.5 mt-1 text-xs text-blue-600 hover:text-blue-800 cursor-pointer font-medium"><span>＋ 上傳附件</span><input type="file" class="hidden" onchange="upFile(this,${si})"></label><span class="text-[11px] text-slate-400 ml-2">最大 20MB</span></div>`;}function renderFBL(){const c=document.getElementById('fll');if(!S.fbs.length){c.innerHTML='<p style="color:var(--morandi-subtle);font-size:.8rem;text-align:center;padding:1rem 0">目前尚無回饋項目</p>';return;}c.innerHTML=S.fbs.map(item=>`<div class="feedback-item"><div>${item.isCompleted?`<div class="fi-done"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#7a9e84" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>`:'<div class="fi-pend"></div>'}</div><div class="flex-1 min-w-0"><p style="font-size:.85rem;color:var(--morandi-text);font-weight:500;line-height:1.5">${xe(item.item)}</p>${!item.isCompleted&&item.reason?`<span class="fb-reason">${xe(item.reason)}</span>`:''}<p style="font-size:.72rem;color:var(--morandi-subtle);margin-top:.25rem">${fmtD(item.createdAt)}</p></div><button onclick="rmFB('${item.id}')" class="bic d flex-shrink-0"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></div>`).join('');}function fc(){
+  if(!S.cur)return;
+  S.dirty=true;
+  S.cur.id=document.getElementById('f-id').value.trim();
+  S.cur.publishDate=document.getElementById('f-pd').value;
+  S.cur.periodStart=document.getElementById('f-ps').value;
+  S.cur.periodEnd=document.getElementById('f-pe').value;
+  S.cur.title=document.getElementById('f-ti').value.trim();
+  S.cur.isPinned=document.getElementById('f-pin').checked;
+  S.cur.isHidden=document.getElementById('f-hidden') ? document.getElementById('f-hidden').checked : false;
+  S.cur.audienceType = window._currentAudienceType || (S.cur.audienceType || 'all');
+  if (S.cur.audienceType === 'custom') {
+    const checked = Array.from(document.querySelectorAll('.aud-user-cb:checked')).map(cb => cb.value);
+    S.cur.authorizedEmails = checked;
+  } else {
+    S.cur.authorizedEmails = [];
+  }
+}async function saveDraft(){if(!S.cur)return;fc();document.getElementById('btn-dft').disabled=true;try{await DS.save(S.cur.id,{...S.cur,status:'draft',feedbackLog:S.fbs});S.dirty=false;const sb=document.getElementById('tb-status');sb.className='bdg-dft';sb.textContent='草稿';toast('草稿已儲存 ✓','ok');S.mmap=await DS.getMonths();renderSB();}catch(e){toast('儲存失敗：'+e.message,'er');}finally{document.getElementById('btn-dft').disabled=false;}}async function pubBulletin(){if(!S.cur)return;if(!confirm('確定要正式發布？'))return;fc();const pt=document.getElementById('pub-txt'),ps=document.getElementById('pub-spn'),btn=document.getElementById('btn-pub');btn.disabled=true;pt.textContent='發布中...';ps.classList.remove('hidden');try{const d={...S.cur,status:'published',feedbackLog:S.fbs};await DS.save(d.id,d);await NS.notify(d);S.dirty=false;const sb=document.getElementById('tb-status');sb.className='bdg-pub';sb.textContent='已發布';toast('🎉 週報已正式發布！','ok');S.mmap=await DS.getMonths();renderSB();}catch(e){toast('發布失敗：'+e.message,'er');}finally{btn.disabled=false;pt.textContent='正式發布';ps.classList.add('hidden');}}async function cloneBulletin(){if(!S.cur)return;const c=JSON.parse(JSON.stringify(S.cur));const now=new Date();c.id=`${now.getFullYear()}-W${wk(now)}-copy`;c.status='draft';c.version=1;c.isPinned=false;S.cur=c;S.fbs=[];S.dirty=true;renderEd();toast(`已複製為新草稿：${c.id}`,'in');}async function delBulletin(){if(!S.cur)return;if(!confirm(`確定刪除「${S.cur.id}」？`))return;try{await DS.del(S.cur.id);S.cur=null;S.dirty=false;document.getElementById('es').classList.remove('hidden');document.getElementById('bf').classList.add('hidden');document.getElementById('tb-acts').classList.add('hidden');document.getElementById('tb-title').textContent='請選擇或新增週報';document.getElementById('tb-status').classList.add('hidden');S.mmap=await DS.getMonths();renderSB();toast('週報已刪除','ok');}catch(e){toast('刪除失敗：'+e.message,'er');}}function showModal(){document.getElementById('sm').classList.remove('hidden');document.getElementById('tl').innerHTML=S.tpls.map(t=>`<button onclick="addTpl('${t.id}')" class="w-full text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:border-blue-300 hover:bg-blue-50 transition-all flex items-center gap-3 text-sm mb-1.5"><span class="text-xl">${t.i}</span><span class="font-medium text-slate-700">${t.t}</span></button>`).join('');}function hideModal(){document.getElementById('sm').classList.add('hidden');}function addTpl(tid){
   const t=S.tpls.find(tp=>tp.id===tid);
   if(!t)return;
   const i=(S.cur.sections||[]).length;
@@ -2747,3 +2825,149 @@ async function submitManualRead() {
     }
   }
 }
+
+/* ==========================================================================
+   Audience Control Functions (週報閱讀觀看權限設定)
+   ========================================================================== */
+
+window._currentAudienceType = 'all';
+
+async function setAudienceType(type, markDirty = true) {
+  window._currentAudienceType = type;
+  if (S.cur) {
+    S.cur.audienceType = type;
+    if (markDirty) S.dirty = true;
+  }
+
+  const btnAll = document.getElementById('btn-aud-all');
+  const btnCustom = document.getElementById('btn-aud-custom');
+  const customPanel = document.getElementById('aud-custom-panel');
+
+  if (type === 'all') {
+    if (btnAll) {
+      btnAll.className = 'px-3 py-1 text-xs font-semibold rounded-md transition-all bg-blue-600 text-white shadow-xs';
+    }
+    if (btnCustom) {
+      btnCustom.className = 'px-3 py-1 text-xs font-semibold rounded-md transition-all text-slate-600 hover:text-slate-900';
+    }
+    if (customPanel) customPanel.classList.add('hidden');
+  } else {
+    if (btnAll) {
+      btnAll.className = 'px-3 py-1 text-xs font-semibold rounded-md transition-all text-slate-600 hover:text-slate-900';
+    }
+    if (btnCustom) {
+      btnCustom.className = 'px-3 py-1 text-xs font-semibold rounded-md transition-all bg-indigo-600 text-white shadow-xs';
+    }
+    if (customPanel) customPanel.classList.remove('hidden');
+
+    // 確保白名單與群組資料已載入
+    if (!S.whitelist || S.whitelist.length === 0) {
+      S.whitelist = await DS.getWhitelist();
+    }
+    if (!S.mailGroups || S.mailGroups.length === 0) {
+      S.mailGroups = await DS.getMailGroups();
+    }
+    renderAudUsersList();
+  }
+}
+
+function renderAudUsersList() {
+  const container = document.getElementById('aud-users-list');
+  const fastSelectContainer = document.getElementById('aud-group-fastselect');
+  if (!container) return;
+
+  const authList = (S.cur?.authorizedEmails || []).map(e => (e || '').trim().toLowerCase());
+
+  // 渲染群組快選按鈕
+  if (fastSelectContainer) {
+    if (S.mailGroups && S.mailGroups.length > 0) {
+      fastSelectContainer.innerHTML = '<span class="text-[11px] text-slate-400 mr-1">群組快選:</span>' + S.mailGroups.map(g => `
+        <button type="button" onclick="selectAudGroup('${g.id}')" class="px-2 py-0.5 bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 text-[10px] rounded border border-slate-200 transition-colors font-medium">
+          ${xe(g.name)}
+        </button>
+      `).join('');
+    } else {
+      fastSelectContainer.innerHTML = '';
+    }
+  }
+
+  // 渲染人員卡片
+  const users = S.whitelist || [];
+  if (users.length === 0) {
+    container.innerHTML = '<div class="col-span-full text-center py-4 text-slate-400 text-xs">通訊錄尚無人員資料</div>';
+    updateAudSelectedCount();
+    return;
+  }
+
+  container.innerHTML = users.map(u => {
+    const emailLower = (u.email || '').trim().toLowerCase();
+    const isChecked = authList.includes(emailLower);
+    const unitBadge = u.unit ? `<span class="text-[10px] bg-slate-100 text-slate-600 px-1 rounded">${xe(u.unit)}</span>` : '';
+    return `
+      <label class="aud-user-item flex items-center gap-2 p-2 rounded-lg border border-slate-100 hover:bg-slate-50 cursor-pointer transition-colors text-xs" data-search="${(u.name || '') + ' ' + (u.email || '') + ' ' + (u.unit || '')}">
+        <input type="checkbox" class="aud-user-cb rounded text-indigo-600 border-slate-300 focus:ring-indigo-500 w-3.5 h-3.5" value="${xe(u.email)}" ${isChecked ? 'checked' : ''} onchange="onAudUserCheckChanged()">
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center justify-between gap-1">
+            <span class="font-bold text-slate-700 truncate">${xe(u.name || u.email.split('@')[0])}</span>
+            ${unitBadge}
+          </div>
+          <p class="text-[10px] text-slate-400 truncate mt-0.5">${xe(u.email)}</p>
+        </div>
+      </label>
+    `;
+  }).join('');
+
+  updateAudSelectedCount();
+}
+
+function onAudUserCheckChanged() {
+  if (S.cur) {
+    const checked = Array.from(document.querySelectorAll('.aud-user-cb:checked')).map(cb => cb.value);
+    S.cur.authorizedEmails = checked;
+    S.dirty = true;
+  }
+  updateAudSelectedCount();
+}
+
+function updateAudSelectedCount() {
+  const cbs = document.querySelectorAll('.aud-user-cb:checked');
+  const countEl = document.getElementById('aud-selected-count');
+  if (countEl) {
+    countEl.textContent = `已授權：${cbs.length} 人`;
+  }
+}
+
+function toggleAudAll(checked) {
+  document.querySelectorAll('.aud-user-cb').forEach(cb => {
+    cb.checked = checked;
+  });
+  onAudUserCheckChanged();
+}
+
+function selectAudGroup(groupId) {
+  const g = (S.mailGroups || []).find(x => x.id === groupId);
+  if (!g || !g.emails) return;
+  const targetEmails = g.emails.map(e => (e || '').trim().toLowerCase());
+
+  document.querySelectorAll('.aud-user-cb').forEach(cb => {
+    if (targetEmails.includes((cb.value || '').trim().toLowerCase())) {
+      cb.checked = true;
+    }
+  });
+  onAudUserCheckChanged();
+  toast(`已勾選群組【${g.name}】成員`, 'in');
+}
+
+function filterAudList() {
+  const q = document.getElementById('aud-search-input')?.value.trim().toLowerCase() || '';
+  const items = document.querySelectorAll('.aud-user-item');
+  items.forEach(it => {
+    const text = it.getAttribute('data-search')?.toLowerCase() || '';
+    if (!q || text.includes(q)) {
+      it.style.display = 'flex';
+    } else {
+      it.style.display = 'none';
+    }
+  });
+}
+
