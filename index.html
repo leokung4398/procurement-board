@@ -42,7 +42,7 @@
   <!-- Quill CSS for rendering rich text -->
   <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
   
-  <link rel="stylesheet" href="css/index.css?v=1789723000">
+  <link rel="stylesheet" href="css/index.css?v=1789724000">
 
 
   <style>
@@ -900,7 +900,7 @@ async function showKPI(monthOffset = 0) {
         
         renderApp();
         handleSearch();
-        checkUserIdentity();
+        checkUserIdentity(true);
       } catch (err) {
         console.error('Failed to load data:', err);
         document.getElementById('bulletin-content-area').innerHTML = 
@@ -1014,6 +1014,7 @@ async function showKPI(monthOffset = 0) {
             localStorage.setItem('progress_' + bulletinId, '100');
             localStorage.setItem('has_read_' + bulletinId, '1');
             localStorage.setItem('has_confirmed_' + bulletinId, '1');
+            localStorage.setItem('dismissed_unread_' + bulletinId, '1');
           } catch(e) {}
           currentBulletinProgress = 100;
 
@@ -1071,7 +1072,7 @@ async function showKPI(monthOffset = 0) {
       }
     }
 
-    async function checkUserIdentity() {
+    async function checkUserIdentity(isInitialLoad = false) {
       updateAuthUI();
       if (!DS.isConfigured()) return;
       const userStr = localStorage.getItem('procurement_user');
@@ -1083,7 +1084,10 @@ async function showKPI(monthOffset = 0) {
           const res = uid ? await DS.hasRead(state.activeBulletinId, uid) : { hasRead: false, readProgress: 0, confirmed: false };
 
           if (res.hasRead) {
-            try { localStorage.setItem('has_read_' + state.activeBulletinId, '1'); } catch(e) {}
+            try { 
+              localStorage.setItem('has_read_' + state.activeBulletinId, '1'); 
+              localStorage.setItem('dismissed_unread_' + state.activeBulletinId, '1');
+            } catch(e) {}
             if (res.confirmed || res.readProgress >= 100) {
               try { 
                 localStorage.setItem('has_confirmed_' + state.activeBulletinId, '1');
@@ -1099,18 +1103,32 @@ async function showKPI(monthOffset = 0) {
             document.getElementById('unread-modal').classList.add('hidden');
             updateAuthUI();
           } else {
-            // 雲端確實無紀錄：自動校正清理本地快取，防止偽完讀
+            // 雲端確實無打卡/閱畢紀錄：更新本地打卡狀態，但絕不清除已通知/已查看之防擾紀錄
             try { 
-              localStorage.removeItem('has_read_' + state.activeBulletinId);
               localStorage.removeItem('has_confirmed_' + state.activeBulletinId);
               localStorage.removeItem('progress_' + state.activeBulletinId);
             } catch(e) {}
             updateAuthUI();
 
-            // 彈出新公告提醒視窗
-            const b = state.data ? state.data.bulletins.find(x => x.id === state.activeBulletinId) : null;
-            document.getElementById('unread-bulletin-title').textContent = b ? b.title : '最新緊急公告';
-            document.getElementById('unread-modal').classList.remove('hidden');
+            // 彈出新公告提醒視窗條件：
+            // 1. 必須是初次進入載入（isInitialLoad === true）
+            // 2. 當前週報必須是篩選清單中的最新第一筆週報（歷史舊週報或刪除後遞補的舊週報若同仁已看過絕不重複騷擾）
+            // 3. 同仁在此裝置從未看過或關閉過該期提醒（!dismissed_unread_）
+            // 4. 同仁在本次瀏覽 session 尚未提醒過該期
+            const isDismissed = localStorage.getItem('dismissed_unread_' + state.activeBulletinId) === '1' ||
+                                sessionStorage.getItem('notified_unread_' + state.activeBulletinId) === '1';
+            
+            const filtered = getFilteredBulletins();
+            const isLatestBulletin = filtered.length > 0 && filtered[0].id === state.activeBulletinId;
+
+            if (isInitialLoad && isLatestBulletin && !isDismissed) {
+              const b = state.data ? state.data.bulletins.find(x => x.id === state.activeBulletinId) : null;
+              document.getElementById('unread-bulletin-title').textContent = b ? b.title : '最新緊急公告';
+              document.getElementById('unread-modal').classList.remove('hidden');
+              try { sessionStorage.setItem('notified_unread_' + state.activeBulletinId, '1'); } catch(e) {}
+            } else {
+              document.getElementById('unread-modal').classList.add('hidden');
+            }
           }
           // 在背景向 Firestore 同步更新最後觀看時間（若尚未確認，不傳入 100%）
           const isConf = localStorage.getItem('has_confirmed_' + state.activeBulletinId) === '1';
@@ -1126,6 +1144,8 @@ async function showKPI(monthOffset = 0) {
       if (state.activeBulletinId) {
         try {
           localStorage.setItem('has_read_' + state.activeBulletinId, '1');
+          localStorage.setItem('dismissed_unread_' + state.activeBulletinId, '1');
+          sessionStorage.setItem('notified_unread_' + state.activeBulletinId, '1');
           const userStr = localStorage.getItem('procurement_user');
           if (userStr) {
             const user = JSON.parse(userStr);
