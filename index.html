@@ -42,7 +42,7 @@
   <!-- Quill CSS for rendering rich text -->
   <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
   
-  <link rel="stylesheet" href="css/index.css?v=1789523338">
+  <link rel="stylesheet" href="css/index.css?v=1789720688">
 
 
   <style>
@@ -155,13 +155,17 @@
     }
     .bulletin-item-card .ql-editor table {
       margin-top: 4px !important;
-      margin-bottom: 2px !important;
+      margin-bottom: 4px !important;
     }
-    /* 控制段落與空行高度為精確一個中文字節 */
-    .ql-editor > div, .ql-editor > p {
+    /* 統一全域標題樣式重設，避免瀏覽器預設 1em 產生巨大斷層 */
+    .ql-editor h1, .ql-editor h2, .ql-editor h3, .ql-editor h4, .ql-editor h5, .ql-editor h6 {
+      margin-top: 0.25rem !important;
+      margin-bottom: 0.15rem !important;
+      line-height: 1.25 !important;
+      font-weight: bold !important;
+    }
+    .ql-editor > *:first-child {
       margin-top: 0 !important;
-      margin-bottom: 0.35em !important;
-      line-height: 1.3 !important;
     }
     .ql-editor div:empty,
     .ql-editor p:empty,
@@ -1407,13 +1411,13 @@ async function showKPI(monthOffset = 0) {
           const tables = doc.querySelectorAll('table');
           tables.forEach(tbl => {
             tbl.style.height = '';
-            tbl.style.marginTop = '2px';
-            tbl.style.marginBottom = '2px';
+            tbl.style.marginTop = '4px';
+            tbl.style.marginBottom = '4px';
             tbl.querySelectorAll('tr, td, th').forEach(cell => {
               cell.style.height = '';
             });
 
-            // 如果 table 外層包了多層只有此 table 的無用 div，將其解除展開
+            // 如果 table 外層包了只有此 table 的無用 div，將其解除展開
             let parent = tbl.parentElement;
             while (parent && parent !== doc.body && parent.tagName.toLowerCase() === 'div' && parent.children.length === 1) {
               const grandParent = parent.parentElement;
@@ -1426,13 +1430,20 @@ async function showKPI(monthOffset = 0) {
             }
           });
 
-          // 3. 遞迴移除無意義的空 div / 空 p / 空 span / 空 br
+          // 2.1 標題元素樣式行內間距標準化（若自帶過大 margin / line-height 則清除）
+          doc.querySelectorAll('h1, h2, h3, h4, h5, h6').forEach(hEl => {
+            if (hEl.style.margin) hEl.style.margin = '';
+            if (hEl.style.marginTop) hEl.style.marginTop = '';
+            if (hEl.style.marginBottom) hEl.style.marginBottom = '';
+          });
+
+          // 3. 遞迴移除無意義的空 div / 空 p / 空 span / 空 br / 空 h1-h6
           let emptyFound = true;
           while (emptyFound) {
             emptyFound = false;
-            doc.querySelectorAll('div, p, span').forEach(el => {
-              // 若元素無子節點，且內容僅為空白字符或 nbsp
-              if (el.children.length === 0 && (!el.textContent || !el.textContent.replace(/[\s\u00A0\r\n\t]/g, ''))) {
+            doc.querySelectorAll('div, p, span, h1, h2, h3, h4, h5, h6').forEach(el => {
+              // 若元素無實質子節點（非 table/img/iframe），且文字內容僅為空白字符或 nbsp
+              if (!el.querySelector('img, table, iframe') && el.children.length === 0 && (!el.textContent || !el.textContent.replace(/[\s\u00A0\r\n\t]/g, ''))) {
                 el.remove();
                 emptyFound = true;
               }

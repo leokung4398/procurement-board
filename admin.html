@@ -140,6 +140,15 @@
       margin: 0.25rem 0 !important;
     }
 
+    /* 統一全域標題樣式重設，避免瀏覽器預設 1em 產生巨大斷層 */
+    .quill-editor h1, .quill-editor h2, .quill-editor h3, .quill-editor h4, .quill-editor h5, .quill-editor h6,
+    .ql-editor h1, .ql-editor h2, .ql-editor h3, .ql-editor h4, .ql-editor h5, .ql-editor h6 {
+      margin-top: 0.25rem !important;
+      margin-bottom: 0.15rem !important;
+      line-height: 1.25 !important;
+      font-weight: bold !important;
+    }
+
     .pro-table, .quill-editor table {
       width: 100% !important;
       height: auto !important;
