@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>採購週報版面呈現模擬器 (三大方案切換預覽)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Inter', 'PingFang TC', 'Microsoft JhengHei', sans-serif; }
+    .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
+    .custom-scroll::-webkit-scrollbar-track { background: #f1f5f9; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    .active-tab-btn {
+      background: #2563eb !important;
+      color: white !important;
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+    }
+  </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col">
+
+  <!-- 頂部控制台 (切換方案) -->
+  <header class="sticky top-0 z-50 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 shadow-xl">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-teal-500 flex items-center justify-center text-white shadow-lg font-bold text-sm">
+        UI
+      </div>
+      <div>
+        <h1 class="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+          前台週報版面呈現模擬器
+          <span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full border border-emerald-400/30 font-semibold">獨立預覽頁面</span>
+        </h1>
+        <p class="text-xs text-slate-400">採購同仁想將上方週報選項移至左側或優化之三種方案實時切換展示</p>
+      </div>
+    </div>
+
+    <!-- 方案切換 Tabs -->
+    <div class="flex items-center gap-1.5 bg-slate-800/90 p-1.5 rounded-xl border border-slate-700/80 shadow-inner">
+      <button onclick="setScheme('A')" id="btn-scheme-A" class="active-tab-btn px-4 py-2 rounded-lg text-xs font-semibold text-slate-300 transition-all flex items-center gap-1.5">
+        <span>📑</span>
+        <span>方案 A：經典文檔雙欄流</span>
+      </button>
+      <button onclick="setScheme('B')" id="btn-scheme-B" class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-1.5">
+        <span>📐</span>
+        <span>方案 B：現代可折疊側邊欄</span>
+      </button>
+      <button onclick="setScheme('C')" id="btn-scheme-C" class="px-4 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-1.5">
+        <span>🧭</span>
+        <span>方案 C：頂部精緻下拉選單</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- 方案展示沙盒舞台 -->
+  <main class="flex-1 bg-slate-100 text-slate-800 relative overflow-hidden flex flex-col" id="stage-area">
+    <!-- JS 動態注入 -->
+  </main>
+
+  <!-- 底部方案特點導讀與優缺點分析 -->
+  <footer id="footer-notes" class="bg-slate-900 border-t border-slate-800 px-6 py-3 text-xs text-slate-300 flex flex-col sm:flex-row items-center justify-between gap-3">
+    <!-- JS 動態更新 -->
+  </footer>
+
+  <script>
+    const mockData = [
+      { id: '2026-W39', date: '2026-09-21', month: '2026-09', title: '經營TEAM採購｜本週重點摘要 (W39)', isPinned: true, confirmed: false, isNew: true },
+      { id: '2026-W38', date: '2026-09-14', month: '2026-09', title: '經營TEAM採購｜本週重點摘要 (W38)', isPinned: false, confirmed: true, isNew: false },
+      { id: '2026-W37', date: '2026-09-07', month: '2026-09', title: '經營TEAM採購｜本週重點摘要 (W37)', isPinned: false, confirmed: true, isNew: false },
+      { id: '2026-W36', date: '2026-08-31', month: '2026-08', title: '經營TEAM採購｜本週重點摘要 (W36)', isPinned: false, confirmed: true, isNew: false },
+      { id: '2026-W35', date: '2026-08-24', month: '2026-08', title: '經營TEAM採購｜本週重點摘要 (W35)', isPinned: false, confirmed: true, isNew: false },
+      { id: '2026-W34', date: '2026-08-17', month: '2026-08', title: '經營TEAM採購｜本週重點摘要 (W34)', isPinned: false, confirmed: true, isNew: false },
+      { id: '2026-W29', date: '2026-07-17', month: '2026-07', title: '經營TEAM採購｜本週重點摘要 (W29)', isPinned: false, confirmed: true, isNew: false }
+    ];
+
+    let currentScheme = 'A';
+    let currentId = '2026-W39';
+    let isBCollapsed = false;
+    let isCDropdownOpen = false;
+
+    function setScheme(s) {
+      currentScheme = s;
+      document.querySelectorAll('[id^="btn-scheme-"]').forEach(b => {
+        b.className = 'px-4 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:text-white transition-all flex items-center gap-1.5';
+      });
+      document.getElementById('btn-scheme-' + s).className = 'active-tab-btn px-4 py-2 rounded-lg text-xs font-semibold text-slate-300 transition-all flex items-center gap-1.5';
+      render();
+    }
+
+    function selectBulletin(id) {
+      currentId = id;
+      render();
+    }
+
+    function toggleCollapseB() {
+      isBCollapsed = !isBCollapsed;
+      render();
+    }
+
+    function toggleDropdownC() {
+      isCDropdownOpen = !isCDropdownOpen;
+      render();
+    }
+
+    function getArticleHtml(b) {
+      return `
+        <!-- 週報主 Banner -->
+        <div class="bg-gradient-to-r from-blue-700 via-indigo-700 to-teal-700 text-white rounded-2xl p-6 shadow-md relative overflow-hidden">
+          <div class="absolute -right-10 -top-10 w-44 h-44 bg-white/10 rounded-full blur-3xl"></div>
+          <div class="flex items-center gap-2.5 relative z-10">
+            ${b.isPinned ? '<span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-500 text-white shadow-sm flex items-center gap-1"><span class="animate-pulse">🚨</span> 緊急公告</span>' : ''}
+            <h2 class="text-xl font-bold tracking-tight">${b.title}</h2>
+          </div>
+          <div class="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 relative z-10 text-xs text-blue-100">
+            <div class="flex items-center gap-1.5 bg-white/15 px-3 py-1 rounded-full border border-white/20">
+              <span>🕒</span>
+              <span class="font-medium text-white">發布時間：${b.date} 14:00</span>
+            </div>
+            <div class="flex items-center gap-3 pl-1 border-l border-white/20">
+              <div>期數代碼：<span class="font-bold text-white">${b.id}</span></div>
+              <div class="flex items-center gap-1">
+                <span>狀態：</span>
+                <span class="font-bold ${b.confirmed ? 'text-emerald-300' : 'text-amber-300'}">${b.confirmed ? '✓ 本人已完讀打卡' : '● 尚未閱讀打卡'}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 一、採購作業進度 -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 mt-4">
+          <h3 class="text-base font-bold text-slate-800 flex items-center gap-2 pb-2 mb-3 border-b border-slate-100">
+            <span class="text-lg">📋</span>
+            <span class="text-blue-600">一、</span>
+            <span>採購作業進度</span>
+          </h3>
+          <div class="space-y-2">
+            <div class="p-3 border-l-4 border-rose-500 bg-rose-50/70 rounded-r-xl text-xs leading-relaxed font-medium text-slate-800">
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-bold text-rose-700">【重要公告】全台維修物料預測作業調整通知</span>
+                <span class="bg-rose-500 text-white text-[10px] px-1.5 py-0.2 rounded font-semibold">緊急控管</span>
+              </div>
+              因目前全台營運處週轉天數普遍偏高，為優化庫存水位，本月下旬定期採購預測將調整發包步調，各營運單位請優先消化現有庫存。
+            </div>
+            <div class="p-3 border-l-4 border-blue-600 bg-blue-50/60 rounded-r-xl text-xs leading-relaxed font-medium text-slate-800">
+              <span class="font-bold text-blue-700">【合約進度】年度消耗性零件議價完成</span>：2027 年度鏈條與煞車皮標案已完成最終議價，節省採購預算約 4.2%，合約已送審核。
+            </div>
+          </div>
+        </section>
+
+        <!-- 二、交期異動明細表格 -->
+        <section class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-5 mt-4">
+          <h3 class="text-base font-bold text-slate-800 flex items-center gap-2 pb-2 mb-3 border-b border-slate-100">
+            <span class="text-lg">📦</span>
+            <span class="text-blue-600">二、</span>
+            <span>交期異動明細</span>
+          </h3>
+          <div class="overflow-x-auto">
+            <table class="w-full text-xs text-left border-collapse border border-slate-200 rounded-xl overflow-hidden">
+              <thead>
+                <tr class="bg-slate-50 text-slate-600 font-semibold">
+                  <th class="p-2.5 border border-slate-200">供應商</th>
+                  <th class="p-2.5 border border-slate-200">採購單號</th>
+                  <th class="p-2.5 border border-slate-200">品名料號</th>
+                  <th class="p-2.5 border border-slate-200 text-center">原定交期</th>
+                  <th class="p-2.5 border border-slate-200 text-center">異動後交期</th>
+                  <th class="p-2.5 border border-slate-200">異動原因</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-200">
+                <tr class="hover:bg-slate-50/80">
+                  <td class="p-2.5 border border-slate-200 font-bold text-slate-800">台螺金屬</td>
+                  <td class="p-2.5 border border-slate-200 font-mono text-slate-500">3310-20260527002</td>
+                  <td class="p-2.5 border border-slate-200">伸縮座管 TG208N 螺絲 (75507500)</td>
+                  <td class="p-2.5 border border-slate-200 text-center line-through text-slate-400">09/15</td>
+                  <td class="p-2.5 border border-slate-200 text-center font-bold text-rose-600 bg-rose-50/50">09/28</td>
+                  <td class="p-2.5 border border-slate-200 text-slate-600">原物料熱處理排程順延，尾數分批交付</td>
+                </tr>
+                <tr class="hover:bg-slate-50/80">
+                  <td class="p-2.5 border border-slate-200 font-bold text-slate-800">安大科技</td>
+                  <td class="p-2.5 border border-slate-200 font-mono text-slate-500">3310-20260601015</td>
+                  <td class="p-2.5 border border-slate-200">車手轉接座防震橡膠</td>
+                  <td class="p-2.5 border border-slate-200 text-center line-through text-slate-400">09/18</td>
+                  <td class="p-2.5 border border-slate-200 text-center font-bold text-emerald-600 bg-emerald-50/50">09/20 (提早)</td>
+                  <td class="p-2.5 border border-slate-200 text-slate-600">模具保養順利提早開模交貨</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- 底端閱讀打卡確認卡片 -->
+        <div class="p-4 rounded-2xl border mt-4 transition-all duration-300 ${b.confirmed ? 'bg-slate-50/80 border-slate-200/80' : 'bg-white border-slate-200 shadow-sm'}">
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-3 text-center sm:text-left">
+              <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${b.confirmed ? 'bg-amber-50 text-amber-500 border border-amber-200/60' : 'bg-indigo-50 text-indigo-600 border border-indigo-100'}">
+                <span class="text-xl leading-none">${b.confirmed ? '👑' : '📋'}</span>
+              </div>
+              <div>
+                <div class="flex items-center justify-center sm:justify-start gap-2">
+                  <h4 class="text-sm font-bold text-slate-800">${b.confirmed ? '本期週報閱讀確認' : '閱讀打卡確認'}</h4>
+                  ${b.confirmed ? '<span class="text-[11px] font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">✓ 已閱畢</span>' : ''}
+                </div>
+                <p class="text-xs text-slate-500 mt-0.5">${b.confirmed ? '系統已記錄您的閱畢紀錄，頂部已點亮尊榮皇冠徽章。' : '閱畢重點通知與異動明細後，請點擊右側按鈕完成閱讀打卡。'}</p>
+              </div>
+            </div>
+            <button class="px-5 py-2.5 rounded-xl font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 ${b.confirmed ? 'bg-slate-100 text-slate-400 border border-slate-200 cursor-default' : 'bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-500 text-white shadow-md hover:shadow-lg active:scale-95'}">
+              ${b.confirmed ? '已完成本期打卡' : '確認已閱讀完畢 (打卡)'}
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function render() {
+      const stage = document.getElementById('stage-area');
+      const curB = mockData.find(b => b.id === currentId) || mockData[0];
+      const footer = document.getElementById('footer-notes');
+
+      // 群組月份
+      const mGroup = {};
+      mockData.forEach(b => {
+        if (!mGroup[b.month]) mGroup[b.month] = [];
+        mGroup[b.month].push(b);
+      });
+      const mKeys = Object.keys(mGroup).sort().reverse();
+
+      if (currentScheme === 'A') {
+        // ==========================================
+        // 方案 A：經典文檔雙欄流 (Notion / GitBook 風格)
+        // ==========================================
+        footer.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 bg-blue-500/20 text-blue-300 rounded font-bold border border-blue-400/30">方案 A 核心優勢</span>
+            <span>完美貼合採購同仁想要「左側歸檔」的想法。月份分類折疊一目了然，垂直捲動比上方橫向 Tabs 更符合操作直覺，頂部視覺大幅釋放！</span>
+          </div>
+          <div class="text-slate-400">推薦度：★★★★★ (最受企業文檔平台推薦)</div>
+        `;
+
+        stage.innerHTML = `
+          <div class="flex-1 flex overflow-hidden h-[calc(100vh-80px)]">
+            <!-- 左側側邊欄 (寬度 280px) -->
+            <aside class="w-72 bg-white border-r border-slate-200/90 flex flex-col flex-shrink-0 shadow-sm z-10">
+              <!-- 頂部過濾與搜尋 -->
+              <div class="p-3.5 border-b border-slate-100 bg-slate-50/70">
+                <div class="flex items-center justify-between mb-2">
+                  <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                    <span>📚</span> 歷史週報歸檔
+                  </span>
+                  <span class="text-[10px] bg-blue-50 text-blue-600 px-1.5 py-0.5 rounded font-bold border border-blue-200">共 ${mockData.length} 期</span>
+                </div>
+                <div class="relative">
+                  <input type="text" placeholder="搜尋週報料號、廠商..." class="w-full text-xs pl-7 pr-2.5 py-1.5 bg-white border border-slate-200 rounded-lg focus:outline-none focus:border-blue-500">
+                  <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2 top-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                </div>
+              </div>
+
+              <!-- 週報列表 (月份折疊) -->
+              <nav class="flex-1 overflow-y-auto p-3 space-y-3 custom-scroll">
+                ${mKeys.map(mk => {
+                  const mTitle = mk.replace('-', ' 年 ') + ' 月';
+                  const items = mGroup[mk];
+                  return `
+                    <div class="space-y-1">
+                      <div class="flex items-center justify-between px-2 py-1 text-xs font-bold text-slate-700 bg-slate-100/70 rounded-md">
+                        <span class="flex items-center gap-1.5">
+                          <span>📁</span>
+                          <span>${mTitle}</span>
+                        </span>
+                        <span class="text-[10px] font-normal text-slate-400">${items.length} 期</span>
+                      </div>
+                      <div class="pl-1.5 space-y-0.5">
+                        ${items.map(b => {
+                          const isAct = b.id === currentId;
+                          return `
+                            <button onclick="selectBulletin('${b.id}')" class="w-full text-left px-2.5 py-2 rounded-lg text-xs font-medium transition-all flex items-center justify-between group ${
+                              isAct 
+                                ? 'bg-blue-50 text-blue-700 font-bold border border-blue-200/80 shadow-xs' 
+                                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border border-transparent'
+                            }">
+                              <div class="flex items-center gap-2 min-w-0">
+                                <span class="w-1.5 h-1.5 rounded-full ${isAct ? 'bg-blue-600 ring-2 ring-blue-200' : 'bg-slate-300'}"></span>
+                                <span class="truncate font-mono">${b.id}</span>
+                                ${b.isNew ? '<span class="text-[9px] bg-rose-500 text-white px-1 py-0.2 rounded font-bold">NEW</span>' : ''}
+                              </div>
+                              <div class="flex items-center gap-1.5 flex-shrink-0">
+                                ${b.confirmed ? '<span class="text-emerald-500 text-xs font-bold" title="已打卡">✓</span>' : '<span class="w-1.5 h-1.5 rounded-full bg-amber-400" title="未打卡"></span>'}
+                                <span class="text-[10px] text-slate-400">${b.date.slice(5)}</span>
+                              </div>
+                            </button>
+                          `;
+                        }).join('')}
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </nav>
+
+              <!-- 左下角身分卡片 -->
+              <div class="p-3 border-t border-slate-100 bg-slate-50/60 flex items-center justify-between text-xs">
+                <div class="flex items-center gap-2">
+                  <div class="w-7 h-7 rounded-full bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-xs">採</div>
+                  <div class="truncate">
+                    <p class="font-semibold text-slate-700 truncate">孔令淳 (採購部)</p>
+                    <p class="text-[10px] text-emerald-600">線上連線中</p>
+                  </div>
+                </div>
+                <div class="text-base" title="本期已完讀">👑</div>
+              </div>
+            </aside>
+
+            <!-- 右側主內容區 -->
+            <div class="flex-1 overflow-y-auto p-6 custom-scroll bg-slate-100">
+              <div class="max-w-4xl mx-auto space-y-4">
+                ${getArticleHtml(curB)}
+              </div>
+            </div>
+          </div>
+        `;
+
+      } else if (currentScheme === 'B') {
+        // ==========================================
+        // 方案 B：現代可折疊側邊欄 (自由切換沉浸模式)
+        // ==========================================
+        footer.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 bg-indigo-500/20 text-indigo-300 rounded font-bold border border-indigo-400/30">方案 B 核心優勢</span>
+            <span>保有方案 A 的左側歸檔，但額外多了「一鍵收合 ❮ / 展開 ❯」按鈕。遇到長篇大表格時收合側邊欄，文章空間瞬間放大 100%！</span>
+          </div>
+          <div class="text-slate-400">推薦度：★★★★★ (適合大寬螢幕與常看繁雜交期表的團隊)</div>
+        `;
+
+        stage.innerHTML = `
+          <div class="flex-1 flex overflow-hidden h-[calc(100vh-80px)] relative">
+            <!-- 折疊側邊欄 -->
+            <aside class="${isBCollapsed ? 'w-16' : 'w-72'} transition-all duration-300 bg-white border-r border-slate-200 flex flex-col flex-shrink-0 shadow-sm z-20 relative">
+              <!-- 收合/展開懸浮按鈕 -->
+              <button onclick="toggleCollapseB()" class="absolute -right-3 top-5 w-6 h-6 rounded-full bg-white border border-slate-300 shadow-md text-slate-600 hover:text-blue-600 hover:border-blue-400 flex items-center justify-center text-xs transition-all z-30" title="${isBCollapsed ? '展開側邊欄' : '收合側邊欄'}">
+                ${isBCollapsed ? '❯' : '❮'}
+              </button>
+
+              ${isBCollapsed ? `
+                <!-- 迷你縮圖模式 -->
+                <div class="py-4 flex flex-col items-center gap-4 flex-1">
+                  <div class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs shadow-xs">
+                    週報
+                  </div>
+                  <div class="h-px w-8 bg-slate-200"></div>
+                  <div class="space-y-2">
+                    ${mockData.slice(0, 6).map(b => `
+                      <button onclick="selectBulletin('${b.id}')" class="w-10 h-10 rounded-xl flex flex-col items-center justify-center text-[10px] font-mono transition-all ${b.id === currentId ? 'bg-blue-600 text-white font-bold shadow-md' : 'text-slate-600 hover:bg-slate-100'}" title="${b.id} (${b.date})">
+                        <span>${b.id.slice(-3)}</span>
+                        ${b.confirmed ? '<span class="w-1 h-1 rounded-full bg-emerald-400 -mt-0.5"></span>' : ''}
+                      </button>
+                    `).join('')}
+                  </div>
+                </div>
+              ` : `
+                <!-- 展開模式 -->
+                <div class="p-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50/70">
+                  <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-lg bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold text-xs">
+                      期
+                    </div>
+                    <span class="text-xs font-bold text-slate-800">歷史週報導航</span>
+                  </div>
+                  <span class="text-[10px] text-slate-400">可彈性收合</span>
+                </div>
+
+                <nav class="flex-1 overflow-y-auto p-3 space-y-3 custom-scroll">
+                  ${mKeys.map(mk => {
+                    const mTitle = mk.replace('-', ' 年 ') + ' 月';
+                    const items = mGroup[mk];
+                    return `
+                      <div class="space-y-1">
+                        <p class="text-[11px] font-bold text-slate-400 px-2 uppercase tracking-wider">${mTitle}</p>
+                        ${items.map(b => {
+                          const isAct = b.id === currentId;
+                          return `
+                            <button onclick="selectBulletin('${b.id}')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-medium transition-all flex items-center justify-between ${
+                              isAct 
+                                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold shadow-md shadow-blue-500/20' 
+                                : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+                            }">
+                              <span class="font-mono">${b.id}</span>
+                              <span class="text-[10px] ${isAct ? 'text-blue-100' : 'text-slate-400'}">${b.date}</span>
+                            </button>
+                          `;
+                        }).join('')}
+                      </div>
+                    `;
+                  }).join('')}
+                </nav>
+              `}
+            </aside>
+
+            <!-- 右側主內容 (自適應擴展寬度) -->
+            <div class="flex-1 overflow-y-auto p-6 custom-scroll bg-slate-100 transition-all">
+              <div class="${isBCollapsed ? 'max-w-5xl' : 'max-w-4xl'} mx-auto space-y-4 transition-all duration-300">
+                <div class="flex items-center justify-between bg-white px-4 py-2 rounded-xl border border-slate-200 text-xs text-slate-500">
+                  <span>目前檢視期別：<strong class="text-slate-800">${curB.id} (${curB.date})</strong></span>
+                  <button onclick="toggleCollapseB()" class="text-blue-600 hover:underline flex items-center gap-1 font-semibold">
+                    <span>${isBCollapsed ? '展開左側目錄 ❯' : '收合側邊欄 (沉浸大畫面) ❮'}</span>
+                  </button>
+                </div>
+                ${getArticleHtml(curB)}
+              </div>
+            </div>
+          </div>
+        `;
+
+      } else if (currentScheme === 'C') {
+        // ==========================================
+        // 方案 C：頂部精緻下拉選單 / Mega Menu (微改動版)
+        // ==========================================
+        footer.innerHTML = `
+          <div class="flex items-center gap-2">
+            <span class="px-2 py-0.5 bg-teal-500/20 text-teal-300 rounded font-bold border border-teal-400/30">方案 C 核心優勢</span>
+            <span>完全保留前台單欄居中閱讀的寬闊感，不增加側邊欄。以精緻卡片下拉選單徹底消滅「橫條滑不動」問題，改動幅度最小！</span>
+          </div>
+          <div class="text-slate-400">推薦度：★★★★☆ (適合重視單欄置中、不想讓畫面出現側邊欄的同仁)</div>
+        `;
+
+        stage.innerHTML = `
+          <div class="flex-1 overflow-y-auto p-6 custom-scroll bg-slate-100 h-[calc(100vh-80px)]">
+            <div class="max-w-4xl mx-auto space-y-4 relative">
+              
+              <!-- 頂部期別下拉切換列 -->
+              <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-3.5 flex flex-wrap items-center justify-between gap-3 relative z-30">
+                <div class="flex items-center gap-3">
+                  <!-- 下拉按鈕 -->
+                  <div class="relative">
+                    <button onclick="toggleDropdownC()" class="flex items-center gap-2.5 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 text-blue-700 px-4 py-2 rounded-xl text-xs font-bold hover:bg-blue-100 transition-all shadow-xs">
+                      <span>📅 選擇期別：</span>
+                      <span class="font-mono text-sm">${curB.id}</span>
+                      <span class="text-slate-500 font-normal">(${curB.date})</span>
+                      <svg class="w-4 h-4 text-blue-600 transition-transform ${isCDropdownOpen ? 'rotate-180' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+
+                    <!-- 下拉階層卡片 (Mega Menu) -->
+                    <div class="${isCDropdownOpen ? 'block' : 'hidden'} absolute left-0 top-full mt-2 w-[480px] bg-white rounded-2xl shadow-2xl border border-slate-200 p-4 z-50 animate-in fade-in zoom-in-95 duration-150">
+                      <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-100">
+                        <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                          <span>🗂️</span> 點選切換歷史週報
+                        </span>
+                        <span class="text-[11px] text-slate-400">共收錄 ${mockData.length} 期發布週報</span>
+                      </div>
+
+                      <div class="grid grid-cols-12 gap-3 max-h-72 overflow-y-auto custom-scroll pr-1">
+                        <!-- 月份選單欄 -->
+                        <div class="col-span-4 border-r border-slate-100 pr-2 space-y-1">
+                          ${mKeys.map(mk => `
+                            <button class="w-full text-left px-2.5 py-1.5 rounded-lg text-xs font-semibold ${mk === curB.month ? 'bg-blue-50 text-blue-700' : 'text-slate-500 hover:bg-slate-50'}">
+                              ${mk.slice(0, 4)} 年 ${parseInt(mk.slice(5))} 月
+                            </button>
+                          `).join('')}
+                        </div>
+                        
+                        <!-- 週別清單 -->
+                        <div class="col-span-8 space-y-1.5">
+                          ${mockData.map(b => `
+                            <button onclick="selectBulletin('${b.id}'); toggleDropdownC();" class="w-full text-left px-3 py-2 rounded-xl text-xs transition-all flex items-center justify-between ${b.id === currentId ? 'bg-blue-600 text-white font-bold shadow-sm' : 'hover:bg-slate-50 text-slate-700 border border-slate-100'}">
+                              <div class="flex items-center gap-2">
+                                <span class="font-mono font-bold">${b.id}</span>
+                                ${b.isNew ? '<span class="text-[9px] bg-rose-500 text-white px-1 rounded font-bold">NEW</span>' : ''}
+                              </div>
+                              <div class="flex items-center gap-2 text-[10px] ${b.id === currentId ? 'text-blue-100' : 'text-slate-400'}">
+                                <span>${b.date}</span>
+                                ${b.confirmed ? '<span>✓ 已讀</span>' : ''}
+                              </div>
+                            </button>
+                          `).join('')}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- 快速前一期 / 後一期 -->
+                  <div class="flex items-center gap-1">
+                    <button class="px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-bold" title="上一期">◀</button>
+                    <button class="px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-600 text-xs font-bold" title="下一期">▶</button>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                  <input type="text" placeholder="搜尋料號、廠商、關鍵字..." class="text-xs px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl w-48">
+                  <button class="px-3.5 py-1.5 bg-blue-600 text-white rounded-xl text-xs font-semibold hover:bg-blue-700 shadow-xs">搜尋</button>
+                </div>
+              </div>
+
+              <!-- 主內容 -->
+              ${getArticleHtml(curB)}
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    // 初始渲染
+    window.addEventListener('DOMContentLoaded', render);
+  </script>
+</body>
+</html>
