@@ -433,6 +433,12 @@
               if (progress > currentProgress) {
                 updateData.readProgress = Math.min(100, Math.round(progress));
               }
+              if (progress >= 100) {
+                updateData.confirmed = true;
+                if (!docSnap.data().confirmedAt) {
+                  updateData.confirmedAt = firebase.firestore.FieldValue.serverTimestamp();
+                }
+              }
             }
             await userRef.update(updateData);
           } else {
@@ -446,9 +452,19 @@
               readAt: firebase.firestore.FieldValue.serverTimestamp(),
               lastViewedAt: firebase.firestore.FieldValue.serverTimestamp()
             };
+            if (initialProgress >= 100) {
+              newDoc.confirmed = true;
+              newDoc.confirmedAt = firebase.firestore.FieldValue.serverTimestamp();
+            }
             await userRef.set(newDoc);
           }
-          try { localStorage.setItem('has_read_' + bulletinId, '1'); } catch(e) {}
+          if (progress >= 100) {
+            try { 
+              localStorage.setItem('has_confirmed_' + bulletinId, '1');
+              localStorage.setItem('has_read_' + bulletinId, '1'); 
+              localStorage.setItem('progress_' + bulletinId, '100');
+            } catch(e) {}
+          }
           return { success: true };
         } catch (e) {
           console.error("markAsRead error:", e);
@@ -456,18 +472,20 @@
         }
       },
       async hasRead(bulletinId, userId) {
-        if (!this.isConfigured()) return { hasRead: true, readProgress: 100 };
-        if (!userId) return { hasRead: false, readProgress: 0 };
+        if (!this.isConfigured()) return { hasRead: true, readProgress: 100, confirmed: true };
+        if (!userId) return { hasRead: false, readProgress: 0, confirmed: false };
         try {
           const docSnap = await db.collection('bulletins').doc(bulletinId).collection('readReceipts').doc(userId).get();
           if (docSnap.exists) {
-            const p = docSnap.data().readProgress;
-            return { hasRead: true, readProgress: typeof p === 'number' ? p : 100 };
+            const data = docSnap.data();
+            const p = typeof data.readProgress === 'number' ? data.readProgress : 100;
+            const confirmed = data.confirmed === true || p >= 100;
+            return { hasRead: true, readProgress: p, confirmed: confirmed };
           }
-          return { hasRead: false, readProgress: 0 };
+          return { hasRead: false, readProgress: 0, confirmed: false };
         } catch (e) {
           console.error("hasRead error:", e);
-          return { hasRead: false, readProgress: 0 };
+          return { hasRead: false, readProgress: 0, confirmed: false };
         }
       }
     };
@@ -913,10 +931,11 @@ async function showKPI(monthOffset = 0) {
             btnLogout.classList.add('flex');
           }
 
-          // 判斷當前週報完讀狀態，呈現尊榮金徽章
+          // 判斷當前週報完讀狀態，呈現尊榮金徽章（必須經過確認打卡，而非僅滾動進度）
           if (state.activeBulletinId && readBadge) {
-            const isRead = parseInt(localStorage.getItem('progress_' + state.activeBulletinId) || '0', 10) >= 100;
-            if (isRead) {
+            const isConfirmed = localStorage.getItem('has_confirmed_' + state.activeBulletinId) === '1' || 
+                                (localStorage.getItem('has_read_' + state.activeBulletinId) === '1' && parseInt(localStorage.getItem('progress_' + state.activeBulletinId) || '0', 10) >= 100);
+            if (isConfirmed) {
               if (readBadgeText) readBadgeText.textContent = `${state.activeBulletinId} 已完讀`;
               readBadge.classList.remove('hidden');
               readBadge.classList.add('inline-flex');
@@ -987,6 +1006,7 @@ async function showKPI(monthOffset = 0) {
           try {
             localStorage.setItem('progress_' + bulletinId, '100');
             localStorage.setItem('has_read_' + bulletinId, '1');
+            localStorage.setItem('has_confirmed_' + bulletinId, '1');
           } catch(e) {}
           currentBulletinProgress = 100;
 
@@ -1051,44 +1071,43 @@ async function showKPI(monthOffset = 0) {
       if (userStr) {
         const user = JSON.parse(userStr);
         if (state.activeBulletinId) {
-          // 1. 本地已讀快取：若本地已打卡完讀，先確保介面流暢不卡頓
-          const localRead = localStorage.getItem('has_read_' + state.activeBulletinId);
-          const localProgress = parseInt(localStorage.getItem('progress_' + state.activeBulletinId) || '0', 10);
-          if (localRead === '1' || localProgress >= 100) {
-            document.getElementById('unread-modal').classList.add('hidden');
-            if (localProgress >= 100) {
-              currentBulletinProgress = 100;
-              const bar = document.getElementById('reading-progress-bar');
-              if (bar) bar.style.width = '100%';
-            }
-            updateAuthUI();
-            // 在背景向 Firestore 同步更新最後觀看時間
-            DS.markAsRead(state.activeBulletinId, user);
-            return;
-          }
-
-          // 2. 向雲端 Firestore 確認歷史閱讀進度
           const uid = user.userId || user.uid || (user.email ? user.email.replace(/[@.]/g, '_') : null);
-          const res = uid ? await DS.hasRead(state.activeBulletinId, uid) : { hasRead: false, readProgress: 0 };
-          
+          // 優先向雲端 Firestore 查驗打卡與閱讀進度真理來源
+          const res = uid ? await DS.hasRead(state.activeBulletinId, uid) : { hasRead: false, readProgress: 0, confirmed: false };
+
           if (res.hasRead) {
             try { localStorage.setItem('has_read_' + state.activeBulletinId, '1'); } catch(e) {}
-            if (res.readProgress >= 100) {
-              try { localStorage.setItem('progress_' + state.activeBulletinId, '100'); } catch(e) {}
+            if (res.confirmed || res.readProgress >= 100) {
+              try { 
+                localStorage.setItem('has_confirmed_' + state.activeBulletinId, '1');
+                localStorage.setItem('progress_' + state.activeBulletinId, '100'); 
+              } catch(e) {}
               currentBulletinProgress = 100;
               const bar = document.getElementById('reading-progress-bar');
               if (bar) bar.style.width = '100%';
+            } else {
+              // 雲端記錄尚未完讀/未打卡：若本地有殘留舊的 has_confirmed_ 則主動清除校正
+              try { localStorage.removeItem('has_confirmed_' + state.activeBulletinId); } catch(e) {}
             }
             document.getElementById('unread-modal').classList.add('hidden');
             updateAuthUI();
           } else {
-            // 確實未讀！彈出新公告提醒視窗
+            // 雲端確實無紀錄：自動校正清理本地快取，防止偽完讀
+            try { 
+              localStorage.removeItem('has_read_' + state.activeBulletinId);
+              localStorage.removeItem('has_confirmed_' + state.activeBulletinId);
+              localStorage.removeItem('progress_' + state.activeBulletinId);
+            } catch(e) {}
+            updateAuthUI();
+
+            // 彈出新公告提醒視窗
             const b = state.data ? state.data.bulletins.find(x => x.id === state.activeBulletinId) : null;
             document.getElementById('unread-bulletin-title').textContent = b ? b.title : '最新緊急公告';
             document.getElementById('unread-modal').classList.remove('hidden');
           }
-          // 背景標記閱讀狀態
-          DS.markAsRead(state.activeBulletinId, user);
+          // 在背景向 Firestore 同步更新最後觀看時間（若尚未確認，不傳入 100%）
+          const isConf = localStorage.getItem('has_confirmed_' + state.activeBulletinId) === '1';
+          DS.markAsRead(state.activeBulletinId, user, isConf ? 100 : null);
         }
       } else {
         document.getElementById('user-modal').classList.remove('hidden');
@@ -1723,39 +1742,40 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
             `;
           })()}
           ${(() => {
-            const isRead = (parseInt(localStorage.getItem('progress_' + bulletin.id) || '0', 10) >= 100) && (localStorage.getItem('has_read_' + bulletin.id) === '1');
+            const isConfirmed = localStorage.getItem('has_confirmed_' + bulletin.id) === '1' || 
+                                (localStorage.getItem('has_read_' + bulletin.id) === '1' && parseInt(localStorage.getItem('progress_' + bulletin.id) || '0', 10) >= 100);
             return `
               <div id="reading-confirm-card" class="p-4 rounded-xl border transition-all duration-300 ${
-                isRead 
+                isConfirmed 
                   ? 'bg-slate-50/80 border-slate-200/80' 
                   : 'bg-white border-slate-200 shadow-sm hover:border-indigo-200'
               }">
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
                   <div class="flex items-center gap-3 min-w-0 text-center sm:text-left">
                     <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                      isRead ? 'bg-amber-50 text-amber-500 border border-amber-200/60' : 'bg-indigo-50 text-indigo-600 border border-indigo-100'
+                      isConfirmed ? 'bg-amber-50 text-amber-500 border border-amber-200/60' : 'bg-indigo-50 text-indigo-600 border border-indigo-100'
                     }">
-                      <span class="text-lg leading-none">${isRead ? '👑' : '📋'}</span>
+                      <span class="text-lg leading-none">${isConfirmed ? '👑' : '📋'}</span>
                     </div>
                     <div>
                       <div class="flex items-center justify-center sm:justify-start gap-2">
                         <h4 class="text-sm font-bold text-slate-800">
-                          ${isRead ? '本期週報閱讀確認' : '閱讀打卡確認'}
+                          ${isConfirmed ? '本期週報閱讀確認' : '閱讀打卡確認'}
                         </h4>
-                        ${isRead ? '<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200/70 px-2 py-0.5 rounded-full">✓ 已閱畢</span>' : ''}
+                        ${isConfirmed ? '<span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200/70 px-2 py-0.5 rounded-full">✓ 已閱畢</span>' : ''}
                       </div>
                       <p class="text-xs text-slate-500 mt-0.5">
-                        ${isRead ? '系統已成功記錄您的閱畢紀錄，頂部已點亮尊榮皇冠徽章。' : '閱畢重點通知與異動明細後，請點擊右側按鈕完成閱讀打卡。'}
+                        ${isConfirmed ? '系統已成功記錄您的閱畢紀錄，頂部已點亮尊榮皇冠徽章。' : '閱畢重點通知與異動明細後，請點擊右側按鈕完成閱讀打卡。'}
                       </p>
                     </div>
                   </div>
                   <div class="flex-shrink-0 w-full sm:w-auto">
-                    <button id="btn-confirm-read" onclick="confirmBulletinRead('${e(bulletin.id)}')" ${isRead ? 'disabled' : ''} class="w-full sm:w-auto px-5 py-2 rounded-lg font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 ${
-                      isRead 
+                    <button id="btn-confirm-read" onclick="confirmBulletinRead('${e(bulletin.id)}')" ${isConfirmed ? 'disabled' : ''} class="w-full sm:w-auto px-5 py-2 rounded-lg font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 ${
+                      isConfirmed 
                         ? 'bg-slate-100 text-slate-400 border border-slate-200/80 cursor-default shadow-none' 
                         : 'bg-gradient-to-r from-blue-600 via-indigo-600 to-teal-500 hover:from-blue-700 hover:via-indigo-700 hover:to-teal-600 text-white shadow hover:shadow-md active:scale-95 cursor-pointer ring-1 ring-indigo-300/30'
                     }">
-                      <span>${isRead ? '已完成本期打卡' : '確認已閱讀完畢 (打卡)'}</span>
+                      <span>${isConfirmed ? '已完成本期打卡' : '確認已閱讀完畢 (打卡)'}</span>
                     </button>
                   </div>
                 </div>
@@ -1814,11 +1834,7 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
         const bar = document.getElementById('reading-progress-bar');
         if (bar) bar.style.width = `${currentBulletinProgress}%`;
 
-        if (currentBulletinProgress >= 100) {
-          try { localStorage.setItem('progress_' + state.activeBulletinId, '100'); } catch(e) {}
-        }
-
-        // 節流回傳 (防抖 1.5 秒)
+        // 節流回傳 (防抖 1.5 秒，僅向雲端更新滾動進度，不觸發已完讀打卡)
         clearTimeout(progressDebounceTimer);
         progressDebounceTimer = setTimeout(() => {
           syncReadingProgress();
@@ -1830,13 +1846,14 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
         const uStr = localStorage.getItem('procurement_user');
         if (!uStr) return;
         const u = JSON.parse(uStr);
-        DS.markAsRead(state.activeBulletinId, u, currentBulletinProgress);
-        if (currentBulletinProgress >= 100) {
-          try { 
-            localStorage.setItem('progress_' + state.activeBulletinId, '100'); 
-            localStorage.setItem('has_read_' + state.activeBulletinId, '1');
-          } catch(e) {}
-          updateAuthUI();
+        // 若尚未點擊打卡按鈕，只更新進度百分比（上限 95% 或記錄滾動進度），真正的 100% 完讀需以按鈕打卡為準
+        const isConfirmed = localStorage.getItem('has_confirmed_' + state.activeBulletinId) === '1';
+        if (!isConfirmed) {
+          // 滾動紀錄：上限 95%，保留最後 5% 必須由同仁點擊打卡卡片按鈕確認
+          const reportProgress = Math.min(95, currentBulletinProgress);
+          DS.markAsRead(state.activeBulletinId, u, reportProgress);
+        } else {
+          DS.markAsRead(state.activeBulletinId, u, 100);
         }
       }
       window.syncReadingProgress = syncReadingProgress;
