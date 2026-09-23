@@ -350,12 +350,43 @@ const DS = {
     }
   },
   async addAuditLog(bulletinId, actionDesc) {
-    if (!this.isConfigured()) return;
+    if (!this.isConfigured() || !bulletinId) return;
     try {
-      const senderInfo = (firebase.auth().currentUser && firebase.auth().currentUser.email) ? (firebase.auth().currentUser.displayName || firebase.auth().currentUser.email) : '系統';
+      const user = firebase.auth().currentUser;
+      const email = (user && user.email) ? user.email.toLowerCase().trim() : '';
+
+      // 排除測試人員 (Leo Kung 孔令淳)，避免測試操作污染正式稽核日誌
+      const isTestUser = email === 'leokung@youbike.com.tw' || 
+                         email === 'gb4398@giantcycling.com' ||
+                         (user && user.displayName && user.displayName.includes('孔令淳'));
+      if (isTestUser) {
+        console.log('[AuditLog] 測試人員 (Leo Kung) 操作，略過日誌寫入以防污染正式稽核紀錄。');
+        return;
+      }
+
+      // 動態解析操作者中文姓名與身分
+      let senderInfo = '系統';
+      if (user) {
+        let adminMatch = null;
+        if (typeof S !== 'undefined' && Array.isArray(S.admins)) {
+          adminMatch = S.admins.find(a => a.email && a.email.toLowerCase().trim() === email);
+        }
+        if (!adminMatch && typeof S !== 'undefined' && Array.isArray(S.whitelist)) {
+          adminMatch = S.whitelist.find(w => w.email && w.email.toLowerCase().trim() === email);
+        }
+        if (adminMatch && adminMatch.name) {
+          senderInfo = adminMatch.name;
+        } else if (user.displayName) {
+          senderInfo = user.displayName;
+        } else if (email) {
+          senderInfo = email.split('@')[0];
+        }
+      }
+
       await db.collection('bulletins').doc(bulletinId).collection('audit_logs').add({
         action: actionDesc,
         sender: senderInfo,
+        senderEmail: email || null,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
       });
     } catch (e) { console.error('Audit Log Error:', e); }
