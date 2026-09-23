@@ -188,6 +188,10 @@
       user-select: none !important;
       transition: filter 0.3s ease;
     }
+    .custom-scroll::-webkit-scrollbar { width: 5px; height: 5px; }
+    .custom-scroll::-webkit-scrollbar-track { background: transparent; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+    .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen font-sans">
@@ -231,7 +235,7 @@
     </div>
   </div>
 
-  <div id="app-main-container" class="max-w-6xl mx-auto px-4 py-8">
+  <div id="app-main-container" class="max-w-7xl mx-auto px-4 py-8">
     <!-- Header -->
     <header class="bg-white rounded-lg shadow-sm p-6 mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
       <div>
@@ -314,17 +318,40 @@
       </button>
     </div>
 
-    <!-- 週別切換 Tab -->
-    <div class="mb-6 border-b border-slate-200 w-full overflow-x-auto">
-      <nav id="tabs-container" class="-mb-px flex space-x-8 min-w-max" aria-label="Tabs">
-        <!-- JS 動態渲染 Tabs -->
-      </nav>
-    </div>
+    <!-- 經典文檔雙欄流容器 (左側歷史週報目錄 + 右側週報內容) -->
+    <div class="flex flex-col lg:flex-row gap-6 relative items-start">
+      <!-- 左側可收合歸檔側邊欄 -->
+      <aside id="archive-sidebar" class="w-full lg:w-72 bg-white rounded-2xl border border-slate-200/90 shadow-sm flex flex-col flex-shrink-0 transition-all duration-300 relative z-20 overflow-visible">
+        <!-- 桌面端懸浮收合 / 展開按鈕 -->
+        <button id="btn-sidebar-collapse" onclick="toggleSidebarCollapse()" class="hidden lg:flex absolute -right-3.5 top-5 w-7 h-7 rounded-full bg-white border border-slate-300 shadow-md text-slate-500 hover:text-blue-600 hover:border-blue-400 items-center justify-center text-xs transition-all z-30 cursor-pointer select-none" title="收合/展開側邊欄">
+          ❮
+        </button>
 
-    <!-- 主要佈告欄內容 -->
-    <main id="bulletin-content-area" class="space-y-6">
-      <div class="text-center py-12 text-slate-500">載入中...</div>
-    </main>
+        <!-- 側邊欄內部容器 -->
+        <div id="sidebar-content" class="w-full overflow-hidden flex flex-col">
+          <!-- 頂部歸檔標題列 -->
+          <div class="p-3.5 border-b border-slate-100 bg-slate-50/70 flex items-center justify-between">
+            <span class="text-xs font-bold text-slate-600 tracking-wider flex items-center gap-1.5">
+              <span>📚</span> 歷史週報歸檔
+            </span>
+            <span id="sidebar-count-badge" class="text-[11px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold border border-blue-200/70">-- 期</span>
+          </div>
+
+          <!-- 週報月份折疊與項目清單 -->
+          <nav id="tabs-container" class="p-3 space-y-3 max-h-[calc(100vh-280px)] overflow-y-auto custom-scroll" aria-label="週報歸檔目錄">
+            <!-- JS 動態渲染左側月份與週報清單 -->
+          </nav>
+        </div>
+      </aside>
+
+      <!-- 右側主內容區 -->
+      <div id="article-main-wrapper" class="flex-1 min-w-0 w-full space-y-6">
+        <!-- 主要佈告欄內容 -->
+        <main id="bulletin-content-area" class="space-y-6">
+          <div class="text-center py-12 text-slate-500">載入中...</div>
+        </main>
+      </div>
+    </div>
 
     <!-- 頁尾聯絡資訊 -->
     <footer class="mt-4 bg-white rounded-xl p-5 shadow-sm border border-slate-200/70 space-y-3.5">
@@ -1057,8 +1084,9 @@ async function showKPI(monthOffset = 0) {
         btn.innerHTML = '<span>已完成本期打卡</span>';
       }
 
-      // 即刻點亮 Header 尊榮徽章
+      // 即刻點亮 Header 尊榮徽章與更新側邊欄已讀打卡標記
       updateAuthUI();
+      renderTabs();
 
       // 3. 背景同步寫入雲端 Firestore
       try {
@@ -1417,33 +1445,121 @@ async function showKPI(monthOffset = 0) {
       renderActiveBulletin();
     }
 
+    function toggleSidebarCollapse() {
+      state.sidebarCollapsed = !state.sidebarCollapsed;
+      try {
+        localStorage.setItem('user_sidebar_collapsed', state.sidebarCollapsed ? '1' : '0');
+      } catch(e) {}
+      applySidebarCollapseState();
+    }
+
+    function applySidebarCollapseState() {
+      const sidebar = document.getElementById('archive-sidebar');
+      const btn = document.getElementById('btn-sidebar-collapse');
+      const content = document.getElementById('sidebar-content');
+      if (!sidebar) return;
+
+      const isCollapsed = !!state.sidebarCollapsed;
+
+      if (isCollapsed) {
+        sidebar.classList.remove('lg:w-72');
+        sidebar.classList.add('lg:w-14');
+        if (btn) {
+          btn.innerHTML = '❯';
+          btn.title = '展開側邊欄';
+        }
+        if (content) {
+          content.classList.add('lg:hidden');
+        }
+      } else {
+        sidebar.classList.remove('lg:w-14');
+        sidebar.classList.add('lg:w-72');
+        if (btn) {
+          btn.innerHTML = '❮';
+          btn.title = '收合側邊欄';
+        }
+        if (content) {
+          content.classList.remove('lg:hidden');
+        }
+      }
+    }
+
     function renderTabs(filteredBulletins = null) {
       const container = document.getElementById('tabs-container');
-      if (!container || !state.data.bulletins) return;
+      const countBadge = document.getElementById('sidebar-count-badge');
+      if (!container || !state.data || !state.data.bulletins) return;
 
       if (!filteredBulletins) {
         filteredBulletins = getFilteredBulletins();
       }
 
+      if (countBadge) {
+        countBadge.textContent = `${filteredBulletins.length} 期`;
+      }
+
       if (filteredBulletins.length === 0) {
-        container.innerHTML = '<span class="py-4 text-slate-500 text-sm">找不到符合條件的週報</span>';
+        container.innerHTML = '<div class="py-8 text-center text-slate-400 text-xs">查無符合條件之週報</div>';
         return;
       }
 
-      const tabsHtml = filteredBulletins.map(b => {
-        const isActive = b.id === state.activeBulletinId;
-        const activeClass = isActive 
-          ? 'border-blue-500 text-blue-600 font-semibold'
-          : 'border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300';
-        
+      // 檢查側邊欄收合偏好
+      if (state.sidebarCollapsed === undefined) {
+        state.sidebarCollapsed = localStorage.getItem('user_sidebar_collapsed') === '1';
+      }
+      applySidebarCollapseState();
+
+      // 依月份 (YYYY-MM) 進行分組歸檔
+      const mGroup = {};
+      filteredBulletins.forEach(b => {
+        const mKey = (b.publishDate || '').slice(0, 7) || '其他';
+        if (!mGroup[mKey]) mGroup[mKey] = [];
+        mGroup[mKey].push(b);
+      });
+      const sortedMonths = Object.keys(mGroup).sort().reverse();
+
+      const html = sortedMonths.map(mk => {
+        const items = mGroup[mk];
+        const mTitle = mk.includes('-') ? mk.replace('-', ' 年 ') + ' 月' : mk;
         return `
-          <button onclick="selectBulletin('${b.id}')" class="whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-all duration-200 ${activeClass}">
-            ${e(b.id)} (${e(b.publishDate)})
-          </button>
+          <div class="space-y-1.5">
+            <div class="flex items-center justify-between px-2.5 py-1.5 text-xs font-bold text-slate-600 bg-slate-100/80 rounded-lg select-none">
+              <span class="flex items-center gap-1.5">
+                <span class="text-sm">📁</span>
+                <span>${e(mTitle)}</span>
+              </span>
+              <span class="text-[10px] font-semibold text-slate-400 bg-white/70 px-1.5 py-0.5 rounded-full border border-slate-200/50">${items.length} 期</span>
+            </div>
+            <div class="space-y-1 pl-1">
+              ${items.map(b => {
+                const isActive = b.id === state.activeBulletinId;
+                const isConfirmed = localStorage.getItem('has_confirmed_' + b.id) === '1' ||
+                                    (localStorage.getItem('has_read_' + b.id) === '1' && parseInt(localStorage.getItem('progress_' + b.id) || '0', 10) >= 100);
+                const isNew = filteredBulletins.length > 0 && filteredBulletins[0].id === b.id;
+
+                const activeClass = isActive 
+                  ? 'bg-blue-50 text-blue-700 font-bold border-blue-200/90 shadow-xs ring-1 ring-blue-100'
+                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-transparent';
+
+                return `
+                  <button onclick="selectBulletin('${e(b.id)}')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-medium transition-all flex items-center justify-between group border ${activeClass}">
+                    <div class="flex items-center gap-2 min-w-0">
+                      <span class="w-2 h-2 rounded-full flex-shrink-0 transition-transform ${isActive ? 'bg-blue-600 ring-2 ring-blue-200 scale-110' : 'bg-slate-300 group-hover:bg-slate-400'}"></span>
+                      <span class="truncate font-mono tracking-tight">${e(b.id)}</span>
+                      ${isNew ? '<span class="text-[9px] bg-rose-500 text-white px-1.5 py-0.2 rounded-full font-bold flex-shrink-0 shadow-xs animate-pulse">NEW</span>' : ''}
+                    </div>
+                    <div class="flex items-center gap-1.5 flex-shrink-0 ml-1">
+                      ${isConfirmed ? '<span class="text-emerald-500 text-xs font-bold leading-none select-none" title="已完讀打卡">✓</span>' : '<span class="w-1.5 h-1.5 rounded-full bg-amber-400" title="尚未打卡"></span>'}
+                      <span class="text-[10px] text-slate-400">${b.publishDate ? e(b.publishDate.slice(5)) : ''}</span>
+                    </div>
+                  </button>
+                `;
+              }).join('')}
+            </div>
+          </div>
         `;
       }).join('');
 
-      container.innerHTML = tabsHtml;
+      container.innerHTML = html;
     }
 
     
