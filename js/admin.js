@@ -2805,12 +2805,18 @@ async function submitManualRead() {
       });
     }
 
+    // 寫入防舞弊操作紀錄日誌 (Audit Log)
+    await DS.addAuditLog(bId, `管理員手動補登同仁「${userName} (${userDept})」已讀打卡（完成率：${progress}%）。`);
+
     toast(`✅ 成功為 ${userName} (${userDept}) 補登本期已讀打卡 (${progress}%)！`, 'ok');
     closeManualReadModal();
 
-    // 即時刷新 Section C 已讀狀態列表
+    // 即時刷新 Section C 已讀狀態列表與 Section D 操作紀錄日誌
     if (typeof renderReadReceipts === 'function') {
       await renderReadReceipts(bId);
+    }
+    if (typeof renderAuditLogs === 'function') {
+      await renderAuditLogs(bId);
     }
   } catch (err) {
     console.error('submitManualRead error:', err);
