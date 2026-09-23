@@ -299,34 +299,34 @@
 
     <!-- 經典文檔雙欄流容器 (左側歷史週報目錄與檢索 + 右側週報內容) -->
     <div class="flex flex-col lg:flex-row gap-6 relative items-start">
-      <!-- 左側固定歸檔側邊欄 (方案A：置左不收合，整合搜尋與過濾) -->
-      <aside id="archive-sidebar" class="w-full lg:w-72 bg-white rounded-2xl border border-slate-200/90 shadow-sm flex flex-col flex-shrink-0 relative z-20 overflow-hidden">
+      <!-- 左側固定歸檔側邊欄 (方案A：置左不收合，大字體清晰版，整合搜尋與過濾) -->
+      <aside id="archive-sidebar" class="w-full lg:w-80 bg-white rounded-2xl border border-slate-200/90 shadow-sm flex flex-col flex-shrink-0 relative z-20 overflow-hidden">
         <!-- 頂部歸檔標題列 -->
-        <div class="p-3.5 border-b border-slate-100 bg-slate-50/70 flex items-center justify-between">
-          <span class="text-xs font-bold text-slate-700 tracking-wider flex items-center gap-1.5">
-            <span>📚</span> 歷史週報歸檔
+        <div class="p-4 border-b border-slate-100 bg-slate-50/70 flex items-center justify-between">
+          <span class="text-sm sm:text-base font-bold text-slate-800 tracking-wider flex items-center gap-2">
+            <span class="text-base sm:text-lg">📚</span> 歷史週報歸檔
           </span>
-          <span id="sidebar-count-badge" class="text-[11px] bg-blue-50 text-blue-600 px-2 py-0.5 rounded-full font-bold border border-blue-200/70">-- 期</span>
+          <span id="sidebar-count-badge" class="text-xs bg-blue-50 text-blue-700 px-2.5 py-1 rounded-full font-bold border border-blue-200/70">-- 期</span>
         </div>
 
         <!-- 側邊欄內建搜尋與過濾工具箱 -->
-        <div class="p-3 bg-slate-50/50 border-b border-slate-100 space-y-2.5">
+        <div class="p-3.5 bg-slate-50/50 border-b border-slate-100 space-y-3">
           <!-- 關鍵字搜尋 -->
           <div class="relative">
-            <input type="text" id="search-keyword" oninput="handleSearch()" class="form-input text-xs py-1.5 pl-7 pr-2.5 w-full bg-white border border-slate-200 rounded-lg shadow-2xs focus:ring-1 focus:ring-blue-500" placeholder="搜尋標題、料號、廠商...">
-            <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2 top-2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <input type="text" id="search-keyword" oninput="handleSearch()" class="form-input text-sm py-2 pl-8 pr-3 w-full bg-white border border-slate-200 rounded-lg shadow-2xs focus:ring-2 focus:ring-blue-500" placeholder="搜尋標題、料號、廠商...">
+            <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2.5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
           </div>
           <!-- 月份與類別選單 -->
-          <div class="grid grid-cols-2 gap-2">
+          <div class="grid grid-cols-2 gap-2.5">
             <div>
-              <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">月份篩選</label>
-              <select id="search-month" onchange="handleSearch()" class="form-input text-xs py-1.5 px-2 w-full bg-white border border-slate-200 rounded-lg shadow-2xs">
+              <label class="block text-xs font-bold text-slate-600 mb-1">月份篩選</label>
+              <select id="search-month" onchange="handleSearch()" class="form-input text-xs sm:text-sm py-1.5 px-2.5 w-full bg-white border border-slate-200 rounded-lg shadow-2xs">
                 <option value="">全部月份</option>
               </select>
             </div>
             <div>
-              <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">類別篩選</label>
-              <select id="search-parent" onchange="handleSearch()" class="form-input text-xs py-1.5 px-2 w-full bg-white border border-slate-200 rounded-lg shadow-2xs">
+              <label class="block text-xs font-bold text-slate-600 mb-1">類別篩選</label>
+              <select id="search-parent" onchange="handleSearch()" class="form-input text-xs sm:text-sm py-1.5 px-2.5 w-full bg-white border border-slate-200 rounded-lg shadow-2xs">
                 <option value="">全部類別</option>
                 <option value="一、採購管理">一、採購管理</option>
                 <option value="二、供應商管理">二、供應商管理</option>
@@ -343,7 +343,7 @@
         </div>
 
         <!-- 週報月份折疊與項目清單 -->
-        <nav id="tabs-container" class="p-3 space-y-3 max-h-[calc(100vh-340px)] overflow-y-auto custom-scroll" aria-label="週報歸檔目錄">
+        <nav id="tabs-container" class="p-3.5 space-y-3.5 max-h-[calc(100vh-340px)] overflow-y-auto custom-scroll" aria-label="週報歸檔目錄">
           <!-- JS 動態渲染左側月份與週報清單 -->
         </nav>
       </aside>
@@ -1479,15 +1479,15 @@ async function showKPI(monthOffset = 0) {
         const items = mGroup[mk];
         const mTitle = mk.includes('-') ? mk.replace('-', ' 年 ') + ' 月' : mk;
         return `
-          <div class="space-y-1.5">
-            <div class="flex items-center justify-between px-2.5 py-1.5 text-xs font-bold text-slate-600 bg-slate-100/80 rounded-lg select-none">
-              <span class="flex items-center gap-1.5">
-                <span class="text-sm">📁</span>
+          <div class="space-y-2">
+            <div class="flex items-center justify-between px-3 py-2 text-sm font-bold text-slate-700 bg-slate-100/90 rounded-xl select-none">
+              <span class="flex items-center gap-2">
+                <span class="text-base">📁</span>
                 <span>${e(mTitle)}</span>
               </span>
-              <span class="text-[10px] font-semibold text-slate-400 bg-white/70 px-1.5 py-0.5 rounded-full border border-slate-200/50">${items.length} 期</span>
+              <span class="text-xs font-bold text-slate-500 bg-white px-2 py-0.5 rounded-full border border-slate-200/60 shadow-2xs">${items.length} 期</span>
             </div>
-            <div class="space-y-1 pl-1">
+            <div class="space-y-1.5 pl-1">
               ${items.map(b => {
                 const isActive = b.id === state.activeBulletinId;
                 const isConfirmed = localStorage.getItem('has_confirmed_' + b.id) === '1' ||
@@ -1495,19 +1495,19 @@ async function showKPI(monthOffset = 0) {
                 const isNew = filteredBulletins.length > 0 && filteredBulletins[0].id === b.id;
 
                 const activeClass = isActive 
-                  ? 'bg-blue-50 text-blue-700 font-bold border-blue-200/90 shadow-xs ring-1 ring-blue-100'
-                  : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900 border-transparent';
+                  ? 'bg-blue-50 text-blue-700 font-bold border-blue-300 shadow-xs ring-1 ring-blue-200'
+                  : 'text-slate-700 hover:bg-slate-50 hover:text-slate-900 border-transparent';
 
                 return `
-                  <button onclick="selectBulletin('${e(b.id)}')" class="w-full text-left px-3 py-2 rounded-xl text-xs font-medium transition-all flex items-center justify-between group border ${activeClass}">
-                    <div class="flex items-center gap-2 min-w-0">
-                      <span class="w-2 h-2 rounded-full flex-shrink-0 transition-transform ${isActive ? 'bg-blue-600 ring-2 ring-blue-200 scale-110' : 'bg-slate-300 group-hover:bg-slate-400'}"></span>
-                      <span class="truncate font-mono tracking-tight">${e(b.id)}</span>
-                      ${isNew ? '<span class="text-[9px] bg-rose-500 text-white px-1.5 py-0.2 rounded-full font-bold flex-shrink-0 shadow-xs animate-pulse">NEW</span>' : ''}
+                  <button onclick="selectBulletin('${e(b.id)}')" class="w-full text-left px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center justify-between group border ${activeClass}">
+                    <div class="flex items-center gap-2.5 min-w-0">
+                      <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 transition-transform ${isActive ? 'bg-blue-600 ring-4 ring-blue-100 scale-110' : 'bg-slate-300 group-hover:bg-slate-400'}"></span>
+                      <span class="truncate font-mono text-sm tracking-normal font-semibold">${e(b.id)}</span>
+                      ${isNew ? '<span class="text-[10px] bg-rose-500 text-white px-1.5 py-0.5 rounded-full font-bold flex-shrink-0 shadow-xs animate-pulse">NEW</span>' : ''}
                     </div>
-                    <div class="flex items-center gap-1.5 flex-shrink-0 ml-1">
-                      ${isConfirmed ? '<span class="text-emerald-500 text-xs font-bold leading-none select-none" title="已完讀打卡">✓</span>' : '<span class="w-1.5 h-1.5 rounded-full bg-amber-400" title="尚未打卡"></span>'}
-                      <span class="text-[10px] text-slate-400">${b.publishDate ? e(b.publishDate.slice(5)) : ''}</span>
+                    <div class="flex items-center gap-2 flex-shrink-0 ml-1.5">
+                      ${isConfirmed ? '<span class="text-emerald-600 text-sm font-black leading-none select-none" title="已完讀打卡">✓</span>' : '<span class="w-2 h-2 rounded-full bg-amber-400" title="尚未打卡"></span>'}
+                      <span class="text-xs text-slate-500 font-medium">${b.publishDate ? e(b.publishDate.slice(5)) : ''}</span>
                     </div>
                   </button>
                 `;
