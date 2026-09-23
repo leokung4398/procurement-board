@@ -1251,6 +1251,11 @@
           <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>選擇性隱藏開關：</strong>編輯週報時，基本資訊區新增「👁️ 隱藏此週報」選項。勾選後前台同仁即刻無法看見該週報（後台側邊欄標註 [隱藏] 供管理員維護），方便進行機密校對或特定檔期下架，無需刪除文章。</p>
           <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>指定特定人員觀看：</strong>管理員可自由切換「全體公開」或「指定特定人員」。選擇指定人員時，可利用搜尋框與「群組快選」勾選授權同仁。前台僅有獲授權之帳號登入時能看到該週報，其餘人員清單自動過濾，若透過直接連結造訪亦會被安全阻斷！</p>
         </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-purple-300 transition-colors">
+          <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-sm">28</span>後台全員防舞弊操作紀錄日誌與智慧中文姓名解析</h4>
+          <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>全員納管自證清白：</strong>後台「D 發送與操作紀錄日誌」已擴展至全體管理員（丁美雲、阮建澔、包于巧、徐嘉鴻、陳麒任、張必忠等）。舉凡週報發布、撤回發布、或管理員手動補登同仁已讀打卡，均留下精確的伺服器防竄改紀錄，自證清白無可爭議。</p>
+          <p class="text-sm leading-relaxed text-slate-600"><strong>動態中文全名解析與測試過濾：</strong>系統自動交叉比對管理員與白名單，日誌發送者以親切嚴謹的中文姓名呈現；同時智慧排除技術人員測試帳號，保障日誌絕對真實純淨。</p>
+        </div>
       </div>
 
       <!-- 專案開發成果內容 -->
@@ -1269,9 +1274,9 @@
               </p>
             </div>
             <div class="flex items-center gap-2.5 flex-shrink-0">
-              <button id="cat-btn-all" onclick="filterMilestoneCat('all')" type="button" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-indigo-400/40 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 text-xs font-semibold transition-all shadow-sm cursor-pointer active:scale-95" title="還原至 1~32 項原始順序">
+              <button id="cat-btn-all" onclick="filterMilestoneCat('all')" type="button" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-indigo-400/40 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 text-xs font-semibold transition-all shadow-sm cursor-pointer active:scale-95" title="還原至 1~33 項原始順序">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                <span>重置原始排序 (全部32項)</span>
+                <span>重置原始排序 (全部33項)</span>
               </button>
             </div>
           </div>
@@ -1352,7 +1357,7 @@
                     <span class="w-2 h-2 rounded-full bg-purple-400"></span>
                     <span class="text-xs font-bold text-purple-300 group-hover:text-purple-200 transition-colors">數據分析與落實</span>
                   </div>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">7 項</span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">8 項</span>
                 </div>
                 <p class="text-[11px] text-slate-400 group-hover:text-slate-300 leading-snug transition-colors">已讀追蹤、完成率、打卡防護、KPI 看板與 Excel 匯出。</p>
                 <div class="mt-2 flex items-center gap-1 text-[10px] text-purple-400 font-semibold opacity-80 group-hover:opacity-100">
@@ -2034,6 +2039,29 @@
             </div>
           </div>
         </div>
+
+          <!-- 里程碑三十三：後台全員防舞弊操作紀錄日誌與智慧中文姓名解析 -->
+          <div data-cat="data" data-orig-idx="33" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(147,51,234,0.15)] hover:border-purple-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-purple-500 to-indigo-600"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-purple-600 group-hover:text-white transition-all duration-300 shadow-sm"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1 flex items-center gap-2">三十三、後台全員防舞弊操作紀錄日誌與智慧中文姓名解析系統 <span class="bg-purple-50 text-purple-800 border border-purple-200/80 text-[10px] px-2 py-0.5 rounded-md font-semibold tracking-wide flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>數據落實</span> <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-0.5 rounded-full font-normal tracking-wide">2026-09-23</span></h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">採購需求：</span><br>
+                1. 杜絕管理舞弊行為，落實後台操作者責任制與透明度。凡名列後台管理員清單之任何成員（如丁美雲、阮建澔、包于巧、徐嘉鴻、陳麒任、張必忠等），執行任何異動操作均需完整如實入帳紀錄，以利內部稽核與自證清白。<br>
+                2. 覆蓋關鍵管理動作：包含週報正式發布（含郵件推播）、撤回發布（下架至草稿），以及管理員手動為同仁補登已讀打卡紀錄等重大行為。<br>
+                3. 日誌發送者名稱（Sender）需動態比對管理員與通訊錄名冊，精準解析為中文全名與信箱，告別英文暱稱與寫死靜態字串。<br>
+                4. 用戶本人（Leo Kung 孔令淳）純為開發與測試維護，其測試操作應予以智慧排除，避免污染正式業務稽核日誌。
+              </p>
+              <p class="text-xs text-purple-700 font-medium leading-relaxed mt-3 border-l-2 border-purple-400 pl-2">
+                💡 <span class="font-bold">專案成果：</span>全面升級 Section D「發送與操作紀錄日誌（Audit Log）」為企業級稽核防線！透過雲端非同步比對架構動態解析操作者中文實名與信箱；正式串接發布、撤回與手動補登等重大事件紀錄；並建置測試人員專屬過濾機制，達成管理軌跡 100% 具名留痕、不可竄改且純淨真實！
+              </p>
+            </div>
+          </div>
+        </div>
         </div>
       </div>
 
@@ -2326,7 +2354,7 @@
   </div>
 </div>
 
-<script src="js/admin.js?v=1789729000"></script>
+<script src="js/admin.js?v=1789729100"></script>
 <script>
   window.addEventListener('load', () => {
     setTimeout(async () => {
