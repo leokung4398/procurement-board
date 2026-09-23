@@ -235,7 +235,7 @@
     </div>
   </div>
 
-  <div id="app-main-container" class="max-w-7xl mx-auto px-4 py-8">
+  <div id="app-main-container" class="w-full px-4 lg:px-8 py-6">
     <!-- Header -->
     <header class="bg-white rounded-lg shadow-sm p-6 mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
       <div>
@@ -354,33 +354,33 @@
         <main id="bulletin-content-area" class="space-y-6">
           <div class="text-center py-12 text-slate-500">載入中...</div>
         </main>
+
+        <!-- 頁尾聯絡資訊 (放置於主要內容區底端，確保與佈告欄內容卡片完全同寬) -->
+        <footer class="mt-4 bg-white rounded-xl p-5 shadow-sm border border-slate-200/70 space-y-3.5">
+          <div class="border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-2">
+              <span class="w-1.5 h-3.5 bg-blue-600 rounded-full"></span>
+              <h3 class="text-xs font-bold text-slate-700 tracking-wider uppercase">聯絡資訊</h3>
+            </div>
+            <div id="footer-contact" class="mt-3">
+              <!-- JS 動態渲染聯絡資訊 -->
+            </div>
+          </div>
+          <div class="text-[10px] text-slate-400 leading-relaxed">
+            巨大集團擁有此電子郵件所載內容之著作權，惟並不保證該內容之完整與正確性、或無條件支持及同意該內容。除本郵件所傳送之特定對象外，任何人不得未經同意而轉載或揭露本郵件或其所記載之任何訊息。本信件及附件內容可能具機密性，如您並非受指定之收信人或未經授權而收到本電子郵件，除請勿對任何人揭露本信件內容外，亦請告知原發信人此項事實、同時請刪除此信件、其所附檔案及銷毀任何任何已列印之文件。
+          </div>
+          <div class="mt-3 px-3.5 py-2.5 bg-rose-50/60 border border-rose-100 rounded-lg text-xs text-rose-700/90 leading-relaxed shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div class="flex items-center gap-2 font-bold text-rose-800 flex-shrink-0">
+              <svg class="w-4 h-4 text-rose-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+              <span>保密聲明 (限閱)</span>
+            </div>
+            <div class="text-[11px] text-rose-600/80 sm:text-right">
+              本文件為公司營業秘密，僅供授權同仁公務使用，嚴禁未經授權對外揭露、散布或轉載。
+            </div>
+          </div>
+        </footer>
       </div>
     </div>
-
-    <!-- 頁尾聯絡資訊 -->
-    <footer class="mt-4 bg-white rounded-xl p-5 shadow-sm border border-slate-200/70 space-y-3.5">
-      <div class="border-b border-slate-100 pb-3">
-        <div class="flex items-center gap-2">
-          <span class="w-1.5 h-3.5 bg-blue-600 rounded-full"></span>
-          <h3 class="text-xs font-bold text-slate-700 tracking-wider uppercase">聯絡資訊</h3>
-        </div>
-        <div id="footer-contact" class="mt-3">
-          <!-- JS 動態渲染聯絡資訊 -->
-        </div>
-      </div>
-      <div class="text-[10px] text-slate-400 leading-relaxed">
-        巨大集團擁有此電子郵件所載內容之著作權，惟並不保證該內容之完整與正確性、或無條件支持及同意該內容。除本郵件所傳送之特定對象外，任何人不得未經同意而轉載或揭露本郵件或其所記載之任何訊息。本信件及附件內容可能具機密性，如您並非受指定之收信人或未經授權而收到本電子郵件，除請勿對任何人揭露本信件內容外，亦請告知原發信人此項事實、同時請刪除此信件、其所附檔案及銷毀任何任何已列印之文件。
-      </div>
-      <div class="mt-3 px-3.5 py-2.5 bg-rose-50/60 border border-rose-100 rounded-lg text-xs text-rose-700/90 leading-relaxed shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-        <div class="flex items-center gap-2 font-bold text-rose-800 flex-shrink-0">
-          <svg class="w-4 h-4 text-rose-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-          <span>保密聲明 (限閱)</span>
-        </div>
-        <div class="text-[11px] text-rose-600/80 sm:text-right">
-          本文件為公司營業秘密，僅供授權同仁公務使用，嚴禁未經授權對外揭露、散布或轉載。
-        </div>
-      </div>
-    </footer>
   </div>
 
   <script>
