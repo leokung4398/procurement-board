@@ -1259,6 +1259,11 @@
           <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>全員納管自證清白：</strong>後台「D 發送與操作紀錄日誌」已擴展至全體管理員（丁美雲、阮建澔、包于巧、徐嘉鴻、陳麒任、張必忠等）。舉凡週報發布、撤回發布、或管理員手動補登同仁已讀打卡，均留下精確的伺服器防竄改紀錄，自證清白無可爭議。</p>
           <p class="text-sm leading-relaxed text-slate-600"><strong>動態中文全名解析與測試過濾：</strong>系統自動交叉比對管理員與白名單，日誌發送者以親切嚴謹的中文姓名呈現；同時智慧排除技術人員測試帳號，保障日誌絕對真實純淨。</p>
         </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-blue-300 transition-colors">
+          <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">29</span>全專案架構輕量化與單一資料源 (SSOT) 重構</h4>
+          <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>單一資料源 (SSOT) 整合：</strong>系統架構說明圖與 9 大技術亮點已全面改由 <code>architecture.html</code> 統一提供。後台說明彈窗以高效 iframe 安全嵌入，未來擴充架構圖僅需維護單一檔案，一處更新全站同步，徹底根除雙重維護與版本脫鉤！</p>
+          <p class="text-sm leading-relaxed text-slate-600"><strong>歷史版型評估與工具指引：</strong>版面模擬器 (preview_options.html) 正式標記為歷史評估存檔，避免日常操作混淆；本地照片改名工具 (AutoRenamer.html) 亦內建快速導航連結，兼顧版本清晰與操作便利。</p>
+        </div>
       </div>
 
       <!-- 專案開發成果內容 -->
@@ -1277,9 +1282,9 @@
               </p>
             </div>
             <div class="flex items-center gap-2.5 flex-shrink-0">
-              <button id="cat-btn-all" onclick="filterMilestoneCat('all')" type="button" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-indigo-400/40 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 text-xs font-semibold transition-all shadow-sm cursor-pointer active:scale-95" title="還原至 1~34 項原始順序">
+              <button id="cat-btn-all" onclick="filterMilestoneCat('all')" type="button" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-indigo-400/40 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 text-xs font-semibold transition-all shadow-sm cursor-pointer active:scale-95" title="還原至 1~35 項原始順序">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                <span>重置原始排序 (全部34項)</span>
+                <span>重置原始排序 (全部35項)</span>
               </button>
             </div>
           </div>
@@ -1297,9 +1302,9 @@
                     <span class="w-2 h-2 rounded-full bg-blue-400"></span>
                     <span class="text-xs font-bold text-blue-300 group-hover:text-blue-200 transition-colors">核心系統開發</span>
                   </div>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">10 項</span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">11 項</span>
                 </div>
-                <p class="text-[11px] text-slate-400 group-hover:text-slate-300 leading-snug transition-colors">架構搭建、動態模板、問卷系統、附件上傳與郵件通知。</p>
+                <p class="text-[11px] text-slate-400 group-hover:text-slate-300 leading-snug transition-colors">架構搭建、動態模板、問卷系統、單一資料源架構優化與郵件通知。</p>
                 <div class="mt-2 flex items-center gap-1 text-[10px] text-blue-400 font-semibold opacity-80 group-hover:opacity-100">
                   <span>點擊置頂排序</span>
                   <svg class="w-3 h-3 group-hover:translate-y-[-1px] transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
@@ -2088,303 +2093,36 @@
             </div>
           </div>
         </div>
+
+          <!-- 里程碑三十五：全域重複功能全面清查與系統架構單一資料源 (SSOT) 重構 -->
+          <div data-cat="core" data-orig-idx="35" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(37,99,235,0.15)] hover:border-blue-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-500 to-indigo-600"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-sm"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1 flex items-center gap-2">三十五、全域重複功能全面清查與系統架構單一資料源 (SSOT) 重構優化 <span class="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] px-2 py-0.5 rounded-md font-semibold tracking-wide flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>核心系統</span> <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-0.5 rounded-full font-normal tracking-wide">2026-09-24</span></h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">採購需求：</span><br>
+                1. 全面盤點專案全貌，針對前後台與內部各模組重複、冗餘之功能進行嚴謹查核與分析。<br>
+                2. 解決「系統架構圖」在後台彈窗與獨立頁面雙重維護、版本容易脫鉤之長期隱患。<br>
+                3. 明確區隔歷史版型評估頁面與線上現役功能之定位，並為本機批次工具提供清晰之版本指引。<br>
+                4. 改善作業前嚴格落實多重備份（Git 分支與實體目錄雙重留存），確保系統安全萬無一失。
+              </p>
+              <p class="text-xs text-blue-700 font-medium leading-relaxed mt-3 border-l-2 border-blue-400 pl-2">
+                💡 <span class="font-bold">專案成果：</span>完成全專案重複邏輯盤點報告；將系統架構圖重構為單一資料源（SSOT），後台彈窗直接安全嵌入架構頁，一舉精簡近 300 行重複程式碼；建立安全備份機制並釐清原型定位，專案架構更精練、維護更輕盈！
+              </p>
+            </div>
+          </div>
+        </div>
         </div>
       </div>
 
-<!-- 架構說明內容 -->
-      <div id="tab-architecture" class="about-tab-pane hidden flex-1 overflow-y-auto p-6 space-y-6 bg-slate-50/30 custom-scrollbar smooth-scroll-pane">
-        
-
-<div class="mb-10 text-center md:text-left">
-  <div class="inline-flex items-center justify-center p-3 bg-blue-100 rounded-xl mb-4">
-    <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-  </div>
-  <h1 class="text-3xl md:text-4xl font-bold text-slate-800 mb-3 tracking-tight">採購佈告欄系統架構與邏輯設計</h1>
-  <p class="text-slate-500 text-lg max-w-3xl">本專案採用現代化的 Serverless（無伺服器）架構，達成零硬體維護成本、高安全性與自動化作業。以下為系統的前後端分離架構、資料流向與外部服務整合說明。</p>
-</div>
-
-<div class="mermaid-container mb-12 border border-slate-200">
-  <h2 class="text-xl font-bold text-slate-700 mb-6 flex items-center gap-2">
-    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-    系統全貌資料流向圖 (Data Flow & Architecture)
-  </h2>
-  
-  <div class="mermaid flex justify-center">
-    flowchart TB
-        classDef user fill:#eff6ff,stroke:#3b82f6,stroke-width:2px,color:#1e40af,rx:10px
-        classDef admin fill:#fdf4ff,stroke:#d946ef,stroke-width:2px,color:#86198f,rx:10px
-        classDef frontend fill:#ecfdf5,stroke:#10b981,stroke-width:2px,color:#065f46
-        classDef firebase fill:#fffbeb,stroke:#f59e0b,stroke-width:2px,color:#92400e
-        classDef external fill:#fef2f2,stroke:#ef4444,stroke-width:2px,color:#991b1b
-        classDef security fill:#fef2f2,stroke:#dc2626,stroke-width:2px,color:#991b1b
-        classDef group fill:#f8fafc,stroke:#94a3b8,stroke-width:1px,stroke-dasharray: 5 5
-
-        User(("👨‍💼 一般同仁<br>(Reader)")):::user
-        Admin(("👩‍💻 採購管理員<br>(Admin)")):::admin
-
-        subgraph SecurityGate [🛡️ 企業身分與安全門禁層]
-            direction TB
-            OAuth["🔐 Google 企業帳號驗證<br>(@youbike.com.tw 網域強制門禁)"]:::security
-            ACLGate["👁️ 權限過濾引擎<br>(排除隱藏週報與未受權機密週報)"]:::security
-        end
-
-        subgraph Frontend [🌐 前端介面層 GitHub Pages]
-            direction TB
-            Index["前台 (index.html)<br>・經典雙欄流（左側大字體歸檔檢索＋右側正文）<br>・內容卡片與頁尾資訊欄等寬對齊<br>・底端一鍵完讀漸層打卡＋頂部尊榮已完讀金徽章<br>・未登入高斯模糊防窺與Email浮水印"]:::frontend
-            AdminUI["後台 (admin.html)<br>・TinyMCE富文本編輯與微軟格式淨化<br>・前台即時畫面預覽與多裝置視效模擬器<br>・選擇性隱藏開關與特定人員授權設定<br>・全員防舞弊操作紀錄日誌 (Audit Log)<br>・手動補登已讀打卡 Modal 與 KPI 統計看板"]:::frontend
-        end
-
-        subgraph Backend [☁️ Google Firebase 雲端後端 BaaS]
-            direction TB
-            Rules{"Security Rules<br>(細緻角色權限控管牆)"}:::firebase
-            
-            subgraph DB [Database & Cloud Storage]
-                direction LR
-                Firestore[("Firestore NoSQL<br>・bulletins (週報/草稿/ACL)<br>・readReceipts (100%打卡紀錄)<br>・systemConfig (白名單/管理員/關鍵字)<br>・auditLogs (全員操作防舞弊日誌)")]:::firebase
-                Storage[("Cloud Storage<br>・文章內嵌圖片<br>・實體公務附件檔案")]:::firebase
-            end
-            
-            Rules --> Firestore
-            Rules --> Storage
-        end
-
-        subgraph External [🔗 第三方服務與 CI/CD 自動化]
-            direction TB
-            EmailJS["✉️ EmailJS API<br>(依群組/白名單自動推播HTML信件)"]:::external
-            GHA["⚙️ GitHub Actions<br>(Git push 即刻自動部署 GitHub Pages)"]:::external
-            VersionCheck["🔄 Version Checker<br>(比對 version.txt 強制破除快取)"]:::external
-        end
-
-        User ===>|登入企業帳號| OAuth
-        OAuth ===>|通過安全門禁| ACLGate
-        ACLGate ===>|檢視授權週報與打卡| Index
-
-        Admin ===>|登入管理員帳號| AdminUI
-
-        Index -.->|即時讀取週報與一鍵打卡| Rules
-        AdminUI ===>|編撰、授權設定、補登、稽核日誌| Rules
-        
-        AdminUI -->|正式發布週報| EmailJS
-        EmailJS -.->|寄送通知信件至同仁信箱| User
-        
-        AdminUI -.->|更新程式碼推送 GitHub| GHA
-        GHA -.->|自動編譯並部署發布| Frontend
-        VersionCheck -.->|偵測新版強制重新整理| Index
-  </div>
-</div>
-
-<h2 class="text-xl font-bold text-slate-700 mb-6 flex items-center gap-2">
-  <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-  專案核心亮點與技術邏輯
-</h2>
-
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-  
-  <div class="card">
-    <div class="flex flex-col gap-3 mb-4">
-      <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"></path></svg>
+<!-- 架構說明內容 (統一由 architecture.html 單一資料源載入，杜絕雙重維護) -->
+      <div id="tab-architecture" class="about-tab-pane hidden flex-1 h-full overflow-hidden bg-slate-50">
+        <iframe src="architecture.html" class="w-full h-full border-0" title="系統架構說明"></iframe>
       </div>
-      <h3 class="font-bold text-slate-800 text-lg">Serverless 無伺服器架構</h3>
-    </div>
-    <p class="text-sm text-slate-600 leading-relaxed mb-4">
-      捨棄傳統需要買主機、架設作業系統的框架。全站採用 <strong>HTML5 + JS</strong> 開發，搭配 <strong>GitHub Actions</strong> 實現 CI/CD，每次修改程式碼就會自動發佈至 <strong>GitHub Pages</strong>。
-    </p>
-    <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
-      <li>維護成本為零，無須擔心主機當機</li>
-      <li>全球 CDN 加速，開啟網頁瞬間完成</li>
-      <li>架構極輕量，移交與接手門檻低</li>
-    </ul>
-  </div>
-
-  <div class="card">
-    <div class="flex flex-col gap-3 mb-4">
-      <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-amber-600">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"></path></svg>
-      </div>
-      <h3 class="font-bold text-slate-800 text-lg">Firebase 企業級資料雲</h3>
-    </div>
-    <p class="text-sm text-slate-600 leading-relaxed mb-4">
-      後端資料庫選用 Google 的 <strong>Firebase Firestore (NoSQL)</strong>，具備極高的擴充性。圖文附件則上傳至 <strong>Cloud Storage</strong>。
-    </p>
-    <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
-      <li><strong>資安防護：</strong>透過 Security Rules 嚴格阻擋非管理員的惡意竄改。</li>
-      <li><strong>稽核軌跡：</strong>後台具備 Audit Logs (操作紀錄)，誰在什麼時候發布皆有跡可循。</li>
-      <li>即時同步更新，資料落地安全有保障。</li>
-    </ul>
-  </div>
-
-  <div class="card">
-    <div class="flex flex-col gap-3 mb-4">
-      <div class="w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center text-rose-600">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-      </div>
-      <h3 class="font-bold text-slate-800 text-lg">EmailJS 自動化通知引擎</h3>
-    </div>
-    <p class="text-sm text-slate-600 leading-relaxed mb-4">
-      過去寄發週報需要人工一封封複製貼上，現在系統內建聯絡人與群組管理，並直接串接 <strong>EmailJS API</strong>。
-    </p>
-    <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
-      <li>後台點擊「發布」，自動抓取必讀重點。</li>
-      <li>動態生成 HTML 豐富排版（包含圖片）寄送給同仁。</li>
-      <li>徹底消除人工發信的人為疏失與時間成本。</li>
-    </ul>
-  </div>
-
-  <div class="card">
-    <div class="flex flex-col gap-3 mb-4">
-      <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-      </div>
-      <h3 class="font-bold text-slate-800 text-lg">全域權限與強制更新</h3>
-    </div>
-    <p class="text-sm text-slate-600 leading-relaxed mb-4">
-      系統具備 <strong>Global Whitelist</strong> (全域白名單) 權限控管與 <strong>Version Checker</strong> (強制更新) 機制。
-    </p>
-    <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
-      <li>通訊錄名單即為全站觀看權限，無須逐篇設定</li>
-      <li>管理員可透過 <code class="bg-slate-100 px-1 rounded text-xs">?test_user=1</code> 模擬前台權限</li>
-      <li>發布新版時透過比對 version.txt 強制破除瀏覽器暫存</li>
-    </ul>
-  </div>
-
-  <div class="card">
-    <div class="flex flex-col gap-3 mb-4">
-      <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-600">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-      </div>
-      <h3 class="font-bold text-slate-800 text-lg">機密週報防護與選擇性隱藏</h3>
-    </div>
-    <p class="text-sm text-slate-600 leading-relaxed mb-4">
-      針對高敏或特定廠區週報引入 <strong>ACL 存取控制</strong> 與 <strong>選擇性隱藏開關</strong>。後台勾選特定人員或隱藏後，前台即刻隔離。
-    </p>
-    <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
-      <li><strong>精準存取過濾</strong>：非授權同仁清單完全不顯示，網址直接開啟亦安全鎖定。</li>
-      <li><strong>選擇性隱藏開關</strong>：校對中或特定檔期一鍵隱藏，毋須刪除歷史文檔。</li>
-      <li><strong>防外流浮水印</strong>：前台自動套用登入者 Email 滿版浮水印，強烈心理嚇阻。</li>
-    </ul>
-  </div>
-
-  <div class="card">
-    <div class="flex flex-col gap-3 mb-4">
-      <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path></svg>
-      </div>
-      <h3 class="font-bold text-slate-800 text-lg">前端版面極致最佳化</h3>
-    </div>
-    <p class="text-sm text-slate-600 leading-relaxed mb-4">
-      為迎合使用者對於「高密度資訊、無留白」的嚴格要求，在前端實作了深度的 HTML 過濾與 DOM 重塑引擎。
-    </p>
-    <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
-      <li><strong>智慧空行消除</strong>：遞迴剝離富文本編輯器產生的幽靈空白與換行。</li>
-      <li><strong>響應式懸浮微標</strong>：「緊急」標籤改為 Hover 觸發，不佔用任何版面空間。</li>
-      <li><strong>強制版面壓縮</strong>：覆寫 Tailwind 與 Quill 預設樣式，實現 0 padding/margin。</li>
-    </ul>
-  </div>
-
-  <div class="card">
-    <div class="flex flex-col gap-3 mb-4">
-      <div class="w-12 h-12 bg-cyan-100 rounded-full flex items-center justify-center text-cyan-600">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-      </div>
-      <h3 class="font-bold text-slate-800 text-lg">週報點閱績效統計與數據匯出</h3>
-    </div>
-    <p class="text-sm text-slate-600 leading-relaxed mb-4">
-      前後台整合的視覺化 KPI 看板，能自動追蹤各營運處的閱讀狀況，並支援 Excel 報表匯出。
-    </p>
-    <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
-      <li><strong>自動結算：</strong>自動計算主要聯絡人的應讀與已讀數據。</li>
-      <li><strong>防呆機制：</strong>防呆過濾未設定主要聯絡人的單位，避免數據失真。</li>
-      <li><strong>公開透明：</strong>前台登入自動彈出統計看板，促進團隊內部閱讀積極度。</li>
-    </ul>
-  </div>
-
-  <div class="card">
-    <div class="flex flex-col gap-3 mb-4">
-      <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-amber-600">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-      </div>
-      <h3 class="font-bold text-slate-800 text-lg">一鍵打卡閉環與尊榮完讀金徽章</h3>
-    </div>
-    <p class="text-sm text-slate-600 leading-relaxed mb-4">
-      打破傳統「點開即算已讀」的粗糙統計，週報底部配置商務微漸層打卡按鈕，並採雲端非同步防護。
-    </p>
-    <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
-      <li><strong>底端一鍵打卡</strong>：點擊顯示 Loading 旋轉動畫，Firestore 驗證寫入成功方鎖定狀態。</li>
-      <li><strong>尊榮金徽章回饋</strong>：打卡成功即於 Header 點亮專屬「👑 已完讀」琥珀金徽章。</li>
-      <li><strong>完讀滿條常駐</strong>：已完讀同仁重開時常駐 100% 滿條，兼顧視覺標示與榮譽感。</li>
-    </ul>
-  </div>
-
-  <div class="card">
-    <div class="flex flex-col gap-3 mb-4">
-      <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
-      </div>
-      <h3 class="font-bold text-slate-800 text-lg">多層次已讀容錯與後台手動補登</h3>
-    </div>
-    <p class="text-sm text-slate-600 leading-relaxed mb-4">
-      全面解決同仁因 Google 英文暱稱或同音異字導致無法比對中文姓名之痛點，並提供管理員自主補登介面。
-    </p>
-    <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
-      <li><strong>多維度容錯匹配</strong>：信箱、前綴、全半形去空格姓名與同音字交叉校驗。</li>
-      <li><strong>後台手動補登 Modal</strong>：管理員可直接挑選未讀同仁快速補登，即時連動雲端與 KPI。</li>
-      <li><strong>身分即時顯性化</strong>：前台 Header 呈現登入姓名與單位，後台名冊透明列出登入 Email。</li>
-    </ul>
-  </div>
-
-  <div class="card">
-    <div class="flex flex-col gap-3 mb-4">
-      <div class="w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center text-rose-600">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
-      </div>
-      <h3 class="font-bold text-slate-800 text-lg">全員防舞弊操作紀錄日誌 (Audit Log)</h3>
-    </div>
-    <p class="text-sm text-slate-600 leading-relaxed mb-4">
-      為杜絕舞弊並自證清白，所有在後台管理員清單中的成員執行任何關鍵操作，均受不可竄改日誌嚴格記錄。
-    </p>
-    <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
-      <li><strong>全員責任制入帳</strong>：發布週報、撤回發布、手動補登同仁已讀等重大行為全數留痕。</li>
-      <li><strong>實名中文解析</strong>：日誌動態解析操作者中文實名與信箱，告別英文暱稱與靜態寫死。</li>
-      <li><strong>測試帳號智慧排除</strong>：自動過濾技術人員測試操作，保障稽核軌跡真實純淨。</li>
-    </ul>
-  </div>
-
-  <div class="card">
-    <div class="flex flex-col gap-3 mb-4">
-      <div class="w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center text-teal-600">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/></svg>
-      </div>
-      <h3 class="font-bold text-slate-800 text-lg">經典雙欄流與大字體清晰版型</h3>
-    </div>
-    <p class="text-sm text-slate-600 leading-relaxed mb-4">
-      採用使用者最直觀的「方案 A 固定置左歸檔目錄」，並為資深同仁專屬升級大字體與同寬版型架構。
-    </p>
-    <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
-      <li><strong>歷史歸檔靠左整合</strong>：整合關鍵字即時檢索、月份與類別篩選，大字體觸控好點選。</li>
-      <li><strong>等寬視覺對齊</strong>：中間主要佈告欄內容卡片與下方頁尾聯絡資訊／保密聲明完全等寬。</li>
-      <li><strong>高適配無收合障礙</strong>：移除不穩定的側邊收合按鈕，跨不同解析度維持最高一致性。</li>
-    </ul>
-  </div>
-
-  <div class="card">
-    <div class="flex flex-col gap-3 mb-4">
-      <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-amber-600">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-      </div>
-      <h3 class="font-bold text-slate-800 text-lg">前台即時畫面預覽與多裝置模擬</h3>
-    </div>
-    <p class="text-sm text-slate-600 leading-relaxed mb-4">
-      徹底告別「發布後才發現排版瑕疵」的困擾，後台直接調用安全沙盒與 session 隔離層呈現 1:1 前台實景。
-    </p>
-    <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
-      <li><strong>零發布即時顯影</strong>：即時同步富文本與表格樣式，無須發布即可查閱完整排版。</li>
-      <li><strong>三合一多裝置視角</strong>：內建電腦全螢幕、平板 (768px)、手機 (414px) 響應式模擬。</li>
-      <li><strong>全隔離安全沙盒</strong>：預覽資料不寫入正式資料庫，前台線上讀者不受任何干擾。</li>
-    </ul>
-  </div>
-
-</div>
 
 
       </div>
