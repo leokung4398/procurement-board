@@ -398,6 +398,9 @@
   </div>
 
   <script>
+    // 檢查是否為後台即時預覽模式
+    window.isPreviewMode = new URLSearchParams(window.location.search).get('preview') === '1';
+
     /* =========================================
        1. Store & State Management
        ========================================= */
@@ -467,6 +470,7 @@
         }
       },
       async markAsRead(bulletinId, user, progress = null) {
+        if (window.isPreviewMode) return { success: true };
         if (!this.isConfigured() || !bulletinId || !user) return { success: false, error: '未初始化或缺少使用者資訊' };
         // 兼容多種 uid 格式
         const uid = user.userId || user.uid || (user.email ? user.email.replace(/[@.]/g, '_') : null);
@@ -1252,6 +1256,7 @@ async function showKPI(monthOffset = 0) {
 
     async function checkUserIdentity(isInitialLoad = false) {
       updateAuthUI();
+      if (window.isPreviewMode) return;
       if (!DS.isConfigured()) return;
       const userStr = localStorage.getItem('procurement_user');
       if (userStr) {
@@ -2129,6 +2134,7 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
     let currentBulletinProgress = 0;
 
     function setupReadingProgressTracker() {
+      if (window.isPreviewMode) return;
       const userStr = localStorage.getItem('procurement_user');
       if (!userStr || !state.activeBulletinId) return;
 
@@ -2514,6 +2520,7 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
 
 
         function checkAndShowKPI() {
+      if (window.isPreviewMode) return;
       const now = new Date();
       const launchDate = new Date('2026-09-01T00:00:00+08:00');
       if (now >= launchDate) {
