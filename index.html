@@ -198,6 +198,20 @@
   <!-- 頂部閱讀進度條 -->
   <div id="reading-progress-bar" class="fixed top-0 left-0 h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-teal-400 z-[9999] transition-all duration-200 pointer-events-none shadow-sm" style="width: 0%;"></div>
 
+  <!-- 後台即時效果預覽警示橫幅 -->
+  <div id="preview-mode-banner" class="hidden sticky top-0 left-0 right-0 bg-gradient-to-r from-amber-500 via-amber-600 to-orange-600 text-white px-4 py-2 text-xs font-semibold z-[100] shadow-md flex items-center justify-between">
+    <div class="flex items-center gap-2 max-w-4xl mx-auto w-full justify-between">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-white animate-ping"></span>
+        <span class="bg-black/20 px-2 py-0.5 rounded text-[11px] font-mono uppercase tracking-wider">即時效果預覽</span>
+        <span>您目前處於「後台編輯即時畫面預覽模式」，畫面呈現當前尚未發布之最新排版，不影響線上讀者。</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="text-[11px] opacity-80">唯讀預覽 · 停用打卡計數</span>
+      </div>
+    </div>
+  </div>
+
   <!-- 系統登入強制驗證彈窗 (必須登入企業帳號才能閱覽週報) -->
   <div id="user-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-md z-[100] hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm text-center relative border border-slate-100 animate-in fade-in zoom-in duration-200">
@@ -865,6 +879,113 @@ async function showKPI(monthOffset = 0) {
 
 
     async function loadData() {
+      // 0. 檢查是否為後台即時畫面預覽模式 (Preview Mode)
+      const urlParams = new URLSearchParams(window.location.search);
+      const isPreviewMode = urlParams.get('preview') === '1';
+
+      if (isPreviewMode) {
+        window.isPreviewMode = true;
+        // 顯示頂部預覽專用提示橫幅
+        const banner = document.getElementById('preview-mode-banner');
+        if (banner) banner.classList.remove('hidden');
+
+        // 解除背景模糊鎖定，允許管理員無阻礙預覽
+        const mainContainer = document.getElementById('app-main-container');
+        if (mainContainer) mainContainer.classList.remove('page-blurred');
+
+        // 嘗試從 sessionStorage 讀取後台傳入的即時週報資料
+        let previewBulletin = null;
+        try {
+          const raw = sessionStorage.getItem('procurement_preview_data');
+          if (raw) {
+            previewBulletin = JSON.parse(raw);
+            restoreTablesFromFirestore(previewBulletin);
+          }
+        } catch(e) {
+          console.error("Preview data parse error:", e);
+        }
+
+        // 模擬採購管理員登入資訊供預覽畫面標頭顯示
+        const mockAdminUser = {
+          userId: 'preview_admin',
+          displayName: '採購管理員 (預覽模式)',
+          department: '採購管理中台',
+          email: 'admin@youbike.com.tw'
+        };
+        const infoBadge = document.getElementById('user-info-badge');
+        const infoName = document.getElementById('user-info-name');
+        if (infoBadge && infoName) {
+          infoName.textContent = `${mockAdminUser.displayName} (${mockAdminUser.department})`;
+          infoBadge.classList.remove('hidden');
+          infoBadge.classList.add('flex');
+        }
+
+        // 讀取正式資料庫或 data.json 作為基底週報清單，以供側邊欄歸檔切換
+        let baseBulletins = [];
+        try {
+          baseBulletins = await DS.getAllBulletins();
+        } catch(e) {}
+
+        // 若有預覽週報資料，將其置頂或替換
+        if (previewBulletin) {
+          const existingIdx = baseBulletins.findIndex(b => b.id === previewBulletin.id);
+          if (existingIdx !== -1) {
+            baseBulletins[existingIdx] = previewBulletin;
+          } else {
+            baseBulletins.unshift(previewBulletin);
+          }
+        }
+
+        state.admins = [{ email: 'admin@youbike.com.tw' }];
+        state.data = {
+          bulletins: baseBulletins,
+          meta: baseBulletins[0]?.meta || {
+            siteName: "經營TEAM採購｜佈告欄",
+            company: "微笑單車股份有限公司",
+            contact: {
+              name: "Sunny Ting 丁美云",
+              tel: "+886-2-8978-5094",
+              email: "sunnyting@youbike.com.tw",
+              address: "105403 台北市松山區民生東路三段138號10樓"
+            }
+          }
+        };
+
+        // 載入過濾用的月份選單
+        const mSet = new Set();
+        baseBulletins.forEach(b => {
+          if (b.publishDate) mSet.add(b.publishDate.slice(0, 7));
+        });
+        const mArr = Array.from(mSet).sort().reverse();
+        const smEl = document.getElementById('search-month');
+        if (smEl) {
+          smEl.innerHTML = '<option value="">全部月份</option>';
+          mArr.forEach(m => {
+            const opt = document.createElement('option');
+            opt.value = m;
+            opt.textContent = m;
+            smEl.appendChild(opt);
+          });
+        }
+
+        // 鎖定當前預覽的週報 ID
+        if (previewBulletin && previewBulletin.id) {
+          state.activeBulletinId = previewBulletin.id;
+          if (previewBulletin.publishDate && smEl) {
+            const m = previewBulletin.publishDate.slice(0, 7);
+            smEl.value = m;
+            state.searchMonth = m;
+          }
+        } else if (baseBulletins.length > 0) {
+          state.activeBulletinId = baseBulletins[0].id;
+        }
+
+        renderApp();
+        handleSearch();
+        renderFooter();
+        return;
+      }
+
       // 1. 檢查企業身分：未登入前絕對不向資料庫讀取週報內容，DOM 中不留任何週報資料
       const userStr = localStorage.getItem('procurement_user');
       if (!userStr) {
@@ -1020,6 +1141,14 @@ async function showKPI(monthOffset = 0) {
 
     async function confirmBulletinRead(bulletinId) {
       if (!bulletinId) return;
+      if (window.isPreviewMode) {
+        if (typeof toast === 'function') {
+          toast('ℹ️ 預覽模式提醒：打卡功能僅供模擬視覺體驗，不計入正式閱畢資料庫。', 'in');
+        } else {
+          alert('ℹ️ 預覽模式提醒：此為模擬排版畫面，點擊打卡不會影響正式已讀資料。');
+        }
+        return;
+      }
       const userStr = localStorage.getItem('procurement_user');
       if (!userStr) {
         document.getElementById('user-modal').classList.remove('hidden');

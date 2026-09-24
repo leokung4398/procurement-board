@@ -1435,6 +1435,98 @@ function hideAchievements() {
   document.getElementById('am').classList.add('hidden');
 }
 
+/* =========================================================
+   即時前台畫面預覽控制器 (WYSIWYG 1:1 Live Preview Modal)
+   ========================================================= */
+let currentPreviewDevice = 'desktop';
+
+function openPreviewModal() {
+  if (!S.cur) {
+    toast('請先選擇或新增一份週報', 'in');
+    return;
+  }
+
+  // 1. 同步當前表單文字與編輯器內容至 S.cur
+  fc();
+
+  // 2. 深度深拷貝週報資料，確保預覽隔離性
+  const previewDoc = JSON.parse(JSON.stringify(S.cur));
+  previewDoc.feedbackLog = S.fbs ? JSON.parse(JSON.stringify(S.fbs)) : [];
+  previewDoc.status = 'published'; // 在預覽中模擬已發布視覺狀態
+
+  // 3. 將資料存入 sessionStorage 供前台 iframe 讀取
+  try {
+    sessionStorage.setItem('procurement_preview_data', JSON.stringify(previewDoc));
+  } catch(e) {
+    console.error('Save preview data error:', e);
+  }
+
+  // 4. 重設為電腦版視角並載入 iframe
+  setPreviewDevice('desktop');
+  const iframe = document.getElementById('preview-iframe');
+  if (iframe) {
+    // 加上時間戳防快取
+    iframe.src = 'index.html?preview=1&t=' + Date.now();
+  }
+
+  // 5. 顯示 Modal 視窗
+  const modal = document.getElementById('preview-modal');
+  if (modal) modal.classList.remove('hidden');
+}
+
+function closePreviewModal() {
+  const modal = document.getElementById('preview-modal');
+  if (modal) modal.classList.add('hidden');
+  const iframe = document.getElementById('preview-iframe');
+  if (iframe) iframe.src = 'about:blank'; // 釋放記憶體
+}
+
+function setPreviewDevice(device) {
+  currentPreviewDevice = device;
+  const wrapper = document.getElementById('preview-iframe-wrapper');
+  const btnDesktop = document.getElementById('pv-device-desktop');
+  const btnTablet = document.getElementById('pv-device-tablet');
+  const btnMobile = document.getElementById('pv-device-mobile');
+
+  // 更新按鈕選取外觀
+  [btnDesktop, btnTablet, btnMobile].forEach(btn => {
+    if (!btn) return;
+    btn.className = 'px-3 py-1 font-semibold rounded-lg transition-colors text-slate-600 hover:text-slate-900 flex items-center gap-1.5';
+  });
+
+  const activeBtn = device === 'desktop' ? btnDesktop : (device === 'tablet' ? btnTablet : btnMobile);
+  if (activeBtn) {
+    activeBtn.className = 'px-3 py-1 font-semibold rounded-lg transition-colors bg-white text-blue-600 shadow-xs flex items-center gap-1.5';
+  }
+
+  // 調整 iframe 外框寬度
+  if (wrapper) {
+    if (device === 'desktop') {
+      wrapper.style.maxWidth = '100%';
+      wrapper.style.width = '100%';
+    } else if (device === 'tablet') {
+      wrapper.style.maxWidth = '768px';
+      wrapper.style.width = '768px';
+    } else if (device === 'mobile') {
+      wrapper.style.maxWidth = '414px';
+      wrapper.style.width = '414px';
+    }
+  }
+}
+
+function openPreviewInNewTab() {
+  if (!S.cur) return;
+  fc();
+  const previewDoc = JSON.parse(JSON.stringify(S.cur));
+  previewDoc.feedbackLog = S.fbs ? JSON.parse(JSON.stringify(S.fbs)) : [];
+  previewDoc.status = 'published';
+  try {
+    sessionStorage.setItem('procurement_preview_data', JSON.stringify(previewDoc));
+  } catch(e) {}
+  window.open('index.html?preview=1&t=' + Date.now(), '_blank');
+}
+
+
 let tempKw = [];
     let curKwId = null;
     function showKM() {

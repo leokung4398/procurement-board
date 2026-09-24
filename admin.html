@@ -448,6 +448,10 @@
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
           <span>撤回發布</span>
         </button>
+        <button id="btn-preview" onclick="openPreviewModal()" class="btn-s text-xs py-2 px-3.5 text-blue-600 bg-blue-50/70 border-blue-200 hover:bg-blue-100 hover:text-blue-700 font-semibold shadow-xs" title="即時預覽前台排版與視覺樣式（包含當前未發布之最新修改）">
+          <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+          <span>前台預覽</span>
+        </button>
         <button id="btn-pub" onclick="pubBulletin()" class="btn-ok text-xs py-2 px-4 shadow-sm" title="確認無誤並發送 Email 通知">
           <svg class="w-4 h-4 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
           <span id="pub-txt">正式發布</span>
@@ -2060,6 +2064,26 @@
                 💡 <span class="font-bold">專案成果：</span>全面升級 Section D「發送與操作紀錄日誌（Audit Log）」為企業級稽核防線！透過雲端非同步比對架構動態解析操作者中文實名與信箱；正式串接發布、撤回與手動補登等重大事件紀錄；並建置測試人員專屬過濾機制，達成管理軌跡 100% 具名留痕、不可竄改且純淨真實！
               </p>
             </div>
+          <!-- 里程碑三十四：後台編輯前台畫面即時預覽與多裝置視效模擬器 -->
+          <div data-cat="typesetting" data-orig-idx="34" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-500 to-yellow-600"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-600 group-hover:text-white transition-all duration-300 shadow-sm"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1 flex items-center gap-2">三十四、後台編輯前台畫面即時預覽與多裝置視效模擬器 <span class="bg-amber-50 text-amber-800 border border-amber-200/80 text-[10px] px-2 py-0.5 rounded-md font-semibold tracking-wide flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>排版美化</span> <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-0.5 rounded-full font-normal tracking-wide">2026-09-24</span></h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">採購需求：</span><br>
+                1. 解決採購管理員在後台編撰週報時，無法先行確認前台實際排版、間距與表格呈現之困擾，避免非得等到正式發布後才發現排版瑕疵並反覆修改。<br>
+                2. 預覽過程必須 100% 獨立隔離：不影響前台線上同仁正在閱覽的正式週報，且不得將未發布草稿洩露或寫入線上資料庫。<br>
+                3. 支援一鍵多裝置視角切換：包含電腦桌面版、平板 (768px)、以及行動手機版 (414px)，並可隨時另開獨立分頁供詳細校驗。<br>
+                4. 預覽模式下自動避開企業登入阻擋，並防呆打卡機制，避免管理員預覽時產生假閱畢數據。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-400 pl-2">
+                💡 <span class="font-bold">專案成果：</span>後台頂部新增「👁️ 前台預覽」一鍵啟動視窗，透過 sessionStorage 即時資料流與安全沙盒架構，零延遲呈現最新編輯狀態；內建「電腦／平板／手機」三合一視角模擬器與頂部安全警示橫幅，徹底終結盲目編輯與反覆發布校正的痛點！
+              </p>
+            </div>
           </div>
         </div>
         </div>
@@ -2339,6 +2363,21 @@
       <li><strong>等寬視覺對齊</strong>：中間主要佈告欄內容卡片與下方頁尾聯絡資訊／保密聲明完全等寬。</li>
       <li><strong>高適配無收合障礙</strong>：移除不穩定的側邊收合按鈕，跨不同解析度維持最高一致性。</li>
     </ul>
+  <div class="card">
+    <div class="flex flex-col gap-3 mb-4">
+      <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-amber-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+      </div>
+      <h3 class="font-bold text-slate-800 text-lg">前台即時畫面預覽與多裝置模擬</h3>
+    </div>
+    <p class="text-sm text-slate-600 leading-relaxed mb-4">
+      徹底告別「發布後才發現排版瑕疵」的困擾，後台直接調用安全沙盒與 session 隔離層呈現 1:1 前台實景。
+    </p>
+    <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
+      <li><strong>零發布即時顯影</strong>：即時同步富文本與表格樣式，無須發布即可查閱完整排版。</li>
+      <li><strong>三合一多裝置視角</strong>：內建電腦全螢幕、平板 (768px)、手機 (414px) 響應式模擬。</li>
+      <li><strong>全隔離安全沙盒</strong>：預覽資料不寫入正式資料庫，前台線上讀者不受任何干擾。</li>
+    </ul>
   </div>
 
 </div>
@@ -2398,7 +2437,7 @@
   </div>
 </div>
 
-<script src="js/admin.js?v=1789729100"></script>
+<script src="js/admin.js?v=1789730000"></script>
 <script>
   window.addEventListener('load', () => {
     setTimeout(async () => {
@@ -2746,6 +2785,62 @@
         <svg class="w-3.5 h-3.5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
         <span>確認補登</span>
       </button>
+    </div>
+  </div>
+</div>
+
+<!-- 即時前台畫面預覽 Modal (WYSIWYG 1:1 Live Preview) -->
+<div id="preview-modal" class="hidden fixed inset-0 z-[150] flex items-center justify-center bg-slate-900/70 backdrop-blur-sm transition-all duration-300">
+  <div class="bg-slate-100 rounded-2xl shadow-2xl w-full max-w-7xl h-[94vh] flex flex-col mx-4 overflow-hidden border border-slate-300/80">
+    <!-- 頂部操作與視角切換列 -->
+    <div class="flex items-center justify-between px-6 py-3.5 bg-white border-b border-slate-200 shadow-xs z-10">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center font-bold shadow-xs">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h3 class="text-sm font-bold text-slate-800 tracking-tight">前台即時效果預覽</h3>
+            <span class="text-[10px] bg-emerald-50 text-emerald-700 font-bold px-2 py-0.5 rounded-full border border-emerald-200">即時同步編輯內容</span>
+          </div>
+          <p class="text-[11px] text-slate-500 mt-0.5">預覽當前編輯中尚未發布之最新排版、表格與顏色樣式（不影響前台線上同仁閱覽）</p>
+        </div>
+      </div>
+
+      <!-- 右側切換與關閉工具列 -->
+      <div class="flex items-center gap-3">
+        <!-- 裝置視寬切換 -->
+        <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs">
+          <button id="pv-device-desktop" onclick="setPreviewDevice('desktop')" class="px-3 py-1 font-semibold rounded-lg transition-colors bg-white text-blue-600 shadow-xs flex items-center gap-1.5" title="桌面寬螢幕模式 (100% 滿版)">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+            <span>電腦版</span>
+          </button>
+          <button id="pv-device-tablet" onclick="setPreviewDevice('tablet')" class="px-3 py-1 font-semibold rounded-lg transition-colors text-slate-600 hover:text-slate-900 flex items-center gap-1.5" title="平板模式 (768px)">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+            <span>平板</span>
+          </button>
+          <button id="pv-device-mobile" onclick="setPreviewDevice('mobile')" class="px-3 py-1 font-semibold rounded-lg transition-colors text-slate-600 hover:text-slate-900 flex items-center gap-1.5" title="手機行動裝置模式 (414px)">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+            <span>手機版</span>
+          </button>
+        </div>
+
+        <button onclick="openPreviewInNewTab()" class="btn-s text-xs py-1.5 px-3 flex items-center gap-1.5 text-slate-700 bg-white hover:bg-slate-50 border-slate-200" title="在新分頁開啟前台預覽">
+          <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+          <span>另開新分頁</span>
+        </button>
+
+        <button onclick="closePreviewModal()" class="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors" title="關閉預覽">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- 預覽容器主體 (置中於灰底容器中，根據 desktop/tablet/mobile 動態調整寬度) -->
+    <div class="flex-1 bg-slate-200/70 p-4 sm:p-6 overflow-hidden flex items-center justify-center">
+      <div id="preview-iframe-wrapper" class="w-full h-full bg-white rounded-xl shadow-lg border border-slate-300 overflow-hidden transition-all duration-300 ease-out">
+        <iframe id="preview-iframe" class="w-full h-full border-0 bg-slate-100" title="前台即時畫面預覽"></iframe>
+      </div>
     </div>
   </div>
 </div>
