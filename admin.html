@@ -250,7 +250,41 @@
 
   <script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
   <style>
-    .mermaid-container { background: white; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05); padding: 2.5rem; overflow-x: auto; }
+    .mermaid-container {
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+      padding: 1.75rem;
+      position: relative;
+    }
+    .mermaid-viewport {
+      width: 100%;
+      overflow: auto;
+      background: #fafbfc;
+      border-radius: 12px;
+      border: 1px dashed #cbd5e1;
+      padding: 1.5rem 1rem;
+      position: relative;
+      cursor: grab;
+      user-select: none;
+    }
+    .mermaid-viewport:active {
+      cursor: grabbing;
+    }
+    .mermaid-stage {
+      display: inline-block;
+      min-width: 1100px;
+      width: 100%;
+      transform-origin: 50% 0%;
+      transition: transform 0.18s cubic-bezier(0.2, 0, 0.2, 1);
+    }
+    .mermaid-stage .mermaid svg {
+      max-width: none !important;
+      width: 100% !important;
+      height: auto !important;
+      display: block;
+      margin: 0 auto;
+    }
     .card { background: white; border-radius: 16px; padding: 1.75rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: 1px solid #e2e8f0; transition: transform 0.2s ease, box-shadow 0.2s ease; }
     .card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
     .mermaid { min-height: 200px; width: 100%; }
@@ -266,12 +300,83 @@
               primaryBorderColor: '#cbd5e1',
               primaryTextColor: '#1e293b',
               lineColor: '#64748b',
-              fontFamily: 'Inter, PingFang TC, sans-serif',
+              fontFamily: 'Inter, "Microsoft JhengHei", PingFang TC, sans-serif',
               fontSize: '15px'
             },
-            flowchart: { curve: 'basis' }
+            flowchart: { curve: 'basis', htmlLabels: true }
           });
         }
+    });
+
+    // 系統架構圖縮放與操作控制函式
+    let currentMermaidZoom = 1;
+    function zoomMermaid(delta) {
+      currentMermaidZoom = Math.min(Math.max(0.6, currentMermaidZoom + delta), 2.2);
+      applyMermaidZoom();
+    }
+    function resetMermaidZoom() {
+      currentMermaidZoom = 1;
+      applyMermaidZoom();
+      const vp = document.getElementById('mermaid-viewport');
+      if (vp) {
+        vp.scrollLeft = Math.max(0, (vp.scrollWidth - vp.clientWidth) / 2);
+        vp.scrollTop = 0;
+      }
+    }
+    function applyMermaidZoom() {
+      const stage = document.getElementById('mermaid-stage');
+      const label = document.getElementById('mermaid-zoom-label');
+      if (stage) {
+        stage.style.transform = `scale(${currentMermaidZoom})`;
+      }
+      if (label) {
+        label.textContent = `${Math.round(currentMermaidZoom * 100)}%`;
+      }
+    }
+    function toggleMermaidFullscreen() {
+      const modal = document.getElementById('mermaid-fs-modal');
+      const container = document.querySelector('#tab-architecture .mermaid');
+      const fsTarget = document.getElementById('mermaid-fs-stage');
+      if (!modal || !container || !fsTarget) return;
+
+      if (modal.classList.contains('hidden')) {
+        // 複製 SVG 到全螢幕彈窗中
+        fsTarget.innerHTML = container.innerHTML;
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      } else {
+        modal.classList.add('hidden');
+        fsTarget.innerHTML = '';
+        document.body.style.overflow = '';
+      }
+    }
+
+    // 支援滑鼠按住拖曳畫布 (Mouse Drag to Pan)
+    document.addEventListener("DOMContentLoaded", function() {
+      const vp = document.getElementById('mermaid-viewport');
+      if (!vp) return;
+      let isDown = false;
+      let startX, startY, scrollLeft, scrollTop;
+
+      vp.addEventListener('mousedown', (e) => {
+        isDown = true;
+        startX = e.pageX - vp.offsetLeft;
+        startY = e.pageY - vp.offsetTop;
+        scrollLeft = vp.scrollLeft;
+        scrollTop = vp.scrollTop;
+      });
+      vp.addEventListener('mouseleave', () => { isDown = false; });
+      vp.addEventListener('mouseup', () => { isDown = false; });
+      vp.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - vp.offsetLeft;
+        const y = e.pageY - vp.offsetTop;
+        const walkX = (x - startX) * 1.5;
+        const walkY = (y - startY) * 1.5;
+        vp.scrollLeft = scrollLeft - walkX;
+        vp.scrollTop = scrollTop - walkY;
+      });
     });
   </script>
 
@@ -2132,13 +2237,44 @@
 </div>
 
 <div class="mermaid-container mb-12 border border-slate-200">
-  <h2 class="text-xl font-bold text-slate-700 mb-6 flex items-center gap-2">
-    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-    系統全貌資料流向圖 (Data Flow & Architecture)
-  </h2>
+  <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 pb-3 border-b border-slate-100">
+    <div>
+      <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+        系統全貌資料流向圖 (Data Flow & Architecture)
+      </h2>
+      <p class="text-xs text-slate-500 mt-1 flex items-center gap-1.5">
+        <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span>可直接橫向滑動檢視清晰文字，或使用右側工具列自由縮放與全螢幕</span>
+      </p>
+    </div>
+
+    <!-- 方案 B：微型互動控制列 -->
+    <div class="flex items-center gap-1.5 self-start sm:self-auto bg-slate-100 p-1.5 rounded-xl border border-slate-200 text-xs shadow-inner">
+      <button onclick="zoomMermaid(-0.15)" class="px-2.5 py-1 font-bold text-slate-600 hover:text-slate-900 hover:bg-white rounded-lg transition-colors shadow-xs" title="縮小 (Zoom Out)">
+        －
+      </button>
+      <span id="mermaid-zoom-label" class="px-2 font-mono font-bold text-slate-700 min-w-[48px] text-center select-none">100%</span>
+      <button onclick="zoomMermaid(0.15)" class="px-2.5 py-1 font-bold text-slate-600 hover:text-slate-900 hover:bg-white rounded-lg transition-colors shadow-xs" title="放大 (Zoom In)">
+        ＋
+      </button>
+      <div class="w-[1px] h-4 bg-slate-300 mx-1"></div>
+      <button onclick="resetMermaidZoom()" class="px-2.5 py-1 font-medium text-slate-600 hover:text-slate-900 hover:bg-white rounded-lg transition-colors shadow-xs flex items-center gap-1" title="還原 100% 原始比例">
+        <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        <span>還原</span>
+      </button>
+      <button onclick="toggleMermaidFullscreen()" class="px-2.5 py-1 font-medium text-indigo-700 hover:text-indigo-900 bg-indigo-50/80 hover:bg-indigo-100/80 border border-indigo-200/80 rounded-lg transition-colors shadow-xs flex items-center gap-1 ml-0.5" title="全螢幕高解析檢視">
+        <svg class="w-3.5 h-3.5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+        <span>全螢幕</span>
+      </button>
+    </div>
+  </div>
   
-  <div class="mermaid flex justify-center">
-    flowchart TB
+  <!-- 方案 A：可橫向平滑捲動之 Viewport 與 1100px 舒適最小寬度 Stage -->
+  <div id="mermaid-viewport" class="mermaid-viewport custom-scrollbar">
+    <div id="mermaid-stage" class="mermaid-stage">
+      <div class="mermaid flex justify-center">
+        flowchart TB
         classDef user fill:#eff6ff,stroke:#3b82f6,stroke-width:2px,color:#1e40af,rx:10px
         classDef admin fill:#fdf4ff,stroke:#d946ef,stroke-width:2px,color:#86198f,rx:10px
         classDef frontend fill:#ecfdf5,stroke:#10b981,stroke-width:2px,color:#065f46
@@ -2198,6 +2334,8 @@
         AdminUI -.->|更新程式碼推送 GitHub| GHA
         GHA -.->|自動編譯並部署發布| Frontend
         VersionCheck -.->|偵測新版強制重新整理| Index
+      </div>
+    </div>
   </div>
 </div>
 
@@ -3277,7 +3415,46 @@
       </div>
     </div>
   </div>
+<!-- Mermaid 系統架構圖獨立全螢幕高解析檢視彈窗 -->
+<div id="mermaid-fs-modal" class="hidden fixed inset-0 z-[10050] flex flex-col bg-slate-900/80 backdrop-blur-md transition-all">
+  <!-- 頂部標題與關閉列 -->
+  <div class="flex items-center justify-between px-6 py-4 bg-slate-900/90 border-b border-slate-700/80 text-white shrink-0">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+      </div>
+      <div>
+        <h3 class="text-base font-bold tracking-tight">採購佈告欄系統架構與邏輯設計 (高解析全螢幕)</h3>
+        <p class="text-xs text-slate-400">系統全貌資料流向圖 · 支援上下左右任意自由捲動</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-3">
+      <button onclick="toggleMermaidFullscreen()" class="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-600 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors">
+        <span>關閉全螢幕</span>
+        <kbd class="px-1.5 py-0.5 bg-slate-900 text-[10px] rounded text-slate-400">ESC</kbd>
+      </button>
+    </div>
+  </div>
+  
+  <!-- 全螢幕圖表內容區 -->
+  <div class="flex-1 overflow-auto p-6 md:p-10 flex justify-center items-start custom-scrollbar bg-slate-950/40">
+    <div class="bg-white rounded-2xl p-6 md:p-10 shadow-2xl min-w-[1200px] w-full max-w-6xl my-auto">
+      <div id="mermaid-fs-stage" class="w-full flex justify-center"></div>
+    </div>
+  </div>
 </div>
+
+<script>
+  // 監聽 ESC 鍵關閉全螢幕
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      const modal = document.getElementById('mermaid-fs-modal');
+      if (modal && !modal.classList.contains('hidden')) {
+        toggleMermaidFullscreen();
+      }
+    }
+  });
+</script>
 
 </body>
 </html>
