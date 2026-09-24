@@ -3117,3 +3117,28 @@ function filterAudList() {
   });
 }
 
+// 系統架構圖全螢幕與縮放相容導出
+if (typeof window.toggleMermaidFullscreen !== 'function') {
+  window.toggleMermaidFullscreen = function() {
+    const modal = document.getElementById('mermaid-fs-modal');
+    const container = document.querySelector('#tab-architecture .mermaid');
+    const fsTarget = document.getElementById('mermaid-fs-stage');
+    if (!modal) return;
+    const isHidden = modal.classList.contains('hidden') || modal.style.display === 'none' || getComputedStyle(modal).display === 'none';
+    if (isHidden) {
+      if (container && fsTarget) {
+        fsTarget.innerHTML = container.innerHTML;
+      }
+      modal.classList.remove('hidden');
+      modal.style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    } else {
+      modal.classList.add('hidden');
+      modal.style.display = 'none';
+      if (fsTarget) fsTarget.innerHTML = '';
+      document.body.style.overflow = '';
+    }
+  };
+}
+
+

@@ -278,7 +278,8 @@
       transform-origin: 50% 0%;
       transition: transform 0.18s cubic-bezier(0.2, 0, 0.2, 1);
     }
-    .mermaid-stage .mermaid svg {
+    .mermaid-stage .mermaid svg,
+    #mermaid-fs-stage svg {
       max-width: none !important;
       width: 100% !important;
       height: auto !important;
@@ -337,19 +338,33 @@
       const modal = document.getElementById('mermaid-fs-modal');
       const container = document.querySelector('#tab-architecture .mermaid');
       const fsTarget = document.getElementById('mermaid-fs-stage');
-      if (!modal || !container || !fsTarget) return;
+      if (!modal) {
+        console.error('[Mermaid] mermaid-fs-modal not found');
+        return;
+      }
 
-      if (modal.classList.contains('hidden')) {
-        // 複製 SVG 到全螢幕彈窗中
-        fsTarget.innerHTML = container.innerHTML;
+      const isHidden = modal.classList.contains('hidden') || modal.style.display === 'none' || getComputedStyle(modal).display === 'none';
+
+      if (isHidden) {
+        if (container && fsTarget) {
+          fsTarget.innerHTML = container.innerHTML;
+        }
         modal.classList.remove('hidden');
+        modal.style.display = 'flex';
         document.body.style.overflow = 'hidden';
       } else {
         modal.classList.add('hidden');
-        fsTarget.innerHTML = '';
+        modal.style.display = 'none';
+        if (fsTarget) fsTarget.innerHTML = '';
         document.body.style.overflow = '';
       }
     }
+
+    // 掛載至全域 window，確保任何點擊事件均能直接呼叫
+    window.zoomMermaid = zoomMermaid;
+    window.resetMermaidZoom = resetMermaidZoom;
+    window.applyMermaidZoom = applyMermaidZoom;
+    window.toggleMermaidFullscreen = toggleMermaidFullscreen;
 
     // 支援滑鼠按住拖曳畫布 (Mouse Drag to Pan)
     document.addEventListener("DOMContentLoaded", function() {
@@ -2607,7 +2622,7 @@
   </div>
 </div>
 
-<script src="js/admin.js?v=1789730200"></script>
+<script src="js/admin.js?v=1789730705"></script>
 <script>
   window.addEventListener('load', () => {
     setTimeout(async () => {
@@ -3416,7 +3431,7 @@
     </div>
   </div>
 <!-- Mermaid 系統架構圖獨立全螢幕高解析檢視彈窗 -->
-<div id="mermaid-fs-modal" class="hidden fixed inset-0 z-[10050] flex flex-col bg-slate-900/80 backdrop-blur-md transition-all">
+<div id="mermaid-fs-modal" class="hidden fixed inset-0 z-[99999] flex flex-col bg-slate-950/85 backdrop-blur-md transition-all" style="display: none;">
   <!-- 頂部標題與關閉列 -->
   <div class="flex items-center justify-between px-6 py-4 bg-slate-900/90 border-b border-slate-700/80 text-white shrink-0">
     <div class="flex items-center gap-3">
