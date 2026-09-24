@@ -836,20 +836,30 @@ function openAboutModal() { document.getElementById('about-modal').classList.rem
 function closeAboutModal() { document.getElementById('about-modal').classList.add('hidden'); }
 function switchAboutTab(t) {
   document.querySelectorAll('.about-tab-pane').forEach(el => el.classList.add('hidden'));
-  document.querySelectorAll('[id^="btn-tab-"]').forEach(el => {
-    el.classList.remove('text-amber-600','border-amber-500');
-    el.classList.add('text-slate-500','border-transparent');
+  ['tab-guide', 'tab-achievements', 'tab-architecture'].forEach(tabId => {
+    const bEl = document.getElementById('btn-' + tabId);
+    if (!bEl) return;
+    if (tabId === t) {
+      bEl.className = 'flex-1 py-3 font-semibold text-sm border-b-2 transition-colors text-amber-600 border-amber-500';
+    } else {
+      bEl.className = 'flex-1 py-3 font-semibold text-sm border-b-2 transition-colors text-slate-500 border-transparent hover:text-slate-700';
+    }
   });
-  const tEl = document.getElementById(t), bEl = document.getElementById('btn-'+t);
+  const tEl = document.getElementById(t);
   if (tEl) tEl.classList.remove('hidden');
-  if (bEl) { bEl.classList.remove('text-slate-500','border-transparent'); bEl.classList.add('text-amber-600','border-amber-500'); }
   
   if (t === 'tab-architecture' && window.mermaid) {
-    try {
-      mermaid.run({
-        nodes: document.querySelectorAll('.mermaid')
-      });
-    } catch(e) {}
+    setTimeout(() => {
+      try {
+        const container = document.querySelector('#tab-architecture .mermaid');
+        if (container) {
+          container.removeAttribute('data-processed');
+          mermaid.run({ nodes: [container] });
+        }
+      } catch(e) {
+        console.warn('Mermaid render warning:', e);
+      }
+    }, 60);
   }
 }
 

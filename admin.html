@@ -253,8 +253,7 @@
     .mermaid-container { background: white; border-radius: 16px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.05); padding: 2.5rem; overflow-x: auto; }
     .card { background: white; border-radius: 16px; padding: 1.75rem; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: 1px solid #e2e8f0; transition: transform 0.2s ease, box-shadow 0.2s ease; }
     .card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
-    .mermaid { opacity: 0; transition: opacity 0.5s ease-in; }
-    .mermaid[data-processed="true"] { opacity: 1; }
+    .mermaid { min-height: 200px; width: 100%; }
   </style>
   <script>
     document.addEventListener("DOMContentLoaded", function() {
@@ -1274,13 +1273,13 @@
                 <h4 class="text-base font-bold text-white tracking-wide flex items-center gap-2">🎨 專案開發成果條例分類與即時置頂</h4>
               </div>
               <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">
-                全系列 31 項里程碑已依技術構面導入色彩體系。<span class="text-amber-300 font-medium">💡 點選下方任一分類按鈕，即可將該技術構面之成果卡片立即「置頂排列到最上方」</span>，便於長官與主管聚焦查閱！
+                全系列 34 項里程碑已依技術構面導入色彩體系。<span class="text-amber-300 font-medium">💡 點選下方任一分類按鈕，即可將該技術構面之成果卡片立即「置頂排列到最上方」</span>，便於長官與主管聚焦查閱！
               </p>
             </div>
             <div class="flex items-center gap-2.5 flex-shrink-0">
-              <button id="cat-btn-all" onclick="filterMilestoneCat('all')" type="button" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-indigo-400/40 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 text-xs font-semibold transition-all shadow-sm cursor-pointer active:scale-95" title="還原至 1~33 項原始順序">
+              <button id="cat-btn-all" onclick="filterMilestoneCat('all')" type="button" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-indigo-400/40 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 text-xs font-semibold transition-all shadow-sm cursor-pointer active:scale-95" title="還原至 1~34 項原始順序">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                <span>重置原始排序 (全部33項)</span>
+                <span>重置原始排序 (全部34項)</span>
               </button>
             </div>
           </div>
@@ -1340,7 +1339,7 @@
                     <span class="w-2 h-2 rounded-full bg-amber-400"></span>
                     <span class="text-xs font-bold text-amber-300 group-hover:text-amber-200 transition-colors">排版體驗優化</span>
                   </div>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">7 項</span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">8 項</span>
                 </div>
                 <p class="text-[11px] text-slate-400 group-hover:text-slate-300 leading-snug transition-colors">TinyMCE 核心、跨欄置中、莫蘭迪色盤與 RWD 適配。</p>
                 <div class="mt-2 flex items-center gap-1 text-[10px] text-amber-400 font-semibold opacity-80 group-hover:opacity-100">
@@ -2064,6 +2063,9 @@
                 💡 <span class="font-bold">專案成果：</span>全面升級 Section D「發送與操作紀錄日誌（Audit Log）」為企業級稽核防線！透過雲端非同步比對架構動態解析操作者中文實名與信箱；正式串接發布、撤回與手動補登等重大事件紀錄；並建置測試人員專屬過濾機制，達成管理軌跡 100% 具名留痕、不可竄改且純淨真實！
               </p>
             </div>
+          </div>
+        </div>
+
           <!-- 里程碑三十四：後台編輯前台畫面即時預覽與多裝置視效模擬器 -->
           <div data-cat="typesetting" data-orig-idx="34" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
           <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-500 to-yellow-600"></div>
@@ -2129,7 +2131,7 @@
         subgraph Frontend [🌐 前端介面層 GitHub Pages]
             direction TB
             Index["前台 (index.html)<br>・經典雙欄流（左側大字體歸檔檢索＋右側正文）<br>・內容卡片與頁尾資訊欄等寬對齊<br>・底端一鍵完讀漸層打卡＋頂部尊榮已完讀金徽章<br>・未登入高斯模糊防窺與Email浮水印"]:::frontend
-            AdminUI["後台 (admin.html)<br>・TinyMCE富文本編輯與微軟格式淨化<br>・選擇性隱藏開關與特定人員授權設定<br>・全員防舞弊操作紀錄日誌 (Audit Log)<br>・手動補登已讀打卡 Modal 與 KPI 統計看板"]:::frontend
+            AdminUI["後台 (admin.html)<br>・TinyMCE富文本編輯與微軟格式淨化<br>・前台即時畫面預覽與多裝置視效模擬器<br>・選擇性隱藏開關與特定人員授權設定<br>・全員防舞弊操作紀錄日誌 (Audit Log)<br>・手動補登已讀打卡 Modal 與 KPI 統計看板"]:::frontend
         end
 
         subgraph Backend [☁️ Google Firebase 雲端後端 BaaS]
@@ -2363,6 +2365,8 @@
       <li><strong>等寬視覺對齊</strong>：中間主要佈告欄內容卡片與下方頁尾聯絡資訊／保密聲明完全等寬。</li>
       <li><strong>高適配無收合障礙</strong>：移除不穩定的側邊收合按鈕，跨不同解析度維持最高一致性。</li>
     </ul>
+  </div>
+
   <div class="card">
     <div class="flex flex-col gap-3 mb-4">
       <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-amber-600">
@@ -2437,7 +2441,7 @@
   </div>
 </div>
 
-<script src="js/admin.js?v=1789730000"></script>
+<script src="js/admin.js?v=1789730200"></script>
 <script>
   window.addEventListener('load', () => {
     setTimeout(async () => {
@@ -2860,7 +2864,7 @@
     // 若傳入 'all' 或是再次點選同一分類，則重置原始順序
     if (targetCat === 'all' || currentActiveCat === targetCat) {
       currentActiveCat = null;
-      // 依原始序號排序 1 -> 26
+      // 依原始序號排序 1 -> 34
       cards.sort((a, b) => {
         const idxA = parseInt(a.getAttribute('data-orig-idx') || '0', 10);
         const idxB = parseInt(b.getAttribute('data-orig-idx') || '0', 10);
@@ -2987,13 +2991,14 @@
       setTimeout(() => {
         try {
           const container = document.querySelector('#tab-architecture .mermaid');
-          if (container && !container.getAttribute('data-processed')) {
+          if (container) {
+            container.removeAttribute('data-processed');
             window.mermaid.run({ nodes: [container] });
           }
         } catch(e) {
           console.warn('Mermaid render warning:', e);
         }
-      }, 50);
+      }, 60);
     }
   }
 </script>
