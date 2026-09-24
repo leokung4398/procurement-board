@@ -847,27 +847,6 @@ function switchAboutTab(t) {
   });
   const tEl = document.getElementById(t);
   if (tEl) tEl.classList.remove('hidden');
-  
-  if (t === 'tab-architecture' && window.mermaid) {
-    setTimeout(() => {
-      try {
-        const container = document.querySelector('#tab-architecture .mermaid');
-        if (container) {
-          if (!container.dataset.rawMermaid) {
-            container.dataset.rawMermaid = container.textContent.trim();
-          }
-          if (container.querySelector('svg') && container.getAttribute('data-processed') === 'true') {
-            return;
-          }
-          container.innerHTML = container.dataset.rawMermaid;
-          container.removeAttribute('data-processed');
-          window.mermaid.run({ nodes: [container] });
-        }
-      } catch(e) {
-        console.warn('Mermaid render warning:', e);
-      }
-    }, 60);
-  }
 }
 
 let currentGroupId = null;
@@ -3115,30 +3094,6 @@ function filterAudList() {
       it.style.display = 'none';
     }
   });
-}
-
-// 系統架構圖全螢幕與縮放相容導出
-if (typeof window.toggleMermaidFullscreen !== 'function') {
-  window.toggleMermaidFullscreen = function() {
-    const modal = document.getElementById('mermaid-fs-modal');
-    const container = document.querySelector('#tab-architecture .mermaid');
-    const fsTarget = document.getElementById('mermaid-fs-stage');
-    if (!modal) return;
-    const isHidden = modal.classList.contains('hidden') || modal.style.display === 'none' || getComputedStyle(modal).display === 'none';
-    if (isHidden) {
-      if (container && fsTarget) {
-        fsTarget.innerHTML = container.innerHTML;
-      }
-      modal.classList.remove('hidden');
-      modal.style.display = 'flex';
-      document.body.style.overflow = 'hidden';
-    } else {
-      modal.classList.add('hidden');
-      modal.style.display = 'none';
-      if (fsTarget) fsTarget.innerHTML = '';
-      document.body.style.overflow = '';
-    }
-  };
 }
 
 
