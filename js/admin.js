@@ -853,8 +853,15 @@ function switchAboutTab(t) {
       try {
         const container = document.querySelector('#tab-architecture .mermaid');
         if (container) {
+          if (!container.dataset.rawMermaid) {
+            container.dataset.rawMermaid = container.textContent.trim();
+          }
+          if (container.querySelector('svg') && container.getAttribute('data-processed') === 'true') {
+            return;
+          }
+          container.innerHTML = container.dataset.rawMermaid;
           container.removeAttribute('data-processed');
-          mermaid.run({ nodes: [container] });
+          window.mermaid.run({ nodes: [container] });
         }
       } catch(e) {
         console.warn('Mermaid render warning:', e);

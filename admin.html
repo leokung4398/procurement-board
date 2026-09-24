@@ -3014,12 +3014,22 @@
       }
     });
 
-    // 若切換至架構圖且尚未完成渲染，動態觸發 Mermaid
+    // 若切換至架構圖，安全渲染 Mermaid（避免 SVG 被當成代碼二次解析報錯）
     if (tabId === 'tab-architecture' && window.mermaid) {
       setTimeout(() => {
         try {
           const container = document.querySelector('#tab-architecture .mermaid');
           if (container) {
+            // 首次渲染前記錄純文本原始碼
+            if (!container.dataset.rawMermaid) {
+              container.dataset.rawMermaid = container.textContent.trim();
+            }
+            // 若已經成功渲染出 SVG 且結構健全，則無須重複解析以保效能與穩定
+            if (container.querySelector('svg') && container.getAttribute('data-processed') === 'true') {
+              return;
+            }
+            // 還原原始代碼再執行解析
+            container.innerHTML = container.dataset.rawMermaid;
             container.removeAttribute('data-processed');
             window.mermaid.run({ nodes: [container] });
           }
