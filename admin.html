@@ -2756,161 +2756,308 @@
         </div>
 
         <!-- 區塊三：全案 8 大功能模組外包工時與預算拆解表 (Work Breakdown Structure, WBS) -->
-        <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
-          <div class="px-6 py-4 bg-slate-50 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-            <div>
-              <h2 class="text-base font-bold text-slate-800 flex items-center gap-2">
-                <span class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-bold">2</span>
+        <div class="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden">
+          <!-- 區塊頂部資訊列 -->
+          <div class="px-6 py-4.5 bg-gradient-to-r from-slate-50 via-indigo-50/30 to-blue-50/20 border-b border-slate-200 flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div class="space-y-1">
+              <h2 class="text-base font-bold text-slate-800 flex items-center gap-2.5">
+                <span class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-bold shadow-xs">2</span>
                 <span>系統 8 大核心功能模組外包工作量與費用拆解清單 (WBS & Effort Valuation)</span>
               </h2>
-              <p class="text-xs text-slate-500 mt-0.5">依據台灣軟體工程師平均人月報價（NT$ 18萬 ~ 25萬 /人月）標準核算工期人天</p>
+              <div class="flex items-center gap-2 text-xs text-slate-500">
+                <span class="inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>依據台灣軟體工程師平均人月報價（NT$ 18萬 ~ 25萬 /人月）標準核算工期</span>
+              </div>
             </div>
-            <div class="text-xs font-bold text-slate-700 bg-white px-3 py-1.5 rounded-lg border border-slate-200 shadow-2xs">
-              總投入估算：6.6 人月 (約 145 個專業人天)
+            <div class="flex items-center gap-2 self-start md:self-auto">
+              <div class="inline-flex items-center gap-2 text-xs font-bold text-slate-700 bg-white px-3.5 py-1.5 rounded-xl border border-slate-200 shadow-2xs">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span>總投入估算：<strong class="text-indigo-600 text-sm">6.6 人月</strong> <span class="text-slate-400 font-normal">| 約 145 專業人天</span></span>
+              </div>
             </div>
           </div>
 
+          <!-- 表格主體 -->
           <div class="overflow-x-auto">
             <table class="w-full text-left text-xs border-collapse">
               <thead>
-                <tr class="bg-slate-100/80 text-slate-600 font-bold uppercase tracking-wider border-b border-slate-200">
-                  <th class="py-3 px-4">項次</th>
-                  <th class="py-3 px-4 min-w-[140px]">功能模組名稱</th>
-                  <th class="py-3 px-6 min-w-[280px]">包含之核心業務邏輯與技術細節</th>
-                  <th class="py-3 px-3 text-center">複雜度</th>
-                  <th class="py-3 px-4 text-center">預估工時</th>
-                  <th class="py-3 px-4 text-right min-w-[130px]">外包市場合理估價</th>
+                <tr class="bg-slate-100/90 text-slate-600 font-bold uppercase tracking-wider border-b border-slate-200">
+                  <th class="py-3 px-4 text-center w-14">項次</th>
+                  <th class="py-3 px-5 w-52">功能模組名稱</th>
+                  <th class="py-3 px-6">包含之核心業務邏輯與技術細節</th>
+                  <th class="py-3 px-3 text-center w-24">複雜度</th>
+                  <th class="py-3 px-4 text-center w-32">預估工時</th>
+                  <th class="py-3 px-5 text-right w-44">外包市場合理估價</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-slate-100 text-slate-700">
-                <tr class="hover:bg-slate-50/60 transition-colors">
-                  <td class="py-3.5 px-4 font-mono font-bold text-slate-500 text-center">01</td>
-                  <td class="py-3.5 px-4 font-bold text-slate-800">
-                    企業資安門禁與權限防禦體系
+                
+                <!-- 01 -->
+                <tr class="hover:bg-indigo-50/30 transition-colors group">
+                  <td class="py-4 px-4 text-center align-top">
+                    <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-slate-100 text-slate-600 font-mono font-bold text-xs group-hover:bg-blue-100 group-hover:text-blue-700 transition-colors">01</span>
                   </td>
-                  <td class="py-3.5 px-6 leading-relaxed text-slate-600">
-                    • Google Workspace OAuth 2.0 雙網域門禁 (@youbike.com.tw / @giant.com.tw)<br>
-                    • Zero-Data Pre-gate（未登入前徹底清空 DOM 樹，阻斷 F12 竄改與機密窺探）<br>
-                    • 不可穿透高斯模糊安全鎖定、週報「選擇性隱藏」與「特定同仁授權檢視」<br>
-                    • Firestore 伺服器端 Security Rules 行級防禦與 Session Token 狀態安全防護
+                  <td class="py-4 px-5 align-top">
+                    <div class="font-bold text-slate-900 text-sm mb-1">企業資安門禁與權限防禦體系</div>
+                    <span class="inline-block text-[11px] text-slate-400">登入驗證 · DOM 防篡改 · ACL</span>
                   </td>
-                  <td class="py-3.5 px-3 text-center"><span class="px-2 py-0.5 rounded-full bg-rose-50 text-rose-700 font-bold border border-rose-200 text-[10px]">極高 (資安)</span></td>
-                  <td class="py-3.5 px-4 text-center font-semibold">1.0 人月 (22天)</td>
-                  <td class="py-3.5 px-4 text-right font-bold text-slate-900">$180,000 ~ $250,000</td>
+                  <td class="py-4 px-6 align-top">
+                    <ul class="space-y-1.5 text-slate-600 leading-relaxed list-none">
+                      <li class="flex items-start gap-1.5"><span class="text-blue-500 font-bold">•</span><span><strong>Google Workspace OAuth 2.0 雙網域門禁</strong>（@youbike.com.tw / @giant.com.tw）</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-blue-500 font-bold">•</span><span><strong>Zero-Data Pre-gate</strong>（未登入前徹底清空 DOM 樹，阻斷 F12 竄改與機密窺探）</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-blue-500 font-bold">•</span><span>不可穿透高斯模糊安全鎖定、週報「選擇性隱藏」與「特定同仁授權檢視」</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-blue-500 font-bold">•</span><span>Firestore 伺服器端 Security Rules 行級防禦與 Session Token 狀態安全防護</span></li>
+                    </ul>
+                  </td>
+                  <td class="py-4 px-3 text-center align-top">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 font-bold border border-rose-200 text-[11px] shadow-2xs">
+                      <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>極高 (資安)
+                    </span>
+                  </td>
+                  <td class="py-4 px-4 text-center align-top">
+                    <div class="font-bold text-slate-800 text-xs">1.0 人月</div>
+                    <div class="text-[11px] text-slate-400 mt-0.5">(22 工作天)</div>
+                  </td>
+                  <td class="py-4 px-5 text-right align-top">
+                    <div class="font-extrabold text-slate-900 font-mono text-sm">NT$ 180,000</div>
+                    <div class="text-[11px] text-slate-400 font-mono">~ NT$ 250,000</div>
+                  </td>
                 </tr>
 
-                <tr class="hover:bg-slate-50/60 transition-colors">
-                  <td class="py-3.5 px-4 font-mono font-bold text-slate-500 text-center">02</td>
-                  <td class="py-3.5 px-4 font-bold text-slate-800">
-                    企業級富文本排版工作台
+                <!-- 02 -->
+                <tr class="hover:bg-indigo-50/30 transition-colors group">
+                  <td class="py-4 px-4 text-center align-top">
+                    <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-slate-100 text-slate-600 font-mono font-bold text-xs group-hover:bg-blue-100 group-hover:text-blue-700 transition-colors">02</span>
                   </td>
-                  <td class="py-3.5 px-6 leading-relaxed text-slate-600">
-                    • 深入重構整合 TinyMCE 核心引擎與 zh-Hant 繁體中文支援<br>
-                    • MS Excel / Word 表格貼上攔截管道 (Paste Post-processor) 與自適應淨化<br>
-                    • 獨立開發「跨欄置中」一鍵按鈕、手動拖拉欄寬、多行緊湊排版調優<br>
-                    • 1:1 復刻 32 色商務專屬蜂巢與自訂莫蘭迪色盤選色器對話框
+                  <td class="py-4 px-5 align-top">
+                    <div class="font-bold text-slate-900 text-sm mb-1">企業級富文本排版工作台</div>
+                    <span class="inline-block text-[11px] text-slate-400">TinyMCE · 表格淨化 · 蜂巢選色</span>
                   </td>
-                  <td class="py-3.5 px-3 text-center"><span class="px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 font-bold border border-amber-200 text-[10px]">高 (體驗)</span></td>
-                  <td class="py-3.5 px-4 text-center font-semibold">1.2 人月 (26天)</td>
-                  <td class="py-3.5 px-4 text-right font-bold text-slate-900">$220,000 ~ $280,000</td>
+                  <td class="py-4 px-6 align-top">
+                    <ul class="space-y-1.5 text-slate-600 leading-relaxed list-none">
+                      <li class="flex items-start gap-1.5"><span class="text-amber-500 font-bold">•</span><span>深入重構整合 <strong>TinyMCE 核心引擎</strong>與 zh-Hant 繁體中文全鏈路支援</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-amber-500 font-bold">•</span><span><strong>MS Excel / Word 表格貼上攔截管道</strong> (Paste Post-processor) 與自適應淨化</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-amber-500 font-bold">•</span><span>獨立開發<strong>「跨欄置中」</strong>一鍵按鈕、手動拖拉欄寬、多行緊湊排版調優</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-amber-500 font-bold">•</span><span>1:1 復刻 <strong>32 色商務專屬蜂巢</strong>與自訂莫蘭迪色盤選色器對話框</span></li>
+                    </ul>
+                  </td>
+                  <td class="py-4 px-3 text-center align-top">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 font-bold border border-amber-200 text-[11px] shadow-2xs">
+                      <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>高 (體驗)
+                    </span>
+                  </td>
+                  <td class="py-4 px-4 text-center align-top">
+                    <div class="font-bold text-slate-800 text-xs">1.2 人月</div>
+                    <div class="text-[11px] text-slate-400 mt-0.5">(26 工作天)</div>
+                  </td>
+                  <td class="py-4 px-5 text-right align-top">
+                    <div class="font-extrabold text-slate-900 font-mono text-sm">NT$ 220,000</div>
+                    <div class="text-[11px] text-slate-400 font-mono">~ NT$ 280,000</div>
+                  </td>
                 </tr>
 
-                <tr class="hover:bg-slate-50/60 transition-colors">
-                  <td class="py-3.5 px-4 font-mono font-bold text-slate-500 text-center">03</td>
-                  <td class="py-3.5 px-4 font-bold text-slate-800">
-                    週報編撰與生命週期管理
+                <!-- 03 -->
+                <tr class="hover:bg-indigo-50/30 transition-colors group">
+                  <td class="py-4 px-4 text-center align-top">
+                    <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-slate-100 text-slate-600 font-mono font-bold text-xs group-hover:bg-blue-100 group-hover:text-blue-700 transition-colors">03</span>
                   </td>
-                  <td class="py-3.5 px-6 leading-relaxed text-slate-600">
-                    • 9 大分類主題架構（含倉儲管理擴增）與連動式關鍵字庫 (12大類63常用詞)<br>
-                    • 草稿、正式發布、一鍵撤回下架之完整生命週期狀態機管理<br>
-                    • 版本快照管理、差異對比演算法 (Diff Compare) 與多維歷史週報月份歸檔
+                  <td class="py-4 px-5 align-top">
+                    <div class="font-bold text-slate-900 text-sm mb-1">週報編撰與生命週期管理</div>
+                    <span class="inline-block text-[11px] text-slate-400">狀態機 · 詞庫聯動 · Diff 差異比對</span>
                   </td>
-                  <td class="py-3.5 px-3 text-center"><span class="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-bold border border-blue-200 text-[10px]">中高</span></td>
-                  <td class="py-3.5 px-4 text-center font-semibold">0.8 人月 (18天)</td>
-                  <td class="py-3.5 px-4 text-right font-bold text-slate-900">$140,000 ~ $190,000</td>
+                  <td class="py-4 px-6 align-top">
+                    <ul class="space-y-1.5 text-slate-600 leading-relaxed list-none">
+                      <li class="flex items-start gap-1.5"><span class="text-blue-500 font-bold">•</span><span><strong>9 大分類主題架構</strong>（含倉儲管理擴增）與連動式關鍵字庫 (12大類63常用詞)</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-blue-500 font-bold">•</span><span>草稿、正式發布、一鍵撤回下架之完整<strong>生命週期狀態機管理</strong></span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-blue-500 font-bold">•</span><span>版本快照管理、<strong>差異對比演算法 (Diff Compare)</strong> 與多維歷史週報月份歸檔</span></li>
+                    </ul>
+                  </td>
+                  <td class="py-4 px-3 text-center align-top">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 font-bold border border-blue-200 text-[11px] shadow-2xs">
+                      <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>中高
+                    </span>
+                  </td>
+                  <td class="py-4 px-4 text-center align-top">
+                    <div class="font-bold text-slate-800 text-xs">0.8 人月</div>
+                    <div class="text-[11px] text-slate-400 mt-0.5">(18 工作天)</div>
+                  </td>
+                  <td class="py-4 px-5 text-right align-top">
+                    <div class="font-extrabold text-slate-900 font-mono text-sm">NT$ 140,000</div>
+                    <div class="text-[11px] text-slate-400 font-mono">~ NT$ 190,000</div>
+                  </td>
                 </tr>
 
-                <tr class="hover:bg-slate-50/60 transition-colors">
-                  <td class="py-3.5 px-4 font-mono font-bold text-slate-500 text-center">04</td>
-                  <td class="py-3.5 px-4 font-bold text-slate-800">
-                    自動化推播與郵件通訊錄
+                <!-- 04 -->
+                <tr class="hover:bg-indigo-50/30 transition-colors group">
+                  <td class="py-4 px-4 text-center align-top">
+                    <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-slate-100 text-slate-600 font-mono font-bold text-xs group-hover:bg-blue-100 group-hover:text-blue-700 transition-colors">04</span>
                   </td>
-                  <td class="py-3.5 px-6 leading-relaxed text-slate-600">
-                    • 串接 EmailJS API、發布前動態提取「🚨 緊急必讀公告」置頂推播模板<br>
-                    • 雙欄名單高密度通訊錄、分區關鍵字篩選、跨搜尋勾選記憶與自訂發信群組<br>
-                    • CSV 人員名單批次導入解析與 Firebase 雲端白名單同步機制
+                  <td class="py-4 px-5 align-top">
+                    <div class="font-bold text-slate-900 text-sm mb-1">自動化推播與郵件通訊錄</div>
+                    <span class="inline-block text-[11px] text-slate-400">EmailJS · 必讀公告提取 · 分區群組</span>
                   </td>
-                  <td class="py-3.5 px-3 text-center"><span class="px-2 py-0.5 rounded-full bg-blue-50 text-blue-700 font-bold border border-blue-200 text-[10px]">中</span></td>
-                  <td class="py-3.5 px-4 text-center font-semibold">0.6 人月 (13天)</td>
-                  <td class="py-3.5 px-4 text-right font-bold text-slate-900">$110,000 ~ $160,000</td>
+                  <td class="py-4 px-6 align-top">
+                    <ul class="space-y-1.5 text-slate-600 leading-relaxed list-none">
+                      <li class="flex items-start gap-1.5"><span class="text-sky-500 font-bold">•</span><span>串接 EmailJS API、發布前動態提取<strong>「🚨 緊急必讀公告」</strong>置頂推播模板</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-sky-500 font-bold">•</span><span>雙欄名單高密度通訊錄、分區關鍵字篩選、跨搜尋勾選記憶與自訂發信群組</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-sky-500 font-bold">•</span><span>CSV 人員名單批次導入解析與 Firebase 雲端白名單同步機制</span></li>
+                    </ul>
+                  </td>
+                  <td class="py-4 px-3 text-center align-top">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-sky-50 text-sky-700 font-bold border border-sky-200 text-[11px] shadow-2xs">
+                      <span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span>中度
+                    </span>
+                  </td>
+                  <td class="py-4 px-4 text-center align-top">
+                    <div class="font-bold text-slate-800 text-xs">0.6 人月</div>
+                    <div class="text-[11px] text-slate-400 mt-0.5">(13 工作天)</div>
+                  </td>
+                  <td class="py-4 px-5 text-right align-top">
+                    <div class="font-extrabold text-slate-900 font-mono text-sm">NT$ 110,000</div>
+                    <div class="text-[11px] text-slate-400 font-mono">~ NT$ 160,000</div>
+                  </td>
                 </tr>
 
-                <tr class="hover:bg-slate-50/60 transition-colors">
-                  <td class="py-3.5 px-4 font-mono font-bold text-slate-500 text-center">05</td>
-                  <td class="py-3.5 px-4 font-bold text-slate-800">
-                    數據落實度追蹤與 KPI 看板
+                <!-- 05 -->
+                <tr class="hover:bg-indigo-50/30 transition-colors group">
+                  <td class="py-4 px-4 text-center align-top">
+                    <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-slate-100 text-slate-600 font-mono font-bold text-xs group-hover:bg-blue-100 group-hover:text-blue-700 transition-colors">05</span>
                   </td>
-                  <td class="py-3.5 px-6 leading-relaxed text-slate-600">
-                    • 捲動深度完成度 (Scroll Depth Tracker) 節流防抖演算法與 100% 完讀記憶<br>
-                    • 長條漸層微光打卡按鈕、頂部「👑 尊榮已完讀金徽章」即時點亮閉環<br>
-                    • 全台營運處閱讀 KPI 看板（總閱讀率、最佳/最低單位、缺漏主要聯絡人警示）<br>
-                    • 後台專屬手動補登 Modal 視窗與純前端 SheetJS 一鍵導出 Excel 報表
+                  <td class="py-4 px-5 align-top">
+                    <div class="font-bold text-slate-900 text-sm mb-1">數據落實度追蹤與 KPI 看板</div>
+                    <span class="inline-block text-[11px] text-slate-400">完讀打卡 · 全台 KPI · SheetJS 導出</span>
                   </td>
-                  <td class="py-3.5 px-3 text-center"><span class="px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 font-bold border border-purple-200 text-[10px]">高 (分析)</span></td>
-                  <td class="py-3.5 px-4 text-center font-semibold">1.0 人月 (22天)</td>
-                  <td class="py-3.5 px-4 text-right font-bold text-slate-900">$180,000 ~ $250,000</td>
+                  <td class="py-4 px-6 align-top">
+                    <ul class="space-y-1.5 text-slate-600 leading-relaxed list-none">
+                      <li class="flex items-start gap-1.5"><span class="text-purple-500 font-bold">•</span><span>捲動深度完成度 (Scroll Depth Tracker) 節流防抖演算法與 <strong>100% 完讀記憶</strong></span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-purple-500 font-bold">•</span><span>長條漸層微光打卡按鈕、頂部「👑 尊榮已完讀金徽章」即時點亮閉環</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-purple-500 font-bold">•</span><span><strong>全台營運處閱讀 KPI 看板</strong>（總閱讀率、最佳/最低單位、缺漏主要聯絡人警示）</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-purple-500 font-bold">•</span><span>後台專屬手動補登 Modal 視窗與純前端 <strong>SheetJS 一鍵導出 Excel 報表</strong></span></li>
+                    </ul>
+                  </td>
+                  <td class="py-4 px-3 text-center align-top">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-purple-50 text-purple-700 font-bold border border-purple-200 text-[11px] shadow-2xs">
+                      <span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>高 (分析)
+                    </span>
+                  </td>
+                  <td class="py-4 px-4 text-center align-top">
+                    <div class="font-bold text-slate-800 text-xs">1.0 人月</div>
+                    <div class="text-[11px] text-slate-400 mt-0.5">(22 工作天)</div>
+                  </td>
+                  <td class="py-4 px-5 text-right align-top">
+                    <div class="font-extrabold text-slate-900 font-mono text-sm">NT$ 180,000</div>
+                    <div class="text-[11px] text-slate-400 font-mono">~ NT$ 250,000</div>
+                  </td>
                 </tr>
 
-                <tr class="hover:bg-slate-50/60 transition-colors">
-                  <td class="py-3.5 px-4 font-mono font-bold text-slate-500 text-center">06</td>
-                  <td class="py-3.5 px-4 font-bold text-slate-800">
-                    防舞弊稽核日誌與沙盒模擬預覽
+                <!-- 06 -->
+                <tr class="hover:bg-indigo-50/30 transition-colors group">
+                  <td class="py-4 px-4 text-center align-top">
+                    <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-slate-100 text-slate-600 font-mono font-bold text-xs group-hover:bg-blue-100 group-hover:text-blue-700 transition-colors">06</span>
                   </td>
-                  <td class="py-3.5 px-6 leading-relaxed text-slate-600">
-                    • Section D 全員防舞弊具名稽核日誌 (Audit Log)，重大動作 100% 存證自證清白<br>
-                    • 智慧動態解析操作者中文實名與信箱、開發測試帳號智慧排除機制<br>
-                    • 1:1 所見即所得前台畫面即時預覽（內建電腦全螢幕/平板768px/手機414px模擬）<br>
-                    • 獨立問卷回饋系統 (survey.html) 與 Auto Version Checker 跨瀏覽器動態破快取
+                  <td class="py-4 px-5 align-top">
+                    <div class="font-bold text-slate-900 text-sm mb-1">防舞弊稽核日誌與沙盒模擬預覽</div>
+                    <span class="inline-block text-[11px] text-slate-400">Audit Log · 響應式沙盒 · 問卷回饋</span>
                   </td>
-                  <td class="py-3.5 px-3 text-center"><span class="px-2 py-0.5 rounded-full bg-purple-50 text-purple-700 font-bold border border-purple-200 text-[10px]">中高</span></td>
-                  <td class="py-3.5 px-4 text-center font-semibold">0.6 人月 (13天)</td>
-                  <td class="py-3.5 px-4 text-right font-bold text-slate-900">$110,000 ~ $160,000</td>
+                  <td class="py-4 px-6 align-top">
+                    <ul class="space-y-1.5 text-slate-600 leading-relaxed list-none">
+                      <li class="flex items-start gap-1.5"><span class="text-teal-500 font-bold">•</span><span>Section D <strong>全員防舞弊具名稽核日誌 (Audit Log)</strong>，重大動作 100% 存證自證清白</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-teal-500 font-bold">•</span><span>智慧動態解析操作者中文實名與信箱、開發測試帳號智慧排除機制</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-teal-500 font-bold">•</span><span><strong>1:1 所見即所得前台畫面即時預覽</strong>（內建電腦全螢幕/平板768px/手機414px模擬）</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-teal-500 font-bold">•</span><span>獨立問卷回饋系統 (survey.html) 與 Auto Version Checker 跨瀏覽器動態破快取</span></li>
+                    </ul>
+                  </td>
+                  <td class="py-4 px-3 text-center align-top">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-teal-50 text-teal-800 font-bold border border-teal-200 text-[11px] shadow-2xs">
+                      <span class="w-1.5 h-1.5 rounded-full bg-teal-500"></span>中高
+                    </span>
+                  </td>
+                  <td class="py-4 px-4 text-center align-top">
+                    <div class="font-bold text-slate-800 text-xs">0.6 人月</div>
+                    <div class="text-[11px] text-slate-400 mt-0.5">(13 工作天)</div>
+                  </td>
+                  <td class="py-4 px-5 text-right align-top">
+                    <div class="font-extrabold text-slate-900 font-mono text-sm">NT$ 110,000</div>
+                    <div class="text-[11px] text-slate-400 font-mono">~ NT$ 160,000</div>
+                  </td>
                 </tr>
 
-                <tr class="hover:bg-slate-50/60 transition-colors">
-                  <td class="py-3.5 px-4 font-mono font-bold text-slate-500 text-center">07</td>
-                  <td class="py-3.5 px-4 font-bold text-slate-800">
-                    系統架構白皮書與 UI/UX 設計
+                <!-- 07 -->
+                <tr class="hover:bg-indigo-50/30 transition-colors group">
+                  <td class="py-4 px-4 text-center align-top">
+                    <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-slate-100 text-slate-600 font-mono font-bold text-xs group-hover:bg-blue-100 group-hover:text-blue-700 transition-colors">07</span>
                   </td>
-                  <td class="py-3.5 px-6 leading-relaxed text-slate-600">
-                    • 方案 C：IT 專用全鏈路運作邏輯技術白皮書（四層分層拓撲 + 三大業務時序流）<br>
-                    • 全站純原生響應式 Morandi 主題設計、雙欄目錄極致自適應版型<br>
-                    • Serverless 雲端拓撲整合規劃與 GitHub Actions CI/CD 自動化發布流水線
+                  <td class="py-4 px-5 align-top">
+                    <div class="font-bold text-slate-900 text-sm mb-1">系統架構白皮書與 UI/UX 設計</div>
+                    <span class="inline-block text-[11px] text-slate-400">方案 C 白皮書 · 莫蘭迪風格 · CI/CD</span>
                   </td>
-                  <td class="py-3.5 px-3 text-center"><span class="px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-bold border border-indigo-200 text-[10px]">高 (架構)</span></td>
-                  <td class="py-3.5 px-4 text-center font-semibold">0.8 人月 (18天)</td>
-                  <td class="py-3.5 px-4 text-right font-bold text-slate-900">$140,000 ~ $200,000</td>
+                  <td class="py-4 px-6 align-top">
+                    <ul class="space-y-1.5 text-slate-600 leading-relaxed list-none">
+                      <li class="flex items-start gap-1.5"><span class="text-indigo-500 font-bold">•</span><span><strong>方案 C：IT 專用全鏈路運作邏輯技術白皮書</strong>（四層分層拓撲 + 三大業務時序流）</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-indigo-500 font-bold">•</span><span>全站純原生響應式 Morandi 主題設計、雙欄目錄極致自適應版型</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-indigo-500 font-bold">•</span><span>Serverless 雲端拓撲整合規劃與 GitHub Actions CI/CD 自動化發布流水線</span></li>
+                    </ul>
+                  </td>
+                  <td class="py-4 px-3 text-center align-top">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 font-bold border border-indigo-200 text-[11px] shadow-2xs">
+                      <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>高 (架構)
+                    </span>
+                  </td>
+                  <td class="py-4 px-4 text-center align-top">
+                    <div class="font-bold text-slate-800 text-xs">0.8 人月</div>
+                    <div class="text-[11px] text-slate-400 mt-0.5">(18 工作天)</div>
+                  </td>
+                  <td class="py-4 px-5 text-right align-top">
+                    <div class="font-extrabold text-slate-900 font-mono text-sm">NT$ 140,000</div>
+                    <div class="text-[11px] text-slate-400 font-mono">~ NT$ 200,000</div>
+                  </td>
                 </tr>
 
-                <tr class="hover:bg-slate-50/60 transition-colors">
-                  <td class="py-3.5 px-4 font-mono font-bold text-slate-500 text-center">08</td>
-                  <td class="py-3.5 px-4 font-bold text-slate-800">
-                    專案管理、需求迭代調優與 QA 測試
+                <!-- 08 -->
+                <tr class="hover:bg-indigo-50/30 transition-colors group">
+                  <td class="py-4 px-4 text-center align-top">
+                    <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-slate-100 text-slate-600 font-mono font-bold text-xs group-hover:bg-blue-100 group-hover:text-blue-700 transition-colors">08</span>
                   </td>
-                  <td class="py-3.5 px-6 leading-relaxed text-slate-600">
-                    • 跨 35 個里程碑之需求釐清、跨部門痛點排查與相容性修復驗收<br>
-                    • 瀏覽器相容性測試（Chrome、Edge、Safari、手機瀏覽器）與跨域壓測調優
+                  <td class="py-4 px-5 align-top">
+                    <div class="font-bold text-slate-900 text-sm mb-1">專案管理、需求迭代調優與 QA 測試</div>
+                    <span class="inline-block text-[11px] text-slate-400">35次迭代 · 跨瀏覽器相容 · 驗收交付</span>
                   </td>
-                  <td class="py-3.5 px-3 text-center"><span class="px-2 py-0.5 rounded-full bg-slate-100 text-slate-700 font-bold text-[10px]">常規</span></td>
-                  <td class="py-3.5 px-4 text-center font-semibold">0.6 人月 (13天)</td>
-                  <td class="py-3.5 px-4 text-right font-bold text-slate-900">$70,000 ~ $160,000</td>
+                  <td class="py-4 px-6 align-top">
+                    <ul class="space-y-1.5 text-slate-600 leading-relaxed list-none">
+                      <li class="flex items-start gap-1.5"><span class="text-slate-500 font-bold">•</span><span><strong>跨 35 個里程碑之需求釐清</strong>、跨部門痛點排查與相容性修復驗收</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-slate-500 font-bold">•</span><span>瀏覽器相容性測試（Chrome、Edge、Safari、手機瀏覽器）與跨域壓測調優</span></li>
+                    </ul>
+                  </td>
+                  <td class="py-4 px-3 text-center align-top">
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-slate-100 text-slate-700 font-bold border border-slate-300/80 text-[11px] shadow-2xs">
+                      <span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>常規
+                    </span>
+                  </td>
+                  <td class="py-4 px-4 text-center align-top">
+                    <div class="font-bold text-slate-800 text-xs">0.6 人月</div>
+                    <div class="text-[11px] text-slate-400 mt-0.5">(13 工作天)</div>
+                  </td>
+                  <td class="py-4 px-5 text-right align-top">
+                    <div class="font-extrabold text-slate-900 font-mono text-sm">NT$ 70,000</div>
+                    <div class="text-[11px] text-slate-400 font-mono">~ NT$ 160,000</div>
+                  </td>
                 </tr>
 
                 <!-- 總計列 -->
-                <tr class="bg-indigo-50/80 font-bold border-t-2 border-indigo-300 text-indigo-950 text-sm">
-                  <td colspan="4" class="py-4 px-6 text-right">全專案累計工時與外部市場總預算對標合計：</td>
-                  <td class="py-4 px-4 text-center font-extrabold text-blue-700">6.6 人月 (145天)</td>
-                  <td class="py-4 px-4 text-right font-extrabold text-emerald-700 text-base">NT$ 1,150,000 ~ 1,650,000</td>
+                <tr class="bg-gradient-to-r from-indigo-50/90 via-blue-50/70 to-emerald-50/80 font-bold border-t-2 border-indigo-300 text-indigo-950">
+                  <td colspan="4" class="py-4.5 px-6 text-right">
+                    <div class="text-sm font-bold text-slate-800 flex items-center justify-end gap-2">
+                      <span class="inline-block px-2 py-0.5 rounded bg-indigo-100 text-indigo-700 text-xs">對標合格專業廠商</span>
+                      <span>全專案累計工時與外部市場總預算對標合計：</span>
+                    </div>
+                  </td>
+                  <td class="py-4.5 px-4 text-center">
+                    <div class="text-sm font-extrabold text-indigo-700">6.6 人月</div>
+                    <div class="text-[11px] text-slate-500 font-normal">約 145 人天</div>
+                  </td>
+                  <td class="py-4.5 px-5 text-right">
+                    <div class="text-base font-extrabold text-emerald-700 font-mono tracking-tight">NT$ 1,150,000</div>
+                    <div class="text-xs font-bold text-emerald-600 font-mono">~ NT$ 1,650,000</div>
+                  </td>
                 </tr>
               </tbody>
             </table>
