@@ -836,7 +836,7 @@ function openAboutModal() { document.getElementById('about-modal').classList.rem
 function closeAboutModal() { document.getElementById('about-modal').classList.add('hidden'); }
 function switchAboutTab(t) {
   document.querySelectorAll('.about-tab-pane').forEach(el => el.classList.add('hidden'));
-  ['tab-guide', 'tab-achievements', 'tab-architecture'].forEach(tabId => {
+  ['tab-guide', 'tab-achievements', 'tab-architecture', 'tab-valuation'].forEach(tabId => {
     const bEl = document.getElementById('btn-' + tabId);
     if (!bEl) return;
     if (tabId === t) {
