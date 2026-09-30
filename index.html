@@ -63,11 +63,12 @@
     .ql-editor div {
       margin: 0 !important;
       padding: 0 !important;
+      line-height: 1.25 !important;
     }
     .ql-editor p {
       margin-top: 0 !important;
-      margin-bottom: 0.1rem !important; /* 每一行行距再縮短一些 */
-      line-height: 1.2 !important;
+      margin-bottom: 0.15rem !important; /* 每一行行距緊湊適中 */
+      line-height: 1.25 !important;
       padding: 0 !important;
       color: inherit !important;
     }
@@ -80,7 +81,7 @@
     .ql-editor li p {
       display: inline !important;
       margin: 0 !important;
-      line-height: 1.2 !important;
+      line-height: 1.25 !important;
     }
     /* 文字加框 (boxed) 與加圓圈 (circled) 樣式強化，確保上下框線完整不被切邊 */
     .ql-boxed, span[style*="border"][style*="solid"] {
@@ -109,7 +110,7 @@
       width: 100% !important;
       height: auto !important;
       border-collapse: collapse !important;
-      margin: 2px 0 2px 0 !important;
+      margin: 4px 0 !important;
       font-size: 0.875rem !important;
       table-layout: auto !important;
     }
@@ -125,10 +126,11 @@
     #bulletin-content-area table:not(.data-table) th,
     .pro-table td, .pro-table th {
       border: 1px solid #cbd5e1 !important;
-      padding: 4px 6px !important;
+      padding: 3px 6px !important;
       height: auto !important;
       vertical-align: top;
       word-break: break-word;
+      line-height: 1.3 !important;
     }
     #bulletin-content-area table:not(.data-table) th,
     .pro-table th {
@@ -139,8 +141,8 @@
     /* 確保重點公告卡片與內容無多餘溢出捲軸及緊湊留白 */
     .bulletin-item-card {
       overflow: visible !important;
-      padding-top: 6px !important;
-      padding-bottom: 6px !important;
+      padding-top: 5px !important;
+      padding-bottom: 5px !important;
     }
     .bulletin-item-card .ql-editor {
       overflow: visible !important;
@@ -1729,6 +1731,28 @@ async function showKPI(monthOffset = 0) {
             if (hEl.style.margin) hEl.style.margin = '';
             if (hEl.style.marginTop) hEl.style.marginTop = '';
             if (hEl.style.marginBottom) hEl.style.marginBottom = '';
+          });
+
+          // 2.2 解除多層單一子節點的嵌套無用 div，扁平化結構消除不必要的行距與外距
+          let unwrapFound = true;
+          let unwrapPasses = 0;
+          while (unwrapFound && unwrapPasses < 5) {
+            unwrapFound = false;
+            unwrapPasses++;
+            doc.querySelectorAll('div').forEach(d => {
+              if (d.parentElement && d.parentElement !== doc.body && d.children.length === 1 && d.children[0].tagName.toLowerCase() === 'div') {
+                const child = d.children[0];
+                d.parentElement.replaceChild(child, d);
+                unwrapFound = true;
+              }
+            });
+          }
+
+          // 2.3 清理行內殘留過大的 line-height / margin 樣式
+          doc.querySelectorAll('*').forEach(el => {
+            if (el.style && el.style.lineHeight && (parseFloat(el.style.lineHeight) > 1.35 || el.style.lineHeight.includes('px'))) {
+              el.style.lineHeight = '';
+            }
           });
 
           // 3. 遞迴移除無意義的空 div / 空 p / 空 span / 空 br / 空 h1-h6
