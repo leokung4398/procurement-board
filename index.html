@@ -1731,8 +1731,8 @@ async function showKPI(monthOffset = 0) {
           const tables = doc.querySelectorAll('table');
           tables.forEach(tbl => {
             tbl.style.height = '';
-            tbl.style.marginTop = '4px';
-            tbl.style.marginBottom = '4px';
+            tbl.style.marginTop = '2px';
+            tbl.style.marginBottom = '2px';
             tbl.querySelectorAll('tr, td, th').forEach(cell => {
               cell.style.height = '';
             });
@@ -1757,42 +1757,59 @@ async function showKPI(monthOffset = 0) {
             if (hEl.style.marginBottom) hEl.style.marginBottom = '';
           });
 
-          // 2.2 解除多層單一子節點的嵌套無用 div，扁平化結構消除不必要的行距與外距
-          let unwrapFound = true;
-          let unwrapPasses = 0;
-          while (unwrapFound && unwrapPasses < 12) {
-            unwrapFound = false;
-            unwrapPasses++;
-            doc.querySelectorAll('div').forEach(d => {
-              if (d.parentElement) {
-                // (a) 若 div 內部只有一個子元素 (div, p, table, ul, ol)，且自身無特別樣式，則直接將子元素提出
-                if (d.children.length === 1 && !d.className && !d.id) {
-                  const firstChild = d.children[0];
-                  const tag = firstChild.tagName.toLowerCase();
-                  if (['div', 'p', 'table', 'ul', 'ol'].includes(tag)) {
-                    d.parentElement.replaceChild(firstChild, d);
-                    unwrapFound = true;
-                    return;
-                  }
-                }
-                // (b) 若 div 本身是空的或只有空白字元/換行，直接移除
-                if (!d.querySelector('img, table, iframe') && (!d.textContent || !d.textContent.replace(/[\s\u00A0\r\n\t]/g, ''))) {
-                  d.remove();
-                  unwrapFound = true;
-                  return;
-                }
+          // 判斷節點是否為實質空白（忽略空白、換行、&nbsp;、\u00A0、\u3000）
+          function isNodeEmpty(node) {
+            if (!node) return true;
+            if (node.nodeType === 3) { // 文字節點
+              return !node.textContent.replace(/[\s\u00A0\u3000\r\n\t]/g, '');
+            }
+            if (node.nodeType === 1) { // 元素節點
+              const tag = node.tagName.toLowerCase();
+              if (['img', 'table', 'iframe', 'video', 'input'].includes(tag)) return false;
+              if (tag === 'br') return true;
+              for (let i = 0; i < node.childNodes.length; i++) {
+                if (!isNodeEmpty(node.childNodes[i])) return false;
+              }
+              return true;
+            }
+            return true;
+          }
+
+          // 2.2 遞迴移除所有實質空白的標籤節點 (div, p, span, h1-h6)
+          let removedAny = true;
+          let removePasses = 0;
+          while (removedAny && removePasses < 12) {
+            removedAny = false;
+            removePasses++;
+            doc.querySelectorAll('div, p, span, h1, h2, h3, h4, h5, h6').forEach(el => {
+              if (isNodeEmpty(el)) {
+                el.remove();
+                removedAny = true;
               }
             });
           }
 
-          // 2.3 徹底移除所有空標籤 (不限於 div，包含 p, span, h1-h6)
-          let emptyScan = true;
-          while (emptyScan) {
-            emptyScan = false;
-            doc.querySelectorAll('div, p, span, h1, h2, h3, h4, h5, h6').forEach(el => {
-              if (!el.querySelector('img, table, iframe') && (!el.textContent || !el.textContent.replace(/[\s\u00A0\r\n\t]/g, ''))) {
-                el.remove();
-                emptyScan = true;
+          // 2.3 解除多層單一子節點的嵌套無用 div，扁平化結構消除不必要的行距與外距
+          let unwrapFound = true;
+          let unwrapPasses = 0;
+          while (unwrapFound && unwrapPasses < 15) {
+            unwrapFound = false;
+            unwrapPasses++;
+            doc.querySelectorAll('div').forEach(d => {
+              if (d.parentElement) {
+                // (a) 若 div 內部只有一個子元素且自身無特定 class/id，直接將子元素提出
+                if (d.children.length === 1 && !d.className && !d.id) {
+                  const firstChild = d.children[0];
+                  d.parentElement.replaceChild(firstChild, d);
+                  unwrapFound = true;
+                  return;
+                }
+                // (b) 若 div 為空則移除
+                if (isNodeEmpty(d)) {
+                  d.remove();
+                  unwrapFound = true;
+                  return;
+                }
               }
             });
           }
@@ -1817,23 +1834,11 @@ async function showKPI(monthOffset = 0) {
           function trimTrailingEmptyNodes(parent) {
             while (parent.lastChild) {
               const lc = parent.lastChild;
-              if (lc.nodeType === 3) { // 文字節點
-                if (!lc.textContent.replace(/[\s\u00A0\r\n\t]/g, '')) {
-                  lc.remove();
-                } else {
-                  break;
-                }
-              } else if (lc.nodeType === 1) { // 元素節點
-                const tag = lc.tagName.toLowerCase();
-                if (tag === 'br') {
-                  lc.remove();
-                } else if (!lc.textContent.replace(/[\s\u00A0\r\n\t]/g, '') && !lc.querySelector('img, table, iframe')) {
-                  lc.remove();
-                } else {
-                  // 遞迴清理末尾子元素的內部末尾
-                  trimTrailingEmptyNodes(lc);
-                  break;
-                }
+              if (isNodeEmpty(lc)) {
+                lc.remove();
+              } else if (lc.nodeType === 1) {
+                trimTrailingEmptyNodes(lc);
+                break;
               } else {
                 break;
               }
@@ -2213,13 +2218,30 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
       `;
 
       // 即時清理瀏覽器渲染後的所有空 div / 空 p / 空標籤，徹底根除多餘行距
+      function isLiveNodeEmpty(node) {
+        if (!node) return true;
+        if (node.nodeType === 3) {
+          return !node.textContent.replace(/[\s\u00A0\u3000\r\n\t]/g, '');
+        }
+        if (node.nodeType === 1) {
+          const tag = node.tagName.toLowerCase();
+          if (['img', 'table', 'iframe', 'video', 'input'].includes(tag)) return false;
+          if (tag === 'br') return true;
+          for (let i = 0; i < node.childNodes.length; i++) {
+            if (!isLiveNodeEmpty(node.childNodes[i])) return false;
+          }
+          return true;
+        }
+        return true;
+      }
+
       let cleanupLoop = true;
       let cleanupPasses = 0;
-      while (cleanupLoop && cleanupPasses < 10) {
+      while (cleanupLoop && cleanupPasses < 12) {
         cleanupLoop = false;
         cleanupPasses++;
         container.querySelectorAll('.ql-editor div, .ql-editor p, .ql-editor span, .ql-editor h1, .ql-editor h2, .ql-editor h3, .ql-editor h4, .ql-editor h5, .ql-editor h6').forEach(el => {
-          if (!el.querySelector('img, table, iframe') && (!el.textContent || !el.textContent.replace(/[\s\u00A0\r\n\t]/g, ''))) {
+          if (isLiveNodeEmpty(el)) {
             el.remove();
             cleanupLoop = true;
           }
@@ -2229,16 +2251,23 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
       container.querySelectorAll('.ql-editor br + br').forEach(b => b.remove());
       container.querySelectorAll('.ql-editor div > br:only-child, .ql-editor p > br:only-child').forEach(b => {
         const p = b.parentElement;
-        if (p && !p.querySelector('img, table, iframe') && (!p.textContent || !p.textContent.replace(/[\s\u00A0\r\n\t]/g, ''))) {
+        if (p && isLiveNodeEmpty(p)) {
           p.remove();
         }
       });
-      // 解開只包著單一 table 的純容器 div，消除斷層
-      container.querySelectorAll('.ql-editor div').forEach(d => {
-        if (d.children.length === 1 && d.children[0].tagName.toLowerCase() === 'table' && !d.className && !d.id) {
-          d.parentElement.replaceChild(d.children[0], d);
-        }
-      });
+      // 解開所有無用單一子元素的純容器 div（包含包著 table、p 或其它 div 的情況），徹底消除斷層與多餘空行
+      let unwrapLive = true;
+      let unwrapLivePasses = 0;
+      while (unwrapLive && unwrapLivePasses < 10) {
+        unwrapLive = false;
+        unwrapLivePasses++;
+        container.querySelectorAll('.ql-editor div').forEach(d => {
+          if (d.children.length === 1 && !d.className && !d.id && d.parentElement) {
+            d.parentElement.replaceChild(d.children[0], d);
+            unwrapLive = true;
+          }
+        });
+      }
 
       setupReadingProgressTracker();
     }
