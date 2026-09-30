@@ -63,12 +63,12 @@
     .ql-editor div {
       margin: 0 !important;
       padding: 0 !important;
-      line-height: 1.2 !important;
+      line-height: 1.15 !important;
     }
     .ql-editor p {
       margin-top: 0 !important;
-      margin-bottom: 0.12rem !important; /* 每一行行距緊湊適中 */
-      line-height: 1.2 !important;
+      margin-bottom: 0.05rem !important; /* 極致緊湊微邊距 */
+      line-height: 1.15 !important;
       padding: 0 !important;
       color: inherit !important;
     }
@@ -82,18 +82,18 @@
     .ql-editor span[style*="font-size: 14pt"],
     .ql-editor span[style*="font-size: 16pt"],
     .ql-editor span[style*="font-size: 18pt"] {
-      line-height: 1.2 !important;
+      line-height: 1.15 !important;
       display: inline !important;
     }
     .ql-editor li p {
       display: inline !important;
       margin: 0 !important;
-      line-height: 1.2 !important;
+      line-height: 1.15 !important;
     }
     /* 文字加框 (boxed) 與加圓圈 (circled) 樣式強化，確保上下框線完整不被切邊 */
     .ql-boxed, span[style*="border"][style*="solid"] {
       display: inline-block !important;
-      line-height: 1.15 !important;
+      line-height: 1.12 !important;
       vertical-align: baseline !important;
       margin: 1px 2px !important;
       padding: 1px 5px !important;
@@ -101,7 +101,7 @@
     }
     .ql-editor ol, .ql-editor ul {
       padding-left: 1.25rem !important;
-      margin: 0.2rem 0 !important;
+      margin: 0.15rem 0 !important;
     }
     .ql-editor > *:first-child {
       margin-top: 0 !important;
@@ -117,7 +117,7 @@
       width: 100% !important;
       height: auto !important;
       border-collapse: collapse !important;
-      margin: 2px 0 4px 0 !important;
+      margin: 2px 0 !important;
       font-size: 0.875rem !important;
       table-layout: auto !important;
     }
@@ -137,7 +137,7 @@
       height: auto !important;
       vertical-align: top;
       word-break: break-word;
-      line-height: 1.25 !important;
+      line-height: 1.2 !important;
     }
     #bulletin-content-area table:not(.data-table) th,
     .pro-table th {
@@ -148,8 +148,8 @@
     /* 確保重點公告卡片與內容無多餘溢出捲軸及緊湊留白 */
     .bulletin-item-card {
       overflow: visible !important;
-      padding-top: 5px !important;
-      padding-bottom: 5px !important;
+      padding-top: 4px !important;
+      padding-bottom: 4px !important;
     }
     .bulletin-item-card .ql-editor {
       overflow: visible !important;
@@ -163,14 +163,14 @@
       padding-bottom: 0 !important;
     }
     .bulletin-item-card .ql-editor table {
-      margin-top: 4px !important;
-      margin-bottom: 4px !important;
+      margin-top: 2px !important;
+      margin-bottom: 2px !important;
     }
     /* 統一全域標題樣式重設，避免瀏覽器預設 1em 產生巨大斷層 */
     .ql-editor h1, .ql-editor h2, .ql-editor h3, .ql-editor h4, .ql-editor h5, .ql-editor h6 {
-      margin-top: 0.25rem !important;
-      margin-bottom: 0.15rem !important;
-      line-height: 1.25 !important;
+      margin-top: 0.15rem !important;
+      margin-bottom: 0.08rem !important;
+      line-height: 1.2 !important;
       font-weight: bold !important;
     }
     .ql-editor > *:first-child {
@@ -187,8 +187,8 @@
     /* 緊鄰標題與列表項目的行距緊縮 */
     .ql-editor .space-y-1 > div,
     .ql-editor .space-y-1 > p {
-      margin-top: 0.2em !important;
-      margin-bottom: 0.2em !important;
+      margin-top: 0.1em !important;
+      margin-bottom: 0.1em !important;
     }
     /* 未登入時背景不可穿透高斯模糊與鎖定 */
     .page-blurred {
@@ -2031,17 +2031,19 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
           `
           : '';
 
-        // 標準分類序號對應表
+        // 標準分類序號對應表 (嚴格對齊後台標準 9 大業務大類)
         const CANONICAL_SECNUMS = {
+          '採購管理': '一',
           '採購作業進度': '一',
-          '交期異動作業': '二',
-          '供應商管理': '三',
+          '供應商管理': '二',
+          '品質管理': '三',
           '工程管理': '四',
-          '物料異常(返修)作業': '五',
-          '對外供應商詢價作業': '六',
-          '供應商物料漲價': '七',
-          '倉儲管理': '八',
-          '附件': '九'
+          '物流管理': '五',
+          '倉儲管理': '六',
+          '文件管理': '七',
+          '公告管理': '八',
+          '其他': '九',
+          '附件': '十'
         };
         const rawTitle = (sec.title || '').replace(/^[一二三四五六七八九十]+、\s*/, '').trim();
         const displaySecNum = CANONICAL_SECNUMS[rawTitle] || sec.sectionNumber || (NUMS[secIdx] || String(secIdx + 1));
