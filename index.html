@@ -182,10 +182,23 @@
     }
     .ql-editor div:empty,
     .ql-editor p:empty,
+    .ql-editor div:blank,
+    .ql-editor p:blank,
+    .ql-editor div:not(:has(*)):not(:has(text)),
     .ql-editor > br {
       display: none !important;
       height: 0 !important;
+      min-height: 0 !important;
+      line-height: 0 !important;
+      font-size: 0 !important;
       margin: 0 !important;
+      padding: 0 !important;
+      border: 0 !important;
+    }
+    /* 針對包含表格的外層 div，重置為純容器，不額外產生段落外距 */
+    .ql-editor div:has(> table) {
+      margin-top: 2px !important;
+      margin-bottom: 2px !important;
       padding: 0 !important;
     }
     /* 緊鄰標題與列表項目的行距緊縮 */
@@ -1747,7 +1760,7 @@ async function showKPI(monthOffset = 0) {
           // 2.2 解除多層單一子節點的嵌套無用 div，扁平化結構消除不必要的行距與外距
           let unwrapFound = true;
           let unwrapPasses = 0;
-          while (unwrapFound && unwrapPasses < 10) {
+          while (unwrapFound && unwrapPasses < 12) {
             unwrapFound = false;
             unwrapPasses++;
             doc.querySelectorAll('div').forEach(d => {
@@ -1772,7 +1785,19 @@ async function showKPI(monthOffset = 0) {
             });
           }
 
-          // 2.3 清理行內殘留過大的 line-height / margin 樣式
+          // 2.3 徹底移除所有空標籤 (不限於 div，包含 p, span, h1-h6)
+          let emptyScan = true;
+          while (emptyScan) {
+            emptyScan = false;
+            doc.querySelectorAll('div, p, span, h1, h2, h3, h4, h5, h6').forEach(el => {
+              if (!el.querySelector('img, table, iframe') && (!el.textContent || !el.textContent.replace(/[\s\u00A0\r\n\t]/g, ''))) {
+                el.remove();
+                emptyScan = true;
+              }
+            });
+          }
+
+          // 2.4 清理行內殘留過大的 line-height / margin 樣式
           doc.querySelectorAll('*').forEach(el => {
             if (el.style) {
               if (el.style.lineHeight && (parseFloat(el.style.lineHeight) > 1.25 || el.style.lineHeight.includes('px'))) {
@@ -1783,19 +1808,6 @@ async function showKPI(monthOffset = 0) {
               }
             }
           });
-
-          // 3. 遞迴移除無意義的空 div / 空 p / 空 span / 空 br / 空 h1-h6
-          let emptyFound = true;
-          while (emptyFound) {
-            emptyFound = false;
-            doc.querySelectorAll('div, p, span, h1, h2, h3, h4, h5, h6').forEach(el => {
-              // 若元素無實質子節點（非 table/img/iframe），且文字內容僅為空白字符或 nbsp
-              if (!el.querySelector('img, table, iframe') && el.children.length === 0 && (!el.textContent || !el.textContent.replace(/[\s\u00A0\r\n\t]/g, ''))) {
-                el.remove();
-                emptyFound = true;
-              }
-            });
-          }
 
           // 清理多餘連續的 br 或直接緊跟在 block 元素旁的 br
           doc.querySelectorAll('br + br').forEach(b => b.remove());
@@ -1834,7 +1846,10 @@ async function showKPI(monthOffset = 0) {
           console.warn('clnHtm DOM sanitization error:', e);
         }
 
-        // 4. 清理開頭、結尾以及中間多餘的空白段落 (包含 <p>&nbsp;</p>, <div>&nbsp;</div>, 空 div)
+        // 4. 清理字串層級的多餘空白標籤 (包含 <div></div>, <p></p>, <div>&nbsp;</div>)
+        h = h.replace(/<(?:div|p)[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/(?:div|p)>/gi, '');
+        h = h.replace(/(?:<(?:div|p)[^>]*>(?:\s|&nbsp;|<br\s*\/?>)*<\/(?:div|p)>\s*)+/gi, '');
+
         let r = h;
         let lastR = '';
         while (r !== lastR) {

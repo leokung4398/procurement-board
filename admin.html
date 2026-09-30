@@ -179,9 +179,19 @@
     .pro-table tr, .quill-editor table tr {
       height: auto !important;
     }
-    .quill-editor > div:empty,
-    .quill-editor p:empty {
+    .quill-editor div:empty,
+    .quill-editor p:empty,
+    .quill-editor div:blank,
+    .quill-editor p:blank,
+    .quill-editor div:not(:has(*)):not(:has(text)) {
       display: none !important;
+      height: 0 !important;
+      min-height: 0 !important;
+      line-height: 0 !important;
+      font-size: 0 !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      border: 0 !important;
     }
     .pro-table td, .pro-table th, .quill-editor table td, .quill-editor table th {
       border: 1px solid #cbd5e1 !important;
