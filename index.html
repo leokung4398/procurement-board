@@ -63,12 +63,12 @@
     .ql-editor div {
       margin: 0 !important;
       padding: 0 !important;
-      line-height: 1.25 !important;
+      line-height: 1.2 !important;
     }
     .ql-editor p {
       margin-top: 0 !important;
-      margin-bottom: 0.15rem !important; /* 每一行行距緊湊適中 */
-      line-height: 1.25 !important;
+      margin-bottom: 0.12rem !important; /* 每一行行距緊湊適中 */
+      line-height: 1.2 !important;
       padding: 0 !important;
       color: inherit !important;
     }
@@ -78,10 +78,17 @@
     .ql-editor span {
       line-height: inherit !important;
     }
+    .ql-editor span[style*="font-size: 13pt"],
+    .ql-editor span[style*="font-size: 14pt"],
+    .ql-editor span[style*="font-size: 16pt"],
+    .ql-editor span[style*="font-size: 18pt"] {
+      line-height: 1.2 !important;
+      display: inline !important;
+    }
     .ql-editor li p {
       display: inline !important;
       margin: 0 !important;
-      line-height: 1.25 !important;
+      line-height: 1.2 !important;
     }
     /* 文字加框 (boxed) 與加圓圈 (circled) 樣式強化，確保上下框線完整不被切邊 */
     .ql-boxed, span[style*="border"][style*="solid"] {
@@ -94,7 +101,7 @@
     }
     .ql-editor ol, .ql-editor ul {
       padding-left: 1.25rem !important;
-      margin: 0.25rem 0 !important;
+      margin: 0.2rem 0 !important;
     }
     .ql-editor > *:first-child {
       margin-top: 0 !important;
@@ -110,7 +117,7 @@
       width: 100% !important;
       height: auto !important;
       border-collapse: collapse !important;
-      margin: 4px 0 !important;
+      margin: 2px 0 4px 0 !important;
       font-size: 0.875rem !important;
       table-layout: auto !important;
     }
@@ -130,7 +137,7 @@
       height: auto !important;
       vertical-align: top;
       word-break: break-word;
-      line-height: 1.3 !important;
+      line-height: 1.25 !important;
     }
     #bulletin-content-area table:not(.data-table) th,
     .pro-table th {
@@ -1736,22 +1743,33 @@ async function showKPI(monthOffset = 0) {
           // 2.2 解除多層單一子節點的嵌套無用 div，扁平化結構消除不必要的行距與外距
           let unwrapFound = true;
           let unwrapPasses = 0;
-          while (unwrapFound && unwrapPasses < 5) {
+          while (unwrapFound && unwrapPasses < 6) {
             unwrapFound = false;
             unwrapPasses++;
             doc.querySelectorAll('div').forEach(d => {
-              if (d.parentElement && d.parentElement !== doc.body && d.children.length === 1 && d.children[0].tagName.toLowerCase() === 'div') {
-                const child = d.children[0];
-                d.parentElement.replaceChild(child, d);
-                unwrapFound = true;
+              if (d.parentElement && d.parentElement !== doc.body) {
+                // 若 div 只有一個子節點 (div 或 table)，且自身無任何 class/id/實質文字，則將其解開
+                if (d.children.length === 1 && !d.className && !d.id) {
+                  const firstChild = d.children[0];
+                  const tag = firstChild.tagName.toLowerCase();
+                  if (tag === 'div' || tag === 'table') {
+                    d.parentElement.replaceChild(firstChild, d);
+                    unwrapFound = true;
+                  }
+                }
               }
             });
           }
 
           // 2.3 清理行內殘留過大的 line-height / margin 樣式
           doc.querySelectorAll('*').forEach(el => {
-            if (el.style && el.style.lineHeight && (parseFloat(el.style.lineHeight) > 1.35 || el.style.lineHeight.includes('px'))) {
-              el.style.lineHeight = '';
+            if (el.style) {
+              if (el.style.lineHeight && (parseFloat(el.style.lineHeight) > 1.25 || el.style.lineHeight.includes('px'))) {
+                el.style.lineHeight = '1.2';
+              }
+              if (el.tagName.toLowerCase() === 'div' && el.style.margin) {
+                el.style.margin = '0';
+              }
             }
           });
 
@@ -2013,13 +2031,28 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
           `
           : '';
 
+        // 標準分類序號對應表
+        const CANONICAL_SECNUMS = {
+          '採購作業進度': '一',
+          '交期異動作業': '二',
+          '供應商管理': '三',
+          '工程管理': '四',
+          '物料異常(返修)作業': '五',
+          '對外供應商詢價作業': '六',
+          '供應商物料漲價': '七',
+          '倉儲管理': '八',
+          '附件': '九'
+        };
+        const rawTitle = (sec.title || '').replace(/^[一二三四五六七八九十]+、\s*/, '').trim();
+        const displaySecNum = CANONICAL_SECNUMS[rawTitle] || sec.sectionNumber || (NUMS[secIdx] || String(secIdx + 1));
+
         return `
           <section class="bg-white rounded-xl shadow-sm border border-slate-100 px-3 py-2">
             <h3 class="text-lg font-bold text-slate-800 flex items-center gap-2 pb-2 mb-2 border-b border-slate-100 flex-wrap">
               <div class="flex items-center gap-2">
                 <span class="text-xl">${e(sec.icon)}</span>
-                <span class="text-blue-600">${e(sec.sectionNumber)}、</span>
-                <span ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].title" class="outline-none">${e(sec.title.replace(/^[一二三四五六七八九十]+、\s*/, ''))}</span>
+                <span class="text-blue-600">${e(displaySecNum)}、</span>
+                <span ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].title" class="outline-none">${e(rawTitle)}</span>
               </div>
               ${sec.subtitle ? `<span class="text-sm font-medium text-slate-500 px-2 py-0.5 bg-slate-100 rounded-md border border-slate-200">${e(sec.subtitle)}</span>` : ''}
             </h3>

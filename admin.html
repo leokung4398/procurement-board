@@ -122,6 +122,20 @@
     .quill-editor p:last-child, .ql-editor p:last-child {
       margin-bottom: 0 !important;
     }
+    .quill-editor span, .ql-editor span {
+      line-height: inherit !important;
+    }
+    .quill-editor span[style*="font-size: 13pt"],
+    .quill-editor span[style*="font-size: 14pt"],
+    .quill-editor span[style*="font-size: 16pt"],
+    .quill-editor span[style*="font-size: 18pt"],
+    .ql-editor span[style*="font-size: 13pt"],
+    .ql-editor span[style*="font-size: 14pt"],
+    .ql-editor span[style*="font-size: 16pt"],
+    .ql-editor span[style*="font-size: 18pt"] {
+      line-height: 1.2 !important;
+      display: inline !important;
+    }
     .ql-editor li p, .quill-editor li p, .pro-table li p {
       display: inline !important;
       margin: 0 !important;
@@ -137,7 +151,7 @@
     }
     .ql-editor ol, .ql-editor ul {
       padding-left: 1.25rem !important;
-      margin: 0.25rem 0 !important;
+      margin: 0.2rem 0 !important;
     }
 
     /* 統一全域標題樣式重設，避免瀏覽器預設 1em 產生巨大斷層 */
