@@ -182,10 +182,10 @@
     }
     .ql-editor div:empty,
     .ql-editor p:empty,
-    .ql-editor div:blank,
-    .ql-editor p:blank,
-    .ql-editor div:not(:has(*)):not(:has(text)),
-    .ql-editor > br {
+    .ql-editor span:empty,
+    .ql-editor > br,
+    .ql-editor div > br:only-child,
+    .ql-editor p > br:only-child {
       display: none !important;
       height: 0 !important;
       min-height: 0 !important;
@@ -2213,9 +2213,24 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
       `;
 
       // 即時清理瀏覽器渲染後的所有空 div / 空 p / 空標籤，徹底根除多餘行距
-      container.querySelectorAll('.ql-editor div, .ql-editor p, .ql-editor span').forEach(el => {
-        if (!el.querySelector('img, table, iframe') && (!el.textContent || !el.textContent.replace(/[\s\u00A0\r\n\t]/g, ''))) {
-          el.remove();
+      let cleanupLoop = true;
+      let cleanupPasses = 0;
+      while (cleanupLoop && cleanupPasses < 10) {
+        cleanupLoop = false;
+        cleanupPasses++;
+        container.querySelectorAll('.ql-editor div, .ql-editor p, .ql-editor span, .ql-editor h1, .ql-editor h2, .ql-editor h3, .ql-editor h4, .ql-editor h5, .ql-editor h6').forEach(el => {
+          if (!el.querySelector('img, table, iframe') && (!el.textContent || !el.textContent.replace(/[\s\u00A0\r\n\t]/g, ''))) {
+            el.remove();
+            cleanupLoop = true;
+          }
+        });
+      }
+      // 清除 ql-editor 內部開頭與結尾的 br，以及連續的 br
+      container.querySelectorAll('.ql-editor br + br').forEach(b => b.remove());
+      container.querySelectorAll('.ql-editor div > br:only-child, .ql-editor p > br:only-child').forEach(b => {
+        const p = b.parentElement;
+        if (p && !p.querySelector('img, table, iframe') && (!p.textContent || !p.textContent.replace(/[\s\u00A0\r\n\t]/g, ''))) {
+          p.remove();
         }
       });
       // 解開只包著單一 table 的純容器 div，消除斷層

@@ -181,9 +181,13 @@
     }
     .quill-editor div:empty,
     .quill-editor p:empty,
-    .quill-editor div:blank,
-    .quill-editor p:blank,
-    .quill-editor div:not(:has(*)):not(:has(text)) {
+    .quill-editor span:empty,
+    .ql-editor div:empty,
+    .ql-editor p:empty,
+    .ql-editor span:empty,
+    .quill-editor > br,
+    .quill-editor div > br:only-child,
+    .quill-editor p > br:only-child {
       display: none !important;
       height: 0 !important;
       min-height: 0 !important;
