@@ -192,6 +192,40 @@
       font-weight: 600 !important;
       color: #475569 !important;
     }
+
+    /* 前後台 1:1 所見即所得 (WYSIWYG) 編輯卡片樣式標準 */
+    .editor-wysiwyg-container {
+      max-width: 880px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .bulletin-item-card {
+      overflow: visible !important;
+      padding-top: 4px !important;
+      padding-bottom: 4px !important;
+      transition: all 0.2s ease;
+    }
+    .bulletin-item-card .quill-editor,
+    .bulletin-item-card .ql-editor {
+      background: transparent !important;
+      border: none !important;
+      outline: none !important;
+      box-shadow: none !important;
+      overflow: visible !important;
+      padding: 0 !important;
+    }
+    .bulletin-item-card .quill-editor > *:last-child,
+    .bulletin-item-card .quill-editor *:last-child,
+    .bulletin-item-card .ql-editor > *:last-child,
+    .bulletin-item-card .ql-editor *:last-child {
+      margin-bottom: 0 !important;
+      padding-bottom: 0 !important;
+    }
+    .bulletin-item-card .quill-editor table,
+    .bulletin-item-card .ql-editor table {
+      margin-top: 2px !important;
+      margin-bottom: 2px !important;
+    }
   
     /* TinyMCE Overflow Menu Horizontal Layout (限定僅作用於滑動溢出選單，避免破壞任何對話框) */
     .tox-tinymce-aux .tox-toolbar__overflow,
@@ -633,7 +667,9 @@
               <span>新增段落</span>
             </button>
           </div>
-          <div id="sc"></div>
+          <div class="p-6 bg-slate-50/40">
+            <div id="sc" class="editor-wysiwyg-container space-y-4"></div>
+          </div>
         </section>
 
         <!-- Section C: 已讀狀態追蹤 -->
