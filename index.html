@@ -2211,6 +2211,20 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
           })()}
         </div>
       `;
+
+      // 即時清理瀏覽器渲染後的所有空 div / 空 p / 空標籤，徹底根除多餘行距
+      container.querySelectorAll('.ql-editor div, .ql-editor p, .ql-editor span').forEach(el => {
+        if (!el.querySelector('img, table, iframe') && (!el.textContent || !el.textContent.replace(/[\s\u00A0\r\n\t]/g, ''))) {
+          el.remove();
+        }
+      });
+      // 解開只包著單一 table 的純容器 div，消除斷層
+      container.querySelectorAll('.ql-editor div').forEach(d => {
+        if (d.children.length === 1 && d.children[0].tagName.toLowerCase() === 'table' && !d.className && !d.id) {
+          d.parentElement.replaceChild(d.children[0], d);
+        }
+      });
+
       setupReadingProgressTracker();
     }
     // ==========================================
