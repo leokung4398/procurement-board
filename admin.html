@@ -113,6 +113,9 @@
       padding: 0 !important;
       line-height: 1.15 !important;
     }
+    .quill-editor div + div, .ql-editor div + div {
+      margin-top: 0 !important;
+    }
     .quill-editor p, .ql-editor p {
       margin-top: 0 !important;
       margin-bottom: 0.05rem !important;
@@ -120,7 +123,8 @@
       padding: 0 !important;
       color: inherit !important;
     }
-    .quill-editor p:last-child, .ql-editor p:last-child {
+    .quill-editor p:last-child, .ql-editor p:last-child,
+    .quill-editor div:last-child, .ql-editor div:last-child {
       margin-bottom: 0 !important;
     }
     .quill-editor span, .ql-editor span {
@@ -193,11 +197,9 @@
       color: #475569 !important;
     }
 
-    /* 前後台 1:1 所見即所得 (WYSIWYG) 編輯卡片樣式標準 */
+    /* 前後台編輯卡片樣式標準 */
     .editor-wysiwyg-container {
-      max-width: 880px;
-      margin-left: auto;
-      margin-right: auto;
+      width: 100%;
     }
     .bulletin-item-card {
       overflow: visible !important;
@@ -667,9 +669,7 @@
               <span>新增段落</span>
             </button>
           </div>
-          <div class="p-6 bg-slate-50/40">
-            <div id="sc" class="editor-wysiwyg-container space-y-4"></div>
-          </div>
+          <div id="sc"></div>
         </section>
 
         <!-- Section C: 已讀狀態追蹤 -->

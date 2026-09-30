@@ -65,6 +65,9 @@
       padding: 0 !important;
       line-height: 1.15 !important;
     }
+    .ql-editor div + div {
+      margin-top: 0 !important;
+    }
     .ql-editor p {
       margin-top: 0 !important;
       margin-bottom: 0.05rem !important; /* 極致緊湊微邊距 */
@@ -72,7 +75,8 @@
       padding: 0 !important;
       color: inherit !important;
     }
-    .ql-editor p:last-child {
+    .ql-editor p:last-child,
+    .ql-editor div:last-child {
       margin-bottom: 0 !important;
     }
     .ql-editor span {
@@ -1743,19 +1747,26 @@ async function showKPI(monthOffset = 0) {
           // 2.2 解除多層單一子節點的嵌套無用 div，扁平化結構消除不必要的行距與外距
           let unwrapFound = true;
           let unwrapPasses = 0;
-          while (unwrapFound && unwrapPasses < 6) {
+          while (unwrapFound && unwrapPasses < 10) {
             unwrapFound = false;
             unwrapPasses++;
             doc.querySelectorAll('div').forEach(d => {
-              if (d.parentElement && d.parentElement !== doc.body) {
-                // 若 div 只有一個子節點 (div 或 table)，且自身無任何 class/id/實質文字，則將其解開
+              if (d.parentElement) {
+                // (a) 若 div 內部只有一個子元素 (div, p, table, ul, ol)，且自身無特別樣式，則直接將子元素提出
                 if (d.children.length === 1 && !d.className && !d.id) {
                   const firstChild = d.children[0];
                   const tag = firstChild.tagName.toLowerCase();
-                  if (tag === 'div' || tag === 'table') {
+                  if (['div', 'p', 'table', 'ul', 'ol'].includes(tag)) {
                     d.parentElement.replaceChild(firstChild, d);
                     unwrapFound = true;
+                    return;
                   }
+                }
+                // (b) 若 div 本身是空的或只有空白字元/換行，直接移除
+                if (!d.querySelector('img, table, iframe') && (!d.textContent || !d.textContent.replace(/[\s\u00A0\r\n\t]/g, ''))) {
+                  d.remove();
+                  unwrapFound = true;
+                  return;
                 }
               }
             });
@@ -1765,7 +1776,7 @@ async function showKPI(monthOffset = 0) {
           doc.querySelectorAll('*').forEach(el => {
             if (el.style) {
               if (el.style.lineHeight && (parseFloat(el.style.lineHeight) > 1.25 || el.style.lineHeight.includes('px'))) {
-                el.style.lineHeight = '1.2';
+                el.style.lineHeight = '1.15';
               }
               if (el.tagName.toLowerCase() === 'div' && el.style.margin) {
                 el.style.margin = '0';
@@ -1786,8 +1797,9 @@ async function showKPI(monthOffset = 0) {
             });
           }
 
-          // 清理多餘連續的 br
+          // 清理多餘連續的 br 或直接緊跟在 block 元素旁的 br
           doc.querySelectorAll('br + br').forEach(b => b.remove());
+          doc.querySelectorAll('div > br:first-child, div > br:last-child, p > br:first-child, p > br:last-child').forEach(b => b.remove());
 
           // 4. 清理末尾孤立的 br、空文字節點或只有空白字元的區塊
           function trimTrailingEmptyNodes(parent) {
