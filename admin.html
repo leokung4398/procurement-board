@@ -168,15 +168,16 @@
       font-weight: bold !important;
     }
 
-    .pro-table, .quill-editor table {
+    .pro-table, .quill-editor table, .ql-editor table {
       width: 100% !important;
       height: auto !important;
       border-collapse: collapse !important;
-      margin: 4px 0 !important;
+      margin-top: 4px !important;
+      margin-bottom: 6px !important;
       font-size: 0.875rem !important;
       table-layout: auto !important;
     }
-    .pro-table tr, .quill-editor table tr {
+    .pro-table tr, .quill-editor table tr, .ql-editor table tr {
       height: auto !important;
     }
     .quill-editor div:empty,
@@ -196,6 +197,20 @@
       margin: 0 !important;
       padding: 0 !important;
       border: 0 !important;
+    }
+    /* 針對包含表格的外層 div，重置為純容器，不額外產生段落外距 */
+    .quill-editor div:has(> table), .ql-editor div:has(> table) {
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+      padding: 0 !important;
+    }
+    .quill-editor table + div, .ql-editor table + div,
+    .quill-editor div:has(> table) + div, .ql-editor div:has(> table) + div {
+      margin-top: 4px !important;
+    }
+    .quill-editor div + table, .ql-editor div + table,
+    .quill-editor div + div:has(> table), .ql-editor div + div:has(> table) {
+      margin-top: 2px !important;
     }
     .pro-table td, .pro-table th, .quill-editor table td, .quill-editor table th {
       border: 1px solid #cbd5e1 !important;
