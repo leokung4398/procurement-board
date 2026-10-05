@@ -2922,13 +2922,18 @@ async function submitManualRead() {
     const backfillNote = `[管理員手動補登] ${new Date().toLocaleString('zh-TW')}`;
 
     if (docSnap.exists) {
-      await receiptRef.update({
+      const updateData = {
         readProgress: progress,
         lastViewedAt: timestamp,
         note: backfillNote
-      });
+      };
+      if (progress >= 100) {
+        updateData.confirmed = true;
+        updateData.confirmedAt = timestamp;
+      }
+      await receiptRef.update(updateData);
     } else {
-      await receiptRef.set({
+      const docData = {
         userId: docId,
         email: userEmail,
         displayName: userName,
@@ -2937,7 +2942,12 @@ async function submitManualRead() {
         readAt: timestamp,
         lastViewedAt: timestamp,
         note: backfillNote
-      });
+      };
+      if (progress >= 100) {
+        docData.confirmed = true;
+        docData.confirmedAt = timestamp;
+      }
+      await receiptRef.set(docData);
     }
 
     // 寫入防舞弊操作紀錄日誌 (Audit Log)

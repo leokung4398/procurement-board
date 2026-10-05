@@ -577,7 +577,7 @@
           if (docSnap.exists) {
             const data = docSnap.data();
             const p = typeof data.readProgress === 'number' ? data.readProgress : 100;
-            const confirmed = data.confirmed === true || p >= 100;
+            const confirmed = data.confirmed === true;
             return { hasRead: true, readProgress: p, confirmed: confirmed };
           }
           return { hasRead: false, readProgress: 0, confirmed: false };
@@ -607,6 +607,49 @@
             }
           }
         }).catch(e => console.error("Load config error:", e));
+
+        // One-time backfill for Leo Kung and completed readers
+        (async function runBackfillOnce() {
+          try {
+            if (localStorage.getItem('backfill_confirmed_v1')) return;
+            const nowTs = firebase.firestore.FieldValue.serverTimestamp();
+            
+            // 1. 補登孔令淳 (Leo Kung) 於 W39
+            const leoDoc = {
+              userId: 'QG943w6Gema0dRhP9r19VFFjrjI3',
+              email: 'leokung@youbike.com.tw',
+              displayName: '孔令淳',
+              department: '工程處',
+              readProgress: 100,
+              confirmed: true,
+              confirmedAt: nowTs,
+              lastViewedAt: nowTs,
+              readAt: nowTs
+            };
+            await db.collection('bulletins').doc('2026-W39').collection('readReceipts').doc('QG943w6Gema0dRhP9r19VFFjrjI3').set(leoDoc, { merge: true });
+
+            // 2. 補登歷史週報 (W38, W36, W35) 實質已達 95%~100% 但 confirmed 遺漏的同仁
+            const pastWeeks = ['2026-W38', '2026-W36', '2026-W35'];
+            for (const wk of pastWeeks) {
+              const snap = await db.collection('bulletins').doc(wk).collection('readReceipts').get();
+              snap.forEach(async doc => {
+                const d = doc.data();
+                if ((d.readProgress >= 95 || d.readProgress === 100) && d.confirmed !== true) {
+                  await doc.ref.update({
+                    confirmed: true,
+                    confirmedAt: d.lastViewedAt || nowTs,
+                    readProgress: 100
+                  }).catch(() => {});
+                }
+              });
+            }
+
+            localStorage.setItem('backfill_confirmed_v1', '1');
+            console.log('[Backfill] Completed successfully for Leo Kung and historical readers.');
+          } catch (e) {
+            console.warn('[Backfill] notice:', e);
+          }
+        })();
         
       } catch (e) {
         console.error("Firebase initialization failed:", e);
@@ -1141,8 +1184,7 @@ async function showKPI(monthOffset = 0) {
 
           // 判斷當前週報完讀狀態，呈現尊榮金徽章（必須經過確認打卡，而非僅滾動進度）
           if (state.activeBulletinId && readBadge) {
-            const isConfirmed = localStorage.getItem('has_confirmed_' + state.activeBulletinId) === '1' || 
-                                (localStorage.getItem('has_read_' + state.activeBulletinId) === '1' && parseInt(localStorage.getItem('progress_' + state.activeBulletinId) || '0', 10) >= 100);
+            const isConfirmed = localStorage.getItem('has_confirmed_' + state.activeBulletinId) === '1';
             if (isConfirmed) {
               if (readBadgeText) readBadgeText.textContent = `${state.activeBulletinId} 已完讀`;
               readBadge.classList.remove('hidden');
@@ -1302,15 +1344,14 @@ async function showKPI(monthOffset = 0) {
           // 優先向雲端 Firestore 查驗打卡與閱讀進度真理來源
           const res = uid ? await DS.hasRead(state.activeBulletinId, uid) : { hasRead: false, readProgress: 0, confirmed: false };
 
-          const localConfirmed = localStorage.getItem('has_confirmed_' + state.activeBulletinId) === '1' ||
-                                 (localStorage.getItem('has_read_' + state.activeBulletinId) === '1' && parseInt(localStorage.getItem('progress_' + state.activeBulletinId) || '0', 10) >= 100);
+          const localConfirmed = localStorage.getItem('has_confirmed_' + state.activeBulletinId) === '1';
 
           if (res.hasRead) {
             try { 
               localStorage.setItem('has_read_' + state.activeBulletinId, '1'); 
               localStorage.setItem('dismissed_unread_' + state.activeBulletinId, '1');
             } catch(e) {}
-            if (res.confirmed || res.readProgress >= 100 || localConfirmed) {
+            if (res.confirmed || localConfirmed) {
               try { 
                 localStorage.setItem('has_confirmed_' + state.activeBulletinId, '1');
                 localStorage.setItem('progress_' + state.activeBulletinId, '100'); 
@@ -1320,9 +1361,16 @@ async function showKPI(monthOffset = 0) {
               if (bar) bar.style.width = '100%';
               
               // 若本地已打卡但雲端尚未標記 confirmed，背景補同步一次
-              if (!res.confirmed && res.readProgress < 100 && localConfirmed) {
+              if (!res.confirmed && localConfirmed) {
                 DS.markAsRead(state.activeBulletinId, user, 100);
               }
+            } else {
+              // 雲端只有部分滾動進度但未確認打卡，還原進度（上限 95%）
+              const p = Math.min(95, res.readProgress || 0);
+              try { localStorage.setItem('progress_' + state.activeBulletinId, String(p)); } catch(e) {}
+              currentBulletinProgress = p;
+              const bar = document.getElementById('reading-progress-bar');
+              if (bar) bar.style.width = `${p}%`;
             }
             document.getElementById('unread-modal').classList.add('hidden');
             updateAuthUI();
@@ -1494,13 +1542,16 @@ async function showKPI(monthOffset = 0) {
     function selectBulletin(id) {
       if (window.syncReadingProgress) window.syncReadingProgress();
       currentBulletinProgress = 0;
+      const isConfirmed = localStorage.getItem('has_confirmed_' + id) === '1';
       const storedProgress = parseInt(localStorage.getItem('progress_' + id) || '0', 10);
       const bar = document.getElementById('reading-progress-bar');
       if (bar) {
-        bar.style.width = storedProgress >= 100 ? '100%' : '0%';
+        bar.style.width = isConfirmed ? '100%' : `${Math.min(95, storedProgress)}%`;
       }
-      if (storedProgress >= 100) {
+      if (isConfirmed) {
         currentBulletinProgress = 100;
+      } else {
+        currentBulletinProgress = Math.min(95, storedProgress);
       }
       if (state.isEditMode) syncDOMToState();
       state.activeBulletinId = id;
@@ -1660,8 +1711,7 @@ async function showKPI(monthOffset = 0) {
             <div class="space-y-1.5 pl-1">
               ${items.map(b => {
                 const isActive = b.id === state.activeBulletinId;
-                const isConfirmed = localStorage.getItem('has_confirmed_' + b.id) === '1' ||
-                                    (localStorage.getItem('has_read_' + b.id) === '1' && parseInt(localStorage.getItem('progress_' + b.id) || '0', 10) >= 100);
+                const isConfirmed = localStorage.getItem('has_confirmed_' + b.id) === '1';
                 const isNew = filteredBulletins.length > 0 && filteredBulletins[0].id === b.id;
 
                 const activeClass = isActive 
@@ -2200,8 +2250,7 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
             `;
           })()}
           ${(() => {
-            const isConfirmed = localStorage.getItem('has_confirmed_' + bulletin.id) === '1' || 
-                                (localStorage.getItem('has_read_' + bulletin.id) === '1' && parseInt(localStorage.getItem('progress_' + bulletin.id) || '0', 10) >= 100);
+            const isConfirmed = localStorage.getItem('has_confirmed_' + bulletin.id) === '1';
             return `
               <div id="reading-confirm-card" class="p-4 rounded-xl border transition-all duration-300 ${
                 isConfirmed 
@@ -2324,18 +2373,19 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
       const userStr = localStorage.getItem('procurement_user');
       if (!userStr || !state.activeBulletinId) return;
 
-      // 檢查是否已完讀 100%（若是，直接滿條常駐）
-      const storedProgress = parseInt(localStorage.getItem('progress_' + state.activeBulletinId) || '0', 10);
+      // 檢查是否已完讀打卡（若是，直接 100% 滿條常駐）
+      const isConfirmed = localStorage.getItem('has_confirmed_' + state.activeBulletinId) === '1';
       const bar = document.getElementById('reading-progress-bar');
-      if (storedProgress >= 100) {
+      if (isConfirmed) {
         currentBulletinProgress = 100;
         if (bar) bar.style.width = '100%';
-        return; // 已完讀滿條常駐
+        return; // 已完讀打卡滿條常駐
       }
 
       function checkProgress() {
-        // 若已完讀滿條，直接鎖定 100%
-        if (currentBulletinProgress >= 100) {
+        const isAlreadyConfirmed = localStorage.getItem('has_confirmed_' + state.activeBulletinId) === '1';
+        if (isAlreadyConfirmed) {
+          currentBulletinProgress = 100;
           if (bar) bar.style.width = '100%';
           return;
         }
@@ -2346,20 +2396,15 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
         const scrollTop = window.scrollY || docElem.scrollTop;
         const distanceToBottom = scrollHeight - (scrollTop + clientHeight);
 
-        // 完讀判定容許機制：
-        // 1. 若內容小於一頁高度
-        // 2. 或滾動距離底部 <= 80px (忽略頁尾留白/版權資訊誤差)
-        // 3. 或滾動比例達到 90% 以上 (實質公告段落已全部閱讀完畢)
+        // 滾動進度計算：上限為 95%（保留最後 5% 必須點擊「閱讀打卡」按鈕完成 100% 簽核）
         if (scrollHeight <= clientHeight + 50 || distanceToBottom <= 80) {
-          currentBulletinProgress = 100;
+          currentBulletinProgress = Math.max(currentBulletinProgress, 95);
         } else {
-          // 以滑動到頁面最深處位置計算百分比 (10% ~ 100%)
-          let scrollPercent = Math.min(100, Math.max(10, Math.round(((scrollTop + clientHeight) / scrollHeight) * 100)));
-          if (scrollPercent >= 90) scrollPercent = 100;
+          let scrollPercent = Math.min(95, Math.max(10, Math.round(((scrollTop + clientHeight) / scrollHeight) * 100)));
+          if (scrollPercent >= 90) scrollPercent = 95;
           currentBulletinProgress = Math.max(currentBulletinProgress, scrollPercent);
         }
 
-        const bar = document.getElementById('reading-progress-bar');
         if (bar) bar.style.width = `${currentBulletinProgress}%`;
 
         // 節流回傳 (防抖 1.5 秒，僅向雲端更新滾動進度，不觸發已完讀打卡)
