@@ -1333,13 +1333,13 @@
                 <h4 class="text-base font-bold text-white tracking-wide flex items-center gap-2">🎨 專案開發成果條例分類與即時置頂</h4>
               </div>
               <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">
-                全系列 35 項里程碑已依技術構面導入色彩體系。<span class="text-amber-300 font-medium">💡 點選下方任一分類按鈕，即可將該技術構面之成果卡片立即「置頂排列到最上方」</span>，便於長官與主管聚焦查閱！
+                全系列 36 項里程碑已依技術構面導入色彩體系。<span class="text-amber-300 font-medium">💡 點選下方任一分類按鈕，即可將該技術構面之成果卡片立即「置頂排列到最上方」</span>，便於長官與主管聚焦查閱！
               </p>
             </div>
             <div class="flex items-center gap-2.5 flex-shrink-0">
-              <button id="cat-btn-all" onclick="filterMilestoneCat('all')" type="button" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-indigo-400/40 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 text-xs font-semibold transition-all shadow-sm cursor-pointer active:scale-95" title="還原至 1~35 項原始順序">
+              <button id="cat-btn-all" onclick="filterMilestoneCat('all')" type="button" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-indigo-400/40 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 text-xs font-semibold transition-all shadow-sm cursor-pointer active:scale-95" title="還原至 1~36 項原始順序">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                <span>重置原始排序 (全部35項)</span>
+                <span>重置原始排序 (全部36項)</span>
               </button>
             </div>
           </div>
@@ -1420,7 +1420,7 @@
                     <span class="w-2 h-2 rounded-full bg-purple-400"></span>
                     <span class="text-xs font-bold text-purple-300 group-hover:text-purple-200 transition-colors">數據分析與落實</span>
                   </div>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">8 項</span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">9 項</span>
                 </div>
                 <p class="text-[11px] text-slate-400 group-hover:text-slate-300 leading-snug transition-colors">已讀追蹤、完成率、打卡防護、KPI 看板與 Excel 匯出。</p>
                 <div class="mt-2 flex items-center gap-1 text-[10px] text-purple-400 font-semibold opacity-80 group-hover:opacity-100">
@@ -2171,6 +2171,29 @@
             </div>
           </div>
         </div>
+
+          <!-- 里程碑三十六：閱讀打卡狀態真理校驗、滾動防誤鎖與多期閱讀存根補登機制 -->
+          <div data-cat="data" data-orig-idx="36" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(147,51,234,0.15)] hover:border-purple-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-purple-500 to-indigo-600"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-purple-600 group-hover:text-white transition-all duration-300 shadow-sm"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1 flex items-center gap-2">三十六、閱讀打卡狀態真理校驗、滾動防誤鎖與多期閱讀存根補登機制 <span class="bg-purple-50 text-purple-800 border border-purple-200/80 text-[10px] px-2 py-0.5 rounded-md font-semibold tracking-wide flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>數據落實</span> <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-0.5 rounded-full font-normal tracking-wide">2026-10-05</span></h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">採購需求：</span><br>
+                1. 解決同仁在前台閱讀週報滑至底部時，UI 誤將滾動 100% 視為自動打卡並過早反灰鎖定確認按鈕，導致真正的 Firestore 完讀確認訊號未送出，後台名冊依然顯示未讀之問題。<br>
+                2. 明確區隔「滾動閱讀（進度上限壓制於 95%）」與「手動打卡簽核（100% 完讀）」，維持打卡按鈕明亮可點擊，點擊後即刻同步雲端並點亮尊榮皇冠金徽章。<br>
+                3. 後台手動補登介面同步健全化，於設定 100% 完讀時一併寫入 confirmed: true 標籤，落實前後台狀態判定之一致性。<br>
+                4. 針對既有歷史週報（如 W35、W36、W38、W39）已有實質閱讀紀錄（進度 &ge; 95% 或 100%）但確認旗標未補齊之名單進行全域校驗與自動修復補登。
+              </p>
+              <p class="text-xs text-purple-700 font-medium leading-relaxed mt-3 border-l-2 border-purple-400 pl-2">
+                💡 <span class="font-bold">專案成果：</span>徹底重構閱讀狀態判定機制，確立「點擊確認按鈕才是打卡真理」之架構；滾動追蹤器設 95% 緩衝防線，打卡後即時寫入 Firestore confirmed: true 與伺服器時間戳記；後台手動補登功能同步強化確認旗標寫入；全域建置自癒型補登引擎，全自動修復孔令淳（W39）與歷史實質閱讀人員之完讀打卡紀錄！
+              </p>
+            </div>
+          </div>
+        </div>
         </div>
       </div>
 
@@ -2669,7 +2692,7 @@
                 <span>採購電子週報系統｜外包市場價值與專案效益分析</span>
               </h1>
               <p class="text-sm md:text-base text-slate-300 leading-relaxed">
-                本系統歷經 <strong class="text-white">35 個完整迭代里程碑</strong>，已從初期公告頁深化演進為整合<strong>「企業 OAuth 2.0 門禁、Zero-Data 機密防護、富文本/Word/Excel無損排版、全台營運處閱讀 KPI 看板、全員防舞弊操作日誌與多裝置沙盒模擬」</strong>之企業級營運管理平台。本報告依據台灣資訊軟體公會人月標準及市場專業軟體接案公司行情進行全鏈路核算，提供客觀、詳實之商業價值佐證。
+                本系統歷經 <strong class="text-white">36 個完整迭代里程碑</strong>，已從初期公告頁深化演進為整合<strong>「企業 OAuth 2.0 門禁、Zero-Data 機密防護、富文本/Word/Excel無損排版、全台營運處閱讀 KPI 看板、全員防舞弊操作日誌與多裝置沙盒模擬」</strong>之企業級營運管理平台。本報告依據台灣資訊軟體公會人月標準及市場專業軟體接案公司行情進行全鏈路核算，提供客觀、詳實之商業價值佐證。
               </p>
             </div>
             
