@@ -696,17 +696,48 @@ async function fetchKPIData(monthOffset) {
   const snapW = await db.collection('systemConfig').doc('whitelist').get();
   const whitelist = snapW.exists ? (snapW.data().list || []) : [];
   
+  // 檢查是否有名單明確設定過 isPrimary
+  const hasExplicitPrimary = whitelist.some(w => w && w.isPrimary === true);
+
   const unitPrimaryCount = {};
   const allUnits = new Set();
-  
+  const primaryByUnit = {};
+
   whitelist.forEach(w => {
-    if (!w.unit) return;
-    allUnits.add(w.unit);
-    if (w.isPrimary) {
-      unitPrimaryCount[w.unit] = (unitPrimaryCount[w.unit] || 0) + 1;
+    // 單位名稱支援 w.unit 或 w.region 回退機制
+    const rawUnit = (w.unit || w.region || '').trim();
+    if (!rawUnit) return;
+    allUnits.add(rawUnit);
+
+    // 判定是否為該單位的主要統計代表：
+    // 若系統中已有名單設為 isPrimary，則依照 isPrimary 判定；
+    // 若全系統尚未有人設定 isPrimary，則自動將各營運處全員視為應閱讀窗口！
+    const isTargetPrimary = hasExplicitPrimary ? (w.isPrimary === true) : true;
+
+    if (isTargetPrimary) {
+      unitPrimaryCount[rawUnit] = (unitPrimaryCount[rawUnit] || 0) + 1;
+      if (!primaryByUnit[rawUnit]) primaryByUnit[rawUnit] = [];
+      let found = primaryByUnit[rawUnit].find(p => p.name === w.name);
+      if (!found) {
+        found = { name: w.name, emails: new Set() };
+        primaryByUnit[rawUnit].push(found);
+      }
+      if (w.email) found.emails.add(w.email.trim().toLowerCase());
     }
   });
-  
+
+  // Also link alternate emails of the same person in the same unit
+  whitelist.forEach(w => {
+    const rawUnit = (w.unit || w.region || '').trim();
+    if (!rawUnit) return;
+    if (primaryByUnit[rawUnit]) {
+      const found = primaryByUnit[rawUnit].find(p => p.name === w.name);
+      if (found && w.email) {
+        found.emails.add(w.email.trim().toLowerCase());
+      }
+    }
+  });
+
   const missingUnits = [];
   const validUnits = [];
   allUnits.forEach(u => {
@@ -744,34 +775,6 @@ async function fetchKPIData(monthOffset) {
     unitFirstConfirmedTime[u] = Infinity;
   });
 
-  // Group primary contacts by unit
-  const primaryByUnit = {};
-  whitelist.forEach(w => {
-    const u = w.unit;
-    if (!u) return;
-    if (w.isPrimary) {
-      if (!primaryByUnit[u]) primaryByUnit[u] = [];
-      let found = primaryByUnit[u].find(p => p.name === w.name);
-      if (!found) {
-        found = { name: w.name, emails: new Set() };
-        primaryByUnit[u].push(found);
-      }
-      if (w.email) found.emails.add(w.email.trim().toLowerCase());
-    }
-  });
-
-  // Also link alternate emails of the same person in the same unit
-  whitelist.forEach(w => {
-    const u = w.unit;
-    if (!u || w.isPrimary) return;
-    if (primaryByUnit[u]) {
-      const found = primaryByUnit[u].find(p => p.name === w.name);
-      if (found && w.email) {
-        found.emails.add(w.email.trim().toLowerCase());
-      }
-    }
-  });
-
   for (let bId of bulletinIds) {
     const snapR = await db.collection('bulletins').doc(bId).collection('readReceipts').get();
     const readerMap = new Map();
@@ -779,7 +782,9 @@ async function fetchKPIData(monthOffset) {
       const data = r.data();
       const prog = typeof data.readProgress === 'number' ? data.readProgress : 100;
       let timeMs = Infinity;
-      if (data.readAt && typeof data.readAt.toDate === 'function') {
+      if (data.confirmedAt && typeof data.confirmedAt.toDate === 'function') {
+        timeMs = data.confirmedAt.toDate().getTime();
+      } else if (data.readAt && typeof data.readAt.toDate === 'function') {
         timeMs = data.readAt.toDate().getTime();
       } else if (data.readAt && data.readAt.seconds) {
         timeMs = data.readAt.seconds * 1000;
@@ -1129,17 +1134,30 @@ async function showKPI(monthOffset = 0) {
           smEl.appendChild(opt);
         });
 
-        // 自動鎖定並過濾為最新月份
-        if (mArr.length > 0) {
-          smEl.value = mArr[0];
-          state.searchMonth = mArr[0];
-        }
+        // 優先檢查網址是否有傳入指定週報 ID (?id=2026-W39)
+        const urlId = new URLSearchParams(window.location.search).get('id');
+        const targetBulletin = urlId ? bulletins.find(b => b.id === urlId) : null;
 
-        const initialFiltered = getFilteredBulletins();
-        if (initialFiltered.length > 0) {
-          state.activeBulletinId = initialFiltered[0].id;
-        } else if (bulletins.length > 0) {
-          state.activeBulletinId = bulletins[0].id;
+        if (targetBulletin) {
+          state.activeBulletinId = targetBulletin.id;
+          if (targetBulletin.publishDate) {
+            const m = targetBulletin.publishDate.slice(0, 7);
+            smEl.value = m;
+            state.searchMonth = m;
+          }
+        } else {
+          // 自動鎖定並過濾為最新月份
+          if (mArr.length > 0) {
+            smEl.value = mArr[0];
+            state.searchMonth = mArr[0];
+          }
+
+          const initialFiltered = getFilteredBulletins();
+          if (initialFiltered.length > 0) {
+            state.activeBulletinId = initialFiltered[0].id;
+          } else if (bulletins.length > 0) {
+            state.activeBulletinId = bulletins[0].id;
+          }
         }
         
         renderApp();
@@ -1241,94 +1259,96 @@ async function showKPI(monthOffset = 0) {
       const btn = document.getElementById('btn-confirm-read');
       const card = document.getElementById('reading-confirm-card');
 
-      // 1. 防重複點擊與 Loading 動態回饋
+      // 1. 防重複點擊與 Loading 動態回饋（先不樂觀標記本地完讀，確保雲端入帳為真理）
+      const origHtml = btn ? btn.innerHTML : '';
+      const origClass = btn ? btn.className : '';
       if (btn) {
         btn.disabled = true;
-        btn.dataset.originalHtml = btn.innerHTML;
-        btn.dataset.originalClass = btn.className;
         btn.className = 'w-full sm:w-auto px-5 py-2 rounded-lg font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 bg-indigo-500 text-white shadow-none cursor-wait opacity-90';
         btn.innerHTML = `
           <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
           </svg>
-          <span>同步打卡中...</span>
+          <span>雲端連線打卡中...</span>
         `;
       }
 
-      // 2. 樂觀立即鎖定本地完讀與尊榮徽章（Optimistic UI Update）
-      try {
-        localStorage.setItem('progress_' + bulletinId, '100');
-        localStorage.setItem('has_read_' + bulletinId, '1');
-        localStorage.setItem('has_confirmed_' + bulletinId, '1');
-        localStorage.setItem('dismissed_unread_' + bulletinId, '1');
-      } catch(e) {}
-      currentBulletinProgress = 100;
-
-      // 頂部閱讀進度條拉滿
-      const bar = document.getElementById('reading-progress-bar');
-      if (bar) bar.style.width = '100%';
-
-      // 更新底端按鈕與卡片狀態為已打卡
-      if (card) {
-        card.className = 'p-4 rounded-xl border transition-all duration-300 bg-slate-50/80 border-slate-200/80';
-        card.innerHTML = `
-          <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div class="flex items-center gap-3 min-w-0 text-center sm:text-left">
-              <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 bg-amber-50 text-amber-500 border border-amber-200/60">
-                <span class="text-lg leading-none">👑</span>
-              </div>
-              <div>
-                <div class="flex items-center justify-center sm:justify-start gap-2">
-                  <h4 class="text-sm font-bold text-slate-800">本期週報閱讀確認</h4>
-                  <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200/70 px-2 py-0.5 rounded-full">✓ 已閱畢</span>
-                </div>
-                <p class="text-xs text-slate-500 mt-0.5">系統已成功記錄您的閱畢紀錄，頂部已點亮尊榮皇冠徽章。</p>
-              </div>
-            </div>
-            <div class="flex-shrink-0 w-full sm:w-auto">
-              <button id="btn-confirm-read" disabled class="w-full sm:w-auto px-5 py-2 rounded-lg font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 bg-slate-100 text-slate-400 border border-slate-200/80 cursor-default shadow-none">
-                <span>已完成本期打卡</span>
-              </button>
-            </div>
-          </div>
-        `;
-      } else if (btn) {
-        btn.disabled = true;
-        btn.className = 'w-full sm:w-auto px-5 py-2 rounded-lg font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 bg-slate-100 text-slate-400 border border-slate-200/80 cursor-default shadow-none';
-        btn.innerHTML = '<span>已完成本期打卡</span>';
-      }
-
-      // 即刻點亮 Header 尊榮徽章與更新側邊欄已讀打卡標記
-      updateAuthUI();
-      renderTabs();
-
-      // 3. 背景同步寫入雲端 Firestore
+      // 2. 嚴格雲端雙向認可同步 (Strict Cloud Acknowledgment)
       try {
         const res = await DS.markAsRead(bulletinId, user, 100);
         if (res && res.success) {
+          // 雲端確實驗收成功，正式鎖定本地打卡與尊榮金徽章
+          try {
+            localStorage.setItem('progress_' + bulletinId, '100');
+            localStorage.setItem('has_read_' + bulletinId, '1');
+            localStorage.setItem('has_confirmed_' + bulletinId, '1');
+            localStorage.setItem('dismissed_unread_' + bulletinId, '1');
+          } catch(e) {}
+          currentBulletinProgress = 100;
+
+          // 頂部閱讀進度條拉滿
+          const bar = document.getElementById('reading-progress-bar');
+          if (bar) bar.style.width = '100%';
+
+          // 更新底端按鈕與卡片狀態為已打卡
+          if (card) {
+            card.className = 'p-4 rounded-xl border transition-all duration-300 bg-slate-50/80 border-slate-200/80';
+            card.innerHTML = `
+              <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0 text-center sm:text-left">
+                  <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 bg-amber-50 text-amber-500 border border-amber-200/60">
+                    <span class="text-lg leading-none">👑</span>
+                  </div>
+                  <div>
+                    <div class="flex items-center justify-center sm:justify-start gap-2">
+                      <h4 class="text-sm font-bold text-slate-800">本期週報閱讀確認</h4>
+                      <span class="inline-flex items-center gap-1 text-[11px] font-semibold text-emerald-600 bg-emerald-50 border border-emerald-200/70 px-2 py-0.5 rounded-full">✓ 已閱畢</span>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-0.5">系統已成功記錄您的閱畢紀錄，頂部已點亮尊榮皇冠徽章。</p>
+                  </div>
+                </div>
+                <div class="flex-shrink-0 w-full sm:w-auto">
+                  <button id="btn-confirm-read" disabled class="w-full sm:w-auto px-5 py-2 rounded-lg font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 bg-slate-100 text-slate-400 border border-slate-200/80 cursor-default shadow-none">
+                    <span>已完成本期打卡</span>
+                  </button>
+                </div>
+              </div>
+            `;
+          } else if (btn) {
+            btn.disabled = true;
+            btn.className = 'w-full sm:w-auto px-5 py-2 rounded-lg font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 bg-slate-100 text-slate-400 border border-slate-200/80 cursor-default shadow-none';
+            btn.innerHTML = '<span>已完成本期打卡</span>';
+          }
+
+          // 即刻點亮 Header 尊榮徽章與更新側邊欄已讀打卡標記
+          updateAuthUI();
+          renderTabs();
+
           if (typeof toast === 'function') {
-            toast('👑 感謝您的閱畢打卡！雲端已成功同步並點亮尊榮已完讀徽章。', 'ok');
+            toast('👑 感謝您的閱畢打卡！雲端已成功同步入帳並點亮尊榮皇冠金徽章。', 'ok');
           } else {
-            alert('🎉 您已完成本期週報閱讀打卡！已於頂部點亮尊榮完讀徽章。');
+            alert('🎉 您已完成本期週報閱讀打卡！已成功同步至管理後台。');
           }
         } else {
-          // 雲端權限或短暫異常：由於本地已成功打卡，提示同仁並保持已完讀狀態，不阻擋閱覽
-          const errMsg = (res && res.error) ? (res.error.message || String(res.error)) : '';
-          console.warn('Background sync status:', errMsg);
-          if (typeof toast === 'function') {
-            toast('👑 本地打卡成功！尊榮完讀徽章已點亮（雲端將於背景自動同步備份）。', 'ok');
-          } else {
-            alert('🎉 您已完成本期週報閱讀打卡！已於頂部點亮尊榮完讀徽章。');
+          // 雲端寫入失敗：嚴格回滾按鈕狀態，絕不造成已打卡之視覺假象
+          const errMsg = (res && res.error) ? (res.error.message || String(res.error)) : '網路中斷或伺服器回應逾時';
+          console.error('Cloud confirmation error:', errMsg);
+          if (btn) {
+            btn.disabled = false;
+            btn.className = origClass || 'w-full sm:w-auto px-5 py-2 rounded-lg font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 bg-gradient-to-r from-red-600 to-indigo-600 text-white shadow cursor-pointer';
+            btn.innerHTML = '<span>⚠️ 同步失敗，請點此重新打卡</span>';
           }
+          alert('❌ 雲端打卡同步失敗：' + errMsg + '\n請確認網路連線正常後，再次點擊按鈕重試打卡！');
         }
       } catch(err) {
-        console.warn('Background sync warning:', err);
-        if (typeof toast === 'function') {
-          toast('👑 本地打卡成功！尊榮完讀徽章已點亮（雲端將於背景自動同步備份）。', 'ok');
-        } else {
-          alert('🎉 您已完成本期週報閱讀打卡！已於頂部點亮尊榮完讀徽章。');
+        console.error('Cloud confirmation exception:', err);
+        if (btn) {
+          btn.disabled = false;
+          btn.className = origClass || 'w-full sm:w-auto px-5 py-2 rounded-lg font-semibold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all duration-200 bg-gradient-to-r from-red-600 to-indigo-600 text-white shadow cursor-pointer';
+          btn.innerHTML = '<span>⚠️ 連線異常，請點此重試</span>';
         }
+        alert('❌ 雲端伺服器連線異常，尚未完成存檔，請再點一次打卡按鈕進行重試。');
       }
     }
 

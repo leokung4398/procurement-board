@@ -2139,17 +2139,48 @@ async function fetchKPIData(monthOffset) {
   const snapW = await db.collection('systemConfig').doc('whitelist').get();
   const whitelist = snapW.exists ? (snapW.data().list || []) : [];
   
+  // 檢查是否有名單明確設定過 isPrimary
+  const hasExplicitPrimary = whitelist.some(w => w && w.isPrimary === true);
+
   const unitPrimaryCount = {};
   const allUnits = new Set();
-  
+  const primaryByUnit = {};
+
   whitelist.forEach(w => {
-    if (!w.unit) return;
-    allUnits.add(w.unit);
-    if (w.isPrimary) {
-      unitPrimaryCount[w.unit] = (unitPrimaryCount[w.unit] || 0) + 1;
+    // 單位名稱支援 w.unit 或 w.region 回退機制
+    const rawUnit = (w.unit || w.region || '').trim();
+    if (!rawUnit) return;
+    allUnits.add(rawUnit);
+
+    // 判定是否為該單位的主要統計代表：
+    // 若系統中已有名單設為 isPrimary，則依照 isPrimary 判定；
+    // 若全系統尚未有人設定 isPrimary，則自動將各營運處全員視為應閱讀窗口！
+    const isTargetPrimary = hasExplicitPrimary ? (w.isPrimary === true) : true;
+
+    if (isTargetPrimary) {
+      unitPrimaryCount[rawUnit] = (unitPrimaryCount[rawUnit] || 0) + 1;
+      if (!primaryByUnit[rawUnit]) primaryByUnit[rawUnit] = [];
+      let found = primaryByUnit[rawUnit].find(p => p.name === w.name);
+      if (!found) {
+        found = { name: w.name, emails: new Set() };
+        primaryByUnit[rawUnit].push(found);
+      }
+      if (w.email) found.emails.add(w.email.trim().toLowerCase());
     }
   });
-  
+
+  // Also link alternate emails of the same person in the same unit
+  whitelist.forEach(w => {
+    const rawUnit = (w.unit || w.region || '').trim();
+    if (!rawUnit) return;
+    if (primaryByUnit[rawUnit]) {
+      const found = primaryByUnit[rawUnit].find(p => p.name === w.name);
+      if (found && w.email) {
+        found.emails.add(w.email.trim().toLowerCase());
+      }
+    }
+  });
+
   const missingUnits = [];
   const validUnits = [];
   allUnits.forEach(u => {
@@ -2187,34 +2218,6 @@ async function fetchKPIData(monthOffset) {
     unitFirstConfirmedTime[u] = Infinity;
   });
 
-  // Group primary contacts by unit
-  const primaryByUnit = {};
-  whitelist.forEach(w => {
-    const u = w.unit;
-    if (!u) return;
-    if (w.isPrimary) {
-      if (!primaryByUnit[u]) primaryByUnit[u] = [];
-      let found = primaryByUnit[u].find(p => p.name === w.name);
-      if (!found) {
-        found = { name: w.name, emails: new Set() };
-        primaryByUnit[u].push(found);
-      }
-      if (w.email) found.emails.add(w.email.trim().toLowerCase());
-    }
-  });
-
-  // Also link alternate emails of the same person in the same unit
-  whitelist.forEach(w => {
-    const u = w.unit;
-    if (!u || w.isPrimary) return;
-    if (primaryByUnit[u]) {
-      const found = primaryByUnit[u].find(p => p.name === w.name);
-      if (found && w.email) {
-        found.emails.add(w.email.trim().toLowerCase());
-      }
-    }
-  });
-
   for (let bId of bulletinIds) {
     const snapR = await db.collection('bulletins').doc(bId).collection('readReceipts').get();
     const readerMap = new Map();
@@ -2222,7 +2225,9 @@ async function fetchKPIData(monthOffset) {
       const data = r.data();
       const prog = typeof data.readProgress === 'number' ? data.readProgress : 100;
       let timeMs = Infinity;
-      if (data.readAt && typeof data.readAt.toDate === 'function') {
+      if (data.confirmedAt && typeof data.confirmedAt.toDate === 'function') {
+        timeMs = data.confirmedAt.toDate().getTime();
+      } else if (data.readAt && typeof data.readAt.toDate === 'function') {
         timeMs = data.readAt.toDate().getTime();
       } else if (data.readAt && data.readAt.seconds) {
         timeMs = data.readAt.seconds * 1000;
