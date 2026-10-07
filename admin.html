@@ -837,6 +837,7 @@
                       <option value="台南">台南</option>
                       <option value="高雄">高雄</option>
                       <option value="屏東">屏東</option>
+                      <option value="台東">台東</option>
                     </select>
                   </div>
                   <div class="col-span-12 sm:col-span-3">
@@ -887,6 +888,7 @@
                   <option value="台南">台南</option>
                   <option value="高雄">高雄</option>
                   <option value="屏東">屏東</option>
+                  <option value="台東">台東</option>
                 </select>
               </div>
               <div class="flex-1 min-w-[200px] relative">
@@ -3294,7 +3296,7 @@
   </div>
 </div>
 
-<script src="js/admin.js?v=1789730999"></script>
+<script src="js/admin.js?v=1791215000"></script>
 <script>
   window.addEventListener('load', () => {
     // 執行已讀打卡補登 (Leo Kung & 實質完讀者)
@@ -3338,30 +3340,6 @@
         console.warn('[Admin Backfill] notice:', err);
       }
     }, 2000);
-
-    setTimeout(async () => {
-      if (localStorage.getItem('migrated_users_115_v2')) return;
-      const newUsers = [{"region": "台中", "name": "萬偉", "email": "weiwan@youbike.com.tw", "receiveEmail": true}, {"region": "", "name": "傅涵立", "email": "hanleyfu@youbike.com.tw", "receiveEmail": true}, {"region": "台中", "name": "陳恩柔", "email": "rubychen2@youbike.com.tw", "receiveEmail": true}, {"region": "", "name": "黃仁瑱", "email": "ringkahuang@youbike.com.tw", "receiveEmail": true}, {"region": "台中", "name": "吳建穎", "email": "colawu@youbike.com.tw", "receiveEmail": true}, {"region": "", "name": "盧瑞云", "email": "wendylu@youbike.com.tw", "receiveEmail": true}, {"region": "台東", "name": "張挐瑄", "email": "ruxuanzhang@youbike.com.tw", "receiveEmail": true}, {"region": "", "name": "王若維", "email": "ruoweiwang@youbike.com.tw", "receiveEmail": true}, {"region": "台南", "name": "黃聖育", "email": "samhuang@youbike.com.tw", "receiveEmail": true}, {"region": "", "name": "陳韻欣", "email": "yunchen@youbike.com.tw", "receiveEmail": true}, {"region": "台南", "name": "黃龍輝", "email": "clonhuang@youbike.com.tw", "receiveEmail": true}, {"region": "", "name": "彭上維", "email": "ryanpeng@youbike.com.tw", "receiveEmail": true}, {"region": "台南", "name": "倪順一", "email": "shunini@youbike.com.tw", "receiveEmail": true}, {"region": "", "name": "簡榮德", "email": "michaelchien@youbike.com.tw", "receiveEmail": true}, {"region": "台南", "name": "朱栩葳", "email": "hsuweichu@youbike.com.tw", "receiveEmail": true}, {"region": "", "name": "蔡瀚緯", "email": "hanktsai@youbike.com.tw", "receiveEmail": true}, {"region": "台南", "name": "李建融", "email": "chienlonglee@youbike.com.tw", "receiveEmail": true}, {"region": "", "name": "林明孝", "email": "mingxiaolin@youbike.com.tw", "receiveEmail": true}, {"region": "台南", "name": "李庠霖", "email": "hsianglinlee@youbike.com.tw", "receiveEmail": true}, {"region": "", "name": "白正隆", "email": "chenlongpai@youbike.com.tw", "receiveEmail": true}, {"region": "汐止", "name": "張必忠", "email": "joshchang@youbike.com.tw", "receiveEmail": true}, {"region": "", "name": "黃啟中", "email": "qizhonghuang@youbike.com.tw", "receiveEmail": true}, {"region": "屏東", "name": "邱宜敏", "email": "yiminchiu@youbike.com.tw", "receiveEmail": true}, {"region": "台南\n屏東", "name": "洪訢睿", "email": "xinrayhung@youbike.com.tw", "receiveEmail": true}, {"region": "苗栗", "name": "彭世華", "email": "harrypeng@youbike.com.tw", "receiveEmail": true}, {"region": "苗栗", "name": "莊佳誼", "email": "janechuang@youbike.com.tw", "receiveEmail": true}, {"region": "苗栗", "name": "曾薰嬉", "email": "xunxizeng@youbike.com.tw", "receiveEmail": true}, {"region": "桃園", "name": "林瑋泰", "email": "marslin@youbike.com.tw", "receiveEmail": true}, {"region": "桃園", "name": "陳俊帆", "email": "georgechen@youbike.com.tw", "receiveEmail": true}, {"region": "桃園", "name": "吳曉昀", "email": "vivianwu@youbike.com.tw", "receiveEmail": true}, {"region": "高雄", "name": "陳漢全", "email": "boachen@youbike.com.tw", "receiveEmail": true}, {"region": "高雄\n屏東", "name": "林渝軒", "email": "brucelin@youbike.com.tw", "receiveEmail": true}, {"region": "高雄", "name": "李嘉修", "email": "chiahsiuli@youbike.com.tw", "receiveEmail": true}, {"region": "", "name": "徐嘉鴻", "email": "jhsu@youbike.com.tw", "receiveEmail": true}, {"region": "高雄", "name": "呂淑綺", "email": "shuchilu@youbike.com.tw", "receiveEmail": true}, {"region": "", "name": "陳麒任", "email": "aidpanchen@youbike.com.tw", "receiveEmail": true}, {"region": "高雄", "name": "劉建德", "email": "jiandeliu@youbike.com.tw", "receiveEmail": true}, {"region": "", "name": "蕭琮瀚", "email": "jackhsiao@youbike.com.tw", "receiveEmail": true}, {"region": "新竹", "name": "任北辰", "email": "beichenren@youbike.com.tw", "receiveEmail": true}, {"region": "", "name": "賴宜平", "email": "benlai@youbike.com.tw", "receiveEmail": true}, {"region": "新竹", "name": "林柏勳", "email": "poxunlin@youbike.com.tw", "receiveEmail": true}, {"region": "", "name": "張必忠", "email": "joshchang@youbike.com.tw", "receiveEmail": true}, {"region": "新竹", "name": "林言柔", "email": "zoeylin@youbike.com.tw", "receiveEmail": true}, {"region": "", "name": "孔令淳", "email": "leokung@youbike.com.tw", "receiveEmail": true}, {"region": "新竹", "name": "謝小雪", "email": "alicexie@youbike.com.tw", "receiveEmail": true}, {"region": "", "name": "陸逸群", "email": "yichunlu@youbike.com.tw", "receiveEmail": true}, {"region": "嘉義\n台中", "name": "林育民", "email": "tanklin@youbike.com.tw", "receiveEmail": true}, {"region": "", "name": "葉爵豪", "email": "chuehhaoyeh@youbike.com.tw", "receiveEmail": true}, {"region": "嘉義", "name": "林信安", "email": "sinanlin@youbike.com.tw", "receiveEmail": true}, {"region": "", "name": "包于巧", "email": "ciaopao@youbike.com.tw", "receiveEmail": true}, {"region": "蘆洲", "name": "王文樺", "email": "lucaswang@youbike.com.tw", "receiveEmail": true}, {"region": "蘆洲", "name": "吳俊緯", "email": "junweiwu@youbike.com.tw", "receiveEmail": true}, {"region": "蘆洲", "name": "顧致宇", "email": "jiyugu@youbike.com.tw", "receiveEmail": true}, {"region": "蘆洲", "name": "李子岳", "email": "zihyueli@youbike.com.tw", "receiveEmail": true}, {"region": "蘆洲", "name": "李明穎", "email": "mingyinglee@giant.com.tw", "receiveEmail": true}, {"region": "蘆洲", "name": "陳彥文", "email": "kevenchen@youbike.com.tw", "receiveEmail": true}, {"region": "雙北", "name": "唐仕伀", "email": "colintang@youbike.com.tw", "receiveEmail": true}, {"region": "雙北", "name": "李碩晏", "email": "seanlee@youbike.com.tw", "receiveEmail": true}];
-      let wl = S.whitelist || [];
-      let updated = 0;
-      let added = 0;
-      for (const nu of newUsers) {
-        if(!nu.email) continue;
-        const existing = wl.find(x => x.email.toLowerCase() === nu.email.toLowerCase());
-        if (existing) {
-           if (nu.region) existing.region = nu.region;
-           if (nu.name) existing.name = nu.name;
-           updated++;
-        } else {
-           wl.push(nu);
-           added++;
-        }
-      }
-      await DS.saveWhitelist(wl);
-      localStorage.setItem('migrated_users_115_v2', '1');
-      alert('已成功更新通訊錄！依據 115年｜人員名單.csv，共新增 ' + added + ' 筆，更新 ' + updated + ' 筆資料。請重整網頁。');
-      window.location.reload();
-    }, 5000);
   });
 </script>
 
