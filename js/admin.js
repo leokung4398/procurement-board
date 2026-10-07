@@ -2223,7 +2223,13 @@ async function fetchKPIData(monthOffset) {
     const readerMap = new Map();
     snapR.forEach(r => {
       const data = r.data();
-      const prog = typeof data.readProgress === 'number' ? data.readProgress : 100;
+      // 只要同仁有確認打卡 (confirmed: true) 或已有讀取紀錄，該篇進度視為 100%
+      let prog = 100;
+      if (data.confirmed === false) {
+        prog = typeof data.readProgress === 'number' ? data.readProgress : 0;
+      } else {
+        prog = (typeof data.readProgress === 'number' && data.readProgress > 0) ? 100 : 100;
+      }
       let timeMs = Infinity;
       if (data.confirmedAt && typeof data.confirmedAt.toDate === 'function') {
         timeMs = data.confirmedAt.toDate().getTime();

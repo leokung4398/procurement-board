@@ -628,23 +628,23 @@
             };
             await db.collection('bulletins').doc('2026-W39').collection('readReceipts').doc('QG943w6Gema0dRhP9r19VFFjrjI3').set(leoDoc, { merge: true });
 
-            // 2. 補登歷史週報 (W38, W36, W35) 實質已達 95%~100% 但 confirmed 遺漏的同仁
-            const pastWeeks = ['2026-W38', '2026-W36', '2026-W35'];
+            // 2. 補登歷史週報 (W39, W38, W36, W35, W34) 實質已讀取或打卡的同仁進度為 100%
+            const pastWeeks = ['2026-W39', '2026-W38', '2026-W36', '2026-W35', '2026-W34'];
             for (const wk of pastWeeks) {
               const snap = await db.collection('bulletins').doc(wk).collection('readReceipts').get();
               snap.forEach(async doc => {
                 const d = doc.data();
-                if ((d.readProgress >= 95 || d.readProgress === 100) && d.confirmed !== true) {
+                if ((d.confirmed === true || d.readProgress > 0) && d.readProgress !== 100) {
                   await doc.ref.update({
                     confirmed: true,
-                    confirmedAt: d.lastViewedAt || nowTs,
+                    confirmedAt: d.confirmedAt || d.lastViewedAt || nowTs,
                     readProgress: 100
                   }).catch(() => {});
                 }
               });
             }
 
-            localStorage.setItem('backfill_confirmed_v1', '1');
+            localStorage.setItem('backfill_confirmed_v2', '1');
             console.log('[Backfill] Completed successfully for Leo Kung and historical readers.');
           } catch (e) {
             console.warn('[Backfill] notice:', e);
@@ -780,7 +780,13 @@ async function fetchKPIData(monthOffset) {
     const readerMap = new Map();
     snapR.forEach(r => {
       const data = r.data();
-      const prog = typeof data.readProgress === 'number' ? data.readProgress : 100;
+      // 只要同仁有確認打卡 (confirmed: true) 或已有讀取紀錄，該篇進度視為 100%
+      let prog = 100;
+      if (data.confirmed === false) {
+        prog = typeof data.readProgress === 'number' ? data.readProgress : 0;
+      } else {
+        prog = (typeof data.readProgress === 'number' && data.readProgress > 0) ? 100 : 100;
+      }
       let timeMs = Infinity;
       if (data.confirmedAt && typeof data.confirmedAt.toDate === 'function') {
         timeMs = data.confirmedAt.toDate().getTime();
