@@ -320,6 +320,12 @@
           <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
           <span>績效統計</span>
         </button>
+        <!-- 需求調查問卷入口按鈕 (精緻琥珀微漸層與浮雕質感) -->
+        <a href="survey.html" target="_blank" rel="noopener noreferrer" id="survey-nav-btn" class="px-3 py-2 rounded text-sm font-semibold border border-amber-300/80 text-amber-800 bg-gradient-to-r from-amber-50 via-orange-50 to-amber-100/60 hover:from-amber-100 hover:to-orange-100 hover:border-amber-400 hover:text-amber-900 transition-all duration-200 shadow-xs hover:shadow-sm flex items-center gap-1.5 group active:scale-95" title="填寫採購電子週報使用需求調查問卷">
+          <span class="inline-block transform group-hover:scale-110 group-hover:rotate-6 transition-transform duration-200 text-sm">📝</span>
+          <span class="tracking-wide">需求問卷</span>
+          <span class="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse"></span>
+        </a>
         <button id="btn-login" onclick="document.getElementById('user-modal').classList.remove('hidden')" class="px-4 py-2 rounded text-sm font-semibold border border-blue-500 text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-sm flex items-center gap-2">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
           Google 登入
@@ -406,7 +412,29 @@
         </main>
 
         <!-- 頁尾聯絡資訊 (放置於主要內容區底端，確保與佈告欄內容卡片完全同寬) -->
-        <footer class="mt-4 bg-white rounded-xl p-5 shadow-sm border border-slate-200/70 space-y-3.5">
+        <footer class="mt-4 bg-white rounded-xl p-5 shadow-sm border border-slate-200/70 space-y-4">
+          <!-- 意見調查與回饋邀請卡片 (柔和微黏土風高雅漸層卡) -->
+          <div class="relative overflow-hidden rounded-xl border border-amber-200/80 bg-gradient-to-br from-amber-50/70 via-orange-50/40 to-amber-100/30 p-4 transition-all duration-300 hover:border-amber-300 hover:shadow-xs">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div class="flex items-start sm:items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 text-white flex items-center justify-center text-lg shadow-sm flex-shrink-0">
+                  📋
+                </div>
+                <div>
+                  <div class="flex items-center gap-2">
+                    <h4 class="text-sm font-bold text-slate-800">採購週報使用需求調查</h4>
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-200/70 text-amber-800 tracking-wide">您的回饋是我們優化的動力</span>
+                  </div>
+                  <p class="text-xs text-slate-500 mt-0.5">歡迎填寫短問卷，協助我們調整週報版面與欄位內容，打造更貼近大家需求的資訊交流平台！</p>
+                </div>
+              </div>
+              <a href="survey.html" target="_blank" rel="noopener noreferrer" class="self-start sm:self-auto px-4 py-2 rounded-lg text-xs font-bold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-xs hover:shadow transition-all duration-200 flex items-center gap-1.5 flex-shrink-0 active:scale-95 group">
+                <span>前往填寫問卷</span>
+                <svg class="w-3.5 h-3.5 transform group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+              </a>
+            </div>
+          </div>
+
           <div class="border-b border-slate-100 pb-3">
             <div class="flex items-center gap-2">
               <span class="w-1.5 h-3.5 bg-blue-600 rounded-full"></span>
