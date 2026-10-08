@@ -7,34 +7,42 @@ service cloud.firestore {
       // 允許所有使用者讀取佈告欄資訊 (包含 index.html 與 admin.html 初始載入)
       allow read: if true;
       
-      // 寫入權限：理想狀態下應限制為管理員 (request.auth != null)，
-      // 由於目前系統採用無密碼或前端自訂密碼驗證，為確保開發與轉移順利，暫時開放寫入。
-      // 若正式上線，強烈建議導入 Firebase Auth，並將此改為 `allow write: if request.auth != null;`
-      allow write: if true;
+      // 寫入權限：允許新增與更新（系統刪除採用 status: 'deleted' 軟刪除）
+      // 嚴格禁止直接從前台物理刪除 (Hard Delete) 文件，防止資料庫被一鍵清空
+      allow create, update: if true;
+      allow delete: if false;
 
       // 1-1. 已讀紀錄子集合 (Read Receipts)
       match /readReceipts/{userId} {
-        // 允許任何人寫入與讀取已讀紀錄 (供 index.html 登記與 admin.html 統計)
-        allow read, write: if true;
+        // 允許讀取與打卡紀錄寫入，禁止外部刪除打卡存根
+        allow read: if true;
+        allow create, update: if true;
+        allow delete: if false;
       }
     }
 
     // 2. 使用者身分集合 (Users)
     match /users/{userId} {
-      // 允許一般使用者登記個人資訊
-      allow read, write: if true;
+      // 允許登記與更新個人資訊，禁止整筆刪除
+      allow read: if true;
+      allow create, update: if true;
+      allow delete: if false;
     }
 
     // 3. 系統設定集合 (System Config)
     match /systemConfig/{doc} {
-      // 允許前台讀取設定（例如登入時驗證白名單），且後台無使用 Firebase Auth 因此放開寫入
-      allow read: if true; allow write: if true; 
+      // 允許讀取與更新設定，禁止刪除設定檔
+      allow read: if true;
+      allow create, update: if true;
+      allow delete: if false;
     }
 
     // 4. 使用需求調查問卷集合 (Surveys)
     match /surveys/{surveyId} {
-      // 允許同仁提交問卷與後台統計讀取
-      allow read, write: if true;
+      // 允許同仁提交問卷與後台統計讀取，問卷為重要歷程紀錄，禁止前台刪除
+      allow read: if true;
+      allow create, update: if true;
+      allow delete: if false;
     }
   }
 }
