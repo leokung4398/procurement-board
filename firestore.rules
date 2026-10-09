@@ -2,46 +2,55 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
+    // 判斷是否為已驗證之公司 Google 帳號 (@youbike.com.tw 或母公司 @giantcycling.com)
+    function isCompanyUser() {
+      return request.auth != null && 
+             (request.auth.token.email.matches('.*@youbike[.]com[.]tw$') ||
+              request.auth.token.email.matches('.*@giantcycling[.]com$'));
+    }
+
     // 1. 佈告欄集合 (Bulletins)
     match /bulletins/{bulletinId} {
-      // 允許所有使用者讀取佈告欄資訊 (包含 index.html 與 admin.html 初始載入)
-      allow read: if true;
+      // 僅限公司內部登入同仁與管理員讀取，徹底杜絕匿名訪客或外部 F12 繞過窺探機密
+      allow read: if isCompanyUser();
       
-      // 寫入權限：允許新增與更新（系統刪除採用 status: 'deleted' 軟刪除）
-      // 嚴格禁止直接從前台物理刪除 (Hard Delete) 文件，防止資料庫被一鍵清空
-      allow create, update: if true;
+      // 寫入權限：限內部員工/管理員操作，嚴格禁止直接物理刪除 (Hard Delete)，統一使用軟刪除
+      allow create, update: if isCompanyUser();
       allow delete: if false;
 
-      // 1-1. 已讀紀錄子集合 (Read Receipts)
+      // 1-1. 機密保險箱子集合 (Private Content)
+      match /private/{docId} {
+        // 唯有已登入之公司企業帳號方可讀寫
+        allow read, write: if isCompanyUser();
+      }
+
+      // 1-2. 已讀打卡紀錄子集合 (Read Receipts)
       match /readReceipts/{userId} {
-        // 允許讀取與打卡紀錄寫入，禁止外部刪除打卡存根
-        allow read: if true;
-        allow create, update: if true;
+        // 限公司同仁打卡與管理員統計讀取，嚴禁刪除打卡存根
+        allow read: if isCompanyUser();
+        allow create, update: if isCompanyUser();
         allow delete: if false;
       }
     }
 
     // 2. 使用者身分集合 (Users)
     match /users/{userId} {
-      // 允許登記與更新個人資訊，禁止整筆刪除
-      allow read: if true;
-      allow create, update: if true;
+      // 限公司內部帳號登記與檢視
+      allow read, create, update: if isCompanyUser();
       allow delete: if false;
     }
 
     // 3. 系統設定集合 (System Config)
     match /systemConfig/{doc} {
-      // 允許讀取與更新設定，禁止刪除設定檔
-      allow read: if true;
-      allow create, update: if true;
+      // 允許公司同仁讀取白名單與通訊錄，限公司同仁更新，禁止刪除設定檔
+      allow read, create, update: if isCompanyUser();
       allow delete: if false;
     }
 
     // 4. 使用需求調查問卷集合 (Surveys)
     match /surveys/{surveyId} {
-      // 允許同仁提交問卷與後台統計讀取，問卷為重要歷程紀錄，禁止前台刪除
-      allow read: if true;
-      allow create, update: if true;
+      // 允許公司同仁提交意見反饋與後台統計讀取，禁止刪除問卷歷程
+      allow read, create, update: if isCompanyUser();
       allow delete: if false;
     }
   }

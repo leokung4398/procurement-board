@@ -2825,7 +2825,32 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
     // 程式進入點
     window.addEventListener('DOMContentLoaded', () => {
       checkAndShowKPI();
-      loadData();
+      
+      // 監聽 Firebase 身分驗證狀態
+      if (typeof firebase !== 'undefined' && firebase.auth) {
+        firebase.auth().onAuthStateChanged((user) => {
+          if (user) {
+            const userStr = localStorage.getItem('procurement_user');
+            if (!userStr) {
+              const userEmail = (user.email || '').toLowerCase();
+              const pendingUser = {
+                userId: user.uid,
+                displayName: user.displayName || userEmail.split('@')[0],
+                email: userEmail,
+                department: '同仁'
+              };
+              localStorage.setItem('procurement_user', JSON.stringify(pendingUser));
+            }
+            updateAuthUI();
+            loadData();
+          } else {
+            // 未登入狀態
+            loadData();
+          }
+        });
+      } else {
+        loadData();
+      }
     });
   </script>
 
