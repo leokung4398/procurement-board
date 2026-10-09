@@ -94,11 +94,11 @@
 
         subgraph Backend [☁️ Google Firebase 雲端後端 BaaS]
             direction TB
-            Rules{"Security Rules<br>(細緻角色權限控管牆)"}:::firebase
+            Rules{"Security Rules<br>(零信任企業身分門禁牆<br>・限@youbike/@giant帳號<br>・全集合封鎖物理刪除)"}:::firebase
             
             subgraph DB [Database & Cloud Storage]
                 direction LR
-                Firestore[("Firestore NoSQL<br>・bulletins (週報/草稿/ACL)<br>・readReceipts (100%打卡紀錄與真理)<br>・surveys (同仁意見調查回饋)<br>・systemConfig (白名單/管理員/關鍵字)<br>・auditLogs (全員操作防舞弊日誌)")]:::firebase
+                Firestore[("Firestore NoSQL<br>・bulletins (週報/草稿/ACL)<br>・private (機密保險箱內文)<br>・readReceipts (100%打卡紀錄與真理)<br>・surveys (同仁意見調查回饋)<br>・systemConfig (白名單/管理員/關鍵字)<br>・auditLogs (全員操作防舞弊日誌)")]:::firebase
                 Storage[("Cloud Storage<br>・文章內嵌圖片<br>・實體公務附件檔案")]:::firebase
             end
             
@@ -375,6 +375,23 @@
       <li><strong>Header 質感呼吸入口</strong>：琥珀微漸層按鈕搭配 hover 微動態與呼吸光點，優雅不突兀。</li>
       <li><strong>頁尾意見調查卡片</strong>：閱畢即時引導回饋，與聯絡資訊同寬對齊，視覺協調具專業感。</li>
       <li><strong>獨立分頁無縫流暢</strong>：以新分頁開啟專屬 3D 黏土問卷，完全不中斷當前閱讀與打卡狀態。</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="flex flex-col gap-3 mb-4">
+      <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+      </div>
+      <h3 class="font-bold text-slate-800 text-lg">雲端零信任伺服器安全與防物理刪除</h3>
+    </div>
+    <p class="text-sm text-slate-600 leading-relaxed mb-4">
+      告別前端假性防護，將資安提升至雲端伺服器級別，打造無法被 F12 或惡意外部腳本穿透的防護鐵幕。
+    </p>
+    <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
+      <li><strong>雲端零信任網域鐵律</strong>：Firestore 規則嚴格校驗 <code>isCompanyUser()</code>，非公司帳號一概拒絕存取。</li>
+      <li><strong>全集合禁止物理刪除</strong>：強制 <code>allow delete: if false;</code>，徹底免除誤刪或惡意洗庫風險。</li>
+      <li><strong>自動化身分監聽閉環</strong>：引入 <code>onAuthStateChanged</code>，自動還原已驗證會話，安全無縫流暢。</li>
     </ul>
   </div>
 
