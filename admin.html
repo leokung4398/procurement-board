@@ -103,7 +103,6 @@
       padding-top: 3px !important;
       padding-bottom: 2px !important;
       height: auto !important;
-      min-height: unset !important;
       overflow: visible !important;
       overflow-y: visible !important;
       overflow-x: visible !important;
@@ -180,24 +179,6 @@
     .pro-table tr, .quill-editor table tr, .ql-editor table tr {
       height: auto !important;
     }
-    .quill-editor div:empty,
-    .quill-editor p:empty,
-    .quill-editor span:empty,
-    .ql-editor div:empty,
-    .ql-editor p:empty,
-    .ql-editor span:empty,
-    .quill-editor > br,
-    .quill-editor div > br:only-child,
-    .quill-editor p > br:only-child {
-      display: none !important;
-      height: 0 !important;
-      min-height: 0 !important;
-      line-height: 0 !important;
-      font-size: 0 !important;
-      margin: 0 !important;
-      padding: 0 !important;
-      border: 0 !important;
-    }
     /* 針對包含表格的外層 div，重置為純容器，不額外產生段落外距 */
     .quill-editor div:has(> table), .ql-editor div:has(> table) {
       margin-top: 0 !important;
@@ -238,12 +219,34 @@
     }
     .bulletin-item-card .quill-editor,
     .bulletin-item-card .ql-editor {
-      background: transparent !important;
-      border: none !important;
+      background: #ffffff !important;
+      border: 1.5px dashed #94a3b8 !important;
+      border-radius: 8px !important;
       outline: none !important;
-      box-shadow: none !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05) !important;
       overflow: visible !important;
-      padding: 0 !important;
+      padding: 8px 12px !important;
+      min-height: 52px !important;
+      cursor: text !important;
+      transition: all 0.2s ease !important;
+    }
+    .bulletin-item-card .quill-editor:focus,
+    .bulletin-item-card .quill-editor.tox-edit-focus,
+    .bulletin-item-card .quill-editor:hover {
+      border-color: #3b82f6 !important;
+      border-style: solid !important;
+      background: #ffffff !important;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+    }
+    .bulletin-item-card .quill-editor:empty::before,
+    .bulletin-item-card .quill-editor[data-mce-placeholder]:empty::before,
+    .bulletin-item-card .quill-editor[data-empty="true"]::before {
+      content: "點擊此處輸入公告內容（可使用頂部工具列進行格式化、插入表格或超連結）...";
+      color: #94a3b8;
+      font-size: 0.85rem;
+      pointer-events: none;
+      display: block;
+      font-style: italic;
     }
     .bulletin-item-card .quill-editor > *:last-child,
     .bulletin-item-card .quill-editor *:last-child,
@@ -3433,7 +3436,7 @@
   </div>
 </div>
 
-<script src="js/admin.js?v=1791225000"></script>
+<script src="js/admin.js?v=1791248000"></script>
 <script>
   window.addEventListener('load', () => {
     // 執行已讀打卡補登 (Leo Kung & 實質完讀者)
