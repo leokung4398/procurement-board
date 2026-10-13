@@ -2828,18 +2828,41 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
       
       // 監聽 Firebase 身分驗證狀態
       if (typeof firebase !== 'undefined' && firebase.auth) {
-        firebase.auth().onAuthStateChanged((user) => {
+        firebase.auth().onAuthStateChanged(async (user) => {
           if (user) {
+            let userObj = null;
             const userStr = localStorage.getItem('procurement_user');
-            if (!userStr) {
-              const userEmail = (user.email || '').toLowerCase();
-              const pendingUser = {
+            if (userStr) {
+              try { userObj = JSON.parse(userStr); } catch(e) {}
+            }
+            
+            const userEmail = (user.email || '').toLowerCase();
+            // 若本地無資料，或單位仍為未指定/通用預設值，向雲端白名單補正營運處資訊
+            if (!userObj || !userObj.department || userObj.department === '同仁' || userObj.department === '未指定') {
+              let matchedUnit = '同仁';
+              let matchedName = user.displayName || userEmail.split('@')[0];
+              try {
+                if (db) {
+                  const mailSnap = await db.collection('systemConfig').doc('whitelist').get();
+                  if (mailSnap.exists) {
+                    const mailUsers = mailSnap.data().list || [];
+                    const found = mailUsers.find(u => u && u.email && u.email.toLowerCase() === userEmail);
+                    if (found) {
+                      if (found.unit) matchedUnit = found.unit;
+                      if (found.name) matchedName = found.name;
+                    }
+                  }
+                }
+              } catch(e) {
+                console.warn('Whitelist auto-sync error:', e);
+              }
+              userObj = {
                 userId: user.uid,
-                displayName: user.displayName || userEmail.split('@')[0],
+                displayName: matchedName,
                 email: userEmail,
-                department: '同仁'
+                department: matchedUnit
               };
-              localStorage.setItem('procurement_user', JSON.stringify(pendingUser));
+              localStorage.setItem('procurement_user', JSON.stringify(userObj));
             }
             updateAuthUI();
             loadData();

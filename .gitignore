@@ -31,3 +31,7 @@ test_read_db.json
 temp*
 check_*.py
 upload_*.py
+*.csv
+*名單*
+*whitelist*.json
+

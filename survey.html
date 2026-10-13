@@ -296,9 +296,12 @@
           <p>
             親愛的同仁您好！為了持續優化「採購電子週報」的內容豐富度與閱讀體驗，並深入掌握各單位的實際工作需求，請協助撥冗完成本份問卷。這是一份輕鬆、溫馨的回饋調查，您的每一筆想法都是推動我們進步最珍貴的寶藏！
           </p>
-          <div class="pt-1.5 flex items-center gap-2 text-amber-800 font-bold text-xs">
-            <span class="text-base">⏳</span>
-            <span>溫馨提醒：請於收到通知後 5 個工作日內完成填寫回覆，衷心感謝您的暖心支持！</span>
+          <div class="pt-1.5 flex items-center justify-between flex-wrap gap-2 text-amber-800 font-bold text-xs">
+            <div class="flex items-center gap-2">
+              <span class="text-base">⏳</span>
+              <span>溫馨提醒：請於收到通知後 5 個工作日內完成填寫回覆，衷心感謝您的暖心支持！</span>
+            </div>
+            <span id="survey-auth-status" class="hidden text-[11px] bg-amber-100 text-amber-900 px-2.5 py-0.5 rounded-full font-semibold border border-amber-300"></span>
           </div>
         </div>
       </div>
@@ -703,19 +706,39 @@
 
       const btn = document.getElementById('btn-submit');
       btn.disabled = true;
-      btn.innerHTML = '<span>資料傳遞中... ✨</span>';
+      btn.innerHTML = '<span>驗證權限與資料傳遞中... ✨</span>';
 
       try {
-        if (db) {
-          await db.collection('surveys').add(surveyData);
+        if (!db) throw new Error("資料庫未初始化");
+
+        // 確保符合 Firestore 零信任安全規則：必須以公司 Google 帳號驗證
+        let currentUser = firebase.auth().currentUser;
+        if (!currentUser) {
+          // 若未驗證登入，自動叫起 Google 登入
+          const provider = new firebase.auth.GoogleAuthProvider();
+          const loginRes = await firebase.auth().signInWithPopup(provider);
+          currentUser = loginRes.user;
         }
+
+        const userEmail = (currentUser && currentUser.email ? currentUser.email : '').toLowerCase();
+        if (!userEmail.endsWith('@youbike.com.tw') && !userEmail.endsWith('@giantcycling.com')) {
+          await firebase.auth().signOut();
+          throw new Error('問卷限公司同仁填寫，請使用 @youbike.com.tw 或 @giantcycling.com Google 帳號！');
+        }
+
+        // 記錄填表者登入識別
+        surveyData.submitterEmail = userEmail;
+        surveyData.submitterUid = currentUser.uid;
+
+        await db.collection('surveys').add(surveyData);
+
         localStorage.setItem('has_submitted_procurement_survey', '1');
         document.getElementById('survey-form').classList.add('hidden');
         document.getElementById('success-card').classList.remove('hidden');
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } catch (err) {
         console.error("Survey submission failed:", err);
-        alert('問卷提交發生異常，請稍後再試或聯繫採購管理員：' + err.message);
+        alert('問卷提交發生異常：' + err.message + '\n請確認使用公司 Google 帳號授權後重試。');
         btn.disabled = false;
         btn.innerHTML = '<span>💖 確認送出問卷回饋</span>';
       }
@@ -723,6 +746,20 @@
 
     // 自動預填（若有使用者身分）
     window.addEventListener('DOMContentLoaded', () => {
+      // 保持 Firebase Auth 監聽，自動識別已登入之同仁
+      if (typeof firebase !== 'undefined' && firebase.auth) {
+        firebase.auth().onAuthStateChanged((user) => {
+          if (user) {
+            const userEmail = (user.email || '').toLowerCase();
+            const emailSpan = document.getElementById('survey-auth-status');
+            if (emailSpan) {
+              emailSpan.innerText = `👤 已以 ${userEmail} 登入`;
+              emailSpan.classList.remove('hidden');
+            }
+          }
+        });
+      }
+
       try {
         const uStr = localStorage.getItem('procurement_user');
         if (uStr) {
