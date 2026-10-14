@@ -261,6 +261,29 @@
       margin-bottom: 2px !important;
     }
   
+    /* TinyMCE 下拉選單與彈出層層級防遮擋保證 (Fix Dropdown Clipping & Z-Index) */
+    .tox-tinymce-aux,
+    div.tox-tinymce-aux,
+    .tox.tox-tinymce-aux {
+      z-index: 99999 !important;
+      position: absolute !important;
+    }
+    .tox .tox-menu,
+    .tox .tox-pop,
+    .tox .tox-collection--list {
+      z-index: 99999 !important;
+      max-height: 380px !important;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+    }
+    #toolbar-portal {
+      overflow: visible !important;
+    }
+    #toolbar-portal .tox-tinymce-inline,
+    #toolbar-portal .tox-editor-header,
+    #toolbar-portal .tox-toolbar-over {
+      overflow: visible !important;
+    }
+
     /* TinyMCE Overflow Menu Horizontal Layout (限定僅作用於滑動溢出選單，避免破壞任何對話框) */
     .tox-tinymce-aux .tox-toolbar__overflow,
     .tox .tox-toolbar__overflow {
@@ -686,8 +709,8 @@
         </section>
 
         <!-- Section B: 段落內容管理 -->
-        <section class="bg-white rounded-2xl border border-slate-200/90 shadow-xs overflow-hidden">
-          <div class="px-6 py-4 border-b border-slate-100 bg-white/95 backdrop-blur-md flex items-center justify-between sticky top-0 z-10 shadow-xs">
+        <section class="bg-white rounded-2xl border border-slate-200/90 shadow-xs">
+          <div class="px-6 py-4 border-b border-slate-100 bg-white/95 backdrop-blur-md flex items-center justify-between sticky top-0 z-10 shadow-xs rounded-t-2xl">
             <div class="flex items-center gap-3 flex-1 min-w-0 mr-4">
               <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2.5 shrink-0">
                 <span class="w-6 h-6 bg-indigo-600 text-white rounded-lg flex items-center justify-center text-xs font-bold shadow-xs">B</span>
@@ -3436,7 +3459,7 @@
   </div>
 </div>
 
-<script src="js/admin.js?v=1791249000"></script>
+<script src="js/admin.js?v=1791250000"></script>
 <script>
   window.addEventListener('load', () => {
     // 執行已讀打卡補登 (Leo Kung & 實質完讀者)
