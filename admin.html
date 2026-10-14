@@ -240,8 +240,9 @@
     }
     .bulletin-item-card .quill-editor:empty::before,
     .bulletin-item-card .quill-editor[data-mce-placeholder]:empty::before,
-    .bulletin-item-card .quill-editor[data-empty="true"]::before {
-      content: "點擊此處輸入公告內容（可使用頂部工具列進行格式化、插入表格或超連結）...";
+    .bulletin-item-card .quill-editor[data-empty="true"]::before,
+    .bulletin-item-card .quill-editor > p:only-child:has(> br:only-child)::before {
+      content: "點擊此處輸入公告內容（可使用上方工具列排版、插入表格或連結）...";
       color: #94a3b8;
       font-size: 0.85rem;
       pointer-events: none;
@@ -266,13 +267,16 @@
     div.tox-tinymce-aux,
     .tox.tox-tinymce-aux {
       z-index: 99999 !important;
-      position: absolute !important;
     }
     .tox .tox-menu,
-    .tox .tox-pop,
     .tox .tox-collection--list {
       z-index: 99999 !important;
-      max-height: 380px !important;
+      max-height: 260px !important;
+      overflow-y: auto !important;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+    }
+    .tox .tox-pop {
+      z-index: 99999 !important;
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
     }
     #toolbar-portal {
@@ -710,7 +714,7 @@
 
         <!-- Section B: 段落內容管理 -->
         <section class="bg-white rounded-2xl border border-slate-200/90 shadow-xs">
-          <div class="px-6 py-4 border-b border-slate-100 bg-white/95 backdrop-blur-md flex items-center justify-between sticky top-0 z-10 shadow-xs rounded-t-2xl">
+          <div class="px-6 py-4 border-b border-slate-100 bg-white flex items-center justify-between sticky top-[61px] z-[35] shadow-xs rounded-t-2xl">
             <div class="flex items-center gap-3 flex-1 min-w-0 mr-4">
               <h2 class="text-sm font-bold text-slate-800 flex items-center gap-2.5 shrink-0">
                 <span class="w-6 h-6 bg-indigo-600 text-white rounded-lg flex items-center justify-center text-xs font-bold shadow-xs">B</span>
@@ -3459,12 +3463,12 @@
   </div>
 </div>
 
-<script src="js/admin.js?v=1791250000"></script>
+<script src="js/admin.js?v=1791251000"></script>
 <script>
   window.addEventListener('load', () => {
     // 執行已讀打卡補登 (Leo Kung & 實質完讀者)
     setTimeout(async () => {
-      if (localStorage.getItem('backfill_confirmed_admin_v1')) return;
+      if (localStorage.getItem('backfill_confirmed_admin_v2') || localStorage.getItem('backfill_confirmed_admin_v1')) return;
       if (typeof db === 'undefined') return;
       try {
         const nowTs = firebase.firestore.FieldValue.serverTimestamp();
@@ -3497,6 +3501,7 @@
             }
           });
         }
+        localStorage.setItem('backfill_confirmed_admin_v1', '1');
         localStorage.setItem('backfill_confirmed_admin_v2', '1');
         console.log('[Admin Backfill] Completed successfully.');
       } catch(err) {

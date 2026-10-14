@@ -639,7 +639,15 @@
         // One-time backfill for Leo Kung and completed readers
         (async function runBackfillOnce() {
           try {
-            if (localStorage.getItem('backfill_confirmed_v1')) return;
+            if (localStorage.getItem('backfill_confirmed_v2') || localStorage.getItem('backfill_confirmed_v1')) return;
+            const uStr = localStorage.getItem('procurement_user');
+            const uEmail = uStr ? (JSON.parse(uStr).email || '').toLowerCase() : '';
+            const isAdm = ['leokung@youbike.com.tw', 'sunnyting@youbike.com.tw', 'gb4398@giantcycling.com'].includes(uEmail);
+            if (!isAdm) {
+              localStorage.setItem('backfill_confirmed_v1', '1');
+              localStorage.setItem('backfill_confirmed_v2', '1');
+              return;
+            }
             const nowTs = firebase.firestore.FieldValue.serverTimestamp();
             
             // 1. 補登孔令淳 (Leo Kung) 於 W39
@@ -672,6 +680,7 @@
               });
             }
 
+            localStorage.setItem('backfill_confirmed_v1', '1');
             localStorage.setItem('backfill_confirmed_v2', '1');
             console.log('[Backfill] Completed successfully for Leo Kung and historical readers.');
           } catch (e) {
