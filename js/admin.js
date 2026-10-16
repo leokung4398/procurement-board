@@ -1121,7 +1121,7 @@ function renderSecs(){if(window.tinymce){try{tinymce.remove('.quill-editor');}ca
         tables.forEach(table => {
           table.style.width = '100%';
           table.style.borderCollapse = 'collapse';
-          table.style.margin = '8px 0';
+          table.style.margin = '2px 0';
           table.removeAttribute('width');
           const cells = table.querySelectorAll('td, th');
           cells.forEach(cell => {
@@ -1130,9 +1130,9 @@ function renderSecs(){if(window.tinymce){try{tinymce.remove('.quill-editor');}ca
             if (cell.style.width) cell.style.width = '';
             if (cell.style.height) cell.style.height = '';
             cell.style.border = '1px solid #cbd5e1';
-            cell.style.padding = '6px 10px';
+            cell.style.padding = '3px 6px';
             cell.style.fontSize = '0.875rem';
-            cell.style.lineHeight = '1.4';
+            cell.style.lineHeight = '1.3';
           });
           const headers = table.querySelectorAll('th');
           headers.forEach(th => {

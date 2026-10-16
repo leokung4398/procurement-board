@@ -39,16 +39,13 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
   <script src="firebase-config.js"></script>
   
-  <!-- Quill CSS for rendering rich text -->
-  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-  
   <link rel="stylesheet" href="css/index.css?v=1789726000">
 
 
   <style>
-    /* True WYSIWYG: Compact 1.2 Line-Height & Controlled Spacing Standard */
+    /* True WYSIWYG: Compact 1.2 Line-Height & Controlled Spacing Standard (1:1 Aligned with Admin) */
     .ql-editor {
-      font-size: 0.875rem;
+      font-size: 0.875rem !important;
       line-height: 1.2 !important;
       letter-spacing: 0.002em;
       color: #1e293b !important; /* 統一字體顏色 slate-800 */
@@ -59,6 +56,8 @@
       overflow: visible !important;
       overflow-y: visible !important;
       overflow-x: visible !important;
+      white-space: normal !important;
+      word-wrap: break-word;
     }
     .ql-editor div {
       margin: 0 !important;
@@ -97,15 +96,21 @@
     /* 文字加框 (boxed) 與加圓圈 (circled) 樣式強化，確保上下框線完整不被切邊 */
     .ql-boxed, span[style*="border"][style*="solid"] {
       display: inline-block !important;
-      line-height: 1.12 !important;
+      line-height: 1.15 !important;
       vertical-align: baseline !important;
       margin: 1px 2px !important;
       padding: 1px 5px !important;
       box-sizing: border-box !important;
     }
-    .ql-editor ol, .ql-editor ul {
+    .ql-editor ol {
+      list-style-type: decimal !important;
       padding-left: 1.25rem !important;
-      margin: 0.15rem 0 !important;
+      margin: 0.2rem 0 !important;
+    }
+    .ql-editor ul {
+      list-style-type: disc !important;
+      padding-left: 1.25rem !important;
+      margin: 0.2rem 0 !important;
     }
     .ql-editor > *:first-child {
       margin-top: 0 !important;
@@ -116,8 +121,8 @@
     .ql-editor > p:first-child > br:first-child { display: none; }
     .ql-editor > p:last-child > br:last-child { display: none; }
   
-    /* Rich Text & Pasted Table Normalization */
-    #bulletin-content-area table:not(.data-table), .pro-table {
+    /* Rich Text & Pasted Table Normalization (1:1 Aligned with Admin) */
+    #bulletin-content-area table:not(.data-table), .pro-table, .ql-editor table {
       width: 100% !important;
       height: auto !important;
       border-collapse: collapse !important;
@@ -127,7 +132,8 @@
       table-layout: auto !important;
     }
     #bulletin-content-area table:not(.data-table) tr,
-    .pro-table tr {
+    .pro-table tr,
+    .ql-editor table tr {
       height: auto !important;
     }
     .ql-editor > div:empty,
@@ -136,16 +142,31 @@
     }
     #bulletin-content-area table:not(.data-table) td,
     #bulletin-content-area table:not(.data-table) th,
-    .pro-table td, .pro-table th {
+    .pro-table td, .pro-table th,
+    .ql-editor table td, .ql-editor table th {
       border: 1px solid #cbd5e1 !important;
       padding: 3px 6px !important;
       height: auto !important;
       vertical-align: top;
       word-break: break-word;
-      line-height: 1.2 !important;
+      line-height: 1.3 !important;
+      white-space: normal !important;
+    }
+    #bulletin-content-area table:not(.data-table) td p,
+    #bulletin-content-area table:not(.data-table) th p,
+    #bulletin-content-area table:not(.data-table) td div,
+    #bulletin-content-area table:not(.data-table) th div,
+    .pro-table td p, .pro-table th p,
+    .pro-table td div, .pro-table th div,
+    .ql-editor table td p, .ql-editor table th p,
+    .ql-editor table td div, .ql-editor table th div {
+      margin: 0 !important;
+      padding: 0 !important;
+      line-height: 1.3 !important;
     }
     #bulletin-content-area table:not(.data-table) th,
-    .pro-table th {
+    .pro-table th,
+    .ql-editor table th {
       background-color: #f8fafc !important;
       font-weight: 600 !important;
       color: #475569 !important;
@@ -168,8 +189,8 @@
       padding-bottom: 0 !important;
     }
     .bulletin-item-card .ql-editor table {
-      margin-top: 4px !important;
-      margin-bottom: 6px !important;
+      margin-top: 2px !important;
+      margin-bottom: 2px !important;
     }
     /* 統一全域標題樣式重設，避免瀏覽器預設 1em 產生巨大斷層 */
     .ql-editor h1, .ql-editor h2, .ql-editor h3, .ql-editor h4, .ql-editor h5, .ql-editor h6 {
@@ -1850,7 +1871,25 @@ async function showKPI(monthOffset = 0) {
               });
             }
           });
-          // 2. 清除表格上的固定高度行內樣式，並清理表格儲存格中寫死的 height
+          // 判斷節點是否為實質空白（忽略空白、換行、&nbsp;、\u00A0、\u3000）
+          function isNodeEmpty(node) {
+            if (!node) return true;
+            if (node.nodeType === 3) { // 文字節點
+              return !node.textContent.replace(/[\s\u00A0\u3000\r\n\t]/g, '');
+            }
+            if (node.nodeType === 1) { // 元素節點
+              const tag = node.tagName.toLowerCase();
+              if (['img', 'table', 'iframe', 'video', 'input'].includes(tag)) return false;
+              if (tag === 'br') return true;
+              for (let i = 0; i < node.childNodes.length; i++) {
+                if (!isNodeEmpty(node.childNodes[i])) return false;
+              }
+              return true;
+            }
+            return true;
+          }
+
+          // 2. 清除表格上的固定高度行內樣式，並清理表格儲存格中寫死的 height 與首尾多餘空白換行
           const tables = doc.querySelectorAll('table');
           tables.forEach(tbl => {
             tbl.style.height = '';
@@ -1858,6 +1897,19 @@ async function showKPI(monthOffset = 0) {
             tbl.style.marginBottom = '2px';
             tbl.querySelectorAll('tr, td, th').forEach(cell => {
               cell.style.height = '';
+              cell.removeAttribute('height');
+              if (cell.tagName.toLowerCase() === 'td' || cell.tagName.toLowerCase() === 'th') {
+                cell.style.padding = '3px 6px';
+                cell.style.lineHeight = '1.3';
+                while (cell.firstChild && isNodeEmpty(cell.firstChild)) cell.firstChild.remove();
+                while (cell.lastChild && isNodeEmpty(cell.lastChild)) cell.lastChild.remove();
+                if (cell.firstChild && cell.firstChild.nodeType === 3) {
+                  cell.firstChild.textContent = cell.firstChild.textContent.replace(/^[\r\n\s]+/, '');
+                }
+                if (cell.lastChild && cell.lastChild.nodeType === 3) {
+                  cell.lastChild.textContent = cell.lastChild.textContent.replace(/[\r\n\s]+$/, '');
+                }
+              }
             });
 
             // 如果 table 外層包了只有此 table 的無用 div，將其解除展開
@@ -1880,24 +1932,6 @@ async function showKPI(monthOffset = 0) {
             if (hEl.style.marginBottom) hEl.style.marginBottom = '';
           });
 
-          // 判斷節點是否為實質空白（忽略空白、換行、&nbsp;、\u00A0、\u3000）
-          function isNodeEmpty(node) {
-            if (!node) return true;
-            if (node.nodeType === 3) { // 文字節點
-              return !node.textContent.replace(/[\s\u00A0\u3000\r\n\t]/g, '');
-            }
-            if (node.nodeType === 1) { // 元素節點
-              const tag = node.tagName.toLowerCase();
-              if (['img', 'table', 'iframe', 'video', 'input'].includes(tag)) return false;
-              if (tag === 'br') return true;
-              for (let i = 0; i < node.childNodes.length; i++) {
-                if (!isNodeEmpty(node.childNodes[i])) return false;
-              }
-              return true;
-            }
-            return true;
-          }
-
           // 2.2 遞迴移除所有實質空白的標籤節點 (div, p, span, h1-h6)
           let removedAny = true;
           let removePasses = 0;
@@ -1912,7 +1946,8 @@ async function showKPI(monthOffset = 0) {
             });
           }
 
-          // 2.3 解除多層單一子節點的嵌套無用 div，扁平化結構消除不必要的行距與外距
+          // 2.3 解除多層單一區塊子節點的嵌套無用 div（避免誤拆含 span/strong 等行內元素的 div）
+          const blockTags = ['div', 'p', 'table', 'ul', 'ol', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
           let unwrapFound = true;
           let unwrapPasses = 0;
           while (unwrapFound && unwrapPasses < 15) {
@@ -1920,12 +1955,14 @@ async function showKPI(monthOffset = 0) {
             unwrapPasses++;
             doc.querySelectorAll('div').forEach(d => {
               if (d.parentElement) {
-                // (a) 若 div 內部只有一個子元素且自身無特定 class/id，直接將子元素提出
-                if (d.children.length === 1 && !d.className && !d.id) {
+                const hasOnlyEmptyText = Array.from(d.childNodes).every(n => n.nodeType !== 3 || !n.textContent.trim());
+                if (d.children.length === 1 && hasOnlyEmptyText && !d.className && !d.id && !d.getAttribute('style')) {
                   const firstChild = d.children[0];
-                  d.parentElement.replaceChild(firstChild, d);
-                  unwrapFound = true;
-                  return;
+                  if (blockTags.includes(firstChild.tagName.toLowerCase())) {
+                    d.parentElement.replaceChild(firstChild, d);
+                    unwrapFound = true;
+                    return;
+                  }
                 }
                 // (b) 若 div 為空則移除
                 if (isNodeEmpty(d)) {
@@ -1941,7 +1978,7 @@ async function showKPI(monthOffset = 0) {
           doc.querySelectorAll('*').forEach(el => {
             if (el.style) {
               if (el.style.lineHeight && (parseFloat(el.style.lineHeight) > 1.25 || el.style.lineHeight.includes('px'))) {
-                el.style.lineHeight = '1.15';
+                el.style.lineHeight = '1.2';
               }
               if (el.tagName.toLowerCase() === 'div' && el.style.margin) {
                 el.style.margin = '0';
@@ -2393,16 +2430,20 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
           p.remove();
         }
       });
-      // 解開所有無用單一子元素的純容器 div（包含包著 table、p 或其它 div 的情況），徹底消除斷層與多餘空行
+      // 解開無用單一區塊子元素的純容器 div（包含包著 table、p 或其它 div 的情況），避免誤拆含 span/strong 的行內元素
+      const liveBlockTags = ['div', 'p', 'table', 'ul', 'ol', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'];
       let unwrapLive = true;
       let unwrapLivePasses = 0;
       while (unwrapLive && unwrapLivePasses < 10) {
         unwrapLive = false;
         unwrapLivePasses++;
         container.querySelectorAll('.ql-editor div').forEach(d => {
-          if (d.children.length === 1 && !d.className && !d.id && d.parentElement) {
-            d.parentElement.replaceChild(d.children[0], d);
-            unwrapLive = true;
+          const hasOnlyEmptyText = Array.from(d.childNodes).every(n => n.nodeType !== 3 || !n.textContent.trim());
+          if (d.children.length === 1 && hasOnlyEmptyText && !d.className && !d.id && !d.getAttribute('style') && d.parentElement) {
+            if (liveBlockTags.includes(d.children[0].tagName.toLowerCase())) {
+              d.parentElement.replaceChild(d.children[0], d);
+              unwrapLive = true;
+            }
           }
         });
       }
