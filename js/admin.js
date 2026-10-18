@@ -1637,93 +1637,288 @@ let tempKw = [];
     }
 
 let editWLIndex = null;
+let filterWLPrimaryOnly = false;
+
+const REGION_DEFAULT_UNIT_MAP = {
+  '工程處': '工程處',
+  '經營Team': '經營Team',
+  '台北': '北區營運處',
+  '新北': '北區營運處',
+  '桃園': '桃園營運處',
+  '新竹': '新竹營運處',
+  '苗栗': '苗栗營運處',
+  '台中': '台中營運處',
+  '嘉義': '嘉義營運處',
+  '台南': '台南營運處',
+  '高雄': '高雄營運處',
+  '屏東': '屏東營運處',
+  '台東': '台東營運處'
+};
+
+function onWLRegionChange(regionVal) {
+  const unitEl = document.getElementById('wl-unit');
+  if (!unitEl) return;
+  const curUnit = unitEl.value.trim();
+  const isDefaultUnit = !curUnit || Object.values(REGION_DEFAULT_UNIT_MAP).includes(curUnit) || curUnit.endsWith('營運處');
+  if (regionVal && REGION_DEFAULT_UNIT_MAP[regionVal] && isDefaultUnit) {
+    unitEl.value = REGION_DEFAULT_UNIT_MAP[regionVal];
+  } else if (!regionVal && isDefaultUnit) {
+    unitEl.value = '';
+  }
+}
+
+function cancelEditWL() {
+  editWLIndex = null;
+  document.getElementById('wl-name').value = '';
+  document.getElementById('wl-email').value = '';
+  document.getElementById('wl-region').value = '';
+  if (document.getElementById('wl-unit')) document.getElementById('wl-unit').value = '';
+  if (document.getElementById('wl-primary')) document.getElementById('wl-primary').checked = false;
+  document.getElementById('wl-receive').checked = true;
+  document.getElementById('wl-btn').innerText = '新增';
+  const cancelBtn = document.getElementById('wl-cancel-btn');
+  if (cancelBtn) cancelBtn.classList.add('hidden');
+  const editHint = document.getElementById('wl-edit-hint');
+  if (editHint) editHint.classList.add('hidden');
+  const formCard = document.getElementById('wl-form-card');
+  if (formCard) {
+    formCard.classList.remove('ring-2', 'ring-blue-400', 'bg-blue-50/40', 'border-blue-300');
+  }
+  renderWL();
+}
+
 async function addWL() {
   const n = document.getElementById('wl-name').value.trim();
   const e = document.getElementById('wl-email').value.trim();
   const region = document.getElementById('wl-region').value;
-  const unit = document.getElementById('wl-unit') ? document.getElementById('wl-unit').value.trim() : '';
+  let unit = document.getElementById('wl-unit') ? document.getElementById('wl-unit').value.trim() : '';
+  if (!unit && region && REGION_DEFAULT_UNIT_MAP[region]) {
+    unit = REGION_DEFAULT_UNIT_MAP[region];
+  }
   const isPrimary = document.getElementById('wl-primary') ? document.getElementById('wl-primary').checked : false;
   const receiveEmail = document.getElementById('wl-receive').checked;
-  if(!n || !e) return toast('姓名或信箱為空', 'er');
-  
-  const newData = {name: n, email: e, region, unit, isPrimary, receiveEmail};
+  if (!n || !e) return toast('請填寫聯絡人姓名與電子郵件', 'er');
+
+  // 檢查 Email 是否重複
+  const emailLower = e.toLowerCase();
+  const dupIdx = S.whitelist.findIndex((w, i) => i !== editWLIndex && (w.email || '').trim().toLowerCase() === emailLower);
+  if (dupIdx !== -1) {
+    return toast(`此信箱已存在於通訊錄中（${S.whitelist[dupIdx].name}），請直接編輯該筆資料`, 'er');
+  }
+
+  const newData = { name: n, email: e, region, unit, isPrimary, receiveEmail };
   if (editWLIndex !== null) {
+    const oldEmail = (S.whitelist[editWLIndex]?.email || '').trim().toLowerCase();
     S.whitelist[editWLIndex] = newData;
-    editWLIndex = null;
-    document.getElementById('wl-btn').innerText = '新增';
-    toast('已更新名單', 'ok');
+    // 若修改了信箱，同步更新發信群組內的信箱參照
+    if (oldEmail && oldEmail !== emailLower && Array.isArray(S.mailGroups)) {
+      let grpUpdated = false;
+      S.mailGroups.forEach(g => {
+        if (Array.isArray(g.emails)) {
+          g.emails = g.emails.map(em => {
+            if ((em || '').trim().toLowerCase() === oldEmail) {
+              grpUpdated = true;
+              return e;
+            }
+            return em;
+          });
+        }
+      });
+      if (grpUpdated) await DS.saveMailGroups(S.mailGroups);
+    }
+    toast('已更新聯絡人資料 ✓', 'ok');
   } else {
     S.whitelist.push(newData);
-    toast('已新增名單', 'ok');
+    toast('已新增聯絡人 ✓', 'ok');
   }
-  await DS.saveWhitelist(S.whitelist); renderWL();
-  document.getElementById('wl-name').value=''; 
-  document.getElementById('wl-email').value='';
-  document.getElementById('wl-region').value='';
-  if(document.getElementById('wl-unit')) document.getElementById('wl-unit').value='';
-  if(document.getElementById('wl-primary')) document.getElementById('wl-primary').checked=false;
-  document.getElementById('wl-receive').checked=true;
+  await DS.saveWhitelist(S.whitelist);
+  cancelEditWL();
 }
+
 function editWL(idx) {
+  if (!S.whitelist[idx]) return;
   editWLIndex = idx;
   document.getElementById('wl-name').value = S.whitelist[idx].name || '';
   document.getElementById('wl-email').value = S.whitelist[idx].email || '';
   document.getElementById('wl-region').value = S.whitelist[idx].region || '';
-  if(document.getElementById('wl-unit')) document.getElementById('wl-unit').value = S.whitelist[idx].unit || '';
-  if(document.getElementById('wl-primary')) document.getElementById('wl-primary').checked = S.whitelist[idx].isPrimary === true;
+  if (document.getElementById('wl-unit')) document.getElementById('wl-unit').value = S.whitelist[idx].unit || '';
+  if (document.getElementById('wl-primary')) document.getElementById('wl-primary').checked = S.whitelist[idx].isPrimary === true;
   document.getElementById('wl-receive').checked = (S.whitelist[idx].receiveEmail !== false);
-  document.getElementById('wl-btn').innerText = '儲存';
+  document.getElementById('wl-btn').innerText = '儲存修改';
+
+  const cancelBtn = document.getElementById('wl-cancel-btn');
+  if (cancelBtn) cancelBtn.classList.remove('hidden');
+  const editHint = document.getElementById('wl-edit-hint');
+  if (editHint) {
+    editHint.textContent = `✏️ 正在編輯：${S.whitelist[idx].name}`;
+    editHint.classList.remove('hidden');
+  }
+  const formCard = document.getElementById('wl-form-card');
+  if (formCard) {
+    formCard.classList.add('ring-2', 'ring-blue-400', 'bg-blue-50/40', 'border-blue-300');
+    formCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+  renderWL();
   document.getElementById('wl-name').focus();
 }
-async function rmWL(idx) { 
-  if(!confirm(`確定要刪除 ${S.whitelist[idx].name} 嗎？`)) return;
-  S.whitelist.splice(idx, 1); await DS.saveWhitelist(S.whitelist); renderWL(); 
+
+async function quickToggleWLPrimary(idx) {
+  if (!S.whitelist[idx]) return;
+  S.whitelist[idx].isPrimary = !S.whitelist[idx].isPrimary;
+  if (editWLIndex === idx && document.getElementById('wl-primary')) {
+    document.getElementById('wl-primary').checked = S.whitelist[idx].isPrimary;
+  }
+  await DS.saveWhitelist(S.whitelist);
+  renderWL();
+  toast(
+    S.whitelist[idx].isPrimary
+      ? `⭐ 已將「${S.whitelist[idx].name}」設為主要聯絡人`
+      : `已取消「${S.whitelist[idx].name}」的主要聯絡人標記`,
+    'in'
+  );
 }
+
+async function quickToggleWLReceive(idx) {
+  if (!S.whitelist[idx]) return;
+  const cur = S.whitelist[idx].receiveEmail !== false;
+  S.whitelist[idx].receiveEmail = !cur;
+  if (editWLIndex === idx && document.getElementById('wl-receive')) {
+    document.getElementById('wl-receive').checked = S.whitelist[idx].receiveEmail;
+  }
+  await DS.saveWhitelist(S.whitelist);
+  renderWL();
+  toast(
+    S.whitelist[idx].receiveEmail
+      ? `✉️ 已開啟「${S.whitelist[idx].name}」接收信件通知`
+      : `🔕 已暫停「${S.whitelist[idx].name}」接收信件通知`,
+    'in'
+  );
+}
+
+function toggleWLPrimaryFilter() {
+  filterWLPrimaryOnly = !filterWLPrimaryOnly;
+  const btn = document.getElementById('wl-filter-primary-btn');
+  if (btn) {
+    if (filterWLPrimaryOnly) {
+      btn.className = 'text-xs px-2.5 py-1.5 rounded-lg border border-amber-300 bg-amber-100 text-amber-800 font-bold flex items-center gap-1 flex-shrink-0 shadow-xs transition-colors';
+    } else {
+      btn.className = 'text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50/60 text-slate-600 hover:bg-amber-50 hover:text-amber-700 hover:border-amber-200 transition-colors font-medium flex items-center gap-1 flex-shrink-0';
+    }
+  }
+  renderWL();
+}
+
+async function rmWL(idx) {
+  if (!S.whitelist[idx]) return;
+  if (!confirm(`確定要刪除「${S.whitelist[idx].name} (${S.whitelist[idx].email})」嗎？`)) return;
+  if (editWLIndex === idx) cancelEditWL();
+  S.whitelist.splice(idx, 1);
+  await DS.saveWhitelist(S.whitelist);
+  renderWL();
+  toast('已刪除聯絡人', 'ok');
+}
+
 let isBatchMode = false;
 let selectedWL = [];
+
+function updateBatchSelectedCount() {
+  const el = document.getElementById('batch-selected-count');
+  if (el) el.textContent = `已選 ${selectedWL.length} 人`;
+}
 
 function toggleBatchMode() {
   isBatchMode = !isBatchMode;
   selectedWL = [];
   const btn = document.getElementById('btn-batch-mode');
   const acts = document.getElementById('batch-actions');
-  if(isBatchMode) {
+  if (isBatchMode) {
     btn.classList.replace('bg-slate-100', 'bg-blue-600');
     btn.classList.replace('text-slate-600', 'text-white');
     btn.classList.replace('hover:bg-slate-200', 'hover:bg-blue-700');
-    if(acts) acts.classList.remove('hidden');
+    if (acts) acts.classList.remove('hidden');
   } else {
     btn.classList.replace('bg-blue-600', 'bg-slate-100');
     btn.classList.replace('text-white', 'text-slate-600');
     btn.classList.replace('hover:bg-blue-700', 'hover:bg-slate-200');
-    if(acts) acts.classList.add('hidden');
+    if (acts) acts.classList.add('hidden');
   }
+  updateBatchSelectedCount();
   renderWL();
 }
 
 function toggleWLCb(email, checked) {
   if (checked) {
-    if(!selectedWL.includes(email)) selectedWL.push(email);
+    if (!selectedWL.includes(email)) selectedWL.push(email);
   } else {
     selectedWL = selectedWL.filter(e => e !== email);
   }
+  updateBatchSelectedCount();
+}
+
+function getFilteredWLList() {
+  const searchEl = document.getElementById('wl-search');
+  const regionEl = document.getElementById('wl-filter-region');
+  const kw = searchEl ? searchEl.value.trim().toLowerCase() : '';
+  const regionKw = regionEl ? regionEl.value : '';
+
+  let list = S.whitelist || [];
+  if (regionKw) {
+    list = list.filter(w => w.region === regionKw);
+  }
+  if (filterWLPrimaryOnly) {
+    list = list.filter(w => w.isPrimary === true);
+  }
+  if (kw) {
+    list = list.filter(w => {
+      const userEmailLower = (w.email || '').trim().toLowerCase();
+      const userGroups = (S.mailGroups || [])
+        .filter(g => Array.isArray(g.emails) && g.emails.some(em => (em || '').trim().toLowerCase() === userEmailLower))
+        .map(g => (g.name || '').toLowerCase())
+        .join(' ');
+      return (
+        (w.name || '').toLowerCase().includes(kw) ||
+        userEmailLower.includes(kw) ||
+        (w.unit || '').toLowerCase().includes(kw) ||
+        (w.region || '').toLowerCase().includes(kw) ||
+        userGroups.includes(kw)
+      );
+    });
+  }
+  return list;
+}
+
+function toggleSelectAllVisibleWL() {
+  const visibleList = getFilteredWLList();
+  if (visibleList.length === 0) return;
+  const visibleEmails = visibleList.map(w => w.email);
+  const allSelected = visibleEmails.every(em => selectedWL.includes(em));
+  if (allSelected) {
+    selectedWL = selectedWL.filter(em => !visibleEmails.includes(em));
+  } else {
+    visibleEmails.forEach(em => {
+      if (!selectedWL.includes(em)) selectedWL.push(em);
+    });
+  }
+  updateBatchSelectedCount();
+  renderWL();
 }
 
 async function batchDeleteWL() {
-  if(selectedWL.length === 0) return toast('請先勾選名單', 'er');
-  if(!confirm(`確定要刪除選取的 ${selectedWL.length} 筆名單嗎？`)) return;
+  if (selectedWL.length === 0) return toast('請先勾選名單', 'er');
+  if (!confirm(`確定要刪除選取的 ${selectedWL.length} 筆名單嗎？`)) return;
   S.whitelist = S.whitelist.filter(w => !selectedWL.includes(w.email));
   await DS.saveWhitelist(S.whitelist);
   selectedWL = [];
+  updateBatchSelectedCount();
   renderWL();
   toast('已批次刪除', 'ok');
 }
 
 function openBatchGroupModal() {
-  if(selectedWL.length === 0) return toast('請先勾選名單', 'er');
+  if (selectedWL.length === 0) return toast('請先勾選名單', 'er');
   document.getElementById('batch-group-modal').classList.remove('hidden');
   const c = document.getElementById('batch-group-list');
-  if(S.mailGroups.length === 0) {
+  if (S.mailGroups.length === 0) {
     c.innerHTML = '<p class="text-sm text-slate-500">目前尚無任何群組，請先到「發信群組管理」建立。</p>';
     return;
   }
@@ -1741,67 +1936,166 @@ function closeBatchGroupModal() {
 
 async function confirmBatchAddGroup() {
   const cbs = document.querySelectorAll('.batch-grp-cb:checked');
-  if(cbs.length === 0) return toast('請勾選至少一個群組', 'er');
-  
+  if (cbs.length === 0) return toast('請勾選至少一個群組', 'er');
+
   const targetGroupIds = Array.from(cbs).map(cb => cb.value);
   let changed = false;
-  
+
   S.mailGroups.forEach(g => {
     if (targetGroupIds.includes(g.id)) {
       selectedWL.forEach(email => {
-        if(!g.emails.includes(email)) {
+        if (!g.emails.includes(email)) {
           g.emails.push(email);
           changed = true;
         }
       });
     }
   });
-  
+
   if (changed) {
     await DS.saveMailGroups(S.mailGroups);
     toast(`成功將 ${selectedWL.length} 人加入到 ${targetGroupIds.length} 個群組！`, 'ok');
   } else {
     toast('選取的人員皆已在目標群組中', 'in');
   }
-  
+
   closeBatchGroupModal();
   toggleBatchMode(); // exit batch mode
 }
 
+function exportWLExcel() {
+  if (!S.whitelist || S.whitelist.length === 0) {
+    return toast('目前通訊錄無資料可匯出', 'er');
+  }
+  const rows = S.whitelist.map(w => {
+    const emailLower = (w.email || '').trim().toLowerCase();
+    const groups = (S.mailGroups || [])
+      .filter(g => Array.isArray(g.emails) && g.emails.some(em => (em || '').trim().toLowerCase() === emailLower))
+      .map(g => g.name)
+      .join('、');
+    return {
+      '地區': w.region || '',
+      '單位': w.unit || '',
+      '姓名': w.name || '',
+      '電子郵件': w.email || '',
+      '主要聯絡人': w.isPrimary ? '是' : '否',
+      '接收信件通知': w.receiveEmail !== false ? '是' : '否',
+      '所屬群組': groups
+    };
+  });
+  const ws = XLSX.utils.json_to_sheet(rows);
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, '郵件通訊錄');
+  const d = new Date();
+  const dateStr = `${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}`;
+  XLSX.writeFile(wb, `採購週報_郵件通訊錄_${dateStr}.xlsx`);
+  toast('已匯出通訊錄 Excel 檔案 ✓', 'ok');
+}
+
+async function importWLExcel(inputEl) {
+  const file = inputEl?.files?.[0];
+  if (!file) return;
+  try {
+    const data = await file.arrayBuffer();
+    const wb = XLSX.read(data, { type: 'array' });
+    const firstSheet = wb.Sheets[wb.SheetNames[0]];
+    const rows = XLSX.utils.sheet_to_json(firstSheet, { defval: '' });
+    if (!rows || rows.length === 0) {
+      toast('Excel 檔案中沒有可讀取的資料列', 'er');
+      inputEl.value = '';
+      return;
+    }
+    let addedCount = 0;
+    let updatedCount = 0;
+    rows.forEach(r => {
+      const name = String(r['姓名'] || r['聯絡人姓名'] || r['name'] || r['Name'] || '').trim();
+      const email = String(r['電子郵件'] || r['信箱'] || r['Email'] || r['email'] || '').trim();
+      if (!name || !email || !email.includes('@')) return;
+      const region = String(r['地區'] || r['region'] || '').trim();
+      const unit = String(r['單位'] || r['unit'] || (region && REGION_DEFAULT_UNIT_MAP[region] ? REGION_DEFAULT_UNIT_MAP[region] : '')).trim();
+      const primaryRaw = String(r['主要聯絡人'] || r['isPrimary'] || '').trim().toLowerCase();
+      const isPrimary = ['是', 'true', '1', 'y', 'yes', '⭐', '主要'].includes(primaryRaw);
+      const recvRaw = String(r['接收信件通知'] || r['收信'] || r['receiveEmail'] || '是').trim().toLowerCase();
+      const receiveEmail = !['否', 'false', '0', 'n', 'no', '停用'].includes(recvRaw);
+
+      const emailLower = email.toLowerCase();
+      const existIdx = S.whitelist.findIndex(w => (w.email || '').trim().toLowerCase() === emailLower);
+      const entry = { name, email, region, unit, isPrimary, receiveEmail };
+      if (existIdx !== -1) {
+        S.whitelist[existIdx] = entry;
+        updatedCount++;
+      } else {
+        S.whitelist.push(entry);
+        addedCount++;
+      }
+    });
+    if (addedCount > 0 || updatedCount > 0) {
+      await DS.saveWhitelist(S.whitelist);
+      renderWL();
+      toast(`匯入完成：新增 ${addedCount} 筆、更新 ${updatedCount} 筆聯絡人 ✓`, 'ok');
+    } else {
+      toast('未偵測到有效的「姓名」與「電子郵件」欄位', 'er');
+    }
+  } catch (err) {
+    console.error('importWLExcel error:', err);
+    toast('匯入 Excel 失敗：' + (err.message || err), 'er');
+  } finally {
+    inputEl.value = '';
+  }
+}
+
 function renderWL() {
   const c = document.getElementById('wl-list');
-  const searchEl = document.getElementById('wl-search');
-  const regionEl = document.getElementById('wl-filter-region');
-  const kw = searchEl ? searchEl.value.trim().toLowerCase() : '';
-  const regionKw = regionEl ? regionEl.value : '';
-  
-  let list = S.whitelist;
-  if(regionKw) {
-    list = list.filter(w => w.region === regionKw);
+  if (!c) return;
+
+  const totalCount = (S.whitelist || []).length;
+  const primaryCount = (S.whitelist || []).filter(w => w.isPrimary === true).length;
+  const list = getFilteredWLList();
+
+  const statsBadge = document.getElementById('wl-stats-badge');
+  if (statsBadge) {
+    if (list.length !== totalCount) {
+      statsBadge.textContent = `篩選 ${list.length} / 共 ${totalCount} 人 · ⭐主要 ${primaryCount} 人`;
+    } else {
+      statsBadge.textContent = `共 ${totalCount} 人 · ⭐主要 ${primaryCount} 人`;
+    }
   }
-  if(kw) {
-    list = list.filter(w => w.name.toLowerCase().includes(kw) || w.email.toLowerCase().includes(kw));
-  }
-  
+
   if (list.length === 0) {
     c.innerHTML = '<div class="col-span-full text-center text-slate-400 py-12 text-sm bg-white rounded-xl border border-dashed border-slate-200">找不到符合條件的通訊名單</div>';
     return;
   }
-  
+
   c.innerHTML = list.map((w) => {
-    const origIdx = S.whitelist.findIndex(x => x.email === w.email);
+    const origIdx = S.whitelist.findIndex(x => x.email === w.email && x.name === w.name);
+    const safeIdx = origIdx !== -1 ? origIdx : S.whitelist.findIndex(x => x.email === w.email);
+    const isEditingThis = editWLIndex === safeIdx;
+
     const regionBadge = w.region ? `<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium bg-slate-100 text-slate-600 border border-slate-200/80">${xe(w.region)}</span>` : '';
     const unitBadge = w.unit ? `<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium bg-blue-50 text-blue-600 border border-blue-100">${xe(w.unit)}</span>` : '';
-    const primaryBadge = w.isPrimary ? `<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200 shadow-xs" title="主要聯絡窗口">⭐ 主要</span>` : '';
-    const receiveBadge = (w.receiveEmail !== false) 
-      ? `<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium bg-emerald-50 text-emerald-600 border border-emerald-100">收信</span>` 
-      : `<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium bg-slate-50 text-slate-400 border border-slate-100" title="暫停接收">停用</span>`;
-    
+
+    // 可一鍵切換的「⭐ 主要」按鈕標籤
+    const primaryToggleBtn = w.isPrimary
+      ? `<button type="button" onclick="quickToggleWLPrimary(${safeIdx})" class="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 shadow-xs transition-colors cursor-pointer" title="點擊可取消主要聯絡人">⭐ 主要</button>`
+      : `<button type="button" onclick="quickToggleWLPrimary(${safeIdx})" class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[10px] font-medium bg-slate-50 hover:bg-amber-50 text-slate-400 hover:text-amber-600 border border-slate-200/70 hover:border-amber-200 opacity-0 group-hover:opacity-100 transition-all cursor-pointer" title="點擊設為主要聯絡人">☆ 設為主要</button>`;
+
+    // 可一鍵切換的「收信 / 停用」按鈕標籤
+    const receiveToggleBtn = (w.receiveEmail !== false)
+      ? `<button type="button" onclick="quickToggleWLReceive(${safeIdx})" class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium bg-emerald-50 hover:bg-emerald-100 text-emerald-600 border border-emerald-100 transition-colors cursor-pointer" title="點擊可暫停接收信件通知">收信</button>`
+      : `<button type="button" onclick="quickToggleWLReceive(${safeIdx})" class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-medium bg-rose-50 hover:bg-rose-100 text-rose-500 border border-rose-200 transition-colors cursor-pointer" title="點擊可恢復接收信件通知">🔕 停用</button>`;
+
+    // 查詢此聯絡人所屬的發信群組
+    const emailLower = (w.email || '').trim().toLowerCase();
+    const userGroups = (S.mailGroups || []).filter(g => Array.isArray(g.emails) && g.emails.some(em => (em || '').trim().toLowerCase() === emailLower));
+    const groupBadges = userGroups.map(g => `<span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-medium bg-indigo-50/80 text-indigo-600 border border-indigo-100" title="所屬發信群組：${xe(g.name)}">👥 ${xe(g.name)}</span>`).join('');
+
     return `
       <div class="group flex items-center justify-between gap-3 p-3 bg-white rounded-xl border transition-all duration-150 ${
-        w.isPrimary 
-          ? 'border-amber-200/90 shadow-xs bg-gradient-to-r from-amber-50/20 to-white hover:border-amber-300' 
-          : 'border-slate-200/80 hover:border-indigo-200 hover:shadow-xs'
+        isEditingThis
+          ? 'ring-2 ring-blue-500 border-blue-400 bg-blue-50/20 shadow-sm'
+          : (w.isPrimary
+              ? 'border-amber-200/90 shadow-xs bg-gradient-to-r from-amber-50/20 to-white hover:border-amber-300'
+              : 'border-slate-200/80 hover:border-indigo-200 hover:shadow-xs')
       }">
         <div class="flex items-center gap-3 min-w-0 flex-1">
           ${isBatchMode ? `
@@ -1810,10 +2104,11 @@ function renderWL() {
           <div class="min-w-0 flex-1">
             <div class="flex flex-wrap items-center gap-1.5 mb-1">
               <span class="font-bold text-slate-800 text-sm tracking-tight">${xe(w.name)}</span>
-              ${primaryBadge}
+              ${primaryToggleBtn}
               ${regionBadge}
               ${unitBadge}
-              ${receiveBadge}
+              ${receiveToggleBtn}
+              ${groupBadges}
             </div>
             <div class="text-xs text-slate-400 font-mono truncate flex items-center gap-1">
               <svg class="w-3 h-3 text-slate-300 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
@@ -1823,10 +2118,10 @@ function renderWL() {
         </div>
         ${!isBatchMode ? `
           <div class="flex items-center gap-1 flex-shrink-0 opacity-80 group-hover:opacity-100 transition-opacity">
-            <button onclick="editWL(${origIdx})" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-colors" title="修改聯絡人">
+            <button onclick="editWL(${safeIdx})" class="w-8 h-8 rounded-lg flex items-center justify-center ${isEditingThis ? 'text-blue-600 bg-blue-100' : 'text-slate-400 hover:text-blue-600 hover:bg-blue-50'} transition-colors" title="修改聯絡人">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
             </button>
-            <button onclick="rmWL(${origIdx})" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors" title="刪除">
+            <button onclick="rmWL(${safeIdx})" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors" title="刪除">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
             </button>
           </div>
