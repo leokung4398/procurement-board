@@ -823,14 +823,23 @@ function openSettingsModal() {
   document.getElementById('settings-modal').classList.remove('hidden');
   switchSettingsTab('tab-whitelist');
 }
-function closeSettingsModal() { document.getElementById('settings-modal').classList.add('hidden'); }
+function closeSettingsModal() {
+  if (kmDirty && !confirm('「關鍵字資料庫」尚有未儲存的修改，確定要直接關閉並放棄變更嗎？')) return;
+  kmDirty = false;
+  document.getElementById('settings-modal').classList.add('hidden');
+}
 function switchSettingsTab(t) {
+  const curKwTab = document.getElementById('tab-keywords');
+  if (t !== 'tab-keywords' && curKwTab && !curKwTab.classList.contains('hidden') && kmDirty) {
+    if (!confirm('「關鍵字資料庫」尚有未儲存的修改，確定要離開此分頁並放棄變更嗎？')) return;
+    kmDirty = false;
+  }
   document.querySelectorAll('.settings-tab-pane').forEach(el => el.classList.add('hidden'));
   document.querySelectorAll('[id^="btn-tab-"]').forEach(el => el.classList.remove('bg-blue-50', 'text-blue-700', 'font-bold'));
   const tEl = document.getElementById(t), bEl = document.getElementById('btn-'+t);
   if (tEl) tEl.classList.remove('hidden');
   if (bEl) bEl.classList.add('bg-blue-50', 'text-blue-700', 'font-bold');
-  if(t==='tab-whitelist')renderWL(); if(t==='tab-groups')renderGroupList(); if(t==='tab-admin')renderAdminList(); if(t==='tab-keywords'){tempKw=JSON.parse(JSON.stringify(S.keywords));renderKMCats();} if(t==='tab-handover')loadHandoverConfig();
+  if(t==='tab-whitelist')renderWL(); if(t==='tab-groups')renderGroupList(); if(t==='tab-admin')renderAdminList(); if(t==='tab-keywords'){initKeywordTab();} if(t==='tab-handover')loadHandoverConfig();
 }
 function openAboutModal() { document.getElementById('about-modal').classList.remove('hidden'); switchAboutTab('tab-guide'); }
 function closeAboutModal() { document.getElementById('about-modal').classList.add('hidden'); }
@@ -1791,86 +1800,546 @@ function openPreviewInNewTab() {
 
 
 let tempKw = [];
-    let curKwId = null;
-    function showKM() {
-      tempKw = JSON.parse(JSON.stringify(S.keywords));
-      document.getElementById('km').classList.remove('hidden');
-      if (tempKw.length > 0) selKMCat(tempKw[0].id);
-      renderKMCats();
-    }
-    function hideKM() { document.getElementById('km').classList.add('hidden'); }
-    function renderKMCats() {
-      const c = document.getElementById('km-cat-list');
-      c.innerHTML = tempKw.map(cat => {
-        const isSelected = cat.id === curKwId;
-        return `
-          <div onclick="selKMCat('${cat.id}')" class="group p-2.5 rounded-xl cursor-pointer transition-all duration-150 border ${
-            isSelected 
-              ? 'bg-blue-50/80 border-blue-200 text-blue-900 shadow-xs font-bold ring-1 ring-blue-200/50' 
-              : 'bg-white border-slate-200/70 text-slate-700 hover:bg-slate-50 hover:border-blue-100 shadow-xs'
-          } flex items-center justify-between text-xs">
-            <div class="flex items-center gap-2 min-w-0 flex-1">
-              <span class="w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-blue-600' : 'bg-slate-300 group-hover:bg-blue-400'} flex-shrink-0"></span>
-              <span class="truncate">${xe(cat.name)}</span>
-            </div>
-            <span class="text-[11px] font-mono px-2 py-0.5 rounded-full ${isSelected ? 'bg-blue-100 text-blue-700 font-bold' : 'bg-slate-100 text-slate-500'} flex-shrink-0">${(cat.keywords||[]).length}</span>
-          </div>
-        `;
-      }).join('');
-    }
-    function selKMCat(id) {
-      curKwId = id;
-      renderKMCats();
-      const cat = tempKw.find(c => c.id === id);
-      document.getElementById('km-kw-title').textContent = cat ? `${cat.name} (${(cat.keywords||[]).length} 個子標題)` : '請選擇左側母標題';
-      renderKWs();
-    }
-    function renderKWs() {
-      const c = document.getElementById('km-kw-list');
-      const cat = tempKw.find(cat => cat.id === curKwId);
-      if (!cat) return;
-      if (!cat.keywords || cat.keywords.length === 0) {
-        c.innerHTML = '<div class="text-center text-slate-400 py-12 text-xs bg-white rounded-xl border border-dashed border-slate-200">尚無任何關鍵字子標題，可點擊右上角新增</div>';
-        return;
-      }
-      cat.keywords.sort((a,b)=>a.order-b.order);
-      c.innerHTML = cat.keywords.map((k, i) => `
-        <div class="flex items-center gap-3 bg-white p-2.5 rounded-xl border border-slate-200/80 shadow-xs hover:border-indigo-200 hover:shadow-sm transition-all group">
-          <div class="cursor-move text-slate-300 hover:text-slate-500 flex-shrink-0" title="拖移排序">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
-          </div>
-          <div class="flex-1 min-w-0">
-            <input type="text" class="w-full font-semibold text-xs text-slate-800 border border-transparent hover:border-slate-200 focus:border-blue-400 rounded-lg px-2.5 py-1.5 bg-transparent focus:bg-white transition-all outline-none" value="${xe(k.text)}" onchange="uKWText('${k.id}', this.value)" placeholder="輸入子標題關鍵字名稱...">
-          </div>
-          <div class="flex items-center gap-1.5 border-l border-slate-100 pl-3 flex-shrink-0">
-            <button onclick="tgKWActive('${k.id}')" class="px-2.5 py-1 rounded-md text-[11px] font-semibold transition-colors ${k.isActive !== false ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/80' : 'bg-slate-100 text-slate-500 border border-slate-200'}">
-              ${k.isActive !== false ? '● 啟用中' : '○ 已停用'}
-            </button>
-            <button onclick="mvKWUp('${k.id}')" class="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors" title="上移">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
-            </button>
-            <button onclick="mvKWDn('${k.id}')" class="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors" title="下移">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
-            </button>
+let curKwId = null;
+let kmDirty = false;
+let kmFilterStatus = 'all';
+let kmDragKwId = null;
+
+function initKeywordTab() {
+  tempKw = JSON.parse(JSON.stringify(S.keywords || []));
+  kmDirty = false;
+  updateKMDirtyUI();
+  if (!curKwId || !tempKw.some(c => c.id === curKwId)) {
+    curKwId = tempKw.length > 0 ? tempKw[0].id : null;
+  }
+  renderKMCats();
+  renderKWs();
+}
+
+function showKM() {
+  openSettingsModal();
+  switchSettingsTab('tab-keywords');
+}
+
+function hideKM() {
+  const legacyKm = document.getElementById('km');
+  if (legacyKm) legacyKm.classList.add('hidden');
+}
+
+function markKMDirty() {
+  kmDirty = true;
+  updateKMDirtyUI();
+}
+
+function updateKMDirtyUI() {
+  const footer = document.getElementById('km-footer-bar');
+  const hint = document.getElementById('km-dirty-hint');
+  const resetBtn = document.getElementById('km-reset-btn');
+  const saveBtn = document.getElementById('km-save-btn');
+  if (!footer || !hint) return;
+  if (kmDirty) {
+    footer.classList.remove('bg-white', 'border-slate-200/80');
+    footer.classList.add('bg-amber-50/90', 'border-amber-200');
+    hint.className = 'text-xs font-bold text-amber-700 flex items-center gap-1';
+    hint.innerHTML = '⚠️ <span>您有尚未儲存的關鍵字變更，請記得點擊右側「儲存關鍵字並發布生效」！</span>';
+    if (resetBtn) resetBtn.classList.remove('hidden');
+    if (saveBtn) saveBtn.classList.add('ring-2', 'ring-blue-300');
+  } else {
+    footer.classList.add('bg-white', 'border-slate-200/80');
+    footer.classList.remove('bg-amber-50/90', 'border-amber-200');
+    hint.className = 'text-xs text-slate-400';
+    hint.textContent = '💡 可直接拖曳 ☰ 調整順序、點擊文字直接修改，完成後請點擊右側按鈕儲存生效。';
+    if (resetBtn) resetBtn.classList.add('hidden');
+    if (saveBtn) saveBtn.classList.remove('ring-2', 'ring-blue-300');
+  }
+}
+
+function discardKMChanges() {
+  if (!confirm('確定要放棄所有尚未儲存的關鍵字變更，還原為目前線上版本嗎？')) return;
+  tempKw = JSON.parse(JSON.stringify(S.keywords || []));
+  kmDirty = false;
+  updateKMDirtyUI();
+  if (!curKwId || !tempKw.some(c => c.id === curKwId)) {
+    curKwId = tempKw.length > 0 ? tempKw[0].id : null;
+  }
+  renderKMCats();
+  renderKWs();
+  toast('已還原未儲存的關鍵字變更', 'in');
+}
+
+function setKMFilterStatus(val) {
+  kmFilterStatus = val || 'all';
+  renderKMCats();
+  renderKWs();
+}
+
+function onKMSearchInput() {
+  const inp = document.getElementById('km-search');
+  const clearBtn = document.getElementById('km-search-clear');
+  const q = inp ? inp.value.trim() : '';
+  if (clearBtn) {
+    if (q) clearBtn.classList.remove('hidden');
+    else clearBtn.classList.add('hidden');
+  }
+  renderKMCats();
+  renderKWs();
+}
+
+function clearKMSearch() {
+  const inp = document.getElementById('km-search');
+  if (inp) inp.value = '';
+  onKMSearchInput();
+}
+
+function updateKMHeaderTitle() {
+  const titleEl = document.getElementById('km-kw-title');
+  if (!titleEl) return;
+  const searchQ = (document.getElementById('km-search')?.value || '').trim();
+  if (searchQ) {
+    titleEl.textContent = `🔍 跨構面搜尋結果：「${searchQ}」`;
+    return;
+  }
+  const cat = tempKw.find(c => c.id === curKwId);
+  if (!cat) {
+    titleEl.textContent = '請選擇左側母標題';
+    return;
+  }
+  const kws = cat.keywords || [];
+  const activeCount = kws.filter(k => k.isActive !== false).length;
+  titleEl.textContent = `${cat.name} (啟用 ${activeCount} / 共 ${kws.length} 個子標題)`;
+}
+
+function renderKMCats() {
+  const c = document.getElementById('km-cat-list');
+  if (!c) return;
+
+  let totalCats = tempKw.length;
+  let totalKws = 0;
+  let totalActiveKws = 0;
+  tempKw.forEach(cat => {
+    const kws = cat.keywords || [];
+    totalKws += kws.length;
+    totalActiveKws += kws.filter(k => k.isActive !== false).length;
+  });
+
+  const statsBadge = document.getElementById('km-stats-badge');
+  if (statsBadge) {
+    statsBadge.textContent = `${totalCats} 大構面 · 啟用 ${totalActiveKws} / 共 ${totalKws} 個子標題`;
+  }
+  const catCountLabel = document.getElementById('km-cat-count-label');
+  if (catCountLabel) {
+    catCountLabel.textContent = `${totalCats} 大構面`;
+  }
+
+  const searchQ = (document.getElementById('km-search')?.value || '').trim().toLowerCase();
+
+  c.innerHTML = tempKw.map((cat, idx) => {
+    const isSelected = cat.id === curKwId;
+    const kws = cat.keywords || [];
+    const activeCount = kws.filter(k => k.isActive !== false).length;
+    const matchCount = searchQ
+      ? kws.filter(k => (k.text || '').toLowerCase().includes(searchQ) || (cat.name || '').toLowerCase().includes(searchQ)).length
+      : 0;
+    const badgeText = activeCount === kws.length ? `${kws.length}` : `${activeCount}/${kws.length}`;
+
+    return `
+      <div onclick="selKMCat('${cat.id}')" class="group p-2.5 rounded-xl cursor-pointer transition-all duration-150 border ${
+        isSelected
+          ? 'bg-blue-50/80 border-blue-200 text-blue-900 shadow-xs font-bold ring-1 ring-blue-200/50'
+          : (searchQ && matchCount > 0 ? 'bg-indigo-50/40 border-indigo-200 text-slate-800' : 'bg-white border-slate-200/70 text-slate-700 hover:bg-slate-50 hover:border-blue-100 shadow-xs')
+      } flex items-center justify-between text-xs gap-1.5">
+        <div class="flex items-center gap-2 min-w-0 flex-1">
+          <span class="w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-blue-600' : (searchQ && matchCount > 0 ? 'bg-indigo-500' : 'bg-slate-300 group-hover:bg-blue-400')} flex-shrink-0"></span>
+          <span class="truncate" title="${xe(cat.name)}">${xe(cat.name)}</span>
+          ${searchQ && matchCount > 0 ? `<span class="text-[10px] bg-indigo-100 text-indigo-700 px-1.5 py-0.2 rounded font-bold flex-shrink-0">命中 ${matchCount}</span>` : ''}
+        </div>
+        <div class="flex items-center gap-0.5 flex-shrink-0">
+          <span class="text-[11px] font-mono px-2 py-0.5 rounded-full ${isSelected ? 'bg-blue-100 text-blue-700 font-bold' : 'bg-slate-100 text-slate-500'}" title="啟用 ${activeCount} / 總計 ${kws.length}">${badgeText}</span>
+          <div class="hidden group-hover:flex items-center gap-0.5 ml-0.5">
+            <button onclick="event.stopPropagation(); renameKMCat('${cat.id}')" class="w-5 h-5 rounded flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-100/60" title="重新命名母標題">✏️</button>
+            <button onclick="event.stopPropagation(); moveKMCatOrder(${idx}, -1)" class="w-5 h-5 rounded flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 ${idx === 0 ? 'opacity-30 pointer-events-none' : ''}" title="上移構面">↑</button>
+            <button onclick="event.stopPropagation(); moveKMCatOrder(${idx}, 1)" class="w-5 h-5 rounded flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-200/60 ${idx === tempKw.length - 1 ? 'opacity-30 pointer-events-none' : ''}" title="下移構面">↓</button>
+            <button onclick="event.stopPropagation(); delKMCat('${cat.id}')" class="w-5 h-5 rounded flex items-center justify-center text-slate-400 hover:text-rose-600 hover:bg-rose-50" title="刪除此母標題構面">🗑️</button>
           </div>
         </div>
-      `).join('');
+      </div>
+    `;
+  }).join('');
+
+  updateKMHeaderTitle();
+}
+
+function selKMCat(id) {
+  curKwId = id;
+  const searchInp = document.getElementById('km-search');
+  if (searchInp && searchInp.value.trim()) {
+    searchInp.value = '';
+    const clearBtn = document.getElementById('km-search-clear');
+    if (clearBtn) clearBtn.classList.add('hidden');
+  }
+  renderKMCats();
+  renderKWs();
+}
+
+function addKMCat() {
+  const inp = document.getElementById('km-new-cat-name');
+  const name = inp ? inp.value.trim() : '';
+  if (!name) return toast('請輸入新母標題（構面）名稱', 'er');
+  if (tempKw.some(c => (c.name || '').trim().toLowerCase() === name.toLowerCase())) {
+    return toast('此母標題名稱已存在', 'er');
+  }
+  const newCat = {
+    id: 'cat_' + Date.now(),
+    name,
+    order: tempKw.length + 1,
+    keywords: []
+  };
+  tempKw.push(newCat);
+  if (inp) inp.value = '';
+  curKwId = newCat.id;
+  markKMDirty();
+  renderKMCats();
+  renderKWs();
+  toast(`已新增母標題「${name}」（請記得點擊底部儲存生效）`, 'ok');
+}
+
+function renameKMCat(catId) {
+  const cat = tempKw.find(c => c.id === catId);
+  if (!cat) return;
+  const newName = prompt('請輸入新的母標題（構面）名稱：', cat.name);
+  if (newName === null) return;
+  const trimmed = newName.trim();
+  if (!trimmed) return toast('母標題名稱不可為空', 'er');
+  if (tempKw.some(c => c.id !== catId && (c.name || '').trim().toLowerCase() === trimmed.toLowerCase())) {
+    return toast('此母標題名稱已存在', 'er');
+  }
+  cat.name = trimmed;
+  markKMDirty();
+  renderKMCats();
+  renderKWs();
+}
+
+function moveKMCatOrder(idx, dir) {
+  const targetIdx = idx + dir;
+  if (targetIdx < 0 || targetIdx >= tempKw.length) return;
+  const tmp = tempKw[idx];
+  tempKw[idx] = tempKw[targetIdx];
+  tempKw[targetIdx] = tmp;
+  tempKw.forEach((c, i) => { c.order = i + 1; });
+  markKMDirty();
+  renderKMCats();
+}
+
+function delKMCat(catId) {
+  const cat = tempKw.find(c => c.id === catId);
+  if (!cat) return;
+  if (!confirm(`確定要刪除母標題「${cat.name}」及其底下 ${(cat.keywords || []).length} 個關鍵字嗎？`)) return;
+  tempKw = tempKw.filter(c => c.id !== catId);
+  if (curKwId === catId) {
+    curKwId = tempKw.length > 0 ? tempKw[0].id : null;
+  }
+  markKMDirty();
+  renderKMCats();
+  renderKWs();
+}
+
+function filterKWItemByStatus(k) {
+  if (kmFilterStatus === 'active') return k.isActive !== false;
+  if (kmFilterStatus === 'inactive') return k.isActive === false;
+  return true;
+}
+
+function renderKWs() {
+  const c = document.getElementById('km-kw-list');
+  if (!c) return;
+  updateKMHeaderTitle();
+
+  const searchQ = (document.getElementById('km-search')?.value || '').trim().toLowerCase();
+
+  // 若有輸入全域搜尋關鍵字，呈現跨構面搜尋結果
+  if (searchQ) {
+    const matchedRows = [];
+    tempKw.forEach(cat => {
+      (cat.keywords || []).sort((a, b) => a.order - b.order).forEach((k, idx) => {
+        if (!filterKWItemByStatus(k)) return;
+        if ((k.text || '').toLowerCase().includes(searchQ) || (cat.name || '').toLowerCase().includes(searchQ)) {
+          matchedRows.push({ cat, k, idx });
+        }
+      });
+    });
+
+    if (matchedRows.length === 0) {
+      c.innerHTML = `<div class="text-center text-slate-400 py-12 text-xs bg-white rounded-xl border border-dashed border-slate-200">找不到符合「${xe(searchQ)}」的關鍵字項目</div>`;
+      return;
     }
-    function getCurCat() { return tempKw.find(cat => cat.id === curKwId); }
-    function uKWText(kwId, val) { const c = getCurCat(); const k = c.keywords.find(x => x.id === kwId); if(k) k.text = val; }
-    function tgKWActive(kwId) { const c = getCurCat(); const k = c.keywords.find(x => x.id === kwId); if(k) k.isActive = (k.isActive === false ? true : false); renderKWs(); }
-    function addKW() { const c = getCurCat(); if(!c)return; if(!c.keywords) c.keywords=[]; c.keywords.push({id: 'kw_'+Date.now(), text: '新關鍵字', isActive: true, order: c.keywords.length+1}); renderKWs(); renderKMCats(); }
-    function mvKWUp(kwId) { const c = getCurCat(); const idx = c.keywords.findIndex(x => x.id === kwId); if(idx>0){ [c.keywords[idx-1], c.keywords[idx]] = [c.keywords[idx], c.keywords[idx-1]]; c.keywords.forEach((x,i)=>x.order=i+1); renderKWs(); } }
-    function mvKWDn(kwId) { const c = getCurCat(); const idx = c.keywords.findIndex(x => x.id === kwId); if(idx<c.keywords.length-1){ [c.keywords[idx], c.keywords[idx+1]] = [c.keywords[idx+1], c.keywords[idx]]; c.keywords.forEach((x,i)=>x.order=i+1); renderKWs(); } }
-    async function saveKMDb() {
-      try {
-        await DS.saveKeywords(tempKw);
-        S.keywords = tempKw;
-        toast('關鍵字資料庫已更新並生效！', 'ok');
-        hideKM();
-        if(S.cur) renderSecs();
-      } catch(e) { toast('儲存失敗', 'er'); }
+
+    c.innerHTML = matchedRows.map(({ cat, k, idx }) => `
+      <div class="flex items-center gap-2.5 bg-white p-2.5 rounded-xl border border-slate-200/80 shadow-xs hover:border-indigo-200 transition-all">
+        <button onclick="selKMCat('${cat.id}')" class="text-[11px] bg-blue-50 text-blue-700 hover:bg-blue-100 border border-blue-200/80 px-2 py-0.5 rounded-md font-semibold flex-shrink-0" title="點擊切換至此構面">
+          ${xe(cat.name)}
+        </button>
+        <span class="text-[11px] font-mono text-slate-400 w-6 text-center flex-shrink-0">#${idx + 1}</span>
+        <div class="flex-1 min-w-0">
+          <input type="text" class="w-full font-semibold text-xs ${k.isActive !== false ? 'text-slate-800' : 'text-slate-400 line-through'} border border-transparent hover:border-slate-200 focus:border-blue-400 rounded-lg px-2.5 py-1.5 bg-transparent focus:bg-white transition-all outline-none" value="${xe(k.text)}" onchange="uKWTextInCat('${cat.id}', '${k.id}', this.value)" placeholder="輸入子標題關鍵字名稱...">
+        </div>
+        <div class="flex items-center gap-1 border-l border-slate-100 pl-2.5 flex-shrink-0">
+          <button onclick="tgKWActiveInCat('${cat.id}', '${k.id}')" class="px-2.5 py-1 rounded-md text-[11px] font-semibold transition-colors ${k.isActive !== false ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/80' : 'bg-slate-100 text-slate-500 border border-slate-200'}">
+            ${k.isActive !== false ? '● 啟用中' : '○ 已停用'}
+          </button>
+          <button onclick="delKWInCat('${cat.id}', '${k.id}')" class="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors" title="刪除此關鍵字">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          </button>
+        </div>
+      </div>
+    `).join('');
+    return;
+  }
+
+  const cat = tempKw.find(cat => cat.id === curKwId);
+  if (!cat) {
+    c.innerHTML = '<div class="text-center text-slate-400 mt-12 text-xs">請從左側選擇一個母標題來編輯對應的子標題。</div>';
+    return;
+  }
+  if (!cat.keywords || cat.keywords.length === 0) {
+    c.innerHTML = '<div class="text-center text-slate-400 py-12 text-xs bg-white rounded-xl border border-dashed border-slate-200">尚無任何關鍵字子標題，可於上方輸入框快速新增</div>';
+    return;
+  }
+
+  cat.keywords.sort((a, b) => a.order - b.order);
+  const visibleKws = cat.keywords.filter(filterKWItemByStatus);
+
+  if (visibleKws.length === 0) {
+    c.innerHTML = '<div class="text-center text-slate-400 py-12 text-xs bg-white rounded-xl border border-dashed border-slate-200">目前狀態篩選下沒有符合的關鍵字子標題</div>';
+    return;
+  }
+
+  c.innerHTML = visibleKws.map((k) => {
+    const realIdx = cat.keywords.findIndex(x => x.id === k.id);
+    return `
+      <div id="kw-row-${k.id}" draggable="true"
+           ondragstart="onKWDragStart(event, '${k.id}')"
+           ondragover="onKWDragOver(event)"
+           ondrop="onKWDrop(event, '${k.id}')"
+           ondragend="onKWDragEnd(event)"
+           class="flex items-center gap-2.5 bg-white p-2.5 rounded-xl border border-slate-200/80 shadow-xs hover:border-indigo-200 hover:shadow-sm transition-all group">
+        <div class="cursor-move text-slate-300 hover:text-indigo-500 flex-shrink-0 p-1" title="按住上下拖曳排序">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </div>
+        <span class="text-[11px] font-mono font-bold text-slate-400 w-6 text-center flex-shrink-0">#${realIdx + 1}</span>
+        <div class="flex-1 min-w-0">
+          <input id="kw-input-${k.id}" type="text" class="w-full font-semibold text-xs ${k.isActive !== false ? 'text-slate-800' : 'text-slate-400 line-through'} border border-transparent hover:border-slate-200 focus:border-blue-400 rounded-lg px-2.5 py-1.5 bg-transparent focus:bg-white transition-all outline-none" value="${xe(k.text)}" onchange="uKWText('${k.id}', this.value)" placeholder="輸入子標題關鍵字名稱...">
+        </div>
+        <div class="flex items-center gap-1 border-l border-slate-100 pl-2.5 flex-shrink-0">
+          <button onclick="tgKWActive('${k.id}')" class="px-2.5 py-1 rounded-md text-[11px] font-semibold transition-colors ${k.isActive !== false ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/80 hover:bg-emerald-100' : 'bg-slate-100 text-slate-500 border border-slate-200 hover:bg-slate-200'}" title="點擊切換啟用或停用">
+            ${k.isActive !== false ? '● 啟用中' : '○ 已停用'}
+          </button>
+          <button onclick="mvKWUp('${k.id}')" class="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors ${realIdx === 0 ? 'opacity-30 pointer-events-none' : ''}" title="上移">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+          </button>
+          <button onclick="mvKWDn('${k.id}')" class="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors ${realIdx === cat.keywords.length - 1 ? 'opacity-30 pointer-events-none' : ''}" title="下移">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <button onclick="delKW('${k.id}')" class="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-rose-50 text-slate-400 hover:text-rose-600 transition-colors" title="刪除此關鍵字">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function onKWDragStart(ev, kwId) {
+  kmDragKwId = kwId;
+  if (ev.dataTransfer) {
+    ev.dataTransfer.effectAllowed = 'move';
+    ev.dataTransfer.setData('text/plain', kwId);
+  }
+  if (ev.currentTarget) ev.currentTarget.classList.add('opacity-50');
+}
+
+function onKWDragOver(ev) {
+  ev.preventDefault();
+  if (ev.dataTransfer) ev.dataTransfer.dropEffect = 'move';
+}
+
+function onKWDrop(ev, targetKwId) {
+  ev.preventDefault();
+  if (!kmDragKwId || kmDragKwId === targetKwId) return;
+  const c = getCurCat();
+  if (!c || !c.keywords) return;
+  const fromIdx = c.keywords.findIndex(x => x.id === kmDragKwId);
+  const toIdx = c.keywords.findIndex(x => x.id === targetKwId);
+  if (fromIdx === -1 || toIdx === -1) return;
+  const [moved] = c.keywords.splice(fromIdx, 1);
+  c.keywords.splice(toIdx, 0, moved);
+  c.keywords.forEach((x, i) => { x.order = i + 1; });
+  kmDragKwId = null;
+  markKMDirty();
+  renderKWs();
+}
+
+function onKWDragEnd(ev) {
+  kmDragKwId = null;
+  if (ev.currentTarget) ev.currentTarget.classList.remove('opacity-50');
+}
+
+function getCurCat() { return tempKw.find(cat => cat.id === curKwId); }
+
+function uKWTextInCat(catId, kwId, val) {
+  const c = tempKw.find(cat => cat.id === catId);
+  if (!c || !c.keywords) return;
+  const trimmed = (val || '').trim();
+  if (!trimmed) {
+    toast('關鍵字名稱不可為空', 'er');
+    renderKWs();
+    return;
+  }
+  const k = c.keywords.find(x => x.id === kwId);
+  if (k && k.text !== trimmed) {
+    k.text = trimmed;
+    markKMDirty();
+    renderKMCats();
+  }
+}
+
+function uKWText(kwId, val) {
+  if (!curKwId) return;
+  uKWTextInCat(curKwId, kwId, val);
+}
+
+function tgKWActiveInCat(catId, kwId) {
+  const c = tempKw.find(cat => cat.id === catId);
+  if (!c || !c.keywords) return;
+  const k = c.keywords.find(x => x.id === kwId);
+  if (k) {
+    k.isActive = (k.isActive === false ? true : false);
+    markKMDirty();
+    renderKMCats();
+    renderKWs();
+  }
+}
+
+function tgKWActive(kwId) {
+  if (!curKwId) return;
+  tgKWActiveInCat(curKwId, kwId);
+}
+
+function toggleAllCurCatKW(enable) {
+  const c = getCurCat();
+  if (!c || !c.keywords || c.keywords.length === 0) return;
+  let changed = false;
+  c.keywords.forEach(k => {
+    const curState = k.isActive !== false;
+    if (curState !== enable) {
+      k.isActive = enable;
+      changed = true;
     }
+  });
+  if (changed) {
+    markKMDirty();
+    renderKMCats();
+    renderKWs();
+    toast(enable ? `已將「${c.name}」全部子標題設為啟用` : `已將「${c.name}」全部子標題設為停用`, 'in');
+  }
+}
+
+function addKW() {
+  const c = getCurCat();
+  if (!c) return toast('請先選擇左側母標題', 'er');
+  if (!c.keywords) c.keywords = [];
+
+  const inp = document.getElementById('km-new-kw-input');
+  const rawText = inp ? inp.value.trim() : '';
+  const text = rawText || '新關鍵字';
+
+  if (rawText && c.keywords.some(k => (k.text || '').trim().toLowerCase() === rawText.toLowerCase())) {
+    return toast(`「${c.name}」底下已存在名為「${rawText}」的關鍵字`, 'er');
+  }
+
+  const newId = 'kw_' + Date.now();
+  c.keywords.push({
+    id: newId,
+    text,
+    isActive: true,
+    order: c.keywords.length + 1
+  });
+
+  if (inp) inp.value = '';
+  markKMDirty();
+  renderKMCats();
+  renderKWs();
+
+  setTimeout(() => {
+    if (rawText) {
+      if (inp) inp.focus();
+      const rowEl = document.getElementById(`kw-row-${newId}`);
+      if (rowEl) rowEl.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } else {
+      const targetInp = document.getElementById(`kw-input-${newId}`);
+      if (targetInp) {
+        targetInp.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        targetInp.focus();
+        targetInp.select();
+      }
+    }
+  }, 30);
+}
+
+function delKWInCat(catId, kwId) {
+  const c = tempKw.find(cat => cat.id === catId);
+  if (!c || !c.keywords) return;
+  const k = c.keywords.find(x => x.id === kwId);
+  if (!k) return;
+  if (!confirm(`確定要從「${c.name}」刪除關鍵字「${k.text}」嗎？`)) return;
+  c.keywords = c.keywords.filter(x => x.id !== kwId);
+  c.keywords.forEach((x, i) => { x.order = i + 1; });
+  markKMDirty();
+  renderKMCats();
+  renderKWs();
+}
+
+function delKW(kwId) {
+  if (!curKwId) return;
+  delKWInCat(curKwId, kwId);
+}
+
+function mvKWUp(kwId) {
+  const c = getCurCat();
+  if (!c || !c.keywords) return;
+  const idx = c.keywords.findIndex(x => x.id === kwId);
+  if (idx > 0) {
+    [c.keywords[idx - 1], c.keywords[idx]] = [c.keywords[idx], c.keywords[idx - 1]];
+    c.keywords.forEach((x, i) => { x.order = i + 1; });
+    markKMDirty();
+    renderKWs();
+  }
+}
+
+function mvKWDn(kwId) {
+  const c = getCurCat();
+  if (!c || !c.keywords) return;
+  const idx = c.keywords.findIndex(x => x.id === kwId);
+  if (idx < c.keywords.length - 1) {
+    [c.keywords[idx], c.keywords[idx + 1]] = [c.keywords[idx + 1], c.keywords[idx]];
+    c.keywords.forEach((x, i) => { x.order = i + 1; });
+    markKMDirty();
+    renderKWs();
+  }
+}
+
+async function saveKMDb() {
+  try {
+    await DS.saveKeywords(tempKw);
+    S.keywords = JSON.parse(JSON.stringify(tempKw));
+    kmDirty = false;
+    updateKMDirtyUI();
+    toast('關鍵字資料庫已更新並生效！', 'ok');
+    hideKM();
+    if (S.cur) renderSecs();
+  } catch (e) {
+    toast('儲存失敗：' + (e.message || e), 'er');
+  }
+}
 
 let editWLIndex = null;
 let filterWLPrimaryOnly = false;
