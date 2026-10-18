@@ -958,13 +958,6 @@ async function showKPI(monthOffset = 0) {
   
   document.getElementById('kpi-month-label').innerText = data.monthStr;
   
-  if (data.missingUnits.length > 0) {
-    document.getElementById('kpi-warning').classList.remove('hidden');
-    document.getElementById('kpi-missing-units').innerText = data.missingUnits.join('、');
-  } else {
-    document.getElementById('kpi-warning').classList.add('hidden');
-  }
-  
   document.getElementById('kpi-total-rate').innerText = `${data.overallRate}%`;
   
   if (data.tableData.length > 0) {
@@ -2970,17 +2963,6 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
 
     <!-- 主體內容滾動區 -->
     <div class="flex-1 overflow-y-auto p-7 bg-slate-50/70 space-y-6">
-      <!-- 未設定聯絡人之警示區塊 -->
-      <div id="kpi-warning" class="hidden p-4 bg-amber-50/90 border border-amber-200/90 rounded-2xl flex items-start gap-3 shadow-xs">
-        <div class="w-7 h-7 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center text-sm shrink-0 mt-0.5">
-          ⚠️
-        </div>
-        <div class="text-xs text-amber-900 leading-relaxed">
-          <strong class="font-bold text-amber-950">待設定單位提醒：</strong>下列單位尚未在通訊錄指定 <span class="text-amber-700 font-semibold">⭐ 主要聯絡人</span>，暫不列入本次閱畢完成度計算：<br>
-          <span id="kpi-missing-units" class="font-bold text-amber-800 mt-1 inline-block"></span>
-        </div>
-      </div>
-      
       <!-- 三大核心指標卡片 (KPI Stat Cards) -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
         <!-- 卡片 1: 全台總閱讀率 -->
