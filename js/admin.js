@@ -2248,12 +2248,20 @@ async function fetchKPIData(monthOffset) {
       let timeMs = Infinity;
       if (data.confirmedAt && typeof data.confirmedAt.toDate === 'function') {
         timeMs = data.confirmedAt.toDate().getTime();
+      } else if (data.confirmedAt && data.confirmedAt.seconds) {
+        timeMs = data.confirmedAt.seconds * 1000;
+      } else if (data.confirmedAt) {
+        timeMs = new Date(data.confirmedAt).getTime() || Infinity;
       } else if (data.readAt && typeof data.readAt.toDate === 'function') {
         timeMs = data.readAt.toDate().getTime();
       } else if (data.readAt && data.readAt.seconds) {
         timeMs = data.readAt.seconds * 1000;
       } else if (data.readAt) {
         timeMs = new Date(data.readAt).getTime() || Infinity;
+      } else if (data.lastViewedAt && typeof data.lastViewedAt.toDate === 'function') {
+        timeMs = data.lastViewedAt.toDate().getTime();
+      } else if (data.lastViewedAt && data.lastViewedAt.seconds) {
+        timeMs = data.lastViewedAt.seconds * 1000;
       } else if (data.lastViewedAt) {
         timeMs = new Date(data.lastViewedAt).getTime() || Infinity;
       }
@@ -2308,6 +2316,12 @@ async function fetchKPIData(monthOffset) {
     let rate = expected === 0 ? 0 : Math.round((confirmed / expected) * 100);
     let avgProgress = expected === 0 ? 0 : Math.round(unitTotalProgress[u] / expected);
     let firstTime = unitFirstConfirmedTime[u] || Infinity;
+    let readTimeStr = '--';
+    if (firstTime !== Infinity && !isNaN(firstTime)) {
+      const dt = new Date(firstTime);
+      const pad = n => String(n).padStart(2, '0');
+      readTimeStr = `${dt.getFullYear()}/${pad(dt.getMonth() + 1)}/${pad(dt.getDate())} ${pad(dt.getHours())}:${pad(dt.getMinutes())}`;
+    }
 
     totalExpected += expected;
     totalConfirmed += confirmed;
@@ -2321,7 +2335,8 @@ async function fetchKPIData(monthOffset) {
       unconfirmed: unconfirmed,
       rate: rate,
       avgProgress: avgProgress,
-      firstTime: firstTime
+      firstTime: firstTime,
+      readTimeStr: readTimeStr
     });
   });
   
@@ -2351,7 +2366,7 @@ async function showKPI(monthOffset = 0) {
   document.getElementById('kpi-tab-1').className = monthOffset === -1 ? 'px-4 py-1.5 text-sm font-semibold rounded-md transition-colors bg-white text-blue-600 shadow-sm' : 'px-4 py-1.5 text-sm font-semibold rounded-md transition-colors text-slate-500 hover:text-slate-700';
   
   document.getElementById('kpi-month-label').innerText = '載入中...';
-  document.getElementById('kpi-table-body').innerHTML = '<tr><td colspan="8" class="text-center py-8 text-slate-400">載入中...</td></tr>';
+  document.getElementById('kpi-table-body').innerHTML = '<tr><td colspan="9" class="text-center py-8 text-slate-400">載入中...</td></tr>';
   
   const data = await fetchKPIData(monthOffset);
   window._lastKPIData = data; // store for export
@@ -2418,6 +2433,7 @@ async function showKPI(monthOffset = 0) {
             ${row.avgProgress}%
           </span>
         </td>
+        <td class="px-4 py-3.5 text-xs text-slate-500 text-center font-mono whitespace-nowrap">${row.readTimeStr || '--'}</td>
         <td class="px-5 py-3.5 text-sm text-center">
           ${lightBadge}
         </td>
@@ -2425,7 +2441,7 @@ async function showKPI(monthOffset = 0) {
     `;
   });
   
-  if(html === '') html = '<tr><td colspan="8" class="text-center py-12 text-slate-400 text-xs">尚無統計數據</td></tr>';
+  if(html === '') html = '<tr><td colspan="9" class="text-center py-12 text-slate-400 text-xs">尚無統計數據</td></tr>';
   document.getElementById('kpi-table-body').innerHTML = html;
 }
 
@@ -2447,6 +2463,7 @@ function exportKPIExcel() {
       '未確認': row.unconfirmed,
       '閱讀率(%)': row.rate,
       '平均閱讀完成率(%)': row.avgProgress,
+      '點閱時間': row.readTimeStr || '--',
       '燈號/狀態': status
     };
   });
