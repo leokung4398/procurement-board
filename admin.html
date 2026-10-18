@@ -1472,6 +1472,12 @@
           <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>伺服器層級零信任安全防線：</strong>Firestore 雲端規則全面收緊，嚴格判定必須為 <code>@youbike.com.tw</code> 或 <code>@giantcycling.com</code> 企業帳號方可讀寫，徹底阻斷外部以專案 ID 或 F12 繞過窺探機密；同時完美保護機密保險箱（private/content）。</p>
           <p class="text-sm leading-relaxed text-slate-600"><strong>全集合禁止物理刪除與會話自癒：</strong>資料庫層級強制封鎖 <code>allow delete: if false;</code>，後台全面改用軟刪除防手滑；前端配合 <code>onAuthStateChanged</code> 自動恢復已登入企業會話，流暢兼備最高資安規格！</p>
         </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-indigo-300 transition-colors">
+          <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm">33</span>系統設定中心三大管理引擎全方位升級（通訊錄、發信群組、關鍵字資料庫）</h4>
+          <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>郵件通訊錄進階管理：</strong>選擇地區自動帶入所屬營運處單位、支援 Excel 批次匯出與匯入、列表單鍵點擊即可快速切換「⭐ 主要窗口」與「✉️ 接收通知」、所屬群組標籤顯示與跨群組搜尋。</p>
+          <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>發信群組智慧控管：</strong>進入分頁自動展開首個群組並將已勾選成員置頂、支援群組改名（✏️）與排序（↑/↓）、地區與主要窗口一鍵批次勾選、自動清理通訊錄已刪除之幽靈信箱，以及一鍵「📋 複製信箱」直貼 Outlook。</p>
+          <p class="text-sm leading-relaxed text-slate-600"><strong>關鍵字資料庫工作台：</strong>支援跨構面全域關鍵字搜尋与啟停狀態篩選、原生滑鼠拖拉排序（☰ Drag & Drop）、構面與子標題增刪改排、以及「⚠️ 未儲存變更」防呆保護與一鍵還原。</p>
+        </div>
       </div>
 
       <!-- 專案開發成果內容 -->
@@ -1486,13 +1492,13 @@
                 <h4 class="text-base font-bold text-white tracking-wide flex items-center gap-2">🎨 專案開發成果條例分類與即時置頂</h4>
               </div>
               <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">
-                全系列 39 項里程碑已依技術構面導入色彩體系。<span class="text-amber-300 font-medium">💡 點選下方任一分類按鈕，即可將該技術構面之成果卡片立即「置頂排列到最上方」</span>，便於長官與主管聚焦查閱！
+                全系列 43 項里程碑已依技術構面導入色彩體系。<span class="text-amber-300 font-medium">💡 點選下方任一分類按鈕，即可將該技術構面之成果卡片立即「置頂排列到最上方」</span>，便於長官與主管聚焦查閱！
               </p>
             </div>
             <div class="flex items-center gap-2.5 flex-shrink-0">
-              <button id="cat-btn-all" onclick="filterMilestoneCat('all')" type="button" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-indigo-400/40 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 text-xs font-semibold transition-all shadow-sm cursor-pointer active:scale-95" title="還原至 1~39 項原始順序">
+              <button id="cat-btn-all" onclick="filterMilestoneCat('all')" type="button" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-indigo-400/40 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 text-xs font-semibold transition-all shadow-sm cursor-pointer active:scale-95" title="還原至 1~43 項原始順序">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                <span>重置原始排序 (全部39項)</span>
+                <span>重置原始排序 (全部43項)</span>
               </button>
             </div>
           </div>
@@ -1510,9 +1516,9 @@
                     <span class="w-2 h-2 rounded-full bg-blue-400"></span>
                     <span class="text-xs font-bold text-blue-300 group-hover:text-blue-200 transition-colors">核心系統開發</span>
                   </div>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">12 項</span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-500/20 text-blue-300 border border-blue-500/30">15 項</span>
                 </div>
-                <p class="text-[11px] text-slate-400 group-hover:text-slate-300 leading-snug transition-colors">架構搭建、動態模板、前台美感問卷入口、單一資料源架構優化與郵件通知。</p>
+                <p class="text-[11px] text-slate-400 group-hover:text-slate-300 leading-snug transition-colors">架構搭建、關鍵字拖曳與跨構面搜尋、通訊錄 Excel 匯出入、智慧群組控管與郵件推播。</p>
                 <div class="mt-2 flex items-center gap-1 text-[10px] text-blue-400 font-semibold opacity-80 group-hover:opacity-100">
                   <span>點擊置頂排序</span>
                   <svg class="w-3 h-3 group-hover:translate-y-[-1px] transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
@@ -1554,7 +1560,7 @@
                   </div>
                   <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">8 項</span>
                 </div>
-                <p class="text-[11px] text-slate-400 group-hover:text-slate-300 leading-snug transition-colors">TinyMCE 核心、跨欄置中、莫蘭迪色盤與 RWD 適配。</p>
+                <p class="text-[11px] text-slate-400 group-hover:text-slate-300 leading-snug transition-colors">TinyMCE 核心、前後台表格 1:1 零誤差對齊、跨欄置中、莫蘭迪色盤與 RWD 適配。</p>
                 <div class="mt-2 flex items-center gap-1 text-[10px] text-amber-400 font-semibold opacity-80 group-hover:opacity-100">
                   <span>點擊置頂排序</span>
                   <svg class="w-3 h-3 group-hover:translate-y-[-1px] transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
@@ -1573,9 +1579,9 @@
                     <span class="w-2 h-2 rounded-full bg-purple-400"></span>
                     <span class="text-xs font-bold text-purple-300 group-hover:text-purple-200 transition-colors">數據分析與落實</span>
                   </div>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">10 項</span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">11 項</span>
                 </div>
-                <p class="text-[11px] text-slate-400 group-hover:text-slate-300 leading-snug transition-colors">已讀追蹤、完成率閉環、主要負責人動態關聯、打卡防護、KPI看板與Excel匯出。</p>
+                <p class="text-[11px] text-slate-400 group-hover:text-slate-300 leading-snug transition-colors">已讀追蹤、完成率閉環、主要負責人動態關聯、點閱時間明細、KPI看板與Excel匯出。</p>
                 <div class="mt-2 flex items-center gap-1 text-[10px] text-purple-400 font-semibold opacity-80 group-hover:opacity-100">
                   <span>點擊置頂排序</span>
                   <svg class="w-3 h-3 group-hover:translate-y-[-1px] transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
@@ -2414,6 +2420,98 @@
             </div>
           </div>
         </div>
+
+          <!-- 里程碑四十：前後台 1:1 表格與段落空隙零誤差對齊、KPI 點閱時間欄位與介面精簡調優 -->
+          <div data-cat="data" data-orig-idx="40" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(147,51,234,0.15)] hover:border-purple-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-purple-500 to-indigo-600"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-purple-600 group-hover:text-white transition-all duration-300 shadow-sm"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1 flex items-center gap-2">四十、前後台 1:1 表格與段落空隙零誤差對齊、KPI 點閱時間欄位與介面精簡調優 <span class="bg-purple-50 text-purple-800 border border-purple-200/80 text-[10px] px-2 py-0.5 rounded-md font-semibold tracking-wide flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-purple-500"></span>數據落實</span> <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-0.5 rounded-full font-normal tracking-wide">2026-10-18</span></h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">採購需求：</span><br>
+                1. 前台佈告欄渲染出的富文本表格與段落間距，需調整為與後台 TinyMCE 編輯器輸入時的空隙 1:1 完全一致，消除前後台視覺落差。<br>
+                2. 後台「週報點閱績效統計」表格與匯出之 Excel 報表需擴充新增「點閱時間」欄位，精準呈現各營運處完成閱讀確認之時間點。<br>
+                3. 移除前台績效統計不必要之未設定單位提醒橫幅，並精簡後台管理員名單之冗餘說明文字，讓版面更加純粹專業。<br>
+                4. 全面健檢專案前端與雲端程式碼，修復潛在重複函式宣告與未定義變數問題。
+              </p>
+              <p class="text-xs text-purple-700 font-medium leading-relaxed mt-3 border-l-2 border-purple-400 pl-2">
+                💡 <span class="font-bold">專案成果：</span>統一前後台富文本 CSS 盒模型（<code>margin: 4px 0</code>、<code>padding: 2px 6px</code> 與緊湊行距），實現真正的 1:1 所見即所得；後台 KPI 看板與 SheetJS 報表完整補齊「點閱時間」欄位（<code>YYYY/MM/DD HH:mm</code>）；並完成全專案程式碼深度體檢與介面淨化！
+              </p>
+            </div>
+          </div>
+        </div>
+
+          <!-- 里程碑四十一：後台「郵件通訊錄」6 大使用者體驗與批次管理全方位升級 -->
+          <div data-cat="core" data-orig-idx="41" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(37,99,235,0.15)] hover:border-blue-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-500 to-indigo-600"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-sm"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1 flex items-center gap-2">四十一、後台「郵件通訊錄」6 大使用者體驗與批次管理全方位升級 <span class="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] px-2 py-0.5 rounded-md font-semibold tracking-wide flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>核心系統</span> <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-0.5 rounded-full font-normal tracking-wide">2026-10-18</span></h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">採購需求：</span><br>
+                1. 改善新增聯絡人時選完「地區」還需手動重複打字輸入「單位」之繁瑣流程，並加入「取消編輯」與防重複信箱機制。<br>
+                2. 支援在名單列表上直接單鍵切換「⭐ 主要窗口」與「✉️ 接收通知」狀態，無需每次進入編輯模式。<br>
+                3. 強化篩選與統計：提供總人數與主要窗口即時統計徽章、「⭐ 僅看主要窗口」快速篩選，以及批次模式「全選目前篩選結果」。<br>
+                4. 在每位聯絡人卡片直接顯示其所屬之「發信群組」徽章，並支援「匯出 / 匯入 Excel」進行大量名單跨部門盤點與維護。
+              </p>
+              <p class="text-xs text-blue-700 font-medium leading-relaxed mt-3 border-l-2 border-blue-400 pl-2">
+                💡 <span class="font-bold">專案成果：</span>打造高效智慧通訊錄工作台！實作地區與營運處智慧連動映射表、編輯模式視覺高亮與一鍵取消、修改信箱自動同步更新群組參照、列表內嵌單鍵狀態切換、群組標籤連動檢索，以及純前端 Excel 批次匯出入引擎，大幅降低採購管理員日常名冊維護成本！
+              </p>
+            </div>
+          </div>
+        </div>
+
+          <!-- 里程碑四十二：後台「發信群組管理」6 大智慧體驗與名單同步升級 -->
+          <div data-cat="core" data-orig-idx="42" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(37,99,235,0.15)] hover:border-blue-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-500 to-indigo-600"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-sm"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1 flex items-center gap-2">四十二、後台「發信群組管理」6 大智慧體驗與名單同步升級 <span class="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] px-2 py-0.5 rounded-md font-semibold tracking-wide flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>核心系統</span> <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-0.5 rounded-full font-normal tracking-wide">2026-10-18</span></h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">採購需求：</span><br>
+                1. 消除進入分頁時右側空白等待點選之斷點，並解決群組已勾選成員散落於百人名單中難以核對之痛點。<br>
+                2. 支援群組「重新命名（✏️）」與「上下調整順序（↑/↓）」，讓前台發布時的群組快選按鈕順序可自由編排。<br>
+                3. 新增右側地區篩選下拉選單、「全選目前篩選」與「⭐ 勾選主要窗口」一鍵批次加入功能。<br>
+                4. 解決通訊錄刪除人員後群組殘留「幽靈信箱」導致人數對不攏的問題，並提供一鍵複製群組信箱串接 Outlook。
+              </p>
+              <p class="text-xs text-blue-700 font-medium leading-relaxed mt-3 border-l-2 border-blue-400 pl-2">
+                💡 <span class="font-bold">專案成果：</span>全面升級發信群組管理中心！預設自動展開首個群組、將已勾選成員自動置頂高亮並提供「👥 僅看本群組成員」切換；實作幽靈信箱自動清理機制（<code>sanitizeAllGroupEmails</code>）確保人數 100% 精準吻合；搭配「📋 複製信箱」一鍵輸出分號分隔清單，外部寄信與內部推播無縫接軌！
+              </p>
+            </div>
+          </div>
+        </div>
+
+          <!-- 里程碑四十三：後台「關鍵字資料庫」6 大互動體驗與跨構面檢索升級 -->
+          <div data-cat="core" data-orig-idx="43" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(37,99,235,0.15)] hover:border-blue-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-blue-500 to-indigo-600"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-blue-600 group-hover:text-white transition-all duration-300 shadow-sm"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1 flex items-center gap-2">四十三、後台「關鍵字資料庫」6 大互動體驗與跨構面檢索升級 <span class="bg-blue-50 text-blue-700 border border-blue-200/80 text-[10px] px-2 py-0.5 rounded-md font-semibold tracking-wide flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>核心系統</span> <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-0.5 rounded-full font-normal tracking-wide">2026-10-18</span></h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">採購需求：</span><br>
+                1. 自動預設展開第一個母標題構面，並修復舊版儲存函式之空指標錯誤，確保儲存後立即連動刷新週報編輯器。<br>
+                2. 補齊關鍵字「🗑️ 刪除」按鈕與頂部快速新增輸入框（支援 Enter 快速新增與重複名稱防呆），以及「全部啟用 / 全部停用」批次切換。<br>
+                3. 新增「跨構面全域關鍵字搜尋」與「狀態篩選（全部 / 僅看啟用 / 僅看停用）」，一秒定位散落於 9 大構面中的子標題。<br>
+                4. 實作原生 HTML5 滑鼠拖拉排序（<code>☰</code> Drag & Drop）與序號顯示，支援母標題構面增刪改排，並加入「⚠️ 未儲存變更」醒目提醒與離開防呆保護。
+              </p>
+              <p class="text-xs text-blue-700 font-medium leading-relaxed mt-3 border-l-2 border-blue-400 pl-2">
+                💡 <span class="font-bold">專案成果：</span>將關鍵字資料庫全面晉升為現代化詞庫工作台！結合跨構面即時檢索命中標記、流暢滑鼠拖曳排序、母標題與子標題完整 CRUD 生命週期管理，以及未儲存異動防呆攔截與一鍵還原機制，讓週報分類體系維護兼具極致效率與零失誤保障！
+              </p>
+            </div>
+          </div>
+        </div>
         </div>
       </div>
 
@@ -2966,7 +3064,7 @@
                 <span>採購電子週報系統｜外包市場價值與專案效益分析</span>
               </h1>
               <p class="text-sm md:text-base text-slate-300 leading-relaxed">
-                本系統歷經 <strong class="text-white">39 個完整迭代里程碑</strong>，已從初期公告頁深化演進為整合<strong>「企業 OAuth 2.0 門禁、Firestore 伺服器端零信任 Rules 權限閉環、全集合防物理刪除、Zero-Data 機密防護、富文本/Word/Excel無損排版、全台營運處閱讀 KPI 看板、主要聯絡人動態對齊與100%打卡閉環、前台美感問卷互動雙通道、全員防舞弊操作日誌與多裝置沙盒模擬」</strong>之企業級營運管理平台。本報告依據台灣資訊軟體公會人月標準及市場專業軟體接案公司行情進行全鏈路核算，提供客觀、詳實之商業價值佐證。
+                本系統歷經 <strong class="text-white">43 個完整迭代里程碑</strong>，已從初期公告頁深化演進為整合<strong>「企業 OAuth 2.0 門禁、Firestore 伺服器端零信任 Rules 權限閉環、全集合防物理刪除、Zero-Data 機密防護、前後台 1:1 富文本/Word/Excel無損排版、全台營運處閱讀 KPI 看板（含點閱時間明細）、主要聯絡人動態對齊與100%打卡閉環、智慧通訊錄/發信群組/跨構面關鍵字三大管理工作台、前台美感問卷互動雙通道、全員防舞弊操作日誌與多裝置沙盒模擬」</strong>之企業級營運管理平台。本報告依據台灣資訊軟體公會人月標準及市場專業軟體接案公司行情進行全鏈路核算，提供客觀、詳實之商業價值佐證。
               </p>
             </div>
             
@@ -3013,7 +3111,7 @@
               <span class="text-xs font-bold text-blue-800 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200">極致響應速度</span>
               <span class="text-2xl">⚡</span>
             </div>
-            <div class="text-2xl font-extrabold text-slate-800 mb-1">39 次即時交付</div>
+            <div class="text-2xl font-extrabold text-slate-800 mb-1">43 次即時交付</div>
             <p class="text-xs text-slate-500 leading-relaxed">
               外包公司每次需求變更 (CR) 均需重談報價與等待 2~4 週工期；本系統採敏捷模式，現場反饋數日內即刻發布上線。
             </p>
@@ -3074,7 +3172,7 @@
                 </p>
                 <div class="text-xs space-y-1.5 pt-2 text-slate-600">
                   <div class="flex items-center gap-1.5 text-rose-600"><span>✕</span> 缺乏資安防護與 Zero-Data 防禦</div>
-                  <div class="flex items-center gap-1.5 text-rose-600"><span>✕</span> 難以配合 38 次高頻率敏捷迭代</div>
+                  <div class="flex items-center gap-1.5 text-rose-600"><span>✕</span> 難以配合 43 次高頻率敏捷迭代</div>
                   <div class="flex items-center gap-1.5 text-rose-600"><span>✕</span> 無專用 IT 運作邏輯白皮書</div>
                 </div>
               </div>
@@ -3213,7 +3311,7 @@
                   <td class="py-4 px-6 align-top">
                     <ul class="space-y-1.5 text-slate-600 leading-relaxed list-none">
                       <li class="flex items-start gap-1.5"><span class="text-amber-500 font-bold">•</span><span>深入重構整合 <strong>TinyMCE 核心引擎</strong>與 zh-Hant 繁體中文全鏈路支援</span></li>
-                      <li class="flex items-start gap-1.5"><span class="text-amber-500 font-bold">•</span><span><strong>MS Excel / Word 表格貼上攔截管道</strong> (Paste Post-processor) 與自適應淨化</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-amber-500 font-bold">•</span><span><strong>MS Excel / Word 表格貼上攔截管道</strong>與前後台 1:1 零誤差盒模型對齊</span></li>
                       <li class="flex items-start gap-1.5"><span class="text-amber-500 font-bold">•</span><span>獨立開發<strong>「跨欄置中」</strong>一鍵按鈕、手動拖拉欄寬、多行緊湊排版調優</span></li>
                       <li class="flex items-start gap-1.5"><span class="text-amber-500 font-bold">•</span><span>1:1 復刻 <strong>32 色商務專屬蜂巢</strong>與自訂莫蘭迪色盤選色器對話框</span></li>
                     </ul>
@@ -3240,11 +3338,11 @@
                   </td>
                   <td class="py-4 px-5 align-top">
                     <div class="font-bold text-slate-900 text-sm mb-1">週報編撰與生命週期管理</div>
-                    <span class="inline-block text-[11px] text-slate-400">狀態機 · 詞庫聯動 · Diff 差異比對</span>
+                    <span class="inline-block text-[11px] text-slate-400">狀態機 · 詞庫拖曳檢索 · Diff 比對</span>
                   </td>
                   <td class="py-4 px-6 align-top">
                     <ul class="space-y-1.5 text-slate-600 leading-relaxed list-none">
-                      <li class="flex items-start gap-1.5"><span class="text-blue-500 font-bold">•</span><span><strong>9 大分類主題架構</strong>（含倉儲管理擴增）與連動式關鍵字庫 (12大類63常用詞)</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-blue-500 font-bold">•</span><span><strong>9 大分類主題架構</strong>、跨構面全域搜尋、HTML5 滑鼠拖拉排序與未儲存變更防呆</span></li>
                       <li class="flex items-start gap-1.5"><span class="text-blue-500 font-bold">•</span><span>草稿、正式發布、一鍵撤回下架之完整<strong>生命週期狀態機管理</strong></span></li>
                       <li class="flex items-start gap-1.5"><span class="text-blue-500 font-bold">•</span><span>版本快照管理、<strong>差異對比演算法 (Diff Compare)</strong> 與多維歷史週報月份歸檔</span></li>
                     </ul>
@@ -3271,13 +3369,13 @@
                   </td>
                   <td class="py-4 px-5 align-top">
                     <div class="font-bold text-slate-900 text-sm mb-1">自動化推播與郵件通訊錄</div>
-                    <span class="inline-block text-[11px] text-slate-400">EmailJS · 必讀公告提取 · 分區群組</span>
+                    <span class="inline-block text-[11px] text-slate-400">EmailJS · Excel 匯出入 · 智慧群組</span>
                   </td>
                   <td class="py-4 px-6 align-top">
                     <ul class="space-y-1.5 text-slate-600 leading-relaxed list-none">
                       <li class="flex items-start gap-1.5"><span class="text-sky-500 font-bold">•</span><span>串接 EmailJS API、發布前動態提取<strong>「🚨 緊急必讀公告」</strong>置頂推播模板</span></li>
-                      <li class="flex items-start gap-1.5"><span class="text-sky-500 font-bold">•</span><span>雙欄名單高密度通訊錄、分區關鍵字篩選、跨搜尋勾選記憶與自訂發信群組</span></li>
-                      <li class="flex items-start gap-1.5"><span class="text-sky-500 font-bold">•</span><span>CSV 人員名單批次導入解析與 Firebase 雲端白名單同步機制</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-sky-500 font-bold">•</span><span>地區自動帶入營運處、單鍵切換主要窗口/收信、群組排序改名、幽靈信箱自癒與一鍵複製信箱</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-sky-500 font-bold">•</span><span><strong>Excel / CSV 人員名冊批次匯出匯入引擎</strong>與 Firebase 雲端白名單同步機制</span></li>
                     </ul>
                   </td>
                   <td class="py-4 px-3 text-center align-top">
@@ -3308,7 +3406,7 @@
                     <ul class="space-y-1.5 text-slate-600 leading-relaxed list-none">
                       <li class="flex items-start gap-1.5"><span class="text-purple-500 font-bold">•</span><span>捲動深度完成度 (Scroll Depth Tracker) 節流防抖演算法與 <strong>100% 完讀記憶</strong></span></li>
                       <li class="flex items-start gap-1.5"><span class="text-purple-500 font-bold">•</span><span>長條漸層微光打卡按鈕、頂部「👑 尊榮已完讀金徽章」即時點亮閉環</span></li>
-                      <li class="flex items-start gap-1.5"><span class="text-purple-500 font-bold">•</span><span><strong>全台營運處閱讀 KPI 看板</strong>（總閱讀率、最佳/最低單位、通訊錄主要負責人動態對齊與排除工程處）</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-purple-500 font-bold">•</span><span><strong>全台營運處閱讀 KPI 看板</strong>（總閱讀率、最佳/最低單位、點閱時間明細與主要負責人動態對齊）</span></li>
                       <li class="flex items-start gap-1.5"><span class="text-purple-500 font-bold">•</span><span><strong>已確認打卡即 100% 完讀真理</strong>與歷史已讀紀錄自動補正引擎</span></li>
                       <li class="flex items-start gap-1.5"><span class="text-purple-500 font-bold">•</span><span>後台專屬手動補登 Modal 視窗與純前端 <strong>SheetJS 一鍵導出 Excel 報表</strong></span></li>
                     </ul>
@@ -3398,11 +3496,11 @@
                   </td>
                   <td class="py-4 px-5 align-top">
                     <div class="font-bold text-slate-900 text-sm mb-1">專案管理、需求迭代調優與 QA 測試</div>
-                    <span class="inline-block text-[11px] text-slate-400">39次迭代 · 跨瀏覽器相容 · 驗收交付</span>
+                    <span class="inline-block text-[11px] text-slate-400">43次迭代 · 跨瀏覽器相容 · 驗收交付</span>
                   </td>
                   <td class="py-4 px-6 align-top">
                     <ul class="space-y-1.5 text-slate-600 leading-relaxed list-none">
-                      <li class="flex items-start gap-1.5"><span class="text-slate-500 font-bold">•</span><span><strong>跨 39 個里程碑之需求釐清</strong>、跨部門痛點排查與相容性修復驗收</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-slate-500 font-bold">•</span><span><strong>跨 43 個里程碑之需求釐清</strong>、跨部門痛點排查與相容性修復驗收</span></li>
                       <li class="flex items-start gap-1.5"><span class="text-slate-500 font-bold">•</span><span>瀏覽器相容性測試（Chrome、Edge、Safari、手機瀏覽器）與跨域壓測調優</span></li>
                     </ul>
                   </td>
