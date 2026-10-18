@@ -850,34 +850,138 @@ function switchAboutTab(t) {
 }
 
 let currentGroupId = null;
+let filterGroupMemberOnly = false;
+
+// 自動清理群組內已不存在於通訊錄的「幽靈殘留信箱」，確保群組人數與通訊錄 100% 吻合
+async function sanitizeAllGroupEmails() {
+  if (!Array.isArray(S.mailGroups) || !Array.isArray(S.whitelist)) return;
+  const validEmails = new Set(S.whitelist.map(w => (w.email || '').trim().toLowerCase()));
+  let changed = false;
+  S.mailGroups.forEach(g => {
+    if (!Array.isArray(g.emails)) {
+      g.emails = [];
+      changed = true;
+      return;
+    }
+    const seen = new Set();
+    const cleaned = [];
+    g.emails.forEach(em => {
+      const lower = (em || '').trim().toLowerCase();
+      if (lower && validEmails.has(lower) && !seen.has(lower)) {
+        seen.add(lower);
+        const canonical = S.whitelist.find(w => (w.email || '').trim().toLowerCase() === lower);
+        cleaned.push(canonical ? canonical.email : em.trim());
+      } else {
+        changed = true;
+      }
+    });
+    if (cleaned.length !== g.emails.length) {
+      g.emails = cleaned;
+      changed = true;
+    }
+  });
+  if (changed) {
+    try { await DS.saveMailGroups(S.mailGroups); } catch (e) {}
+  }
+}
+
 async function addGroup() {
   const name = document.getElementById('grp-name').value.trim();
   if (!name) return toast('請輸入群組名稱', 'er');
-  S.mailGroups.push({ id: 'grp_'+Date.now(), name, emails: [] });
+  const dup = (S.mailGroups || []).some(g => (g.name || '').trim().toLowerCase() === name.toLowerCase());
+  if (dup) return toast(`已存在同名群組「${name}」`, 'er');
+  const newGrp = { id: 'grp_' + Date.now(), name, emails: [] };
+  S.mailGroups.push(newGrp);
   await DS.saveMailGroups(S.mailGroups);
   document.getElementById('grp-name').value = '';
+  currentGroupId = newGrp.id;
   renderGroupList();
-  toast('已建立群組', 'ok');
+  selectGroup(newGrp.id);
+  toast(`已建立群組「${name}」 ✓`, 'ok');
 }
+
+async function renameGroup(id) {
+  const g = S.mailGroups.find(x => x.id === id);
+  if (!g) return;
+  const newName = prompt('請輸入新的群組名稱：', g.name);
+  if (newName === null) return;
+  const trimmed = newName.trim();
+  if (!trimmed) return toast('群組名稱不可為空', 'er');
+  const dup = S.mailGroups.some(x => x.id !== id && (x.name || '').trim().toLowerCase() === trimmed.toLowerCase());
+  if (dup) return toast(`已存在同名群組「${trimmed}」`, 'er');
+  g.name = trimmed;
+  await DS.saveMailGroups(S.mailGroups);
+  renderGroupList();
+  if (currentGroupId === id) {
+    updateGroupDetailHeader(g);
+  }
+  toast('已更新群組名稱 ✓', 'ok');
+}
+
+async function moveGroupOrder(id, dir) {
+  const idx = S.mailGroups.findIndex(x => x.id === id);
+  if (idx === -1) return;
+  const targetIdx = idx + dir;
+  if (targetIdx < 0 || targetIdx >= S.mailGroups.length) return;
+  [S.mailGroups[idx], S.mailGroups[targetIdx]] = [S.mailGroups[targetIdx], S.mailGroups[idx]];
+  await DS.saveMailGroups(S.mailGroups);
+  renderGroupList();
+}
+
 async function delGroup(id) {
-  if (!confirm('確定刪除此群組？')) return;
-  S.mailGroups = S.mailGroups.filter(g => g.id !== id);
+  const g = S.mailGroups.find(x => x.id === id);
+  if (!g) return;
+  if (!confirm(`確定要刪除群組「${g.name}」嗎？（不會刪除通訊錄內的聯絡人）`)) return;
+  S.mailGroups = S.mailGroups.filter(x => x.id !== id);
   await DS.saveMailGroups(S.mailGroups);
   if (currentGroupId === id) {
-    currentGroupId = null;
-    const t = document.getElementById('group-detail-title'), m = document.getElementById('group-members');
-    if (t) t.textContent = '請選擇左側群組';
-    if (m) m.innerHTML = '<div class="text-center text-slate-400 mt-10 text-sm">請選擇左側群組以編輯成員</div>';
+    currentGroupId = S.mailGroups.length > 0 ? S.mailGroups[0].id : null;
   }
   renderGroupList();
+  if (currentGroupId) {
+    selectGroup(currentGroupId);
+  } else {
+    const t = document.getElementById('group-detail-title');
+    const acts = document.getElementById('group-detail-actions');
+    const m = document.getElementById('group-members');
+    if (t) t.textContent = '請選擇左側群組';
+    if (acts) acts.classList.add('hidden');
+    if (m) m.innerHTML = '<div class="text-center text-slate-400 mt-10 text-sm">請先於上方建立新群組</div>';
+  }
+  toast('已刪除群組', 'ok');
 }
+
+function updateGroupDetailHeader(g) {
+  const t = document.getElementById('group-detail-title');
+  const acts = document.getElementById('group-detail-actions');
+  if (g) {
+    if (t) t.textContent = `${g.name} (${(g.emails || []).length} 位成員)`;
+    if (acts) acts.classList.remove('hidden');
+  } else {
+    if (t) t.textContent = '請選擇左側群組';
+    if (acts) acts.classList.add('hidden');
+  }
+}
+
 function renderGroupList() {
   const c = document.getElementById('group-list');
   if (!c) return;
+  sanitizeAllGroupEmails();
+
+  const statsBadge = document.getElementById('grp-stats-badge');
+  if (statsBadge) {
+    statsBadge.textContent = `共 ${(S.mailGroups || []).length} 個群組`;
+  }
+
+  // 若尚未選取任何群組且列表中有群組，預設自動選取第一個群組，消除右側空白
+  if (!currentGroupId && S.mailGroups && S.mailGroups.length > 0) {
+    currentGroupId = S.mailGroups[0].id;
+  }
+
   const searchEl = document.getElementById('grp-list-search');
   const kw = searchEl ? searchEl.value.trim().toLowerCase() : '';
-  
-  let list = S.mailGroups;
+
+  let list = S.mailGroups || [];
   if (kw) {
     list = list.filter(g => (g.name || '').toLowerCase().includes(kw));
   }
@@ -888,18 +992,30 @@ function renderGroupList() {
   }
   c.innerHTML = list.map(g => {
     const isSelected = g.id === currentGroupId;
+    const origIdx = S.mailGroups.findIndex(x => x.id === g.id);
     return `
       <div onclick="selectGroup('${g.id}')" class="group p-2.5 rounded-xl cursor-pointer transition-all duration-150 border ${
-        isSelected 
-          ? 'bg-indigo-50/70 border-indigo-200 text-indigo-900 shadow-xs font-semibold ring-1 ring-indigo-200/50' 
+        isSelected
+          ? 'bg-indigo-50/70 border-indigo-300 text-indigo-900 shadow-xs font-semibold ring-1 ring-indigo-200/60'
           : 'bg-white border-slate-200/70 text-slate-700 hover:bg-slate-50 hover:border-indigo-100 shadow-xs'
       } flex items-center justify-between text-xs">
         <div class="flex items-center gap-2 min-w-0 flex-1">
           <span class="w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-indigo-600' : 'bg-slate-300 group-hover:bg-indigo-400'} flex-shrink-0"></span>
           <span class="truncate">${xe(g.name)}</span>
         </div>
-        <div class="flex items-center gap-1.5 flex-shrink-0">
-          <span class="text-[11px] font-mono px-2 py-0.5 rounded-full ${isSelected ? 'bg-indigo-100/90 text-indigo-700 font-bold' : 'bg-slate-100 text-slate-500'}">${g.emails.length}</span>
+        <div class="flex items-center gap-1 flex-shrink-0">
+          <span class="text-[11px] font-mono px-2 py-0.5 rounded-full ${isSelected ? 'bg-indigo-100/90 text-indigo-700 font-bold' : 'bg-slate-100 text-slate-500'}">${(g.emails || []).length}</span>
+          <div class="hidden group-hover:flex items-center gap-0.5 ml-0.5">
+            <button onclick="event.stopPropagation(); moveGroupOrder('${g.id}', -1)" class="w-5 h-5 rounded flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 ${origIdx === 0 ? 'opacity-30 pointer-events-none' : ''}" title="上移排序">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+            </button>
+            <button onclick="event.stopPropagation(); moveGroupOrder('${g.id}', 1)" class="w-5 h-5 rounded flex items-center justify-center text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 ${origIdx === S.mailGroups.length - 1 ? 'opacity-30 pointer-events-none' : ''}" title="下移排序">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+            </button>
+            <button onclick="event.stopPropagation(); renameGroup('${g.id}')" class="w-5 h-5 rounded flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50" title="重新命名群組">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+            </button>
+          </div>
           <button onclick="event.stopPropagation(); delGroup('${g.id}')" class="w-6 h-6 rounded-md flex items-center justify-center text-slate-300 hover:text-rose-600 hover:bg-rose-50 transition-colors" title="刪除此群組">
             <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
           </button>
@@ -907,52 +1023,101 @@ function renderGroupList() {
       </div>
     `;
   }).join('');
+
+  const curG = (S.mailGroups || []).find(x => x.id === currentGroupId);
+  if (curG) {
+    updateGroupDetailHeader(curG);
+    renderGroupMembers();
+  }
 }
+
 function selectGroup(id) {
   currentGroupId = id;
   renderGroupList();
-  const g = S.mailGroups.find(x => x.id === id);
-  if (!g) return;
-  const t = document.getElementById('group-detail-title');
-  if (t) t.textContent = `${g.name} (${g.emails.length} 位成員)`;
+}
+
+function toggleGroupMemberOnlyFilter() {
+  filterGroupMemberOnly = !filterGroupMemberOnly;
+  const btn = document.getElementById('grp-filter-member-btn');
+  const txt = document.getElementById('grp-filter-member-txt');
+  if (btn) {
+    if (filterGroupMemberOnly) {
+      btn.className = 'text-xs px-2.5 py-1.5 rounded-lg border border-indigo-300 bg-indigo-100 text-indigo-800 font-bold flex items-center gap-1 flex-shrink-0 shadow-xs transition-colors';
+      if (txt) txt.textContent = '顯示全部聯絡人';
+    } else {
+      btn.className = 'text-xs px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50/60 text-slate-600 hover:bg-indigo-50 hover:text-indigo-700 hover:border-indigo-200 transition-colors font-medium flex items-center gap-1 flex-shrink-0';
+      if (txt) txt.textContent = '僅看本群組成員';
+    }
+  }
   renderGroupMembers();
 }
+
+function getFilteredGroupCandidateList(g) {
+  if (!g) return [];
+  const searchEl = document.getElementById('grp-search');
+  const regionEl = document.getElementById('grp-filter-region');
+  const kw = searchEl ? searchEl.value.trim().toLowerCase() : '';
+  const regionKw = regionEl ? regionEl.value : '';
+  const memberSet = new Set((g.emails || []).map(em => (em || '').trim().toLowerCase()));
+
+  let list = (S.whitelist || []).slice();
+  if (regionKw) {
+    list = list.filter(w => w.region === regionKw);
+  }
+  if (filterGroupMemberOnly) {
+    list = list.filter(w => memberSet.has((w.email || '').trim().toLowerCase()));
+  }
+  if (kw) {
+    list = list.filter(w =>
+      (w.name || '').toLowerCase().includes(kw) ||
+      (w.email || '').toLowerCase().includes(kw) ||
+      (w.unit || '').toLowerCase().includes(kw) ||
+      (w.region || '').toLowerCase().includes(kw)
+    );
+  }
+
+  // 自動將「已加入此群組的成員」排在最上方，方便管理員一眼檢視本群組名單
+  list.sort((a, b) => {
+    const aIn = memberSet.has((a.email || '').trim().toLowerCase());
+    const bIn = memberSet.has((b.email || '').trim().toLowerCase());
+    if (aIn !== bIn) return aIn ? -1 : 1;
+    if ((a.isPrimary === true) !== (b.isPrimary === true)) return a.isPrimary ? -1 : 1;
+    return (a.unit || a.region || '').localeCompare(b.unit || b.region || '', 'zh-TW');
+  });
+  return list;
+}
+
 function renderGroupMembers() {
   const c = document.getElementById('group-members');
   if (!c) return;
-  const g = S.mailGroups.find(x => x.id === currentGroupId);
+  const g = (S.mailGroups || []).find(x => x.id === currentGroupId);
   if (!g) return;
-  
-  const searchEl = document.getElementById('grp-search');
-  const kw = searchEl ? searchEl.value.trim().toLowerCase() : '';
-  
-  let list = S.whitelist;
-  if(kw) {
-    list = list.filter(w => (w.name || '').toLowerCase().includes(kw) || (w.email || '').toLowerCase().includes(kw) || (w.unit || '').toLowerCase().includes(kw));
-  }
+
+  const memberSet = new Set((g.emails || []).map(em => (em || '').trim().toLowerCase()));
+  const list = getFilteredGroupCandidateList(g);
 
   if (list.length === 0) {
-    c.innerHTML = '<div class="col-span-full text-center text-slate-400 py-10 text-xs bg-white rounded-xl border border-dashed border-slate-200">無符合條件的名單</div>';
+    c.innerHTML = `<div class="col-span-full text-center text-slate-400 py-10 text-xs bg-white rounded-xl border border-dashed border-slate-200">${filterGroupMemberOnly ? '此群組在目前篩選條件下尚無成員，可點擊上方「顯示全部聯絡人」進行勾選' : '無符合條件的聯絡人名單'}</div>`;
     return;
   }
   c.innerHTML = `
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
       ${list.map(w => {
-        const isMember = g.emails.includes(w.email);
+        const isMember = memberSet.has((w.email || '').trim().toLowerCase());
         const regionBadge = w.region ? `<span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] bg-slate-100 text-slate-500 border border-slate-200">${xe(w.region)}</span>` : '';
         const unitBadge = w.unit ? `<span class="inline-flex items-center px-1.5 py-0.2 rounded text-[10px] bg-blue-50 text-blue-600 border border-blue-100">${xe(w.unit)}</span>` : '';
-        const primaryBadge = w.isPrimary ? `<span class="text-[10px] text-amber-600 font-bold">⭐</span>` : '';
-        
+        const primaryBadge = w.isPrimary ? `<span class="text-[10px] text-amber-600 font-bold" title="主要聯絡人">⭐</span>` : '';
+
         return `
           <label class="flex items-center gap-2.5 p-2.5 rounded-xl border cursor-pointer transition-all duration-150 ${
-            isMember 
-              ? 'border-indigo-200 bg-white shadow-xs ring-1 ring-indigo-200/50' 
+            isMember
+              ? 'border-indigo-300 bg-indigo-50/30 shadow-xs ring-1 ring-indigo-200/60'
               : 'border-slate-200/70 bg-white/70 hover:bg-white hover:border-slate-300'
           }">
             <input type="checkbox" class="w-4 h-4 rounded text-indigo-600 border-slate-300 focus:ring-indigo-500 flex-shrink-0 cursor-pointer" ${isMember ? 'checked' : ''} onchange="toggleGroupMember('${xe(w.email)}', this.checked)">
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-1.5 truncate">
-                <span class="text-xs font-bold text-slate-800">${xe(w.name)}</span>
+                <span class="text-xs font-bold ${isMember ? 'text-indigo-950' : 'text-slate-800'}">${xe(w.name)}</span>
                 ${primaryBadge}
                 ${regionBadge}
                 ${unitBadge}
@@ -965,13 +1130,84 @@ function renderGroupMembers() {
     </div>
   `;
 }
+
 async function toggleGroupMember(email, isChecked) {
   const g = S.mailGroups.find(x => x.id === currentGroupId);
   if (!g) return;
-  if (isChecked) { if (!g.emails.includes(email)) g.emails.push(email); }
-  else { g.emails = g.emails.filter(e => e !== email); }
+  const emailLower = (email || '').trim().toLowerCase();
+  if (isChecked) {
+    if (!g.emails.some(e => (e || '').trim().toLowerCase() === emailLower)) {
+      g.emails.push(email);
+    }
+  } else {
+    g.emails = g.emails.filter(e => (e || '').trim().toLowerCase() !== emailLower);
+  }
   await DS.saveMailGroups(S.mailGroups);
+  updateGroupDetailHeader(g);
   renderGroupList();
+}
+
+async function toggleGroupAllVisible() {
+  const g = S.mailGroups.find(x => x.id === currentGroupId);
+  if (!g) return;
+  const visibleList = getFilteredGroupCandidateList(g);
+  if (visibleList.length === 0) return toast('目前篩選範圍內無聯絡人', 'er');
+  const memberSet = new Set((g.emails || []).map(em => (em || '').trim().toLowerCase()));
+  const allChecked = visibleList.every(w => memberSet.has((w.email || '').trim().toLowerCase()));
+
+  if (allChecked) {
+    const removeSet = new Set(visibleList.map(w => (w.email || '').trim().toLowerCase()));
+    g.emails = g.emails.filter(em => !removeSet.has((em || '').trim().toLowerCase()));
+    toast(`已從「${g.name}」移除目前篩選的 ${visibleList.length} 位人員`, 'in');
+  } else {
+    let added = 0;
+    visibleList.forEach(w => {
+      const lower = (w.email || '').trim().toLowerCase();
+      if (!memberSet.has(lower)) {
+        g.emails.push(w.email);
+        memberSet.add(lower);
+        added++;
+      }
+    });
+    toast(`已將目前篩選範圍內 ${added} 位人員加入「${g.name}」 ✓`, 'ok');
+  }
+  await DS.saveMailGroups(S.mailGroups);
+  updateGroupDetailHeader(g);
+  renderGroupList();
+}
+
+async function selectGroupPrimaryMembers() {
+  const g = S.mailGroups.find(x => x.id === currentGroupId);
+  if (!g) return;
+  const visibleList = getFilteredGroupCandidateList(g).filter(w => w.isPrimary === true);
+  if (visibleList.length === 0) return toast('目前篩選範圍內無「⭐主要聯絡人」', 'er');
+  const memberSet = new Set((g.emails || []).map(em => (em || '').trim().toLowerCase()));
+  let added = 0;
+  visibleList.forEach(w => {
+    const lower = (w.email || '').trim().toLowerCase();
+    if (!memberSet.has(lower)) {
+      g.emails.push(w.email);
+      memberSet.add(lower);
+      added++;
+    }
+  });
+  await DS.saveMailGroups(S.mailGroups);
+  updateGroupDetailHeader(g);
+  renderGroupList();
+  toast(added > 0 ? `已將 ${added} 位主要窗口加入「${g.name}」 ✓` : '篩選範圍內的主要窗口皆已在此群組中', 'ok');
+}
+
+function copyCurrentGroupEmails() {
+  const g = S.mailGroups.find(x => x.id === currentGroupId);
+  if (!g || !g.emails || g.emails.length === 0) {
+    return toast('此群組目前尚無成員信箱可複製', 'er');
+  }
+  const emailStr = g.emails.join('; ');
+  navigator.clipboard.writeText(emailStr).then(() => {
+    toast(`📋 已複製「${g.name}」共 ${g.emails.length} 筆信箱（可直接貼入 Outlook）！`, 'ok');
+  }).catch(() => {
+    prompt('請複製以下群組信箱清單：', emailStr);
+  });
 }
 
 
@@ -1814,6 +2050,7 @@ async function rmWL(idx) {
   if (editWLIndex === idx) cancelEditWL();
   S.whitelist.splice(idx, 1);
   await DS.saveWhitelist(S.whitelist);
+  await sanitizeAllGroupEmails();
   renderWL();
   toast('已刪除聯絡人', 'ok');
 }
@@ -1908,6 +2145,7 @@ async function batchDeleteWL() {
   if (!confirm(`確定要刪除選取的 ${selectedWL.length} 筆名單嗎？`)) return;
   S.whitelist = S.whitelist.filter(w => !selectedWL.includes(w.email));
   await DS.saveWhitelist(S.whitelist);
+  await sanitizeAllGroupEmails();
   selectedWL = [];
   updateBatchSelectedCount();
   renderWL();
