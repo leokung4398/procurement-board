@@ -2,11 +2,13 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // 判斷是否為已驗證之公司 Google 帳號 (@youbike.com.tw 或母公司 @giantcycling.com)
+    // 判斷是否為已驗證之公司 Google 帳號 (@youbike.com.tw 或母公司 @giantcycling.com，不區分大小寫)
     function isCompanyUser() {
       return request.auth != null && 
-             (request.auth.token.email.matches('.*@youbike[.]com[.]tw$') ||
-              request.auth.token.email.matches('.*@giantcycling[.]com$'));
+             request.auth.token.email != null &&
+             (request.auth.token.email.matches('(?i).*@youbike[.]com([.]tw|[.]cn)?$') ||
+              request.auth.token.email.matches('(?i).*@giantcycling[.]com$') ||
+              request.auth.token.email.matches('(?i).*@giant-bicycles[.]com([.]tw)?$'));
     }
 
     // 1. 佈告欄集合 (Bulletins)
