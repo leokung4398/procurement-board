@@ -2,19 +2,20 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     
-    // 判斷是否為已驗證之公司 Google 帳號 (@youbike.com.tw 或母公司 @giantcycling.com，不區分大小寫)
+    // 判斷是否為已驗證之公司 Google 帳號 (@youbike.com.tw 或母公司 @giantcycling.com / @giant.com.tw，不區分大小寫)
     function isCompanyUser() {
       return request.auth != null && 
              request.auth.token.email != null &&
              (request.auth.token.email.matches('(?i).*@youbike[.]com([.]tw|[.]cn)?$') ||
               request.auth.token.email.matches('(?i).*@giantcycling[.]com$') ||
+              request.auth.token.email.matches('(?i).*@giant[.]com([.]tw|[.]cn)?$') ||
               request.auth.token.email.matches('(?i).*@giant-bicycles[.]com([.]tw)?$'));
     }
 
     // 1. 佈告欄集合 (Bulletins)
     match /bulletins/{bulletinId} {
-      // 僅限公司內部登入同仁與管理員讀取，徹底杜絕匿名訪客或外部 F12 繞過窺探機密
-      allow read: if isCompanyUser();
+      // 僅限公司內部登入同仁與管理員讀取（頁尾聯絡資訊 config_handover 允許初始化讀取）
+      allow read: if isCompanyUser() || bulletinId == 'config_handover';
       
       // 寫入權限：限內部員工/管理員操作，嚴格禁止直接物理刪除 (Hard Delete)，統一使用軟刪除
       allow create, update: if isCompanyUser();
