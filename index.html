@@ -794,7 +794,16 @@ async function fetchKPIData(monthOffset) {
         found = { name: w.name, emails: new Set() };
         primaryByUnit[rawUnit].push(found);
       }
-      if (w.email) found.emails.add(w.email.trim().toLowerCase());
+      if (w.email) {
+        const em = w.email.trim().toLowerCase();
+        found.emails.add(em);
+        const prefix = em.split('@')[0];
+        if (prefix) found.emails.add('prefix:' + prefix);
+      }
+      if (w.altEmail) {
+        const alt = w.altEmail.trim().toLowerCase();
+        found.emails.add(alt);
+      }
     }
   });
 
@@ -874,8 +883,18 @@ async function fetchKPIData(monthOffset) {
 
       const info = { prog, timeMs };
       if (r.id) readerMap.set(r.id.toLowerCase(), info);
-      if (data.email) readerMap.set(data.email.trim().toLowerCase(), info);
-      if (data.displayName) readerMap.set(data.displayName.trim(), info);
+      if (data.email) {
+        const em = data.email.trim().toLowerCase();
+        readerMap.set(em, info);
+        const prefix = em.split('@')[0];
+        if (prefix) readerMap.set('prefix:' + prefix, info);
+      }
+      if (data.displayName) {
+        const dn = data.displayName.trim();
+        readerMap.set(dn, info);
+        const cleanDn = dn.replace(/[\(（].*?[\)）]/g, '').trim();
+        if (cleanDn) readerMap.set(cleanDn, info);
+      }
     });
     
     validUnits.forEach(u => {
@@ -1594,29 +1613,66 @@ async function showKPI(monthOffset = 0) {
       }
     }
 
+    // 輔助函式：智慧跨網域比對通訊錄白名單（支援完整信箱、備用信箱、集團網域同帳號前綴、或同姓名匹配）
+    function findUserInWhitelist(mailUsers, userEmail, userDisplayName) {
+      if (!Array.isArray(mailUsers) || !userEmail) return null;
+      const lowerEmail = userEmail.trim().toLowerCase();
+      // 1. 完整信箱或備用信箱精確匹配
+      let found = mailUsers.find(u => u && (
+        (u.email && u.email.trim().toLowerCase() === lowerEmail) ||
+        (u.altEmail && u.altEmail.trim().toLowerCase() === lowerEmail)
+      ));
+      if (found) return found;
+
+      // 2. 若為集團內部網域 (@youbike.com.tw / @giantcycling.com / @giant.com.tw / @giant-bicycles.com)，支援帳號前綴或中文姓名跨網域匹配
+      const isCorpDomain = /@(youbike\.com(\.tw|\.cn)?|giantcycling\.com|giant\.com(\.tw|\.cn)?|giant-bicycles\.com(\.tw)?)$/i.test(lowerEmail);
+      if (isCorpDomain) {
+        const prefix = lowerEmail.split('@')[0];
+        if (prefix) {
+          found = mailUsers.find(u => u && u.email && u.email.trim().toLowerCase().split('@')[0] === prefix);
+          if (found) return found;
+        }
+        const cleanName = (userDisplayName || '').trim();
+        if (cleanName && cleanName.length >= 2) {
+          found = mailUsers.find(u => {
+            if (!u || !u.name) return false;
+            const wlName = u.name.trim();
+            const wlClean = wlName.replace(/[\(（].*?[\)）]/g, '').trim();
+            return wlName === cleanName || wlClean === cleanName;
+          });
+          if (found) return found;
+        }
+      }
+      return null;
+    }
+
     async function frontendGoogleLogin() {
       const provider = new firebase.auth.GoogleAuthProvider();
       try {
         const result = await firebase.auth().signInWithPopup(provider);
         const user = result.user;
-        const userEmail = user.email.toLowerCase();
+        const userEmail = (user.email || '').toLowerCase();
         
         // Check email address book (whitelist)
         const mailSnap = await db.collection('systemConfig').doc('whitelist').get();
         const mailUsers = mailSnap.exists ? (mailSnap.data().list || []) : [];
         
-        // Find matched user in whitelist
-        const matchedUser = mailUsers.find(u => u && u.email && u.email.toLowerCase() === userEmail);
+        // Find matched user in whitelist (supports exact email, altEmail, and cross-domain prefix/name)
+        const matchedUser = findUserInWhitelist(mailUsers, userEmail, user.displayName);
 
+        const isCorpDomain = /@(youbike\.com(\.tw|\.cn)?|giantcycling\.com|giant\.com(\.tw|\.cn)?|giant-bicycles\.com(\.tw)?)$/i.test(userEmail);
         const isAllowed = !!matchedUser || 
+                          isCorpDomain ||
                           userEmail === 'leokung@youbike.com.tw' || 
                           userEmail === 'gb4398@giantcycling.com' ||
                           userEmail === 'sunnyting@youbike.com.tw';
 
         if (!isAllowed) {
+          localStorage.removeItem('procurement_user');
           await firebase.auth().signOut();
+          updateAuthUI();
           const e = document.getElementById('user-le');
-          e.innerText = '無瀏覽權限，請確認是否已被加入通訊錄。';
+          e.innerText = '無瀏覽權限，請確認是否使用公司企業信箱或已被加入通訊錄。';
           e.classList.remove('hidden');
           return;
         }
@@ -1626,9 +1682,9 @@ async function showKPI(monthOffset = 0) {
         
         pendingUser = {
           userId: user.uid,
-          displayName: (matchedUser && matchedUser.name) ? matchedUser.name : (user.displayName || user.email.split('@')[0]),
+          displayName: (matchedUser && matchedUser.name) ? matchedUser.name : (user.displayName || userEmail.split('@')[0]),
           email: userEmail,
-          department: (matchedUser && matchedUser.unit) ? matchedUser.unit : '未指定'
+          department: (matchedUser && (matchedUser.unit || matchedUser.region)) ? (matchedUser.unit || matchedUser.region) : '同仁'
         };
         
         // Login immediately
@@ -2954,9 +3010,9 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
                   const mailSnap = await db.collection('systemConfig').doc('whitelist').get();
                   if (mailSnap.exists) {
                     const mailUsers = mailSnap.data().list || [];
-                    const found = mailUsers.find(u => u && u.email && u.email.toLowerCase() === userEmail);
+                    const found = findUserInWhitelist(mailUsers, userEmail, user.displayName);
                     if (found) {
-                      if (found.unit) matchedUnit = found.unit;
+                      if (found.unit || found.region) matchedUnit = found.unit || found.region;
                       if (found.name) matchedName = found.name;
                     }
                   }
