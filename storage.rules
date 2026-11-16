@@ -1,0 +1,29 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // 判斷是否為已驗證之公司 Google 帳號 (@youbike.com.tw 或母公司 @giantcycling.com / @giant.com.tw，不區分大小寫)
+    function isCompanyUser() {
+      return request.auth != null && 
+             request.auth.token.email != null &&
+             (request.auth.token.email.matches('(?i).*@youbike[.]com([.]tw|[.]cn)?$') ||
+              request.auth.token.email.matches('(?i).*@giantcycling[.]com$') ||
+              request.auth.token.email.matches('(?i).*@giant[.]com([.]tw|[.]cn)?$') ||
+              request.auth.token.email.matches('(?i).*@giant-bicycles[.]com([.]tw)?$'));
+    }
+
+    match /attachments/{bulletinId}/{fileName} {
+      // 唯有已登入之公司企業帳號方可讀取與下載附件與圖片
+      allow read: if isCompanyUser();
+      
+      // 僅限公司內部已驗證同仁/管理員上傳，且單檔大小嚴格限制在 20MB 以內，禁止刪除
+      allow create, update: if isCompanyUser() && request.resource.size < 20 * 1024 * 1024;
+      allow delete: if false;
+    }
+    
+    // 阻擋其餘未授權的路徑存取
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

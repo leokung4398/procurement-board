@@ -1,0 +1,50 @@
+# 系統快照與本機備份目錄
+backup_*/
+備份專區/
+歷史對話紀錄備份/
+使用需求調查問卷參考資料/
+參考資料/
+改善提案影音/
+
+# 已移出公開倉庫之本機檔案與敏感資料
+data.json
+preview_options.html
+AutoRenamer.html
+presentation.html
+assets/slide*.jpg
+attachments/
+js/index.js
+*提案*
+*影音*
+
+# Python 快照與快取
+__pycache__/
+*.py
+*.pyc
+
+# Outlook 信件原始檔
+*.msg
+
+# 歷史版本與測試 HTML
+*_backup*.html
+seed.html
+encrypt.html
+script_test.html
+AutoRenamer_Local.html
+EmailJS_Setup_Guide.html
+
+# 臨時輸出檔與本機資料
+extracted_utf8.txt
+all_receipts_utf8.txt
+output_receipts.txt
+firebase-admin.json
+scratch_wl.json
+titles.json
+test_read_db.json
+temp*
+check_*.py
+upload_*.py
+*.csv
+*名單*
+*whitelist*.json
+

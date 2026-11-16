@@ -1,0 +1,73 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // 判斷是否為已驗證之公司 Google 帳號 (@youbike.com.tw 或母公司 @giantcycling.com / @giant.com.tw，不區分大小寫)
+    function isCompanyUser() {
+      return request.auth != null && 
+             request.auth.token.email != null &&
+             (request.auth.token.email.matches('(?i).*@youbike[.]com([.]tw|[.]cn)?$') ||
+              request.auth.token.email.matches('(?i).*@giantcycling[.]com$') ||
+              request.auth.token.email.matches('(?i).*@giant[.]com([.]tw|[.]cn)?$') ||
+              request.auth.token.email.matches('(?i).*@giant-bicycles[.]com([.]tw)?$'));
+    }
+
+    // 1. 佈告欄集合 (Bulletins)
+    match /bulletins/{bulletinId} {
+      // 嚴格僅限公司內部已登入同仁與管理員讀取（徹底關閉任何未登入讀取後門）
+      allow read: if isCompanyUser();
+      
+      // 寫入權限：限內部員工/管理員操作，嚴格禁止直接物理刪除 (Hard Delete)，統一使用軟刪除
+      allow create, update: if isCompanyUser();
+      allow delete: if false;
+
+      // 1-1. 機密保險箱子集合 (Private Content)
+      match /private/{docId} {
+        allow read, create, update: if isCompanyUser();
+        allow delete: if false;
+      }
+
+      // 1-2. 已讀打卡紀錄子集合 (Read Receipts)
+      match /readReceipts/{userId} {
+        allow read, create, update: if isCompanyUser();
+        allow delete: if false;
+      }
+
+      // 1-3. 防舞弊具名操作稽核日誌子集合 (Audit Logs)
+      match /audit_logs/{logId} {
+        allow read, create: if isCompanyUser();
+        allow update, delete: if false;
+      }
+    }
+
+    // 2. 使用者身分集合 (Users)
+    match /users/{userId} {
+      allow read, create, update: if isCompanyUser();
+      allow delete: if false;
+    }
+
+    // 3. 系統設定集合 (System Config：含 whitelist, admins, mailGroups 等)
+    match /systemConfig/{doc} {
+      allow read, create, update: if isCompanyUser();
+      allow delete: if false;
+
+      // 3-1. 預設分類模板子集合 (Templates List)
+      match /list/{tplId} {
+        allow read, create, update: if isCompanyUser();
+        allow delete: if false;
+      }
+    }
+
+    // 4. 九大分類關鍵字詞庫集合 (Dictionary)
+    match /dictionary/{doc} {
+      allow read, create, update: if isCompanyUser();
+      allow delete: if false;
+    }
+
+    // 5. 使用需求調查問卷集合 (Surveys)
+    match /surveys/{surveyId} {
+      allow read, create, update: if isCompanyUser();
+      allow delete: if false;
+    }
+  }
+}
