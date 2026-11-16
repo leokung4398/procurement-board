@@ -69,5 +69,11 @@ service cloud.firestore {
       allow read, create, update: if isCompanyUser();
       allow delete: if false;
     }
+
+    // 6. 設備維護同時改善會議月報數據集合 (MaIM Reports)
+    match /maimReports/{reportId} {
+      allow read, create, update: if isCompanyUser();
+      allow delete: if false;
+    }
   }
 }
