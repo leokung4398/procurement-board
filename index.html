@@ -2214,12 +2214,20 @@ async function showKPI(monthOffset = 0) {
       }
 
       let watermarkHtml = '';
-      if (bulletin.isConfidential) {
+      {
         const uStr = localStorage.getItem('procurement_user');
-        const userEmail = uStr ? JSON.parse(uStr).email : 'CONFIDENTIAL';
+        let wmLabel = 'YouBike INTERNAL CONFIDENTIAL';
+        if (uStr) {
+          try {
+            const uObj = JSON.parse(uStr);
+            const uName = (uObj.displayName || '').trim();
+            const uMail = (uObj.email || '').trim();
+            wmLabel = (uName && uMail && uName !== uMail.split('@')[0]) ? `${uName}  ${uMail}` : (uMail || uName || wmLabel);
+          } catch(e) {}
+        }
         watermarkHtml = `
-          <div class="fixed inset-0 pointer-events-none z-50 overflow-hidden flex flex-wrap justify-center content-center opacity-[0.03] select-none" style="gap: 50px; transform: rotate(-30deg) scale(1.5);">
-            ${Array(100).fill(`<span class="text-3xl font-bold text-slate-800 tracking-widest whitespace-nowrap">` + userEmail + `</span>`).join('')}
+          <div class="fixed inset-0 pointer-events-none z-50 overflow-hidden flex flex-wrap justify-center content-center select-none" style="gap: 64px 88px; transform: rotate(-26deg) scale(1.45); opacity: 0.055;">
+            ${Array(96).fill(`<span class="text-xl font-bold text-slate-800 tracking-wider whitespace-nowrap">` + e(wmLabel) + `</span>`).join('')}
           </div>
         `;
       }
@@ -2428,6 +2436,7 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
       }
 
       container.innerHTML = `
+        ${watermarkHtml}
         <div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white rounded-lg p-6 shadow-md relative overflow-hidden">
           <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
           <div class="flex items-center gap-3 relative z-10">
