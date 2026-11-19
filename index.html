@@ -249,6 +249,60 @@
     .custom-scroll::-webkit-scrollbar-track { background: transparent; }
     .custom-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     .custom-scroll::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+    /* 前台關鍵字搜尋高亮與動態聚焦樣式 */
+    mark.search-hl,
+    .ql-editor mark.search-hl {
+      background: linear-gradient(120deg, #fef08a 0%, #fde047 100%) !important;
+      color: #0f172a !important;
+      padding: 0.5px 4px !important;
+      margin: 0 1px !important;
+      border-radius: 4px !important;
+      border-bottom: 2px solid #f59e0b !important;
+      box-shadow: 0 1px 2px rgba(245, 158, 11, 0.28) !important;
+      font-weight: 700 !important;
+      cursor: pointer;
+      transition: background 0.18s ease, box-shadow 0.18s ease, color 0.18s ease;
+      box-decoration-break: clone;
+      -webkit-box-decoration-break: clone;
+    }
+    mark.search-hl:hover,
+    .ql-editor mark.search-hl:hover {
+      background: linear-gradient(120deg, #fde047 0%, #facc15 100%) !important;
+      box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.35) !important;
+    }
+    mark.search-hl.search-hl-active,
+    .ql-editor mark.search-hl.search-hl-active {
+      background: linear-gradient(120deg, #f97316 0%, #ea580c 100%) !important;
+      color: #ffffff !important;
+      border-bottom: 2px solid #9a3412 !important;
+      box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.35), 0 3px 8px rgba(234, 88, 12, 0.38) !important;
+      position: relative;
+      z-index: 5;
+    }
+    @keyframes searchHlPulse {
+      0% { box-shadow: 0 0 0 0 rgba(249, 115, 22, 0.75); }
+      70% { box-shadow: 0 0 0 10px rgba(249, 115, 22, 0); }
+      100% { box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.35); }
+    }
+    mark.search-hl.search-hl-pulse,
+    .ql-editor mark.search-hl.search-hl-pulse {
+      animation: searchHlPulse 0.85s ease-out;
+    }
+    /* 表格中含有搜尋關鍵字的列給予柔和淡金底色與左緣指示條 */
+    tr.search-hl-row {
+      background-color: rgba(254, 249, 195, 0.52);
+    }
+    tr.search-hl-row > td:first-child {
+      box-shadow: inset 3.5px 0 0 #f59e0b;
+    }
+    #search-highlight-bar {
+      animation: searchBarSlideDown 0.2s ease-out;
+    }
+    @keyframes searchBarSlideDown {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen font-sans">
@@ -388,10 +442,11 @@
 
         <!-- 側邊欄內建搜尋與過濾工具箱 -->
         <div class="p-3.5 bg-slate-50/50 border-b border-slate-100 space-y-3">
-          <!-- 關鍵字搜尋 -->
+          <!-- 關鍵字搜尋（支援空白分隔多詞，自動高亮週報內文並可逐筆跳轉） -->
           <div class="relative">
-            <input type="text" id="search-keyword" oninput="handleSearch()" class="form-input text-sm py-2 pl-8 pr-3 w-full bg-white border border-slate-200 rounded-lg shadow-2xs focus:ring-2 focus:ring-blue-500" placeholder="搜尋標題、料號、廠商...">
+            <input type="text" id="search-keyword" oninput="onSearchInput()" onkeydown="handleSearchKeydown(event)" oncompositionstart="state.isSearchComposing=true" oncompositionend="state.isSearchComposing=false;onSearchInput(true)" class="form-input text-sm py-2 pl-8 pr-8 w-full bg-white border border-slate-200 rounded-lg shadow-2xs focus:ring-2 focus:ring-amber-400 focus:border-amber-400 transition-colors" placeholder="搜尋標題、料號、廠商（可空白多詞）...">
             <svg class="w-4 h-4 text-slate-400 absolute left-2.5 top-2.5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            <button type="button" id="btn-clear-search" onclick="clearSearchKeyword()" class="hidden absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-slate-200/90 hover:bg-slate-300 text-slate-600 flex items-center justify-center text-[11px] font-bold transition-colors cursor-pointer" title="清除搜尋關鍵字 (Esc)">✕</button>
           </div>
           <!-- 月份與類別選單 -->
           <div class="grid grid-cols-2 gap-2.5">
@@ -427,8 +482,33 @@
 
       <!-- 右側主內容區 -->
       <div id="article-main-wrapper" class="flex-1 min-w-0 w-full space-y-6">
+        <!-- 關鍵字高亮導覽列（搜尋時自動浮現，支援上下處跳轉與快速清除） -->
+        <div id="search-highlight-bar" data-no-highlight="true" hidden class="hidden sticky top-2.5 z-30 mb-4 bg-white/95 backdrop-blur-md border-2 border-amber-300/90 rounded-xl px-3.5 py-2.5 shadow-lg shadow-amber-500/10">
+          <div class="flex flex-wrap items-center justify-between gap-2.5">
+            <div class="flex items-center gap-2 min-w-0 flex-wrap">
+              <span class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-amber-100 text-amber-700 text-xs font-bold flex-shrink-0">🔍</span>
+              <span class="text-xs font-bold text-slate-600 flex-shrink-0">已高亮關鍵字</span>
+              <div id="search-hl-terms" class="flex items-center gap-1.5 flex-wrap"></div>
+              <button type="button" id="search-hl-counter" onclick="focusCurrentSearchMatch()" class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-amber-50 text-amber-800 border border-amber-300 hover:bg-amber-100 transition-colors cursor-pointer" title="點此定位至目前高亮位置">
+                0 處符合
+              </button>
+            </div>
+            <div class="flex items-center gap-1.5 flex-shrink-0">
+              <button type="button" id="btn-hl-prev" onclick="navigateSearchMatch(-1)" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 hover:bg-amber-100 hover:text-amber-900 text-slate-700 border border-slate-200 hover:border-amber-300 transition-all cursor-pointer active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed" title="跳至上一處符合 (Shift + Enter)">
+                <span>▲</span><span class="hidden sm:inline">上一處</span>
+              </button>
+              <button type="button" id="btn-hl-next" onclick="navigateSearchMatch(1)" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-2xs transition-all cursor-pointer active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed" title="跳至下一處符合 (Enter)">
+                <span>▼</span><span>下一處</span>
+              </button>
+              <button type="button" onclick="clearSearchKeyword()" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-white hover:bg-rose-50 text-slate-500 hover:text-rose-600 border border-slate-200 hover:border-rose-200 transition-all cursor-pointer" title="清除搜尋並移除高亮 (Esc)">
+                <span>✕</span><span class="hidden sm:inline">清除</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
         <!-- 主要佈告欄內容 -->
-        <main id="bulletin-content-area" class="space-y-6">
+        <main id="bulletin-content-area" class="space-y-6 !mt-0">
           <div class="text-center py-12 text-slate-500">載入中...</div>
         </main>
 
@@ -708,7 +788,14 @@
     const state = {
       data: null,
       isEditMode: false,
-      activeBulletinId: null // 當前選取的週別 ID
+      activeBulletinId: null, // 當前選取的週別 ID
+      searchRawQuery: '',
+      searchQuery: '',
+      searchMatchTotal: 0,
+      searchMatchCapped: false,
+      searchActiveMatchIdx: -1,
+      searchHasScrolled: false,
+      isSearchComposing: false
     };
 
     async function refreshData() {
@@ -1771,11 +1858,591 @@ async function showKPI(monthOffset = 0) {
       return true;
     }
 
-    function getFilteredBulletins() {
+    // ==========================================
+    // 關鍵字檢索解析、DOM 高亮引擎與快速跳轉控制器
+    // ==========================================
+    function escapeRegExp(str) {
+      return String(str || '').replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function parseSearchTerms(rawQuery) {
+      if (!rawQuery) return [];
+      const parts = String(rawQuery).trim().split(/\s+/).filter(Boolean);
+      const seen = new Set();
+      const terms = [];
+      parts.forEach(p => {
+        const low = p.toLowerCase();
+        if (!seen.has(low)) {
+          seen.add(low);
+          terms.push(p);
+        }
+      });
+      return terms;
+    }
+
+    function buildSearchRegex(rawQuery) {
+      const trimmed = String(rawQuery || '').trim();
+      if (!trimmed) return null;
+      const terms = parseSearchTerms(trimmed);
+      if (terms.length === 0) return null;
+
+      const patterns = [];
+      // 若為多詞組，優先比對連續片語（允許任意空白），再比對個別關鍵字（長詞優先）
+      if (terms.length > 1) {
+        patterns.push(terms.map(escapeRegExp).join('\\s+'));
+      }
+      terms.slice().sort((a, b) => b.length - a.length).forEach(t => {
+        patterns.push(escapeRegExp(t));
+      });
+      try {
+        return new RegExp(patterns.join('|'), 'gi');
+      } catch (err) {
+        return null;
+      }
+    }
+
+    function stripHtmlForSearch(html) {
+      if (!html) return '';
+      return String(html)
+        .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+        .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+        .replace(/<\/?(?:p|div|br|tr|td|th|li|ul|ol|h[1-6]|section|hr|table|thead|tbody)[^>]*>/gi, ' ')
+        .replace(/<[^>]*>/g, '')
+        .replace(/&nbsp;/gi, ' ')
+        .replace(/&amp;/gi, '&')
+        .replace(/&lt;/gi, '<')
+        .replace(/&gt;/gi, '>')
+        .replace(/&quot;/gi, '"')
+        .replace(/&#39;/gi, "'")
+        .replace(/&#(\d+);/g, (_, num) => String.fromCharCode(parseInt(num, 10)))
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+
+    function collectTableTextForSearch(obj, parts) {
+      if (!obj) return;
+      if (obj.table) {
+        if (Array.isArray(obj.table.columns)) {
+          obj.table.columns.forEach(c => { if (c != null) parts.push(String(c)); });
+        }
+        if (Array.isArray(obj.table.rows)) {
+          obj.table.rows.forEach(r => {
+            const cells = Array.isArray(r) ? r : (r && r.c ? r.c : (r && r.cols ? r.cols : []));
+            cells.forEach(cell => { if (cell != null) parts.push(String(cell)); });
+          });
+        }
+      }
+      ['affectedOrders', 'cancelledOrders', 'priceChangeItems', 'repairRecords', 'inquiryRecords'].forEach(key => {
+        if (Array.isArray(obj[key])) {
+          obj[key].forEach(rec => {
+            if (rec && typeof rec === 'object') {
+              Object.values(rec).forEach(v => { if (v != null) parts.push(String(v)); });
+            }
+          });
+        }
+      });
+    }
+
+    function getBulletinSearchableText(b) {
+      if (!b) return '';
+      const parts = [];
+      if (b.id) parts.push(String(b.id));
+      if (b.title) parts.push(String(b.title));
+      if (b.publishDate) parts.push(String(b.publishDate));
+      if (b.periodStart) parts.push(String(b.periodStart));
+      if (b.periodEnd) parts.push(String(b.periodEnd));
+
+      const secs = Array.isArray(b.sections) ? b.sections : (b.sections ? Object.values(b.sections) : []);
+      secs.forEach(sec => {
+        if (!sec) return;
+        if (sec.sectionNumber) parts.push(String(sec.sectionNumber));
+        if (sec.title) parts.push(String(sec.title));
+        if (sec.subtitle) parts.push(String(sec.subtitle));
+        if (Array.isArray(sec.items)) {
+          sec.items.forEach(it => { if (it && it.content) parts.push(stripHtmlForSearch(it.content)); });
+        }
+        if (Array.isArray(sec.subsections)) {
+          sec.subsections.forEach(sub => {
+            if (!sub) return;
+            if (sub.subsectionNumber) parts.push(String(sub.subsectionNumber));
+            if (sub.title) parts.push(String(sub.title));
+            if (Array.isArray(sub.items)) {
+              sub.items.forEach(it => { if (it && it.content) parts.push(stripHtmlForSearch(it.content)); });
+            }
+            collectTableTextForSearch(sub, parts);
+          });
+        }
+        collectTableTextForSearch(sec, parts);
+        if (Array.isArray(sec.files)) {
+          sec.files.forEach(f => { if (f && f.fileName) parts.push(String(f.fileName)); });
+        }
+      });
+
+      if (Array.isArray(b.feedbackLog)) {
+        b.feedbackLog.forEach(fb => {
+          if (!fb) return;
+          if (fb.item) parts.push(String(fb.item));
+          if (fb.reason) parts.push(String(fb.reason));
+        });
+      }
+      return parts.join(' \n ');
+    }
+
+    function countBulletinMatches(b, rawQuery) {
+      const regex = buildSearchRegex(rawQuery);
+      if (!regex || !b) return 0;
+      const text = getBulletinSearchableText(b);
+      let count = 0;
+      let m;
+      while ((m = regex.exec(text)) !== null) {
+        if (m[0].length === 0) { regex.lastIndex++; continue; }
+        count++;
+        if (count >= 100) break;
+      }
+      return count;
+    }
+
+    function clearSearchHighlights(container) {
+      if (!container) return;
+      const marks = container.querySelectorAll('mark.search-hl');
+      if (marks.length > 0) {
+        const parents = new Set();
+        marks.forEach(mark => {
+          const parent = mark.parentNode;
+          if (!parent) return;
+          parents.add(parent);
+          while (mark.firstChild) {
+            parent.insertBefore(mark.firstChild, mark);
+          }
+          parent.removeChild(mark);
+        });
+        parents.forEach(p => {
+          try { p.normalize(); } catch (err) {}
+        });
+      }
+      container.querySelectorAll('tr.search-hl-row').forEach(tr => {
+        tr.classList.remove('search-hl-row');
+      });
+    }
+
+    function collectInlineTextRuns(root) {
+      const SKIP_TAGS = new Set(['SCRIPT', 'STYLE', 'NOSCRIPT', 'SVG', 'TEXTAREA', 'INPUT', 'SELECT', 'OPTION', 'MARK']);
+      const BLOCK_TAGS = new Set([
+        'DIV', 'P', 'LI', 'UL', 'OL', 'TABLE', 'THEAD', 'TBODY', 'TFOOT',
+        'TR', 'TD', 'TH', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6',
+        'SECTION', 'ARTICLE', 'HEADER', 'FOOTER', 'NAV', 'ASIDE',
+        'BLOCKQUOTE', 'PRE', 'BR', 'HR', 'BUTTON'
+      ]);
+      const runs = [];
+      let currentRun = [];
+
+      function flush() {
+        if (currentRun.length > 0) {
+          runs.push(currentRun);
+          currentRun = [];
+        }
+      }
+
+      function walk(node) {
+        if (!node) return;
+        if (node.nodeType === 3) {
+          if (node.nodeValue && node.nodeValue.length > 0) {
+            currentRun.push(node);
+          }
+          return;
+        }
+        if (node.nodeType !== 1) return;
+
+        const tag = node.tagName;
+        if (SKIP_TAGS.has(tag)) { flush(); return; }
+        if (node.getAttribute('data-no-highlight') === 'true' || node.getAttribute('contenteditable') === 'true') {
+          flush();
+          return;
+        }
+
+        const isBlock = BLOCK_TAGS.has(tag);
+        if (isBlock) flush();
+
+        const children = node.childNodes;
+        for (let i = 0; i < children.length; i++) {
+          walk(children[i]);
+        }
+
+        if (isBlock) flush();
+      }
+
+      walk(root);
+      flush();
+      return runs;
+    }
+
+    function applySearchHighlights(container, rawQuery) {
+      if (!container) return 0;
+      clearSearchHighlights(container);
+
+      const trimmed = String(rawQuery || '').trim();
+      if (!trimmed || state.isEditMode) {
+        state.searchMatchTotal = 0;
+        state.searchMatchCapped = false;
+        state.searchActiveMatchIdx = -1;
+        state.searchHasScrolled = false;
+        updateSearchHighlightBar(0, -1, '');
+        return 0;
+      }
+
+      const regex = buildSearchRegex(trimmed);
+      if (!regex) {
+        updateSearchHighlightBar(0, -1, '');
+        return 0;
+      }
+
+      const MAX_MATCH_GROUPS = 600;
+      const runs = collectInlineTextRuns(container);
+      let groupCount = 0;
+      let capped = false;
+
+      for (let rIdx = 0; rIdx < runs.length; rIdx++) {
+        if (groupCount >= MAX_MATCH_GROUPS) { capped = true; break; }
+        const run = runs[rIdx];
+        let fullText = '';
+        const meta = [];
+        for (let nIdx = 0; nIdx < run.length; nIdx++) {
+          const val = run[nIdx].nodeValue;
+          const start = fullText.length;
+          fullText += val;
+          meta.push({ node: run[nIdx], start, end: fullText.length });
+        }
+
+        if (!fullText.trim()) continue;
+
+        regex.lastIndex = 0;
+        const matches = [];
+        let m;
+        while ((m = regex.exec(fullText)) !== null) {
+          if (m[0].length === 0) { regex.lastIndex++; continue; }
+          matches.push({ start: m.index, end: m.index + m[0].length, groupId: groupCount });
+          groupCount++;
+          if (groupCount >= MAX_MATCH_GROUPS) { capped = true; break; }
+        }
+
+        if (matches.length === 0) continue;
+
+        for (let nIdx = 0; nIdx < meta.length; nIdx++) {
+          const { node, start: nodeStart, end: nodeEnd } = meta[nIdx];
+          if (!node.parentNode) continue;
+
+          const overlapping = [];
+          for (let mIdx = 0; mIdx < matches.length; mIdx++) {
+            const mt = matches[mIdx];
+            if (mt.end <= nodeStart) continue;
+            if (mt.start >= nodeEnd) break;
+            overlapping.push({
+              localStart: Math.max(nodeStart, mt.start) - nodeStart,
+              localEnd: Math.min(nodeEnd, mt.end) - nodeStart,
+              groupId: mt.groupId
+            });
+          }
+
+          if (overlapping.length === 0) continue;
+
+          const textVal = node.nodeValue;
+          const frag = document.createDocumentFragment();
+          let cursor = 0;
+          overlapping.forEach(seg => {
+            if (seg.localStart > cursor) {
+              frag.appendChild(document.createTextNode(textVal.slice(cursor, seg.localStart)));
+            }
+            const mark = document.createElement('mark');
+            mark.className = 'search-hl';
+            mark.setAttribute('data-hl-group', String(seg.groupId));
+            mark.textContent = textVal.slice(seg.localStart, seg.localEnd);
+            mark.title = `符合關鍵字（第 ${seg.groupId + 1} 處）`;
+            mark.addEventListener('click', () => {
+              setActiveSearchMatch(seg.groupId, false);
+            });
+            frag.appendChild(mark);
+            cursor = seg.localEnd;
+          });
+          if (cursor < textVal.length) {
+            frag.appendChild(document.createTextNode(textVal.slice(cursor)));
+          }
+
+          // 若符合文字位於資料表格列 (tbody > tr) 內，給予柔和列高亮提示
+          const parentEl = node.parentElement;
+          const rowEl = parentEl ? parentEl.closest('tr') : null;
+          if (rowEl && !rowEl.closest('thead')) {
+            rowEl.classList.add('search-hl-row');
+          }
+
+          node.parentNode.replaceChild(frag, node);
+        }
+      }
+
+      state.searchMatchTotal = groupCount;
+      state.searchMatchCapped = capped;
+      state.searchHasScrolled = false;
+
+      if (groupCount > 0) {
+        setActiveSearchMatch(0, false);
+      } else {
+        state.searchActiveMatchIdx = -1;
+      }
+
+      updateSearchHighlightBar(groupCount, groupCount > 0 ? 0 : -1, trimmed, capped);
+
+      // 同步側邊欄當前週報的符合筆數徽章，確保與內文實際高亮數 100% 一致
+      if (state.activeBulletinId) {
+        const badgeEl = document.querySelector(`[data-tab-match-badge="${CSS.escape(state.activeBulletinId)}"]`);
+        if (badgeEl) {
+          if (groupCount > 0) {
+            badgeEl.textContent = `${groupCount >= 100 ? '99+' : groupCount} 處`;
+            badgeEl.classList.remove('hidden');
+          } else {
+            badgeEl.classList.add('hidden');
+          }
+        }
+      }
+      return groupCount;
+    }
+
+    function isElementVisibleInViewport(el) {
+      if (!el) return false;
+      const rect = el.getBoundingClientRect();
+      return rect.top >= 72 && rect.bottom <= (window.innerHeight - 24);
+    }
+
+    function setActiveSearchMatch(groupIdx, shouldScroll = true) {
+      const container = document.getElementById('bulletin-content-area');
+      if (!container) return;
+
+      container.querySelectorAll('mark.search-hl.search-hl-active').forEach(el => {
+        el.classList.remove('search-hl-active', 'search-hl-pulse');
+      });
+
+      if (groupIdx < 0 || groupIdx >= state.searchMatchTotal) {
+        state.searchActiveMatchIdx = -1;
+        return;
+      }
+
+      const targets = container.querySelectorAll(`mark.search-hl[data-hl-group="${groupIdx}"]`);
+      if (targets.length === 0) return;
+
+      targets.forEach(el => {
+        el.classList.add('search-hl-active');
+        if (shouldScroll) {
+          void el.offsetWidth; // 重新觸發脈衝動畫
+          el.classList.add('search-hl-pulse');
+        }
+      });
+
+      state.searchActiveMatchIdx = groupIdx;
+
+      if (shouldScroll) {
+        state.searchHasScrolled = true;
+        try {
+          targets[0].scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'center' });
+        } catch (err) {
+          targets[0].scrollIntoView();
+        }
+      }
+
+      updateSearchHighlightCounter();
+    }
+
+    function navigateSearchMatch(delta) {
+      if (state.searchMatchTotal <= 0) return;
+      const container = document.getElementById('bulletin-content-area');
+      // 若使用者剛打完字按「下一處」且第 1 處在畫面下方，先定位至第 1 處避免跳過
+      if (delta > 0 && state.searchActiveMatchIdx === 0 && !state.searchHasScrolled && container) {
+        const firstEl = container.querySelector('mark.search-hl[data-hl-group="0"]');
+        if (firstEl && !isElementVisibleInViewport(firstEl)) {
+          setActiveSearchMatch(0, true);
+          return;
+        }
+      }
+      const base = state.searchActiveMatchIdx >= 0 ? state.searchActiveMatchIdx : 0;
+      const nextIdx = (base + delta + state.searchMatchTotal) % state.searchMatchTotal;
+      setActiveSearchMatch(nextIdx, true);
+    }
+
+    function focusCurrentSearchMatch() {
+      if (state.searchMatchTotal <= 0) return;
+      const idx = state.searchActiveMatchIdx >= 0 ? state.searchActiveMatchIdx : 0;
+      setActiveSearchMatch(idx, true);
+    }
+
+    function updateSearchHighlightCounter() {
+      const counterEl = document.getElementById('search-hl-counter');
+      if (!counterEl) return;
+      const total = state.searchMatchTotal;
+      const cappedSuffix = state.searchMatchCapped ? '+' : '';
+      if (total > 0) {
+        const displayIdx = Math.max(1, state.searchActiveMatchIdx + 1);
+        counterEl.textContent = `第 ${displayIdx} / ${total}${cappedSuffix} 處符合`;
+        counterEl.className = 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-extrabold bg-amber-100 text-amber-900 border border-amber-300 hover:bg-amber-200 transition-colors cursor-pointer';
+      } else {
+        counterEl.textContent = '本頁 0 處符合';
+        counterEl.className = 'inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-slate-100 text-slate-500 border border-slate-200 cursor-default';
+      }
+    }
+
+    function updateSearchHighlightBar(total, activeIdx, rawQuery, capped = false) {
+      const bar = document.getElementById('search-highlight-bar');
+      if (!bar) return;
+      const trimmed = String(rawQuery || '').trim();
+      if (!trimmed || state.isEditMode) {
+        bar.classList.add('hidden');
+        bar.hidden = true;
+        return;
+      }
+
+      const termsEl = document.getElementById('search-hl-terms');
+      if (termsEl) {
+        const terms = parseSearchTerms(trimmed);
+        termsEl.innerHTML = terms.map(t =>
+          `<span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-extrabold text-slate-900 border border-amber-400 shadow-2xs" style="background: linear-gradient(120deg, #fef08a 0%, #fde047 100%);">${e(t)}</span>`
+        ).join('');
+      }
+
+      state.searchMatchTotal = total;
+      state.searchMatchCapped = capped;
+      state.searchActiveMatchIdx = activeIdx;
+      updateSearchHighlightCounter();
+
+      const btnPrev = document.getElementById('btn-hl-prev');
+      const btnNext = document.getElementById('btn-hl-next');
+      if (btnPrev) btnPrev.disabled = total <= 0;
+      if (btnNext) btnNext.disabled = total <= 0;
+
+      bar.hidden = false;
+      bar.classList.remove('hidden');
+    }
+
+    let searchDebounceTimer = null;
+    function onSearchInput(immediate = false) {
+      const inputEl = document.getElementById('search-keyword');
+      const val = inputEl ? inputEl.value : '';
+      const clearBtn = document.getElementById('btn-clear-search');
+      if (clearBtn) {
+        clearBtn.classList.toggle('hidden', !val.trim());
+      }
+      if (state.isSearchComposing && !immediate) return;
+
+      clearTimeout(searchDebounceTimer);
+      if (immediate || !val.trim()) {
+        handleSearch();
+      } else {
+        searchDebounceTimer = setTimeout(() => {
+          handleSearch();
+        }, 120);
+      }
+    }
+
+    function handleSearchKeydown(event) {
+      if (event.isComposing || state.isSearchComposing) return;
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        clearTimeout(searchDebounceTimer);
+        const inputEl = document.getElementById('search-keyword');
+        const curRaw = inputEl ? inputEl.value.trim() : '';
+        if (curRaw !== state.searchRawQuery) {
+          handleSearch();
+        }
+        if (state.searchMatchTotal > 0) {
+          navigateSearchMatch(event.shiftKey ? -1 : 1);
+        }
+      } else if (event.key === 'Escape') {
+        if (state.searchRawQuery || (document.getElementById('search-keyword') && document.getElementById('search-keyword').value)) {
+          event.preventDefault();
+          clearSearchKeyword();
+        }
+      }
+    }
+
+    function clearSearchKeyword() {
+      clearTimeout(searchDebounceTimer);
+      const inputEl = document.getElementById('search-keyword');
+      if (inputEl) inputEl.value = '';
+      const clearBtn = document.getElementById('btn-clear-search');
+      if (clearBtn) clearBtn.classList.add('hidden');
+      state.searchRawQuery = '';
+      state.searchQuery = '';
+      handleSearch();
+    }
+
+    function switchSearchToAllMonths() {
+      const smEl = document.getElementById('search-month');
+      if (smEl) smEl.value = '';
+      state.searchMonth = '';
+      handleSearch();
+    }
+
+    function resetAllSearchFilters() {
+      clearTimeout(searchDebounceTimer);
+      const inputEl = document.getElementById('search-keyword');
+      const smEl = document.getElementById('search-month');
+      const spEl = document.getElementById('search-parent');
+      if (inputEl) inputEl.value = '';
+      if (smEl) smEl.value = '';
+      if (spEl) spEl.value = '';
+      const clearBtn = document.getElementById('btn-clear-search');
+      if (clearBtn) clearBtn.classList.add('hidden');
+      state.searchRawQuery = '';
+      state.searchQuery = '';
+      state.searchMonth = '';
+      state.searchParent = '';
+      handleSearch();
+    }
+
+    function renderEmptySearchResult() {
+      updateSearchHighlightBar(0, -1, '');
+      const container = document.getElementById('bulletin-content-area');
+      if (!container) return;
+
+      const totalAvailable = (state.data && state.data.bulletins) ? state.data.bulletins.length : 0;
+      if (totalAvailable === 0) {
+        container.innerHTML = '<div data-empty-search-state="true" class="bg-white rounded-2xl border border-slate-200 p-12 text-center text-slate-500 shadow-xs">目前尚無已發布之週報內容</div>';
+        return;
+      }
+
+      const otherMonthMatches = state.searchMonth ? getFilteredBulletins({ ignoreMonth: true }) : [];
+      const hasOtherMonths = otherMonthMatches.length > 0;
+      const qDisplay = state.searchRawQuery ? `「<span class="px-1.5 py-0.5 rounded font-extrabold text-slate-900" style="background:linear-gradient(120deg,#fef08a,#fde047);">${e(state.searchRawQuery)}</span>」` : '';
+
+      container.innerHTML = `
+        <div data-empty-search-state="true" class="bg-white rounded-2xl border border-slate-200/90 shadow-xs p-10 sm:p-14 text-center max-w-xl mx-auto my-6">
+          <div class="w-16 h-16 rounded-2xl bg-amber-50 border border-amber-200/70 text-amber-500 flex items-center justify-center mx-auto mb-4 text-3xl shadow-inner">
+            🔍
+          </div>
+          <h3 class="text-lg font-bold text-slate-800 mb-2">
+            ${state.searchRawQuery ? `目前篩選範圍內查無 ${qDisplay}` : '此篩選條件下尚無符合週報'}
+          </h3>
+          <p class="text-sm text-slate-500 leading-relaxed mb-6">
+            ${hasOtherMonths
+              ? `目前僅限縮在 <strong>${e(state.searchMonth)}</strong> 月份搜尋；在<strong>全部月份</strong>中共找到 <strong class="text-amber-700">${otherMonthMatches.length} 期</strong>符合的週報！`
+              : '請嘗試更換關鍵字、切換「全部月份」或重設類別篩選條件。'}
+          </p>
+          <div class="flex flex-wrap items-center justify-center gap-2.5">
+            ${hasOtherMonths ? `
+              <button type="button" onclick="switchSearchToAllMonths()" class="px-5 py-2.5 rounded-xl text-sm font-bold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-sm hover:shadow transition-all cursor-pointer active:scale-95">
+                🔍 立即檢視全部月份（共 ${otherMonthMatches.length} 期符合）
+              </button>
+            ` : ''}
+            <button type="button" onclick="resetAllSearchFilters()" class="px-4 py-2.5 rounded-xl text-sm font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition-colors cursor-pointer">
+              重設篩選條件
+            </button>
+          </div>
+        </div>
+      `;
+    }
+
+    function getFilteredBulletins(options = {}) {
       if (!state.data || !state.data.bulletins) return [];
-      const mVal = state.searchMonth || (document.getElementById('search-month') ? document.getElementById('search-month').value : '');
-      const pVal = state.searchParent || (document.getElementById('search-parent') ? document.getElementById('search-parent').value : '');
-      const qVal = state.searchQuery || (document.getElementById('search-keyword') ? document.getElementById('search-keyword').value.trim().toLowerCase() : '');
+      const ignoreMonth = !!(options && options.ignoreMonth);
+      const mVal = ignoreMonth ? '' : (state.searchMonth !== undefined ? state.searchMonth : (document.getElementById('search-month') ? document.getElementById('search-month').value : ''));
+      const pVal = state.searchParent !== undefined ? state.searchParent : (document.getElementById('search-parent') ? document.getElementById('search-parent').value : '');
+      const rawQ = state.searchRawQuery !== undefined ? state.searchRawQuery : (document.getElementById('search-keyword') ? document.getElementById('search-keyword').value.trim() : '');
+      const terms = parseSearchTerms(rawQ).map(t => t.toLowerCase());
 
       const userStr = localStorage.getItem('procurement_user');
       let userEmail = '';
@@ -1805,9 +2472,9 @@ async function showKPI(monthOffset = 0) {
           const hasParent = secs.some(s => s.title === pVal);
           if (!hasParent) return false;
         }
-        if (qVal) {
-          const contentStr = JSON.stringify(b).toLowerCase();
-          if (!contentStr.includes(qVal)) return false;
+        if (terms.length > 0) {
+          const searchableText = getBulletinSearchableText(b).toLowerCase();
+          if (!terms.every(t => searchableText.includes(t))) return false;
         }
         return true;
       });
@@ -1835,23 +2502,43 @@ async function showKPI(monthOffset = 0) {
     }
 
     function handleSearch() {
-      state.searchMonth = document.getElementById('search-month').value;
-      state.searchParent = document.getElementById('search-parent').value;
-      state.searchQuery = document.getElementById('search-keyword').value.trim().toLowerCase();
-      
+      state.searchMonth = document.getElementById('search-month') ? document.getElementById('search-month').value : '';
+      state.searchParent = document.getElementById('search-parent') ? document.getElementById('search-parent').value : '';
+      const rawInput = document.getElementById('search-keyword') ? document.getElementById('search-keyword').value : '';
+      state.searchRawQuery = rawInput.trim();
+      state.searchQuery = state.searchRawQuery.toLowerCase();
+
+      const clearBtn = document.getElementById('btn-clear-search');
+      if (clearBtn) {
+        clearBtn.classList.toggle('hidden', !state.searchRawQuery);
+      }
+
       const filtered = getFilteredBulletins();
-      
-      // 確保目前選中的週報仍在篩選結果內，否則預設選取篩選後的第一筆
+      const prevActiveId = state.activeBulletinId;
+
       if (filtered.length > 0) {
         const stillExists = filtered.find(b => b.id === state.activeBulletinId);
         if (!stillExists) {
           state.activeBulletinId = filtered[0].id;
         }
+      } else {
+        renderTabs(filtered);
+        renderEmptySearchResult();
+        return;
       }
-      
+
       renderTabs(filtered);
-      renderActiveBulletin();
+
+      const container = document.getElementById('bulletin-content-area');
+      const isShowingEmptyState = container && !!container.querySelector('[data-empty-search-state="true"]');
+      if (prevActiveId === state.activeBulletinId && !isShowingEmptyState && container && container.children.length > 0 && !state.isEditMode) {
+        // 同一份週報：原地更新高亮標記（零閃爍、不重置閱讀畫面）
+        applySearchHighlights(container, state.searchRawQuery);
+      } else {
+        renderActiveBulletin();
+      }
     }
+
     function renderTabs(filteredBulletins = null) {
       const container = document.getElementById('tabs-container');
       const countBadge = document.getElementById('sidebar-count-badge');
@@ -1865,8 +2552,23 @@ async function showKPI(monthOffset = 0) {
         countBadge.textContent = `${filteredBulletins.length} 期`;
       }
 
+      const hasQuery = !!state.searchRawQuery;
+      const otherMonthTotal = (hasQuery && state.searchMonth)
+        ? getFilteredBulletins({ ignoreMonth: true }).length
+        : 0;
+      const moreInOtherMonths = Math.max(0, otherMonthTotal - filteredBulletins.length);
+
       if (filteredBulletins.length === 0) {
-        container.innerHTML = '<div class="py-8 text-center text-slate-400 text-xs">查無符合條件之週報</div>';
+        container.innerHTML = `
+          <div class="py-6 px-2 text-center space-y-3">
+            <div class="text-slate-400 text-xs font-medium">查無符合條件之週報</div>
+            ${moreInOtherMonths > 0 ? `
+              <button type="button" onclick="switchSearchToAllMonths()" class="w-full px-3 py-2 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 hover:border-amber-300 text-amber-900 text-xs font-bold transition-colors cursor-pointer shadow-2xs">
+                💡 其他月份找到 ${moreInOtherMonths} 期符合<br><span class="text-amber-700 underline">點此切換「全部月份」查看 →</span>
+              </button>
+            ` : ''}
+          </div>
+        `;
         return;
       }
 
@@ -1896,6 +2598,7 @@ async function showKPI(monthOffset = 0) {
                 const isActive = b.id === state.activeBulletinId;
                 const isConfirmed = localStorage.getItem('has_confirmed_' + b.id) === '1';
                 const isNew = filteredBulletins.length > 0 && filteredBulletins[0].id === b.id;
+                const matchCount = hasQuery ? countBulletinMatches(b, state.searchRawQuery) : 0;
 
                 const activeClass = isActive 
                   ? 'bg-blue-50 text-blue-700 font-bold border-blue-300 shadow-xs ring-1 ring-blue-200'
@@ -1903,10 +2606,11 @@ async function showKPI(monthOffset = 0) {
 
                 return `
                   <button onclick="selectBulletin('${e(b.id)}')" class="w-full text-left px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all flex items-center justify-between group border ${activeClass}">
-                    <div class="flex items-center gap-2.5 min-w-0">
+                    <div class="flex items-center gap-2 min-w-0">
                       <span class="w-2.5 h-2.5 rounded-full flex-shrink-0 transition-transform ${isActive ? 'bg-blue-600 ring-4 ring-blue-100 scale-110' : 'bg-slate-300 group-hover:bg-slate-400'}"></span>
                       <span class="truncate font-mono text-sm tracking-normal font-semibold">${e(b.id)}</span>
-                      ${isNew ? '<span class="text-[10px] bg-rose-500 text-white px-1.5 py-0.5 rounded-full font-bold flex-shrink-0 shadow-xs animate-pulse">NEW</span>' : ''}
+                      ${isNew && !hasQuery ? '<span class="text-[10px] bg-rose-500 text-white px-1.5 py-0.5 rounded-full font-bold flex-shrink-0 shadow-xs animate-pulse">NEW</span>' : ''}
+                      ${hasQuery ? `<span data-tab-match-badge="${e(b.id)}" class="${matchCount > 0 ? '' : 'hidden '}text-[10px] bg-amber-100 text-amber-900 border border-amber-300 px-1.5 py-0.5 rounded-full font-extrabold flex-shrink-0 shadow-2xs" title="本期符合關鍵字次數">${matchCount >= 100 ? '99+' : matchCount} 處</span>` : ''}
                     </div>
                     <div class="flex items-center gap-2 flex-shrink-0 ml-1.5">
                       ${isConfirmed ? '<span class="text-emerald-600 text-sm font-black leading-none select-none" title="已完讀打卡">✓</span>' : '<span class="w-2 h-2 rounded-full bg-amber-400" title="尚未打卡"></span>'}
@@ -1918,7 +2622,12 @@ async function showKPI(monthOffset = 0) {
             </div>
           </div>
         `;
-      }).join('');
+      }).join('') + (moreInOtherMonths > 0 ? `
+        <button type="button" onclick="switchSearchToAllMonths()" class="w-full mt-2 px-3 py-2.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 hover:border-amber-300 text-amber-900 text-xs font-bold flex items-center justify-between gap-2 transition-colors cursor-pointer text-left shadow-2xs">
+          <span>💡 其他月份另有 ${moreInOtherMonths} 期符合</span>
+          <span class="text-amber-700 underline flex-shrink-0">看全部 →</span>
+        </button>
+      ` : '');
 
       container.innerHTML = html;
     }
@@ -2166,6 +2875,7 @@ async function showKPI(monthOffset = 0) {
 
       const bulletin = state.data.bulletins.find(b => b.id === state.activeBulletinId);
       if (!bulletin) {
+        updateSearchHighlightBar(0, -1, '');
         container.innerHTML = '<div class="text-center text-slate-500 py-8">無選取的佈告內容</div>';
         return;
       }
@@ -2210,6 +2920,7 @@ async function showKPI(monthOffset = 0) {
             </div>
           `;
         }
+        updateSearchHighlightBar(0, -1, '');
         return;
       }
 
@@ -2226,7 +2937,7 @@ async function showKPI(monthOffset = 0) {
           } catch(e) {}
         }
         watermarkHtml = `
-          <div class="fixed inset-0 pointer-events-none z-50 overflow-hidden flex flex-wrap justify-center content-center select-none" style="gap: 64px 88px; transform: rotate(-26deg) scale(1.45); opacity: 0.055;">
+          <div data-no-highlight="true" class="fixed inset-0 pointer-events-none z-50 overflow-hidden flex flex-wrap justify-center content-center select-none" style="gap: 64px 88px; transform: rotate(-26deg) scale(1.45); opacity: 0.055;">
             ${Array(96).fill(`<span class="text-xl font-bold text-slate-800 tracking-wider whitespace-nowrap">` + e(wmLabel) + `</span>`).join('')}
           </div>
         `;
@@ -2249,6 +2960,7 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
             }
             throw new Error("No Access");
         } catch(e) {
+            updateSearchHighlightBar(0, -1, '');
             container.innerHTML = '<div class="text-center py-20"><div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-rose-100 text-rose-600 mb-4"><svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg></div><h3 class="text-xl font-bold text-slate-800">機密文件保護中</h3><p class="text-slate-500 mt-2">您不在本份機密週報的授權名單中，無法檢視內容。<br><span class="text-xs text-slate-400">Security Rules Enforced</span></p></div>';
             return;
         }
@@ -2320,7 +3032,7 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
         const filesHtml = hasFiles || state.isEditMode
           ? `
             <div id="sec-attachments-${secIdx}" class="mt-3 bg-gradient-to-r from-pink-50 via-rose-50/90 to-pink-50/70 px-4 py-3.5 rounded-xl border-2 border-pink-300 border-l-[6px] border-l-pink-600 shadow-sm relative overflow-hidden scroll-mt-24">
-              <div class="flex items-center justify-between flex-wrap gap-2 mb-2.5">
+              <div data-no-highlight="true" class="flex items-center justify-between flex-wrap gap-2 mb-2.5">
                 <div class="flex items-center gap-2 flex-wrap">
                   <span class="inline-flex items-center justify-center w-6 h-6 rounded-lg bg-pink-600 text-white text-xs shadow-xs">📎</span>
                   <h5 class="text-sm font-extrabold text-pink-900 tracking-wide">本段相關附件下載專區</h5>
@@ -2341,13 +3053,13 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
                   <li class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-sm bg-white hover:bg-pink-50/40 px-3.5 py-2.5 rounded-lg border border-pink-200 hover:border-pink-400 shadow-xs transition-all duration-150 group">
                     <div class="flex items-center gap-2.5 min-w-0">
                       <span class="text-lg flex-shrink-0">${fileIcon}</span>
-                      <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-pink-100 text-pink-700 border border-pink-200 flex-shrink-0">${fileTypeTag}</span>
+                      <span data-no-highlight="true" class="px-2 py-0.5 rounded text-[11px] font-bold bg-pink-100 text-pink-700 border border-pink-200 flex-shrink-0">${fileTypeTag}</span>
                       <a href="${e(file.url)}" download class="text-pink-950 group-hover:text-pink-700 font-bold truncate hover:underline text-sm sm:text-[15px]">
                         <span ${editableAttr} data-path="${bulletin.id}.sections[${secIdx}].files[${fileIdx}].fileName" class="outline-none">${e(file.fileName)}</span>
                       </a>
                     </div>
                     <div class="flex items-center gap-2 self-end sm:self-auto flex-shrink-0">
-                      <a href="${e(file.url)}" download class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold bg-gradient-to-r from-pink-600 to-rose-500 hover:from-pink-700 hover:to-rose-600 text-white shadow-xs hover:shadow transition-all active:scale-95">
+                      <a href="${e(file.url)}" download data-no-highlight="true" class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-xs font-bold bg-gradient-to-r from-pink-600 to-rose-500 hover:from-pink-700 hover:to-rose-600 text-white shadow-xs hover:shadow transition-all active:scale-95">
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
                         <span>點此下載檔案</span>
                       </a>
@@ -2397,7 +3109,7 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
                 ${sec.subtitle ? `<span class="text-sm font-medium text-slate-500 px-2 py-0.5 bg-slate-100 rounded-md border border-slate-200">${e(sec.subtitle)}</span>` : ''}
               </div>
               ${hasFiles ? `
-                <button type="button" onclick="const el=document.getElementById('sec-attachments-${secIdx}');if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.classList.add('ring-4','ring-pink-400');setTimeout(()=>el.classList.remove('ring-4','ring-pink-400'),1800);}" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-pink-100 hover:bg-pink-200 text-pink-800 border border-pink-300 shadow-2xs transition-all cursor-pointer active:scale-95" title="點擊直接跳轉至本段底部的附件下載區">
+                <button type="button" data-no-highlight="true" onclick="const el=document.getElementById('sec-attachments-${secIdx}');if(el){el.scrollIntoView({behavior:'smooth',block:'center'});el.classList.add('ring-4','ring-pink-400');setTimeout(()=>el.classList.remove('ring-4','ring-pink-400'),1800);}" class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-pink-100 hover:bg-pink-200 text-pink-800 border border-pink-300 shadow-2xs transition-all cursor-pointer active:scale-95" title="點擊直接跳轉至本段底部的附件下載區">
                   <span class="w-1.5 h-1.5 rounded-full bg-pink-600 animate-ping"></span>
                   <span>📎 含 ${(sec.files || []).length} 份附件（點此前往下載 ↓）</span>
                 </button>
@@ -2490,7 +3202,7 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
           ${(() => {
             const isConfirmed = localStorage.getItem('has_confirmed_' + bulletin.id) === '1';
             return `
-              <div id="reading-confirm-card" class="p-4 rounded-xl border transition-all duration-300 ${
+              <div id="reading-confirm-card" data-no-highlight="true" class="p-4 rounded-xl border transition-all duration-300 ${
                 isConfirmed 
                   ? 'bg-slate-50/80 border-slate-200/80' 
                   : 'bg-white border-slate-200 shadow-sm hover:border-indigo-200'
@@ -2601,6 +3313,13 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
           toRemove.remove();
         }
       });
+
+      // 若目前有搜尋關鍵字，自動於渲染與 DOM 清理完成後高亮符合文字
+      if (state.searchRawQuery && !state.isEditMode) {
+        applySearchHighlights(container, state.searchRawQuery);
+      } else {
+        updateSearchHighlightBar(0, -1, '');
+      }
 
       setupReadingProgressTracker();
     }
