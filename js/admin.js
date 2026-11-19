@@ -436,8 +436,138 @@ const S = {
   mailGroups: [],
   mmap: {},
   cur: null,
-  dirty: false
+  collapsedSecs: new Set()
 };
+
+// 響應式未儲存異動監控：任何修改自動點亮頂部「● 未儲存變更」琥珀徽章
+let _adminDirtyFlag = false;
+Object.defineProperty(S, 'dirty', {
+  get() { return _adminDirtyFlag; },
+  set(val) {
+    _adminDirtyFlag = !!val;
+    const badge = document.getElementById('tb-dirty-badge');
+    if (badge) badge.classList.toggle('hidden', !_adminDirtyFlag);
+  },
+  enumerable: true,
+  configurable: true
+});
+
+function toggleTopbarMoreMenu(ev) {
+  if (ev) ev.stopPropagation();
+  const menu = document.getElementById('tb-more-menu');
+  if (menu) menu.classList.toggle('hidden');
+}
+function closeTopbarMoreMenu() {
+  const menu = document.getElementById('tb-more-menu');
+  if (menu) menu.classList.add('hidden');
+}
+document.addEventListener('click', (ev) => {
+  const wrap = document.getElementById('tb-more-wrap');
+  if (wrap && !wrap.contains(ev.target)) closeTopbarMoreMenu();
+});
+
+// 全域快捷鍵：編輯週報時按 Ctrl+S / Cmd+S 立即儲存草稿
+window.addEventListener('keydown', (ev) => {
+  if ((ev.ctrlKey || ev.metaKey) && ev.key && ev.key.toLowerCase() === 's') {
+    const bf = document.getElementById('bf');
+    if (S.cur && bf && !bf.classList.contains('hidden')) {
+      ev.preventDefault();
+      if (window.tinymce) {
+        try { tinymce.triggerSave(); } catch (err) {}
+      }
+      saveDraft();
+    }
+  }
+});
+
+function updateAdminProfileUI(user) {
+  if (!user) return;
+  const email = (user.email || '').trim().toLowerCase();
+  const matchedWl = (S.whitelist || []).find(w => w && w.email && w.email.toLowerCase() === email);
+  const name = (matchedWl && matchedWl.name) || user.displayName || (email ? email.split('@')[0] : '採購管理員');
+  const avatarEl = document.getElementById('sb-admin-avatar');
+  const nameEl = document.getElementById('sb-admin-name');
+  const emailEl = document.getElementById('sb-admin-email');
+  if (avatarEl) avatarEl.textContent = (name.trim()[0] || 'A').toUpperCase();
+  if (nameEl) nameEl.textContent = name;
+  if (emailEl) {
+    emailEl.textContent = email || '在線管理中';
+    emailEl.title = email;
+  }
+}
+
+async function adminLogout() {
+  if (S.dirty && !confirm('目前尚有未儲存的修改，確定要登出管理後台嗎？')) return;
+  if (!confirm('確定要登出採購週報管理後台嗎？')) return;
+  try {
+    S.dirty = false;
+    await firebase.auth().signOut();
+    window.location.reload();
+  } catch (e) {
+    toast('登出失敗：' + e.message, 'er');
+  }
+}
+
+async function renderWelcomeDashboard() {
+  try {
+    const allBulletins = [];
+    Object.values(S.mmap || {}).forEach(arr => {
+      if (Array.isArray(arr)) allBulletins.push(...arr);
+    });
+    allBulletins.sort((a, b) => (b.publishDate || '').localeCompare(a.publishDate || '') || (b.id || '').localeCompare(a.id || ''));
+
+    const publishedList = allBulletins.filter(b => b.status === 'published');
+    const draftList = allBulletins.filter(b => b.status !== 'published');
+
+    const pubEl = document.getElementById('dash-stat-pub');
+    const dftEl = document.getElementById('dash-stat-draft');
+    const dftSubEl = document.getElementById('dash-stat-draft-sub');
+    const wlSubEl = document.getElementById('dash-stat-wl-sub');
+    const resumeBtn = document.getElementById('dash-btn-resume-latest');
+    const resumeText = document.getElementById('dash-btn-resume-text');
+
+    if (pubEl) pubEl.textContent = `${publishedList.length} 期`;
+    if (dftEl) dftEl.textContent = `${draftList.length} 份`;
+    if (dftSubEl) dftSubEl.textContent = draftList.length > 0 ? `最新草稿：${draftList[0].id}` : '目前無待發布草稿';
+
+    // 快捷繼續編輯按鈕（優先最新草稿，否則最新已發布週報）
+    const targetQuick = draftList[0] || publishedList[0];
+    if (targetQuick && resumeBtn && resumeText) {
+      resumeText.textContent = targetQuick.status !== 'published'
+        ? `繼續編輯草稿 (${targetQuick.id})`
+        : `開啟最新週報 (${targetQuick.id})`;
+      resumeBtn.onclick = () => loadB(targetQuick.id);
+      resumeBtn.classList.remove('hidden');
+    }
+
+    // 非同步取得最新一期已讀人數與問卷回饋總數
+    const latestPub = publishedList[0];
+    const readEl = document.getElementById('dash-stat-latest-read');
+    const readIdEl = document.getElementById('dash-stat-latest-id');
+    if (latestPub && DS.isConfigured()) {
+      if (readIdEl) readIdEl.textContent = `期數：${latestPub.id}`;
+      DS.getReadReceipts(latestPub.id).then(({ total }) => {
+        if (readEl) readEl.textContent = `${total} 人`;
+      }).catch(() => { if (readEl) readEl.textContent = '--'; });
+    } else if (readEl) {
+      readEl.textContent = '0 人';
+      if (readIdEl) readIdEl.textContent = '尚無已發布週報';
+    }
+
+    const srvEl = document.getElementById('dash-stat-surveys');
+    const wlCount = (S.whitelist || []).length;
+    if (wlSubEl) wlSubEl.textContent = `通訊錄共 ${wlCount} 位聯絡人`;
+    if (DS.isConfigured() && db) {
+      db.collection('surveys').get().then(snap => {
+        if (srvEl) srvEl.textContent = `${snap.size} 份`;
+      }).catch(() => { if (srvEl) srvEl.textContent = '--'; });
+    } else if (srvEl) {
+      srvEl.textContent = '--';
+    }
+  } catch (err) {
+    console.warn('Welcome dashboard stats error:', err);
+  }
+}
 async function init(){
   S.tpls=await DS.getTpls();
   S.keywords=await DS.getKeywords();
@@ -466,6 +596,10 @@ async function init(){
   }
 
   renderSB();
+  if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
+    updateAdminProfileUI(firebase.auth().currentUser);
+  }
+  renderWelcomeDashboard();
   if (DS.isConfigured()) {
     try {
       const { archivedCount } = await DS.archiveOldBulletins(6);
@@ -522,6 +656,8 @@ function handleAdminSearch() {
   adminSearchMonth = document.getElementById('admin-search-month').value;
   adminSearchParent = document.getElementById('admin-search-parent').value;
   adminSearchQuery = document.getElementById('admin-search-keyword').value.trim().toLowerCase();
+  const clearBtn = document.getElementById('btn-clear-admin-search');
+  if (clearBtn) clearBtn.classList.toggle('hidden', !adminSearchQuery);
   renderSB();
 }
 
@@ -591,6 +727,7 @@ async function loadB(id){
   const b=await DS.getById(id);
   if(!b){toast('無法載入此週報','er');return;}
   S.cur=JSON.parse(JSON.stringify(b));
+  S.collapsedSecs = new Set();
   S.dirty=false;
   renderEd();
   renderSB();
@@ -669,12 +806,133 @@ async function renderReadReceipts(id) {
       container.innerHTML = '<p class="text-slate-400 text-center py-2">目前尚無閱讀紀錄，且未設定名冊</p>';
       return;
     }
-    
-    let html = '';
-    if (readers.length > 0) {
-      html += `
-        <p class="font-semibold text-slate-700 mb-2 border-b border-slate-100 pb-1">✅ 已讀人員</p>
-        <table class="w-full text-left border-collapse mb-4">
+
+    // 標記每位已讀同仁是否為主要窗口並快取供篩選/一鍵複製使用
+    const enrichedReaders = readers.map(r => {
+      const rEmail = (r.email || '').trim().toLowerCase();
+      const rName = (r.displayName || '').replace(/[\s\u3000]/g, '').toLowerCase();
+      const isPrimaryContact = allUsers.some(u => {
+        if (!u.isPrimary) return false;
+        const uEmail = (u.email || '').trim().toLowerCase();
+        const uName = (u.name || '').replace(/[\s\u3000]/g, '').toLowerCase();
+        return (uEmail && uEmail === rEmail) || (uName && (uName === rName || rName.includes(uName)));
+      });
+      return { ...r, isPrimaryContact };
+    });
+
+    window._rrState = {
+      id,
+      readers: enrichedReaders,
+      unread,
+      filterTab: 'all',
+      search: ''
+    };
+    renderReadReceiptsView();
+  } catch (e) {
+    container.innerHTML = '<p class="text-red-400 text-center py-2">載入已讀狀態失敗</p>';
+  }
+}
+
+function setRRFilter(tab) {
+  if (!window._rrState) return;
+  window._rrState.filterTab = tab;
+  renderReadReceiptsView();
+}
+
+function setRRSearch(val) {
+  if (!window._rrState) return;
+  window._rrState.search = (val || '').trim().toLowerCase();
+  renderReadReceiptsView();
+}
+
+async function copyUnreadEmails(primaryOnly = false) {
+  const st = window._rrState;
+  if (!st || !st.unread) return;
+  const targets = primaryOnly ? st.unread.filter(u => !!u.isPrimary) : st.unread;
+  const emails = [...new Set(targets.map(u => (u.email || '').trim()).filter(Boolean))];
+  if (emails.length === 0) {
+    toast(primaryOnly ? '目前沒有未讀的主要窗口信箱 🎉' : '目前全員皆已閱讀完畢 🎉', 'in');
+    return;
+  }
+  const str = emails.join('; ');
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(str);
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = str;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+    }
+    toast(`已複製 ${emails.length} 位${primaryOnly ? '未讀主要窗口' : '未讀同仁'} Email（可直接貼入 Outlook 收件人） ✓`, 'ok');
+  } catch (err) {
+    toast('複製失敗，請手動選取信箱', 'er');
+  }
+}
+
+function renderReadReceiptsView() {
+  const container = document.getElementById('read-list');
+  const st = window._rrState;
+  if (!container || !st) return;
+
+  const { readers, unread, filterTab, search } = st;
+  const unreadPrimaryCount = unread.filter(u => !!u.isPrimary).length;
+  const matchQ = (str) => !search || String(str || '').toLowerCase().includes(search);
+
+  let filteredReaders = readers.filter(r =>
+    matchQ(r.displayName) || matchQ(r.email) || matchQ(r.department)
+  );
+  let filteredUnread = unread.filter(u =>
+    matchQ(u.name) || matchQ(u.email) || matchQ(u.unit) || matchQ(u.region)
+  );
+
+  if (filterTab === 'primary') {
+    filteredReaders = filteredReaders.filter(r => r.isPrimaryContact);
+    filteredUnread = filteredUnread.filter(u => !!u.isPrimary);
+  }
+  const showRead = filterTab === 'all' || filterTab === 'read' || filterTab === 'primary';
+  const showUnread = filterTab === 'all' || filterTab === 'unread' || filterTab === 'primary';
+
+  const tabBtn = (key, label) => {
+    const act = filterTab === key;
+    return `<button type="button" onclick="setRRFilter('${key}')" class="px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all cursor-pointer ${
+      act ? 'bg-sky-600 text-white shadow-2xs' : 'bg-slate-100 hover:bg-slate-200 text-slate-600'
+    }">${label}</button>`;
+  };
+
+  let html = `
+    <div class="flex flex-wrap items-center justify-between gap-2 pb-3 mb-3 border-b border-slate-100 sticky top-0 bg-white z-10 pt-0.5">
+      <div class="flex flex-wrap items-center gap-1.5">
+        ${tabBtn('all', `全部 (${readers.length + unread.length})`)}
+        ${tabBtn('read', `✅ 已讀 (${readers.length})`)}
+        ${tabBtn('unread', `⚠️ 未讀 (${unread.length})`)}
+        ${tabBtn('primary', '⭐ 僅主要窗口')}
+      </div>
+      <div class="flex flex-wrap items-center gap-1.5">
+        <input type="text" value="${xe(st.search)}" oninput="setRRSearch(this.value)" placeholder="篩選姓名、部門、信箱..." class="form-input text-[11px] py-1 px-2.5 w-44 bg-slate-50/70">
+        ${unread.length > 0 ? `
+          <button type="button" onclick="copyUnreadEmails(false)" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 transition-colors cursor-pointer flex items-center gap-1" title="複製所有未讀同仁的 Email（分號分隔可直接貼進 Outlook）">
+            <span>📋</span><span>複製未讀 (${unread.length})</span>
+          </button>
+          ${unreadPrimaryCount > 0 ? `
+            <button type="button" onclick="copyUnreadEmails(true)" class="px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 transition-colors cursor-pointer flex items-center gap-1" title="僅複製未讀的主要窗口 Email 進行提醒">
+              <span>⭐</span><span>複製未讀主要 (${unreadPrimaryCount})</span>
+            </button>
+          ` : ''}
+        ` : ''}
+      </div>
+    </div>
+  `;
+
+  if (showRead && filteredReaders.length > 0) {
+    html += `
+      <p class="font-semibold text-slate-700 mb-2 border-b border-slate-100 pb-1">✅ 已讀人員（${filteredReaders.length} 人）</p>
+      <div class="overflow-x-auto mb-4">
+        <table class="w-full text-left border-collapse">
           <thead>
             <tr class="text-[10px] text-slate-400">
               <th class="pb-1.5 font-semibold">姓名</th>
@@ -686,27 +944,16 @@ async function renderReadReceipts(id) {
             </tr>
           </thead>
           <tbody class="divide-y divide-slate-50">
-            ${readers.map(r => {
+            ${filteredReaders.map(r => {
               const prog = typeof r.readProgress === 'number' ? r.readProgress : 100;
               let badgeCls = 'bg-emerald-50 text-emerald-700 border-emerald-200';
               if (prog < 50) badgeCls = 'bg-slate-100 text-slate-600 border-slate-200';
               else if (prog < 100) badgeCls = 'bg-amber-50 text-amber-700 border-amber-200';
-              
-              // 判定是否為主要窗口 (isPrimary)
-              const rEmail = (r.email || '').trim().toLowerCase();
-              const rName = (r.displayName || '').replace(/[\s\u3000]/g, '').toLowerCase();
-              const isPrimaryContact = allUsers.some(u => {
-                if (!u.isPrimary) return false;
-                const uEmail = (u.email || '').trim().toLowerCase();
-                const uName = (u.name || '').replace(/[\s\u3000]/g, '').toLowerCase();
-                return (uEmail && uEmail === rEmail) || (uName && (uName === rName || rName.includes(uName)));
-              });
-              const primaryBadge = isPrimaryContact 
-                ? `<span class="ml-1.5 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300 shadow-sm" title="單位主要窗口">⭐ 主要窗口</span>` 
+              const primaryBadge = r.isPrimaryContact
+                ? `<span class="ml-1.5 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300 shadow-sm" title="單位主要窗口">⭐ 主要窗口</span>`
                 : '';
-
               return `
-              <tr class="${isPrimaryContact ? 'bg-amber-50/20' : ''}">
+              <tr class="${r.isPrimaryContact ? 'bg-amber-50/20' : ''} hover:bg-slate-50/70">
                 <td class="py-2 text-slate-700 font-medium flex items-center">${xe(r.displayName)}${primaryBadge}</td>
                 <td class="py-2 text-slate-500 font-mono text-xs">${xe(r.email || '-')}</td>
                 <td class="py-2 text-slate-500">${xe(r.department)}</td>
@@ -717,35 +964,50 @@ async function renderReadReceipts(id) {
                 </td>
                 <td class="py-2 text-slate-400 text-xs">${r.readAt}</td>
                 <td class="py-2 text-slate-400 text-xs">${r.lastViewedAt}</td>
-              </tr>
-            `;}).join('')}
+              </tr>`;
+            }).join('')}
           </tbody>
         </table>
-      `;
-    }
-    
-    if (unread.length > 0) {
-      const isDraft = S.cur && S.cur.status === 'draft';
-      const hiddenCls = isDraft ? 'hidden' : '';
-      const toggleBtn = isDraft ? `<button onclick="document.getElementById('unread-container').classList.toggle('hidden')" class="ml-2 text-xs text-blue-500 hover:text-blue-700 font-normal bg-blue-50 px-2 py-0.5 rounded cursor-pointer border border-blue-200">👁️ 顯示/隱藏</button>` : '';
-      html += `
-        <div class="font-semibold text-slate-700 mb-2 border-b border-slate-100 pb-1 mt-4 flex items-center">
-          <span>⚠️ 未讀人員</span> ${toggleBtn}
+      </div>
+    `;
+  }
+
+  if (showUnread && filteredUnread.length > 0) {
+    const isDraft = S.cur && S.cur.status === 'draft';
+    const hiddenCls = (isDraft && filterTab === 'all') ? 'hidden' : '';
+    const toggleBtn = (isDraft && filterTab === 'all') ? `<button onclick="document.getElementById('unread-container').classList.toggle('hidden')" class="ml-2 text-xs text-blue-500 hover:text-blue-700 font-normal bg-blue-50 px-2 py-0.5 rounded cursor-pointer border border-blue-200">👁️ 顯示/隱藏</button>` : '';
+    html += `
+      <div class="font-semibold text-slate-700 mb-2 border-b border-slate-100 pb-1 mt-3 flex items-center justify-between flex-wrap gap-2">
+        <div class="flex items-center">
+          <span>⚠️ 未讀人員（${filteredUnread.length} 人）</span> ${toggleBtn}
         </div>
-        <div id="unread-container" class="flex flex-wrap gap-2 ${hiddenCls}">
-          ${unread.map(u => {
-            const isPrimary = !!u.isPrimary;
-            const cls = isPrimary ? 'bg-amber-100 text-amber-900 border border-amber-300 font-bold' : 'bg-rose-50 text-rose-600 font-medium';
-            const star = isPrimary ? '⭐ ' : '';
-            return `<span class="px-2.5 py-1 ${cls} rounded text-xs flex items-center gap-1" title="${xe(u.email)}">${star}${xe(u.name)}${isPrimary ? ' (主要窗口)' : ''}</span>`;
-          }).join('')}
-        </div>
-      `;
+      </div>
+      <div id="unread-container" class="flex flex-wrap gap-2 ${hiddenCls}">
+        ${filteredUnread.map(u => {
+          const isPrimary = !!u.isPrimary;
+          const cls = isPrimary ? 'bg-amber-100 text-amber-900 border border-amber-300 font-bold' : 'bg-rose-50 text-rose-600 border border-rose-100 font-medium';
+          const star = isPrimary ? '⭐ ' : '';
+          const unitTag = (u.unit || u.region) ? ` · ${xe(u.unit || u.region)}` : '';
+          return `<span class="px-2.5 py-1 ${cls} rounded-lg text-xs flex items-center gap-1" title="${xe(u.email)}">${star}${xe(u.name)}<span class="opacity-70 text-[10px]">${unitTag}</span>${isPrimary ? ' (主要)' : ''}</span>`;
+        }).join('')}
+      </div>
+    `;
+  }
+
+  if ((!showRead || filteredReaders.length === 0) && (!showUnread || filteredUnread.length === 0)) {
+    html += '<p class="text-slate-400 text-center py-6">此篩選條件下查無符合同仁</p>';
+  }
+
+  const prevInput = container.querySelector('input[type="text"]');
+  const hadFocus = prevInput && document.activeElement === prevInput;
+  const selPos = hadFocus ? prevInput.selectionStart : null;
+  container.innerHTML = html;
+  if (hadFocus) {
+    const newInput = container.querySelector('input[type="text"]');
+    if (newInput) {
+      newInput.focus();
+      if (selPos !== null) newInput.setSelectionRange(selPos, selPos);
     }
-    
-    container.innerHTML = html;
-  } catch (e) {
-    container.innerHTML = '<p class="text-red-400 text-center py-2">載入已讀狀態失敗</p>';
   }
 }
 
@@ -1271,6 +1533,7 @@ async function delAdmin(i) {
 
 function newBulletin(){
   if(S.dirty&&!confirm('有未儲存的修改，確定繼續？'))return;
+  S.collapsedSecs = new Set();
   const now=new Date(),p=n=>String(n).padStart(2,'0'),ds=`${now.getFullYear()}-${p(now.getMonth()+1)}-${p(now.getDate())}`;
   S.cur={
     id:`${now.getFullYear()}-W${wk(now)}`,
@@ -1323,7 +1586,7 @@ function renderEd(){
   
   renderSecs();
 }
-function renderSecs(){if(window.tinymce){try{tinymce.remove('.quill-editor');}catch(e){}}const c=document.getElementById('sc');const b=S.cur;const ptl=document.getElementById('toolbar-portal');if(ptl)ptl.innerHTML='';if(!b?.sections?.length){c.innerHTML='<div class="text-center py-10 text-slate-400 text-sm">尚未建立任何段落<br><span class="text-xs">點擊右上角「新增段落」</span></div>';return;}c.innerHTML=b.sections.map((s,i)=>bldSec(s,i)).join('');setTimeout(()=>{
+function renderSecs(){if(window.tinymce){try{tinymce.remove('.quill-editor');}catch(e){}}const c=document.getElementById('sc');const b=S.cur;const ptl=document.getElementById('toolbar-portal');if(ptl)ptl.innerHTML='';if(!b?.sections?.length){c.innerHTML='<div class="text-center py-10 text-slate-400 text-sm">尚未建立任何段落<br><span class="text-xs">點擊右上角「新增段落」</span></div>';return;}c.innerHTML=b.sections.map((s,i)=>bldSec(s,i)).join('');updateToggleAllSecsBtn();setTimeout(()=>{
   document.querySelectorAll('.quill-editor').forEach(el=>{
     if(el.classList.contains('tox-target')) return;
     tinymce.init({
@@ -1547,11 +1810,56 @@ function renderSecs(){if(window.tinymce){try{tinymce.remove('.quill-editor');}ca
     });
   });
 },10);}
-const NUMS=['一','二','三','四','五','六','七','八','九','十'];const ICONS=['📋','📦','🔧','💰','📈','📎','⚙️','📊','📝','🏭'];function bldSec(sec,si){const isCust=!S.keywords.find(c=>c.name===sec.title);
+const NUMS=['一','二','三','四','五','六','七','八','九','十'];const ICONS=['📋','📦','🔧','💰','📈','📎','⚙️','📊','📝','🏭'];function toggleSecCollapse(si) {
+  if (!S.collapsedSecs) S.collapsedSecs = new Set();
+  const body = document.getElementById(`sec-body-${si}`);
+  const summary = document.getElementById(`sec-summary-${si}`);
+  const icon = document.getElementById(`sec-col-icon-${si}`);
+  const willCollapse = !S.collapsedSecs.has(si);
+  if (willCollapse) S.collapsedSecs.add(si);
+  else S.collapsedSecs.delete(si);
+  if (body) body.classList.toggle('hidden', willCollapse);
+  if (summary) summary.classList.toggle('hidden', !willCollapse);
+  if (icon) icon.style.transform = willCollapse ? 'rotate(-90deg)' : '';
+  updateToggleAllSecsBtn();
+}
+
+function toggleAllSectionsCollapse() {
+  if (!S.cur || !Array.isArray(S.cur.sections)) return;
+  if (!S.collapsedSecs) S.collapsedSecs = new Set();
+  const total = S.cur.sections.length;
+  const shouldCollapseAll = S.collapsedSecs.size < total;
+  for (let i = 0; i < total; i++) {
+    if (shouldCollapseAll) S.collapsedSecs.add(i);
+    else S.collapsedSecs.delete(i);
+    const body = document.getElementById(`sec-body-${i}`);
+    const summary = document.getElementById(`sec-summary-${i}`);
+    const icon = document.getElementById(`sec-col-icon-${i}`);
+    if (body) body.classList.toggle('hidden', shouldCollapseAll);
+    if (summary) summary.classList.toggle('hidden', !shouldCollapseAll);
+    if (icon) icon.style.transform = shouldCollapseAll ? 'rotate(-90deg)' : '';
+  }
+  updateToggleAllSecsBtn();
+}
+
+function updateToggleAllSecsBtn() {
+  const btn = document.getElementById('btn-toggle-all-secs');
+  if (!btn || !S.cur || !Array.isArray(S.cur.sections)) return;
+  const allCollapsed = S.cur.sections.length > 0 && S.collapsedSecs && S.collapsedSecs.size >= S.cur.sections.length;
+  btn.innerHTML = allCollapsed ? '<span>▸ 全部展開</span>' : '<span>▾ 全部收合</span>';
+}
+
+function bldSec(sec,si){const isCust=!S.keywords.find(c=>c.name===sec.title);
 const curCat = S.keywords.find(c=>c.name===sec.title) || (S.keywords.length ? S.keywords[0] : null);
 const dlHTML = curCat ? `<datalist id="dl-${si}">${(curCat.keywords||[]).filter(k=>k.isActive!==false).sort((a,b)=>a.order-b.order).map(k=>`<option value="${k.text}">`).join('')}</datalist>` : '';
+const isCol = S.collapsedSecs && S.collapsedSecs.has(si);
+const itemCnt = (sec.items || []).length;
+const fileCnt = (sec.files || []).length;
 return`<div class="p-5 hover:bg-slate-50/40 transition-colors border-t border-slate-100 first:border-0">
-<div class="flex items-center gap-2 mb-3">
+<div class="flex items-center gap-2 ${isCol ? '' : 'mb-3'}">
+<button type="button" onclick="toggleSecCollapse(${si})" class="bic flex-shrink-0 text-slate-500 hover:text-blue-600" title="收合 / 展開此段落">
+  <svg id="sec-col-icon-${si}" class="w-4 h-4 transition-transform duration-200" style="${isCol ? 'transform:rotate(-90deg)' : ''}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M19 9l-7 7-7-7"/></svg>
+</button>
 <select class="form-input csel w-16 text-center text-lg py-1" onchange="uSec(${si},'icon',this.value)">${ICONS.map(ic=>`<option ${sec.icon===ic?'selected':''} value="${ic}">${ic}</option>`).join('')}</select>
 <select class="form-input csel flex-1 font-semibold py-1 max-w-[200px]" onchange="sTitleSel(${si},this.value)">${S.keywords.map(c=>`<option value="${c.name}" ${sec.title===c.name?'selected':''}>${c.name}</option>`).join('')}<option value="__c__" ${isCust?'selected':''}>自訂...</option></select>
 <div class="flex-1 relative ml-1">
@@ -1564,8 +1872,14 @@ return`<div class="p-5 hover:bg-slate-50/40 transition-colors border-t border-sl
 <button onclick="rmSec(${si})" class="bic d" title="刪除"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
 <button onclick="addTableToSec(${si})" class="bic text-xs" title="新增自訂表格" ${sec.table||sec.affectedOrders||sec.cancelledOrders||sec.repairRecords||sec.priceChangeItems?'style="display:none"':''}>📊 表格</button>
 </div>
+<div id="sec-summary-${si}" onclick="toggleSecCollapse(${si})" class="${isCol ? '' : 'hidden'} mt-2 ml-9 px-3 py-1.5 rounded-lg bg-slate-100/80 hover:bg-blue-50 text-xs text-slate-500 hover:text-blue-700 cursor-pointer flex items-center justify-between transition-colors">
+  <span>📦 已收合：包含 <strong>${itemCnt}</strong> 則重點公告${fileCnt > 0 ? ` · 📎 <strong>${fileCnt}</strong> 份附件` : ''}</span>
+  <span class="text-[11px] font-bold text-blue-600">點擊展開編輯 ▾</span>
+</div>
+<div id="sec-body-${si}" class="${isCol ? 'hidden' : ''}">
 <input id="cti-${si}" type="text" class="form-input text-sm mb-3 ${isCust?'':'hidden'}" value="${xe(sec.title||'')}" placeholder="自訂段落標題..." oninput="uSec(${si},'title',this.value)">
 ${bldItems(sec,si)}${sec.subsections!=null?bldSubs(sec,si):''}${sec.table!=null?bldGenericTbl(sec.table,si):''}${sec.affectedOrders!=null?bldOT(sec.affectedOrders,si,'affectedOrders','異動訂單'):''}${sec.cancelledOrders!=null?bldOT(sec.cancelledOrders,si,'cancelledOrders','取消訂單'):''}${sec.repairRecords!=null?bldRT(sec.repairRecords,si):''}${sec.priceChangeItems!=null?bldPT(sec.priceChangeItems,si):''}${bldFiles(sec,si)}
+</div>
 </div>`;}
 function bldGenericTbl(t,si){if(!t||!t.columns||!t.rows)return'';return`<div class="mb-3"><div class="flex items-center justify-between mb-1"><p class="text-xs font-semibold text-slate-500 uppercase tracking-wider">表格資料</p><div class="flex gap-3"><button onclick="editGenCols(${si})" class="text-xs text-indigo-600 font-medium bg-indigo-50 px-2 py-0.5 rounded">⚙️ 編輯欄位</button><button onclick="addGenRow(${si})" class="text-xs text-blue-600 font-medium">＋ 新增列</button><button onclick="rmSecTable(${si}, \'table\')" class="text-xs text-red-500 font-medium ml-3 flex items-center gap-1 hover:text-red-700"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg> 刪除表格</button></div></div><div class="overflow-x-auto rounded-lg border border-slate-200"><table class="data-table w-full text-xs"><thead><tr>${t.columns.map(c=>`<th>${xe(c)}</th>`).join('')}<th style="width:28px"></th></tr></thead><tbody>${t.rows.map((r,ri)=>{const rowCells=Array.isArray(r)?r:(r&&r.c?r.c:(r&&r.cols?r.cols:[]));return `<tr>${rowCells.map((c,ci)=>`<td><input value="${xe(c||'')}" onchange="uGenRow(${si},${ri},${ci},this.value)"></td>`).join('')}<td><button onclick="rmGenRow(${si},${ri})" class="bic d"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button></td></tr>`;}).join('')}</tbody></table></div></div>`;}
 function addGenRow(si){if(!S.cur.sections[si].table)return;const cols=S.cur.sections[si].table.columns.length;S.cur.sections[si].table.rows.push(Array(cols).fill(''));S.dirty=true;renderSecs();}
@@ -1649,7 +1963,7 @@ function bldItems(sec,si){
   } else {
     S.cur.authorizedEmails = [];
   }
-}async function saveDraft(){if(!S.cur)return;fc();document.getElementById('btn-dft').disabled=true;try{await DS.save(S.cur.id,{...S.cur,status:'draft',feedbackLog:S.fbs});S.dirty=false;const sb=document.getElementById('tb-status');sb.className='bdg-dft';sb.textContent='草稿';toast('草稿已儲存 ✓','ok');S.mmap=await DS.getMonths();renderSB();}catch(e){toast('儲存失敗：'+e.message,'er');}finally{document.getElementById('btn-dft').disabled=false;}}async function cloneBulletin(){if(!S.cur)return;const c=JSON.parse(JSON.stringify(S.cur));const now=new Date();c.id=`${now.getFullYear()}-W${wk(now)}-copy`;c.status='draft';c.version=1;c.isPinned=false;S.cur=c;S.fbs=[];S.dirty=true;renderEd();toast(`已複製為新草稿：${c.id}`,'in');}async function delBulletin(){if(!S.cur)return;if(!confirm(`確定刪除「${S.cur.id}」？`))return;try{await DS.del(S.cur.id);S.cur=null;S.dirty=false;document.getElementById('es').classList.remove('hidden');document.getElementById('bf').classList.add('hidden');document.getElementById('tb-acts').classList.add('hidden');document.getElementById('tb-title').textContent='請選擇或新增週報';document.getElementById('tb-status').classList.add('hidden');S.mmap=await DS.getMonths();renderSB();toast('週報已刪除','ok');}catch(e){toast('刪除失敗：'+e.message,'er');}}function showModal(){document.getElementById('sm').classList.remove('hidden');document.getElementById('tl').innerHTML=S.tpls.map(t=>`<button onclick="addTpl('${t.id}')" class="w-full text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:border-blue-300 hover:bg-blue-50 transition-all flex items-center gap-3 text-sm mb-1.5"><span class="text-xl">${t.i}</span><span class="font-medium text-slate-700">${t.t}</span></button>`).join('');}function hideModal(){document.getElementById('sm').classList.add('hidden');}function addTpl(tid){
+}async function saveDraft(){if(!S.cur)return;fc();document.getElementById('btn-dft').disabled=true;try{await DS.save(S.cur.id,{...S.cur,status:'draft',feedbackLog:S.fbs});S.dirty=false;const sb=document.getElementById('tb-status');sb.className='bdg-dft';sb.textContent='草稿';toast('草稿已儲存 ✓','ok');S.mmap=await DS.getMonths();renderSB();renderWelcomeDashboard();}catch(e){toast('儲存失敗：'+e.message,'er');}finally{document.getElementById('btn-dft').disabled=false;}}async function cloneBulletin(){if(!S.cur)return;const c=JSON.parse(JSON.stringify(S.cur));const now=new Date();c.id=`${now.getFullYear()}-W${wk(now)}-copy`;c.status='draft';c.version=1;c.isPinned=false;S.cur=c;S.fbs=[];S.dirty=true;renderEd();toast(`已複製為新草稿：${c.id}`,'in');}async function delBulletin(){if(!S.cur)return;if(!confirm(`確定刪除「${S.cur.id}」？`))return;try{await DS.del(S.cur.id);S.cur=null;S.dirty=false;document.getElementById('es').classList.remove('hidden');document.getElementById('bf').classList.add('hidden');document.getElementById('tb-acts').classList.add('hidden');document.getElementById('tb-title').textContent='請選擇或新增週報';document.getElementById('tb-status').classList.add('hidden');S.mmap=await DS.getMonths();renderSB();renderWelcomeDashboard();toast('週報已刪除','ok');}catch(e){toast('刪除失敗：'+e.message,'er');}}function showModal(){document.getElementById('sm').classList.remove('hidden');document.getElementById('tl').innerHTML=S.tpls.map(t=>`<button onclick="addTpl('${t.id}')" class="w-full text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:border-blue-300 hover:bg-blue-50 transition-all flex items-center gap-3 text-sm mb-1.5"><span class="text-xl">${t.i}</span><span class="font-medium text-slate-700">${t.t}</span></button>`).join('');}function hideModal(){document.getElementById('sm').classList.add('hidden');}function addTpl(tid){
   const t=S.tpls.find(tp=>tp.id===tid);
   if(!t)return;
   const i=(S.cur.sections||[]).length;
@@ -3023,6 +3337,7 @@ async function confirmPubBulletin() {
     toast('🎉 週報已正式發布並寄出通知信！', 'ok');
     S.mmap = await DS.getMonths();
     renderSB();
+    renderWelcomeDashboard();
     renderReadReceipts(d.id);
     renderAuditLogs(d.id);
     hidePubModal();

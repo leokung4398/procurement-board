@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>採購電子週報使用需求調查問卷 (A) | 微笑單車</title>
+  <title>採購電子週報使用需求調查問卷 | 微笑單車</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   
@@ -268,10 +268,45 @@
         0 4px 10px rgba(234, 88, 12, 0.3),
         inset 0 -2px 0 #9a3412;
     }
+    @keyframes surveyShake {
+      0%, 100% { transform: translateX(0); }
+      20%, 60% { transform: translateX(-6px); }
+      40%, 80% { transform: translateX(6px); }
+    }
+    .survey-shake {
+      animation: surveyShake 0.42s ease-in-out;
+    }
   </style>
 </head>
-<body class="py-10 px-4">
+<body class="pt-16 pb-10 px-4">
+  <!-- 頂部吸頂溫馨填答進度列 -->
+  <div id="survey-progress-header" class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-orange-200/80 shadow-xs">
+    <div class="max-w-2xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3">
+      <div class="flex items-center gap-2 min-w-0">
+        <span class="text-base">📋</span>
+        <span class="text-xs font-extrabold text-orange-950 truncate">採購週報需求調查</span>
+      </div>
+      <div class="flex items-center gap-2.5 flex-shrink-0">
+        <div class="w-28 sm:w-40 h-2 bg-orange-100 rounded-full overflow-hidden border border-orange-200/60">
+          <div id="survey-progress-fill" class="h-full bg-gradient-to-r from-amber-400 to-orange-500 rounded-full transition-all duration-300" style="width: 0%;"></div>
+        </div>
+        <span id="survey-progress-text" class="text-[11px] font-extrabold text-orange-700 min-w-[78px] text-right">必填 0 / 5 項</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 輕量浮動 Toast 容器 -->
+  <div id="survey-toast-box" class="fixed top-14 right-4 z-[999] flex flex-col gap-2 max-w-xs w-[calc(100vw-2rem)] pointer-events-none"></div>
+
   <div class="max-w-2xl mx-auto space-y-7">
+    <!-- 重複填寫溫馨提示橫幅（若此裝置已填過） -->
+    <div id="already-submitted-banner" class="hidden rounded-2xl bg-emerald-50/95 border-2 border-emerald-200 px-4 py-3 text-xs text-emerald-800 font-semibold flex items-center justify-between gap-2 shadow-xs">
+      <div class="flex items-center gap-2">
+        <span class="text-base">💚</span>
+        <span>您先前已在本裝置提交過一次問卷，若想補充新建議仍可直接再次填寫送出！</span>
+      </div>
+      <button type="button" onclick="this.parentElement.classList.add('hidden')" class="text-emerald-600 hover:text-emerald-900 font-bold px-1.5 cursor-pointer">✕</button>
+    </div>
 
     <!-- Header & 說明卡片 (Clay Hero Card) -->
     <div class="clay-card !p-0 overflow-hidden border-2 border-orange-200">
@@ -283,7 +318,7 @@
           <span class="inline-block px-3 py-1 bg-amber-400/90 backdrop-blur-sm text-slate-900 rounded-full text-xs font-black tracking-wider uppercase mb-1 shadow-sm">
             微笑單車 經營TEAM採購
           </span>
-          <h1 class="text-xl sm:text-2xl font-black text-white">採購電子週報使用需求調查 (A)</h1>
+          <h1 class="text-xl sm:text-2xl font-black text-white">採購電子週報使用需求調查</h1>
         </div>
       </div>
       
@@ -327,7 +362,7 @@
             <label class="block text-xs font-bold text-slate-700 mb-2">
               1. 所屬單位 <span class="text-rose-500">*</span>
             </label>
-            <select id="f-unit" required class="clay-input w-full cursor-pointer">
+            <select id="f-unit" required onchange="updateSurveyProgress()" class="clay-input w-full cursor-pointer">
               <option value="">▼ 請選擇所屬單位</option>
               <optgroup label="全台營運處">
                 <option value="台北營運處">台北營運處</option>
@@ -361,7 +396,7 @@
             <label class="block text-xs font-bold text-slate-700 mb-2">
               2. 填表人員工編號 <span class="text-rose-500">*</span>
             </label>
-            <input id="f-empid" type="text" required placeholder="請填寫工號（如 Bxxx）" class="clay-input w-full placeholder-slate-400">
+            <input id="f-empid" type="text" required oninput="updateSurveyProgress()" placeholder="請填寫工號（如 Bxxx）" class="clay-input w-full placeholder-slate-400">
           </div>
         </div>
       </div>
@@ -453,6 +488,7 @@
             </div>
           </div>
           <input type="hidden" id="f-score-understand" required>
+          <p id="err-score-understand" class="hidden text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2 mt-2">⚠️ 請點選上方 1～5 分為「內容是否容易理解」評分喔！</p>
           <input id="f-score-understand-other" type="text" placeholder="評分備註或想告訴我們的說明（選填）..." class="clay-input mt-3 w-full text-xs">
         </div>
 
@@ -490,6 +526,7 @@
             </div>
           </div>
           <input type="hidden" id="f-score-layout" required>
+          <p id="err-score-layout" class="hidden text-xs font-bold text-rose-600 bg-rose-50 border border-rose-200 rounded-xl px-3 py-2 mt-2">⚠️ 請點選上方 1～5 分為「版面設計是否清晰」評分喔！</p>
           <input id="f-score-layout-other" type="text" placeholder="版面評分備註或排版建議（選填）..." class="clay-input mt-3 w-full text-xs">
         </div>
       </div>
@@ -611,10 +648,45 @@
       console.warn("Firebase init:", e);
     }
 
+    function surveyToast(msg, type = 'in') {
+      const box = document.getElementById('survey-toast-box');
+      if (!box) return;
+      const cls = type === 'er'
+        ? 'bg-rose-600 text-white border-rose-500'
+        : (type === 'ok' ? 'bg-emerald-600 text-white border-emerald-500' : 'bg-slate-800 text-white border-slate-700');
+      const el = document.createElement('div');
+      el.className = `pointer-events-auto px-4 py-2.5 rounded-xl border shadow-lg text-xs font-bold leading-snug ${cls}`;
+      el.textContent = msg;
+      box.appendChild(el);
+      setTimeout(() => {
+        el.style.transition = 'opacity 0.25s ease';
+        el.style.opacity = '0';
+        setTimeout(() => el.remove(), 260);
+      }, 3600);
+    }
+
+    function updateSurveyProgress() {
+      let done = 0;
+      const total = 5;
+      if (document.getElementById('f-unit')?.value.trim()) done++;
+      if (document.getElementById('f-empid')?.value.trim()) done++;
+      if (document.querySelector('input[name="freq"]:checked')) done++;
+      if (document.getElementById('f-score-understand')?.value) done++;
+      if (document.getElementById('f-score-layout')?.value) done++;
+      const pct = Math.round((done / total) * 100);
+      const fill = document.getElementById('survey-progress-fill');
+      const txt = document.getElementById('survey-progress-text');
+      if (fill) fill.style.width = `${pct}%`;
+      if (txt) txt.textContent = done === total ? '✨ 必填已完成' : `必填 ${done} / ${total} 項`;
+    }
+
     // 評分選取
     function setScore(type, score) {
       document.getElementById(`f-score-${type}`).value = score;
+      const errEl = document.getElementById(`err-score-${type}`);
+      if (errEl) errEl.classList.add('hidden');
       const group = document.getElementById(`score-${type}-group`);
+      if (group) group.classList.remove('ring-2', 'ring-rose-400', 'rounded-2xl', 'p-1');
       const buttons = group.querySelectorAll('.score-btn');
       buttons.forEach((btn, index) => {
         // 5, 4, 3, 2, 1
@@ -625,6 +697,7 @@
           btn.classList.remove('active');
         }
       });
+      updateSurveyProgress();
     }
 
     // 單選卡片
@@ -634,6 +707,7 @@
       el.classList.add('active');
       const radio = el.querySelector('input[type="radio"]');
       if (radio) radio.checked = true;
+      updateSurveyProgress();
     }
 
     // 複選標籤
@@ -665,13 +739,27 @@
       const scoreLayoutOther = document.getElementById('f-score-layout-other').value.trim();
 
       if (!scoreUnderstand) {
-        alert('請為「內容是否容易理解」給予評分喔！');
-        document.getElementById('score-understand-group').scrollIntoView({ behavior: 'smooth' });
+        const grp = document.getElementById('score-understand-group');
+        const err = document.getElementById('err-score-understand');
+        if (err) err.classList.remove('hidden');
+        if (grp) {
+          grp.classList.add('ring-2', 'ring-rose-400', 'rounded-2xl', 'p-1', 'survey-shake');
+          setTimeout(() => grp.classList.remove('survey-shake'), 500);
+          grp.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        surveyToast('⚠️ 請為「內容是否容易理解」點選評分喔！', 'er');
         return;
       }
       if (!scoreLayout) {
-        alert('請為「版面設計是否清晰容易閱讀」給予評分喔！');
-        document.getElementById('score-layout-group').scrollIntoView({ behavior: 'smooth' });
+        const grp = document.getElementById('score-layout-group');
+        const err = document.getElementById('err-score-layout');
+        if (err) err.classList.remove('hidden');
+        if (grp) {
+          grp.classList.add('ring-2', 'ring-rose-400', 'rounded-2xl', 'p-1', 'survey-shake');
+          setTimeout(() => grp.classList.remove('survey-shake'), 500);
+          grp.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        surveyToast('⚠️ 請為「版面設計是否清晰容易閱讀」點選評分喔！', 'er');
         return;
       }
 
@@ -721,9 +809,10 @@
         }
 
         const userEmail = (currentUser && currentUser.email ? currentUser.email : '').toLowerCase();
-        if (!userEmail.endsWith('@youbike.com.tw') && !userEmail.endsWith('@giantcycling.com')) {
+        const isCorpDomain = /@(youbike\.com(\.tw|\.cn)?|giantcycling\.com|giant\.com(\.tw|\.cn)?|giant-bicycles\.com(\.tw)?)$/i.test(userEmail);
+        if (!isCorpDomain) {
           await firebase.auth().signOut();
-          throw new Error('問卷限公司同仁填寫，請使用 @youbike.com.tw 或 @giantcycling.com Google 帳號！');
+          throw new Error('問卷限公司同仁填寫，請使用企業 Google 帳號（@youbike.com.tw / @giantcycling.com / @giant.com.tw）！');
         }
 
         // 記錄填表者登入識別
@@ -734,13 +823,16 @@
 
         localStorage.setItem('has_submitted_procurement_survey', '1');
         document.getElementById('survey-form').classList.add('hidden');
+        document.getElementById('already-submitted-banner')?.classList.add('hidden');
+        document.getElementById('survey-progress-header')?.classList.add('hidden');
         document.getElementById('success-card').classList.remove('hidden');
+        surveyToast('🎉 問卷已順利送達，感謝您的寶貴建議！', 'ok');
         window.scrollTo({ top: 0, behavior: 'smooth' });
       } catch (err) {
         console.error("Survey submission failed:", err);
-        alert('問卷提交發生異常：' + err.message + '\n請確認使用公司 Google 帳號授權後重試。');
+        surveyToast('問卷提交失敗：' + err.message, 'er');
         btn.disabled = false;
-        btn.innerHTML = '<span>💖 確認送出問卷回饋</span>';
+        btn.innerHTML = '<span>💖 確認送出問卷回饋</span><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>';
       }
     }
 
@@ -777,7 +869,11 @@
             document.getElementById('f-empid').value = u.empId;
           }
         }
+        if (localStorage.getItem('has_submitted_procurement_survey') === '1') {
+          document.getElementById('already-submitted-banner')?.classList.remove('hidden');
+        }
       } catch(e) {}
+      updateSurveyProgress();
     });
   </script>
 </body>

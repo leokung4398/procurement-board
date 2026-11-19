@@ -303,11 +303,140 @@
       from { opacity: 0; transform: translateY(-6px); }
       to { opacity: 1; transform: translateY(0); }
     }
+
+    /* 閱讀字體縮放控制 (--reader-scale: 0.9 ~ 1.24) */
+    :root {
+      --reader-scale: 1;
+    }
+    #bulletin-content-area .ql-editor {
+      font-size: calc(0.875rem * var(--reader-scale, 1)) !important;
+    }
+    #bulletin-content-area table:not(.data-table),
+    #bulletin-content-area .pro-table,
+    #bulletin-content-area .ql-editor table {
+      font-size: calc(0.875rem * var(--reader-scale, 1)) !important;
+    }
+
+    /* 長表格閱讀強化：柔和隔列斑馬紋與滑鼠停留高亮 */
+    #bulletin-content-area table:not(.data-table) tbody tr:nth-child(even):not(.search-hl-row),
+    #bulletin-content-area .pro-table tbody tr:nth-child(even):not(.search-hl-row) {
+      background-color: rgba(248, 250, 252, 0.72);
+    }
+    #bulletin-content-area table:not(.data-table) tbody tr:hover:not(.search-hl-row),
+    #bulletin-content-area .pro-table tbody tr:hover:not(.search-hl-row) {
+      background-color: rgba(239, 246, 255, 0.65);
+    }
+
+    /* 內文圖片點擊放大檢視回饋 (Lightbox) */
+    #bulletin-content-area .ql-editor img {
+      cursor: zoom-in;
+      border-radius: 8px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      max-width: 100%;
+      height: auto;
+    }
+    #bulletin-content-area .ql-editor img:hover {
+      box-shadow: 0 8px 20px -4px rgba(15, 23, 42, 0.18);
+      transform: translateY(-1px);
+    }
+
+    /* 前台現代化 Toast 輕提示動畫 */
+    @keyframes feToastIn {
+      from { opacity: 0; transform: translateX(24px) scale(0.96); }
+      to { opacity: 1; transform: translateX(0) scale(1); }
+    }
+    .fe-toast {
+      animation: feToastIn 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+      pointer-events: auto;
+    }
+
+    /* 專屬列印 / 另存 PDF 版面樣式 */
+    @media print {
+      body {
+        background: #ffffff !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      #reading-progress-bar,
+      #preview-mode-banner,
+      #frontend-toast-container,
+      #floating-reader-tools,
+      #img-lightbox-modal,
+      #archive-sidebar,
+      #search-highlight-bar,
+      #section-toc-bar,
+      #reading-confirm-card,
+      #edit-guide,
+      header,
+      footer,
+      [data-print-hide="true"] {
+        display: none !important;
+      }
+      #app-main-container {
+        padding: 0 !important;
+        max-width: 100% !important;
+      }
+      #article-main-wrapper {
+        width: 100% !important;
+        margin: 0 !important;
+      }
+      section {
+        break-inside: avoid-page;
+        box-shadow: none !important;
+        border: 1px solid #cbd5e1 !important;
+      }
+      thead {
+        display: table-header-group;
+      }
+      tr {
+        break-inside: avoid;
+      }
+    }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 min-h-screen font-sans">
   <!-- 頂部閱讀進度條 -->
   <div id="reading-progress-bar" class="fixed top-0 left-0 h-1.5 bg-gradient-to-r from-blue-500 via-indigo-500 to-teal-400 z-[9999] transition-all duration-200 pointer-events-none shadow-sm" style="width: 0%;"></div>
+
+  <!-- 前台右上角現代化 Toast 輕提示容器 -->
+  <div id="frontend-toast-container" class="fixed top-5 right-5 z-[9998] flex flex-col gap-2.5 max-w-sm w-[calc(100vw-2.5rem)] pointer-events-none"></div>
+
+  <!-- 圖片點擊放大檢視燈箱 (Lightbox) -->
+  <div id="img-lightbox-modal" class="hidden fixed inset-0 z-[200] bg-slate-950/88 backdrop-blur-md flex flex-col items-center justify-center p-4 sm:p-8" onclick="if(event.target===this)closeImageLightbox()">
+    <div class="w-full max-w-5xl flex items-center justify-between gap-3 mb-3 text-white">
+      <div class="flex items-center gap-2 min-w-0">
+        <span class="text-base">🖼️</span>
+        <span id="img-lightbox-caption" class="text-xs sm:text-sm font-semibold text-slate-200 truncate">圖片預覽（點擊圖片可切換放大比例，按 Esc 關閉）</span>
+      </div>
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <a id="img-lightbox-open" href="#" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-white/10 hover:bg-white/20 text-white border border-white/20 transition-colors">新分頁檢視 ↗</a>
+        <button type="button" onclick="closeImageLightbox()" class="w-8 h-8 rounded-lg bg-white/10 hover:bg-rose-500/80 text-white flex items-center justify-center font-bold transition-colors cursor-pointer" title="關閉 (Esc)">✕</button>
+      </div>
+    </div>
+    <div class="max-w-[94vw] max-h-[84vh] overflow-auto flex items-center justify-center rounded-xl">
+      <img id="img-lightbox-img" src="" alt="" onclick="toggleLightboxZoom()" class="max-w-full max-h-[82vh] object-contain rounded-xl shadow-2xl border border-white/15 cursor-zoom-in transition-transform duration-200 bg-white">
+    </div>
+  </div>
+
+  <!-- 右下角懸浮閱讀輔助工具組（字體縮放 / 快速前往打卡 / 回到頂部） -->
+  <div id="floating-reader-tools" class="fixed bottom-5 right-5 z-40 flex flex-col items-end gap-2">
+    <!-- 快速前往打卡（僅本期尚未打卡時浮現） -->
+    <button type="button" id="fab-goto-checkin" onclick="jumpToCheckIn()" class="hidden items-center gap-2 px-3.5 py-2 rounded-full text-xs font-bold bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white shadow-lg shadow-indigo-600/30 border border-indigo-400/40 transition-all hover:-translate-y-0.5 active:scale-95 cursor-pointer" title="跳轉至底部進行閱讀打卡確認">
+      <span class="w-2 h-2 rounded-full bg-amber-300 animate-ping"></span>
+      <span>📋 前往打卡</span>
+    </button>
+
+    <!-- 字體大小與回頂部膠囊列 -->
+    <div class="flex items-center gap-1.5 bg-white/95 backdrop-blur-md border border-slate-200/90 rounded-full p-1.5 shadow-lg shadow-slate-900/10">
+      <button type="button" onclick="applyReaderFontScale(-1)" class="w-7 h-7 rounded-full hover:bg-slate-100 text-slate-600 hover:text-slate-900 text-xs font-extrabold flex items-center justify-center transition-colors cursor-pointer" title="縮小內文字體">A-</button>
+      <button type="button" id="fab-font-label" onclick="applyReaderFontScale(0)" class="px-1.5 h-7 rounded-full hover:bg-slate-100 text-[11px] font-bold text-slate-500 hover:text-blue-600 transition-colors cursor-pointer min-w-[40px]" title="點擊還原標準字級 (100%)">100%</button>
+      <button type="button" onclick="applyReaderFontScale(1)" class="w-7 h-7 rounded-full hover:bg-slate-100 text-slate-600 hover:text-slate-900 text-xs font-extrabold flex items-center justify-center transition-colors cursor-pointer" title="放大內文字體">A+</button>
+      <div id="fab-top-divider" class="hidden w-px h-4 bg-slate-200 mx-0.5"></div>
+      <button type="button" id="fab-back-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" class="hidden w-7 h-7 rounded-full bg-blue-50 hover:bg-blue-600 text-blue-600 hover:text-white flex items-center justify-center transition-all cursor-pointer active:scale-95" title="回到頁首">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 15l7-7 7 7"/></svg>
+      </button>
+    </div>
+  </div>
 
   <!-- 後台即時效果預覽警示橫幅 -->
   <div id="preview-mode-banner" class="hidden sticky top-0 left-0 right-0 bg-gradient-to-r from-amber-500 via-amber-600 to-orange-600 text-white px-4 py-2 text-xs font-semibold z-[100] shadow-md flex items-center justify-between">
@@ -369,7 +498,7 @@
         </h1>
         <p class="text-sm text-slate-500 mt-1">提供本週重點摘要、交期異動與物料狀況明細</p>
       </div>
-      <div class="flex items-center gap-3">
+      <div class="flex flex-wrap items-center gap-2 sm:gap-2.5">
         <!-- 尊榮已完讀金徽章 (精簡純皇冠設計，hover 浮現已閱讀提示) -->
         <div id="user-read-badge" class="group relative hidden items-center justify-center w-8 h-8 rounded-full bg-gradient-to-tr from-amber-500 via-yellow-400 to-amber-600 text-white shadow-md ring-2 ring-amber-300/60 hover:scale-110 hover:shadow-lg transition-all duration-300 cursor-pointer">
           <span class="text-base select-none leading-none">👑</span>
@@ -430,8 +559,8 @@
 
     <!-- 經典文檔雙欄流容器 (左側歷史週報目錄與檢索 + 右側週報內容) -->
     <div class="flex flex-col lg:flex-row gap-6 relative items-start">
-      <!-- 左側固定歸檔側邊欄 (方案A：置左不收合，大字體清晰版，整合搜尋與過濾) -->
-      <aside id="archive-sidebar" class="w-full lg:w-80 bg-white rounded-2xl border border-slate-200/90 shadow-sm flex flex-col flex-shrink-0 relative z-20 overflow-hidden">
+      <!-- 左側固定歸檔側邊欄 (方案A：置左不收合，桌面版吸頂跟隨，大字體清晰版，整合搜尋與過濾) -->
+      <aside id="archive-sidebar" class="w-full lg:w-80 lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] bg-white rounded-2xl border border-slate-200/90 shadow-sm flex flex-col flex-shrink-0 relative z-20 overflow-hidden">
         <!-- 頂部歸檔標題列 -->
         <div class="p-4 border-b border-slate-100 bg-slate-50/70 flex items-center justify-between">
           <span class="text-sm sm:text-base font-bold text-slate-800 tracking-wider flex items-center gap-2">
@@ -509,7 +638,25 @@
 
         <!-- 主要佈告欄內容 -->
         <main id="bulletin-content-area" class="space-y-6 !mt-0">
-          <div class="text-center py-12 text-slate-500">載入中...</div>
+          <!-- 脈衝骨架屏載入動畫 (Skeleton Loader) -->
+          <div class="space-y-4 animate-pulse">
+            <div class="h-32 rounded-xl bg-gradient-to-r from-slate-200 via-slate-100 to-slate-200 border border-slate-200/80 p-6 flex flex-col justify-between">
+              <div class="h-6 bg-slate-300/70 rounded-lg w-2/3"></div>
+              <div class="flex items-center gap-3">
+                <div class="h-6 bg-slate-300/60 rounded-full w-44"></div>
+                <div class="h-4 bg-slate-300/50 rounded w-36"></div>
+              </div>
+            </div>
+            <div class="bg-white rounded-xl border border-slate-200/70 p-5 space-y-3">
+              <div class="h-5 bg-slate-200 rounded w-1/3"></div>
+              <div class="h-20 bg-slate-100 rounded-lg w-full"></div>
+              <div class="h-16 bg-slate-100 rounded-lg w-full"></div>
+            </div>
+            <div class="bg-white rounded-xl border border-slate-200/70 p-5 space-y-3">
+              <div class="h-5 bg-slate-200 rounded w-1/4"></div>
+              <div class="h-24 bg-slate-100 rounded-lg w-full"></div>
+            </div>
+          </div>
         </main>
 
         <!-- 頁尾聯絡資訊 (放置於主要內容區底端，確保與佈告欄內容卡片完全同寬) -->
@@ -805,6 +952,7 @@
       btn.disabled = true;
       try {
         await loadData();
+        if (typeof toast === 'function') toast('已同步最新採購週報資料 ✓', 'ok', 2200);
       } finally {
         btn.innerHTML = originalHtml;
         btn.disabled = false;
@@ -1346,6 +1494,11 @@ async function showKPI(monthOffset = 0) {
       const readBadgeText = document.getElementById('user-read-badge-text');
       const mainContainer = document.getElementById('app-main-container');
 
+      if (window.isPreviewMode) {
+        if (mainContainer) mainContainer.classList.remove('page-blurred');
+        return;
+      }
+
       if (userStr) {
         // 已登入：移除背景不可穿透模糊
         if (mainContainer) mainContainer.classList.remove('page-blurred');
@@ -1529,9 +1682,15 @@ async function showKPI(monthOffset = 0) {
             btn.innerHTML = '<span>已完成本期打卡</span>';
           }
 
-          // 即刻點亮 Header 尊榮徽章與更新側邊欄已讀打卡標記
+          // 即刻點亮 Header 尊榮徽章、更新側邊欄已讀打卡標記與懸浮工具列
           updateAuthUI();
           renderTabs();
+          if (typeof updateFloatingReaderTools === 'function') updateFloatingReaderTools();
+          const tocCheckinPill = document.getElementById('toc-checkin-pill');
+          if (tocCheckinPill) {
+            tocCheckinPill.className = 'inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-default';
+            tocCheckinPill.innerHTML = '<span>👑</span><span>本期已完讀</span>';
+          }
 
           if (typeof toast === 'function') {
             toast('👑 感謝您的閱畢打卡！雲端已成功同步入帳並點亮尊榮皇冠金徽章。', 'ok');
@@ -1607,6 +1766,14 @@ async function showKPI(monthOffset = 0) {
             }
             document.getElementById('unread-modal').classList.add('hidden');
             updateAuthUI();
+            if (typeof updateFloatingReaderTools === 'function') updateFloatingReaderTools();
+            if (res.confirmed || localConfirmed) {
+              const tocPill = document.getElementById('toc-checkin-pill');
+              if (tocPill) {
+                tocPill.className = 'inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-default';
+                tocPill.innerHTML = '<span>👑</span><span>本期已完讀</span>';
+              }
+            }
           } else {
             // 雲端查無紀錄：若本地已有完讀打卡，優先維持本地已完讀狀態並嘗試補同步
             if (localConfirmed) {
@@ -3100,7 +3267,7 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
         const displaySecNum = CANONICAL_SECNUMS[rawTitle] || sec.sectionNumber || (NUMS[secIdx] || String(secIdx + 1));
 
         return `
-          <section class="bg-white rounded-xl shadow-sm border border-slate-100 px-3 py-2">
+          <section id="bulletin-sec-${secIdx}" class="bg-white rounded-xl shadow-sm border border-slate-100 px-3 py-2 scroll-mt-20 transition-shadow duration-300">
             <h3 class="text-lg font-bold text-slate-800 flex items-center justify-between gap-2 pb-2 mb-2 border-b border-slate-100 flex-wrap">
               <div class="flex items-center gap-2 flex-wrap">
                 <span class="text-xl">${e(sec.icon)}</span>
@@ -3147,23 +3314,73 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
         `;
       }
 
+      // 動態產生「本期章節快跳目錄」膠囊列
+      const CANONICAL_TOC_NUMS = {
+        '採購管理': '一', '採購作業進度': '一', '供應商管理': '二', '品質管理': '三',
+        '工程管理': '四', '物流管理': '五', '倉儲管理': '六', '文件管理': '七',
+        '公告管理': '八', '其他': '九', '附件': '十'
+      };
+      const isBulletinConfirmedNow = localStorage.getItem('has_confirmed_' + bulletin.id) === '1';
+      const tocBarHtml = (bulletin.sections && bulletin.sections.length > 0) ? `
+        <div id="section-toc-bar" data-no-highlight="true" data-print-hide="true" class="bg-white/95 rounded-xl border border-slate-200/80 shadow-2xs px-3.5 py-2.5 flex flex-wrap items-center justify-between gap-2">
+          <div class="flex flex-wrap items-center gap-1.5">
+            <span class="text-[11px] font-extrabold text-slate-400 tracking-wider mr-1 flex items-center gap-1">
+              <span>📑</span><span>章節快跳</span>
+            </span>
+            ${bulletin.sections.map((sec, sIdx) => {
+              const rTitle = (sec.title || '').replace(/^[一二三四五六七八九十]+、\s*/, '').trim();
+              const dNum = CANONICAL_TOC_NUMS[rTitle] || sec.sectionNumber || (NUMS[sIdx] || String(sIdx + 1));
+              const hasAtt = sec.files && sec.files.length > 0;
+              return `
+                <button type="button" onclick="jumpToSection(${sIdx})" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100/90 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200/80 hover:border-blue-300 transition-all cursor-pointer active:scale-95">
+                  <span class="text-blue-600 font-bold">${e(dNum)}、</span>
+                  <span>${e(rTitle)}</span>
+                  ${hasAtt ? '<span class="text-[10px] text-pink-600 font-bold" title="本段含可下載附件">📎</span>' : ''}
+                </button>
+              `;
+            }).join('')}
+          </div>
+          <button type="button" id="toc-checkin-pill" onclick="${isBulletinConfirmedNow ? '' : 'jumpToCheckIn()'}" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold transition-all flex-shrink-0 ${
+            isBulletinConfirmedNow
+              ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-default'
+              : 'bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 cursor-pointer active:scale-95'
+          }">
+            <span>${isBulletinConfirmedNow ? '👑' : '👇'}</span>
+            <span>${isBulletinConfirmedNow ? '本期已完讀' : '前往打卡'}</span>
+          </button>
+        </div>
+      ` : '';
+
       container.innerHTML = `
         ${watermarkHtml}
-        <div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white rounded-lg p-6 shadow-md relative overflow-hidden">
-          <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-3xl"></div>
-          <div class="flex items-center gap-3 relative z-10">
-            ${bulletin.isPinned ? `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500 text-white shadow-sm flex items-center gap-1.5"><span class="animate-pulse">🚨</span> 緊急</span>` : ''}
-            <h2 ${editableAttr} data-path="${bulletin.id}.title" class="text-xl font-bold outline-none leading-snug">${e(bulletin.title)}</h2>
+        <div class="bg-gradient-to-r from-blue-700 to-indigo-800 text-white rounded-xl p-5 sm:p-6 shadow-md relative overflow-hidden">
+          <div class="absolute -right-10 -top-10 w-40 h-40 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
+          <div class="flex flex-wrap items-start justify-between gap-3 relative z-10">
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+              ${bulletin.isPinned ? `<span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500 text-white shadow-sm flex items-center gap-1.5 flex-shrink-0"><span class="animate-pulse">🚨</span> 緊急</span>` : ''}
+              <h2 ${editableAttr} data-path="${bulletin.id}.title" class="text-lg sm:text-xl font-bold outline-none leading-snug">${e(bulletin.title)}</h2>
+            </div>
+            <div data-no-highlight="true" data-print-hide="true" class="flex items-center gap-1.5 flex-shrink-0">
+              <button type="button" onclick="copyBulletinLink('${e(bulletin.id)}')" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-white/15 hover:bg-white/25 text-white border border-white/25 backdrop-blur-sm transition-all cursor-pointer active:scale-95" title="複製本期週報專屬直達連結，方便於 LINE / Teams 分享">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                <span>複製連結</span>
+              </button>
+              <button type="button" onclick="printBulletin()" class="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-white/15 hover:bg-white/25 text-white border border-white/25 backdrop-blur-sm transition-all cursor-pointer active:scale-95" title="列印純淨排版或另存 PDF 存檔">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                <span class="hidden sm:inline">列印 / PDF</span>
+              </button>
+            </div>
           </div>
           <div class="mt-4 flex flex-wrap items-center gap-x-5 gap-y-3 relative z-10">
             ${publishTimeHtml}
-            <div class="flex items-center gap-4 text-sm text-blue-200/90 pl-1 border-l border-white/20">
+            <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-blue-200/90 pl-1 border-l border-white/20">
               <div>期數 ID: <span class="font-semibold text-blue-50">${e(bulletin.id)}</span></div>
               <div class="w-1 h-1 bg-blue-400 rounded-full"></div>
               <div>統計期間: <span class="font-semibold text-blue-50">${e(bulletin.periodStart)} 至 ${e(bulletin.periodEnd)}</span></div>
             </div>
           </div>
         </div>
+        ${tocBarHtml}
         <div class="space-y-4 mt-4">
           ${sectionsHtml}
           ${(() => {
@@ -3314,6 +3531,17 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
         }
       });
 
+      // 綁定內文圖片點擊放大檢視燈箱 (Lightbox)
+      container.querySelectorAll('.ql-editor img').forEach(img => {
+        if (img.dataset.lightboxBound) return;
+        img.dataset.lightboxBound = '1';
+        img.title = img.title || '點擊放大檢視圖片';
+        img.addEventListener('click', (ev) => {
+          ev.stopPropagation();
+          openImageLightbox(img.src, img.alt || '週報內文圖片');
+        });
+      });
+
       // 若目前有搜尋關鍵字，自動於渲染與 DOM 清理完成後高亮符合文字
       if (state.searchRawQuery && !state.isEditMode) {
         applySearchHighlights(container, state.searchRawQuery);
@@ -3321,8 +3549,174 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
         updateSearchHighlightBar(0, -1, '');
       }
 
+      updateFloatingReaderTools();
       setupReadingProgressTracker();
     }
+
+    // ==========================================
+    // 前台現代化 UI 輔助引擎（Toast / 字體縮放 / 燈箱 / 章節快跳 / 分享與列印）
+    // ==========================================
+    function toast(msg, type = 'in', duration = 3800) {
+      const box = document.getElementById('frontend-toast-container');
+      if (!box) return;
+      const styles = {
+        ok: 'bg-emerald-600 text-white border-emerald-500 shadow-emerald-600/25',
+        er: 'bg-rose-600 text-white border-rose-500 shadow-rose-600/25',
+        in: 'bg-slate-800 text-white border-slate-700 shadow-slate-900/25'
+      };
+      const icons = { ok: '✅', er: '❌', in: 'ℹ️' };
+      const el = document.createElement('div');
+      el.className = `fe-toast flex items-start gap-2.5 px-4 py-3 rounded-xl border shadow-xl text-xs sm:text-sm font-semibold leading-snug ${styles[type] || styles.in}`;
+      el.innerHTML = `<span class="text-base leading-none mt-0.5 flex-shrink-0">${icons[type] || 'ℹ️'}</span><span class="flex-1">${e(msg)}</span><button type="button" onclick="this.parentElement.remove()" class="text-white/75 hover:text-white text-xs font-bold ml-1 cursor-pointer">✕</button>`;
+      box.appendChild(el);
+      setTimeout(() => {
+        el.style.transition = 'opacity 0.28s ease, transform 0.28s ease';
+        el.style.opacity = '0';
+        el.style.transform = 'translateX(24px)';
+        setTimeout(() => el.remove(), 300);
+      }, duration);
+    }
+
+    const READER_FONT_STEPS = [0.9, 1.0, 1.12, 1.24];
+    let readerFontIdx = 1;
+
+    function initReaderFontScale() {
+      try {
+        const saved = parseFloat(localStorage.getItem('reader_font_scale') || '1');
+        const idx = READER_FONT_STEPS.findIndex(v => Math.abs(v - saved) < 0.02);
+        readerFontIdx = idx !== -1 ? idx : 1;
+      } catch (err) { readerFontIdx = 1; }
+      const scale = READER_FONT_STEPS[readerFontIdx];
+      document.documentElement.style.setProperty('--reader-scale', String(scale));
+      const lbl = document.getElementById('fab-font-label');
+      if (lbl) lbl.textContent = `${Math.round(scale * 100)}%`;
+    }
+
+    function applyReaderFontScale(delta) {
+      if (delta === 0) {
+        readerFontIdx = 1;
+      } else {
+        readerFontIdx = Math.max(0, Math.min(READER_FONT_STEPS.length - 1, readerFontIdx + delta));
+      }
+      const scale = READER_FONT_STEPS[readerFontIdx];
+      document.documentElement.style.setProperty('--reader-scale', String(scale));
+      try { localStorage.setItem('reader_font_scale', String(scale)); } catch (err) {}
+      const lbl = document.getElementById('fab-font-label');
+      if (lbl) lbl.textContent = `${Math.round(scale * 100)}%`;
+      toast(`內文字體已調整為 ${Math.round(scale * 100)}%`, 'in', 1800);
+    }
+
+    function jumpToSection(secIdx) {
+      const el = document.getElementById(`bulletin-sec-${secIdx}`);
+      if (!el) return;
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      el.classList.add('ring-2', 'ring-blue-400', 'shadow-md');
+      setTimeout(() => el.classList.remove('ring-2', 'ring-blue-400', 'shadow-md'), 1400);
+    }
+
+    function jumpToCheckIn() {
+      const el = document.getElementById('reading-confirm-card');
+      if (!el) return;
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.classList.add('ring-4', 'ring-indigo-300');
+      setTimeout(() => el.classList.remove('ring-4', 'ring-indigo-300'), 1800);
+    }
+
+    async function copyBulletinLink(bulletinId) {
+      const url = `${window.location.origin}${window.location.pathname}?id=${encodeURIComponent(bulletinId)}`;
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(url);
+        } else {
+          const ta = document.createElement('textarea');
+          ta.value = url;
+          ta.style.position = 'fixed';
+          ta.style.opacity = '0';
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand('copy');
+          ta.remove();
+        }
+        toast(`已複製 ${bulletinId} 專屬連結！可直接貼至 LINE 或 Teams 分享`, 'ok', 3200);
+      } catch (err) {
+        toast('複製失敗，請手動複製瀏覽器網址列', 'er');
+      }
+    }
+
+    function printBulletin() {
+      window.print();
+    }
+
+    let lightboxZoomed = false;
+    function openImageLightbox(src, caption = '') {
+      const modal = document.getElementById('img-lightbox-modal');
+      const img = document.getElementById('img-lightbox-img');
+      const cap = document.getElementById('img-lightbox-caption');
+      const openLink = document.getElementById('img-lightbox-open');
+      if (!modal || !img) return;
+      lightboxZoomed = false;
+      img.src = src;
+      img.alt = caption;
+      img.style.transform = '';
+      img.classList.remove('cursor-zoom-out');
+      img.classList.add('cursor-zoom-in');
+      if (cap) cap.textContent = caption ? `${caption}（點擊圖片可切換縮放，按 Esc 關閉）` : '圖片預覽（點擊圖片可切換縮放，按 Esc 關閉）';
+      if (openLink) openLink.href = src;
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeImageLightbox() {
+      const modal = document.getElementById('img-lightbox-modal');
+      if (modal) modal.classList.add('hidden');
+      document.body.style.overflow = '';
+      lightboxZoomed = false;
+    }
+
+    function toggleLightboxZoom() {
+      const img = document.getElementById('img-lightbox-img');
+      if (!img) return;
+      lightboxZoomed = !lightboxZoomed;
+      img.style.transform = lightboxZoomed ? 'scale(1.45)' : '';
+      img.style.transformOrigin = 'center center';
+      img.classList.toggle('cursor-zoom-out', lightboxZoomed);
+      img.classList.toggle('cursor-zoom-in', !lightboxZoomed);
+    }
+
+    function updateFloatingReaderTools() {
+      const checkinBtn = document.getElementById('fab-goto-checkin');
+      if (!checkinBtn) return;
+      const hasUser = !!localStorage.getItem('procurement_user');
+      const isConfirmed = state.activeBulletinId && localStorage.getItem('has_confirmed_' + state.activeBulletinId) === '1';
+      const hasConfirmCard = !!document.getElementById('reading-confirm-card');
+      if (!window.isPreviewMode && hasUser && state.activeBulletinId && !isConfirmed && hasConfirmCard) {
+        checkinBtn.classList.remove('hidden');
+        checkinBtn.classList.add('inline-flex');
+      } else {
+        checkinBtn.classList.add('hidden');
+        checkinBtn.classList.remove('inline-flex');
+      }
+    }
+
+    window.addEventListener('scroll', () => {
+      const btnTop = document.getElementById('fab-back-top');
+      const divTop = document.getElementById('fab-top-divider');
+      const showTop = (window.scrollY || document.documentElement.scrollTop) > 260;
+      if (btnTop) {
+        btnTop.classList.toggle('hidden', !showTop);
+        btnTop.classList.toggle('flex', showTop);
+      }
+      if (divTop) divTop.classList.toggle('hidden', !showTop);
+    }, { passive: true });
+
+    window.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Escape') {
+        const lb = document.getElementById('img-lightbox-modal');
+        if (lb && !lb.classList.contains('hidden')) {
+          closeImageLightbox();
+        }
+      }
+    });
     // ==========================================
     // 閱讀完成率追蹤（Scroll Depth Tracker）
     // ==========================================
@@ -3731,6 +4125,7 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
     
     // 程式進入點
     window.addEventListener('DOMContentLoaded', () => {
+      initReaderFontScale();
       checkAndShowKPI();
       
       // 監聽 Firebase 身分驗證狀態
