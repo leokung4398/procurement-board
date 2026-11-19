@@ -1564,6 +1564,11 @@
           <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>編輯防呆與快捷操作：</strong>任何內容異動立即在頂部標題旁點亮「● 未儲存變更」琥珀徽章，全面支援 <code>Ctrl + S</code> 快捷鍵存草稿；頂部操作列將「複製 / 撤回發布 / 刪除」安全收斂至「⋯ 更多」選單防誤觸，並提供單段落與全體一鍵「▾ 收合 / 展開」功能。</p>
           <p class="text-sm leading-relaxed text-slate-600"><strong>動態首頁與一鍵複製未讀 Email：</strong>後台首頁自動載入已發布期數、待發布草稿、最新期已讀人數與問卷總數 4 格動態指標；Section C 已讀追蹤區放寬高度並新增「全部 / 已讀 / 未讀 / 僅主要窗口」分頁與「📋 一鍵複製未讀 Email」按鈕，直接貼入 Outlook 即可精準催讀！</p>
         </div>
+        <div class="bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-amber-300 transition-colors">
+          <h4 class="text-lg font-bold text-slate-800 mb-2 flex items-center gap-2"><span class="w-8 h-8 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center text-sm">37</span>前台行動版智慧表格自適應排版與全螢幕放大檢視</h4>
+          <p class="text-sm leading-relaxed mb-2 text-slate-600"><strong>智慧防斷行與殘留欄寬解除：</strong>於手機／平板窄螢幕檢視週報時，系統自動解除 Word/Excel 貼上殘留的桌機百分比欄寬並收斂過大字級，同時自動識別「項次、料號、單號、日期」等關鍵直欄強制單行不折斷，徹底消除料號被切成五行的痛點（桌面版維持 1:1 零變動）。</p>
+          <p class="text-sm leading-relaxed text-slate-600"><strong>超寬表格滑動導引與全螢幕放大檢視：</strong>6 欄以上寬表自動啟用自然寬度橫向滑動外框、右側漸層滑動陰影與「↔ 左右滑動查看完整表格」提示；表格上方並提供「⛶ 放大檢視」按鈕，可開啟滿版全螢幕表格檢視器並自由切換小／標準／大字級。</p>
+        </div>
       </div>
 
       <!-- 專案開發成果內容 -->
@@ -1578,13 +1583,13 @@
                 <h4 class="text-base font-bold text-white tracking-wide flex items-center gap-2">🎨 專案開發成果條例分類與即時置頂</h4>
               </div>
               <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">
-                全系列 49 項里程碑已依技術構面導入色彩體系。<span class="text-amber-300 font-medium">💡 點選下方任一分類按鈕，即可將該技術構面之成果卡片立即「置頂排列到最上方」</span>，便於長官與主管聚焦查閱！
+                全系列 50 項里程碑已依技術構面導入色彩體系。<span class="text-amber-300 font-medium">💡 點選下方任一分類按鈕，即可將該技術構面之成果卡片立即「置頂排列到最上方」</span>，便於長官與主管聚焦查閱！
               </p>
             </div>
             <div class="flex items-center gap-2.5 flex-shrink-0">
-              <button id="cat-btn-all" onclick="filterMilestoneCat('all')" type="button" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-indigo-400/40 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 text-xs font-semibold transition-all shadow-sm cursor-pointer active:scale-95" title="還原至 1~49 項原始順序">
+              <button id="cat-btn-all" onclick="filterMilestoneCat('all')" type="button" class="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full border border-indigo-400/40 bg-indigo-600/30 hover:bg-indigo-600/50 text-indigo-200 text-xs font-semibold transition-all shadow-sm cursor-pointer active:scale-95" title="還原至 1~50 項原始順序">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                <span>重置原始排序 (全部49項)</span>
+                <span>重置原始排序 (全部50項)</span>
               </button>
             </div>
           </div>
@@ -1644,7 +1649,7 @@
                     <span class="w-2 h-2 rounded-full bg-amber-400"></span>
                     <span class="text-xs font-bold text-amber-300 group-hover:text-amber-200 transition-colors">排版體驗優化</span>
                   </div>
-                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">10 項</span>
+                  <span class="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">11 項</span>
                 </div>
                 <p class="text-[11px] text-slate-400 group-hover:text-slate-300 leading-snug transition-colors">TinyMCE 核心、前後台表格 1:1 零誤差對齊、跨欄置中、莫蘭迪色盤與 RWD 適配。</p>
                 <div class="mt-2 flex items-center gap-1 text-[10px] text-amber-400 font-semibold opacity-80 group-hover:opacity-100">
@@ -2722,6 +2727,26 @@
             </div>
           </div>
         </div>
+
+          <!-- 里程碑五十：前台行動版智慧表格自適應排版系統 -->
+          <div data-cat="typesetting" data-orig-idx="50" class="milestone-card group p-5 rounded-2xl bg-white border border-slate-100 shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] hover:shadow-[0_8px_30px_-4px_rgba(245,158,11,0.15)] hover:border-amber-200 transition-all duration-300 relative overflow-hidden">
+          <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-amber-400 to-orange-500"></div>
+          <div class="flex gap-4">
+            <div class="mt-0.5">
+              <div class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center group-hover:scale-110 group-hover:bg-amber-500 group-hover:text-white transition-all duration-300 shadow-sm"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg></div>
+            </div>
+            <div>
+              <h3 class="text-sm font-bold text-slate-800 mb-1 flex items-center gap-2">五十、前台行動版智慧表格自適應排版系統（防料號斷行、橫向導引與全螢幕放大） <span class="bg-amber-50 text-amber-700 border border-amber-200/80 text-[10px] px-2 py-0.5 rounded-md font-semibold tracking-wide flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>排版體驗</span> <span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-0.5 rounded-full font-normal tracking-wide">2026-11-19</span></h3>
+              <p class="text-[11px] text-slate-500 mb-2 leading-relaxed bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <span class="font-semibold text-slate-600">行動裝置痛點排查：</span><br>
+                • Word/Excel 貼上表格殘留桌機寬度比例（如 4.4% / 17.7% / 77.8%）與 14pt 大字，導致手機檢視時「項目」被擠成直排、14 碼料號被硬折成 5 行，多欄 ECN 變更表亦被壓扁難以閱讀。
+              </p>
+              <p class="text-xs text-amber-700 font-medium leading-relaxed mt-3 border-l-2 border-amber-400 pl-2">
+                📱 <span class="font-bold">專案成果：</span>打造三合一行動版智慧表格引擎（<code>enhanceResponsiveTables</code>）：（1）行動版自動解除 Word 殘留百分比寬度、收斂字級，並語意識別項次／料號／單號／日期欄強制不折斷，讓 3～4 欄表一屏完美呈現；（2）6 欄以上寬表自動套用自然寬度橫向捲動、右側漸層陰影與「↔ 左右滑動查看完整表格」提示；（3）全表格配備「⛶ 放大檢視」全螢幕檢視器（支援小／標準／大三段字級與表頭吸頂），桌面版 100% 零變動！
+              </p>
+            </div>
+          </div>
+        </div>
         </div>
       </div>
 
@@ -3321,7 +3346,7 @@
               <span class="text-xs font-bold text-blue-800 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200">極致響應速度</span>
               <span class="text-2xl">⚡</span>
             </div>
-            <div class="text-2xl font-extrabold text-slate-800 mb-1">49 次即時交付</div>
+            <div class="text-2xl font-extrabold text-slate-800 mb-1">50 次即時交付</div>
             <p class="text-xs text-slate-500 leading-relaxed">
               外包公司每次需求變更 (CR) 均需重談報價與等待 2~4 週工期；本系統採敏捷模式，現場反饋數日內即刻發布上線。
             </p>
@@ -3382,7 +3407,7 @@
                 </p>
                 <div class="text-xs space-y-1.5 pt-2 text-slate-600">
                   <div class="flex items-center gap-1.5 text-rose-600"><span>✕</span> 缺乏資安防護與 Zero-Data 防禦</div>
-                  <div class="flex items-center gap-1.5 text-rose-600"><span>✕</span> 難以配合 49 次高頻率敏捷迭代</div>
+                  <div class="flex items-center gap-1.5 text-rose-600"><span>✕</span> 難以配合 50 次高頻率敏捷迭代</div>
                   <div class="flex items-center gap-1.5 text-rose-600"><span>✕</span> 無專用 IT 運作邏輯白皮書</div>
                 </div>
               </div>
@@ -3680,7 +3705,7 @@
                   <td class="py-4 px-6 align-top">
                     <ul class="space-y-1.5 text-slate-600 leading-relaxed list-none">
                       <li class="flex items-start gap-1.5"><span class="text-indigo-500 font-bold">•</span><span><strong>方案 C：IT 專用全鏈路運作邏輯技術白皮書</strong>（四層分層拓撲 + 三大業務時序流）</span></li>
-                      <li class="flex items-start gap-1.5"><span class="text-indigo-500 font-bold">•</span><span>全站響應式主題、吸頂側邊欄、章節快跳、粉紅醒目附件專區、圖片放大燈箱、字級縮放、專屬列印 PDF 版面與問卷進度條</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-indigo-500 font-bold">•</span><span>全站響應式主題、吸頂側邊欄、章節快跳、行動版智慧表格防斷行與全螢幕放大器、粉紅附件專區、圖片燈箱、字級縮放與專屬列印 PDF 版面</span></li>
                       <li class="flex items-start gap-1.5"><span class="text-indigo-500 font-bold">•</span><span>Serverless 雲端拓撲整合規劃與 GitHub Actions CI/CD 自動化發布流水線</span></li>
                     </ul>
                   </td>
@@ -3706,11 +3731,11 @@
                   </td>
                   <td class="py-4 px-5 align-top">
                     <div class="font-bold text-slate-900 text-sm mb-1">專案管理、需求迭代調優與 QA 測試</div>
-                    <span class="inline-block text-[11px] text-slate-400">49次迭代 · 跨瀏覽器相容 · 驗收交付</span>
+                    <span class="inline-block text-[11px] text-slate-400">50次迭代 · 跨瀏覽器相容 · 驗收交付</span>
                   </td>
                   <td class="py-4 px-6 align-top">
                     <ul class="space-y-1.5 text-slate-600 leading-relaxed list-none">
-                      <li class="flex items-start gap-1.5"><span class="text-slate-500 font-bold">•</span><span><strong>跨 49 個里程碑之需求釐清</strong>、跨部門痛點排查與相容性修復驗收</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-slate-500 font-bold">•</span><span><strong>跨 50 個里程碑之需求釐清</strong>、跨部門痛點排查與相容性修復驗收</span></li>
                       <li class="flex items-start gap-1.5"><span class="text-slate-500 font-bold">•</span><span>瀏覽器相容性測試（Chrome、Edge、Safari、手機瀏覽器）與跨域壓測調優</span></li>
                     </ul>
                   </td>

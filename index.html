@@ -350,6 +350,169 @@
       pointer-events: auto;
     }
 
+    /* ==========================================
+       行動裝置智慧表格自適應排版（方案 1 + 2 + 3）
+       僅於行動／窄螢幕介入重排，桌面版維持 1:1 對齊
+       ========================================== */
+    .responsive-table-block,
+    .ql-editor .responsive-table-block {
+      margin: 6px 0 8px 0 !important;
+      padding: 0 !important;
+      max-width: 100% !important;
+      display: block !important;
+    }
+    .ql-editor .table-mobile-toolbar {
+      margin: 0 0 5px 0 !important;
+      padding: 2px 2px !important;
+      line-height: 1.35 !important;
+    }
+    .ql-editor .table-scroll-shell {
+      position: relative !important;
+      max-width: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    .table-scroll-wrap,
+    .ql-editor .table-scroll-wrap {
+      overflow-x: auto !important;
+      -webkit-overflow-scrolling: touch;
+      max-width: 100% !important;
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    .table-scroll-wrap table {
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+    }
+
+    @media (max-width: 768px) {
+      /* 方案 1-1：解除 Word / Excel 殘留之桌機百分比欄寬 */
+      #bulletin-content-area table:not(.data-table) td[style*="width"],
+      #bulletin-content-area table:not(.data-table) th[style*="width"],
+      #bulletin-content-area table:not(.data-table) col[style*="width"],
+      #bulletin-content-area .ql-editor table td[style*="width"],
+      #bulletin-content-area .ql-editor table th[style*="width"],
+      #bulletin-content-area .ql-editor table col[style*="width"] {
+        width: auto !important;
+      }
+
+      /* 方案 1-2：行動版收斂 Word 14pt 大字為舒適 12.5px（同步響應 A-/A+ 字級） */
+      #bulletin-content-area table:not(.data-table),
+      #bulletin-content-area .pro-table,
+      #bulletin-content-area .ql-editor table,
+      #bulletin-content-area .ql-editor table td,
+      #bulletin-content-area .ql-editor table th,
+      #bulletin-content-area .ql-editor table td span,
+      #bulletin-content-area .ql-editor table th span,
+      #bulletin-content-area .ql-editor table td p,
+      #bulletin-content-area .ql-editor table th p {
+        font-size: calc(12.5px * var(--reader-scale, 1)) !important;
+        line-height: 1.35 !important;
+      }
+      #bulletin-content-area table:not(.data-table) td,
+      #bulletin-content-area table:not(.data-table) th,
+      #bulletin-content-area .pro-table td,
+      #bulletin-content-area .pro-table th,
+      #bulletin-content-area .ql-editor table td,
+      #bulletin-content-area .ql-editor table th {
+        padding: 5px 7px !important;
+        vertical-align: middle;
+      }
+
+      /* 方案 1-3：短表頭、項次、料號、單號與日期防斷行保護 */
+      #bulletin-content-area table .th-nowrap,
+      #bulletin-content-area table .col-nowrap-idx,
+      #bulletin-content-area table .col-nowrap-code {
+        white-space: nowrap !important;
+        word-break: keep-all !important;
+      }
+      #bulletin-content-area table .col-nowrap-idx {
+        width: 1% !important;
+        text-align: center;
+      }
+      #bulletin-content-area table .col-nowrap-code {
+        font-variant-numeric: tabular-nums;
+      }
+      #bulletin-content-area table .col-wrap-desc {
+        min-width: 112px !important;
+        white-space: normal !important;
+        word-break: break-word !important;
+      }
+
+      /* 方案 2：寬表格 (>=6 欄) 不硬壓縮成直條，啟用自然寬度橫向滑動 */
+      #bulletin-content-area table.wide-data-table,
+      #bulletin-content-area .ql-editor table.wide-data-table {
+        width: max-content !important;
+        min-width: 100% !important;
+        table-layout: auto !important;
+      }
+      #bulletin-content-area table.wide-data-table .col-wrap-desc {
+        min-width: 120px !important;
+        max-width: 220px !important;
+      }
+      #bulletin-content-area table.smart-fit-table,
+      #bulletin-content-area .ql-editor table.smart-fit-table {
+        min-width: 100% !important;
+        width: auto !important;
+      }
+    }
+
+    /* 方案 3：表格全螢幕放大檢視器專屬樣式 */
+    #table-fullscreen-body table {
+      border-collapse: collapse !important;
+      width: max-content !important;
+      min-width: 100% !important;
+      background: #ffffff;
+    }
+    #table-fullscreen-body table td[style*="width"],
+    #table-fullscreen-body table th[style*="width"],
+    #table-fullscreen-body table col[style*="width"] {
+      width: auto !important;
+    }
+    #table-fullscreen-body table td,
+    #table-fullscreen-body table th {
+      border: 1px solid #cbd5e1 !important;
+      padding: 7px 10px !important;
+      line-height: 1.4 !important;
+      vertical-align: middle;
+    }
+    #table-fullscreen-body table td p,
+    #table-fullscreen-body table th p,
+    #table-fullscreen-body table td div,
+    #table-fullscreen-body table th div {
+      margin: 0 !important;
+      padding: 0 !important;
+    }
+    #table-fullscreen-body table .th-nowrap,
+    #table-fullscreen-body table .col-nowrap-idx,
+    #table-fullscreen-body table .col-nowrap-code {
+      white-space: nowrap !important;
+      word-break: keep-all !important;
+    }
+    #table-fullscreen-body table .col-wrap-desc {
+      min-width: 130px;
+      max-width: 340px;
+      white-space: normal !important;
+      word-break: break-word !important;
+    }
+    #table-fullscreen-body table tbody tr:nth-child(even):not(.search-hl-row) {
+      background-color: rgba(248, 250, 252, 0.72);
+    }
+    #table-fullscreen-body table tr:first-child td,
+    #table-fullscreen-body table thead th {
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background-color: #f8fafc;
+      font-weight: 700;
+    }
+    #table-fullscreen-body.fs-sz-sm table,
+    #table-fullscreen-body.fs-sz-sm table * { font-size: 12px !important; }
+    #table-fullscreen-body.fs-sz-md table,
+    #table-fullscreen-body.fs-sz-md table * { font-size: 14px !important; }
+    #table-fullscreen-body.fs-sz-lg table,
+    #table-fullscreen-body.fs-sz-lg table * { font-size: 16px !important; }
+
     /* 專屬列印 / 另存 PDF 版面樣式 */
     @media print {
       body {
@@ -362,6 +525,7 @@
       #frontend-toast-container,
       #floating-reader-tools,
       #img-lightbox-modal,
+      #table-fullscreen-modal,
       #archive-sidebar,
       #search-highlight-bar,
       #section-toc-bar,
@@ -391,6 +555,13 @@
       tr {
         break-inside: avoid;
       }
+      .table-scroll-wrap {
+        overflow: visible !important;
+      }
+      table.wide-data-table,
+      table.smart-fit-table {
+        width: 100% !important;
+      }
     }
   </style>
 </head>
@@ -416,6 +587,30 @@
     <div class="max-w-[94vw] max-h-[84vh] overflow-auto flex items-center justify-center rounded-xl">
       <img id="img-lightbox-img" src="" alt="" onclick="toggleLightboxZoom()" class="max-w-full max-h-[82vh] object-contain rounded-xl shadow-2xl border border-white/15 cursor-zoom-in transition-transform duration-200 bg-white">
     </div>
+  </div>
+
+  <!-- 表格全螢幕放大檢視器 (Responsive Fullscreen Table Viewer) -->
+  <div id="table-fullscreen-modal" data-no-highlight="true" class="hidden fixed inset-0 z-[210] bg-white flex flex-col">
+    <div class="px-4 py-3 border-b border-slate-200 bg-slate-50/95 backdrop-blur-sm flex items-center justify-between gap-3 flex-shrink-0 shadow-2xs">
+      <div class="flex items-center gap-2 min-w-0">
+        <span class="w-7 h-7 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center text-sm flex-shrink-0">📊</span>
+        <div class="min-w-0">
+          <h3 class="text-sm font-bold text-slate-800 truncate">表格全螢幕檢視模式</h3>
+          <p class="text-[11px] text-slate-500 truncate">支援上下左右順滑捲動與橫向手機檢視</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <div class="inline-flex items-center bg-white border border-slate-200 rounded-lg p-0.5 text-[11px] font-bold">
+          <button type="button" id="btn-fs-sz-sm" onclick="setFullscreenTableSize('sm')" class="px-2 py-1 rounded-md text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer">小</button>
+          <button type="button" id="btn-fs-sz-md" onclick="setFullscreenTableSize('md')" class="px-2 py-1 rounded-md bg-indigo-600 text-white transition-colors cursor-pointer">標準</button>
+          <button type="button" id="btn-fs-sz-lg" onclick="setFullscreenTableSize('lg')" class="px-2 py-1 rounded-md text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer">大</button>
+        </div>
+        <button type="button" onclick="closeTableFullscreen()" class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-800 hover:bg-slate-900 text-white transition-colors cursor-pointer active:scale-95" title="關閉全螢幕表格 (Esc)">
+          <span>✕</span><span>關閉</span>
+        </button>
+      </div>
+    </div>
+    <div id="table-fullscreen-body" class="fs-sz-md flex-1 overflow-auto p-3 sm:p-5 bg-white custom-scroll"></div>
   </div>
 
   <!-- 右下角懸浮閱讀輔助工具組（字體縮放 / 快速前往打卡 / 回到頂部） -->
@@ -3531,6 +3726,9 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
         }
       });
 
+      // 行動版智慧表格自適應排版（方案 1 解除殘留欄寬與料號防斷行 + 方案 2 橫向滑動導引 + 方案 3 全螢幕放大）
+      enhanceResponsiveTables(container);
+
       // 綁定內文圖片點擊放大檢視燈箱 (Lightbox)
       container.querySelectorAll('.ql-editor img').forEach(img => {
         if (img.dataset.lightboxBound) return;
@@ -3709,8 +3907,249 @@ const editableAttr = state.isEditMode ? 'contenteditable="true"' : '';
       if (divTop) divTop.classList.toggle('hidden', !showTop);
     }, { passive: true });
 
+    // ==========================================
+    // 行動版智慧表格自適應排版引擎（方案 1 + 2 + 3）
+    // ==========================================
+    function enhanceResponsiveTables(container) {
+      if (!container || state.isEditMode) return;
+      const tables = Array.from(container.querySelectorAll('table'));
+      if (!tables.length) return;
+
+      const IDX_HDR_RE = /^(項次|項目|序號|序|no\.?|#|數量|未進量|版次|單位|狀態)$/i;
+      const CODE_HDR_RE = /(料號|品號|單號|編號|代號|日期|交期|廠商簡稱|供應商|廠商|型號|追蹤號|表單)/i;
+      const DESC_HDR_RE = /(品名|說明|備註|原因|規格|內容|現象|處理|摘要|事項)/i;
+      const CODE_VAL_RE = /^[A-Za-z0-9\-_.\/#()]{4,24}$/;
+
+      tables.forEach((tbl, tIdx) => {
+        if (tbl.dataset.respEnhanced === '1') return;
+        tbl.dataset.respEnhanced = '1';
+
+        const rows = Array.from(tbl.rows || []);
+        if (rows.length === 0) return;
+
+        // 1. 計算實際最大欄數（完整支援 colspan 合併儲存格）
+        let maxCols = 0;
+        rows.forEach(r => {
+          let spanSum = 0;
+          Array.from(r.cells).forEach(cell => {
+            spanSum += Math.max(1, parseInt(cell.getAttribute('colspan') || '1', 10));
+          });
+          if (spanSum > maxCols) maxCols = spanSum;
+        });
+        if (maxCols <= 1) return;
+
+        if (maxCols >= 6) {
+          tbl.classList.add('wide-data-table');
+        } else {
+          tbl.classList.add('smart-fit-table');
+        }
+
+        // 2. 判定表頭列（含雙層合併群組表頭）並保護短表頭不折字
+        const firstRowHasColspan = Array.from(rows[0].cells).some(c => parseInt(c.getAttribute('colspan') || '1', 10) > 1);
+        const headerRowIdx = (firstRowHasColspan && rows.length > 1) ? 1 : 0;
+        const dataStartIdx = headerRowIdx + 1;
+
+        for (let r = 0; r <= headerRowIdx && r < rows.length; r++) {
+          Array.from(rows[r].cells).forEach(cell => {
+            const txt = (cell.textContent || '').replace(/\s+/g, '').trim();
+            if (txt.length > 0 && txt.length <= 6) {
+              cell.classList.add('th-nowrap');
+            }
+          });
+        }
+
+        // 3. 智慧分析每一欄語意（項次 / 料號代碼 / 品名說明）
+        const headerCells = rows[headerRowIdx] && rows[headerRowIdx].cells.length === maxCols
+          ? Array.from(rows[headerRowIdx].cells)
+          : null;
+
+        const colTypes = new Array(maxCols).fill('auto');
+        for (let c = 0; c < maxCols; c++) {
+          const hdrTxt = headerCells ? (headerCells[c].textContent || '').replace(/\s+/g, '').trim() : '';
+          const sampleVals = [];
+          for (let r = dataStartIdx; r < rows.length && sampleVals.length < 15; r++) {
+            if (rows[r].cells.length === maxCols) {
+              const v = (rows[r].cells[c].textContent || '').replace(/\s+/g, ' ').trim();
+              if (v) sampleVals.push(v);
+            }
+          }
+
+          if (IDX_HDR_RE.test(hdrTxt)) {
+            colTypes[c] = 'idx';
+          } else if (CODE_HDR_RE.test(hdrTxt)) {
+            colTypes[c] = 'code';
+          } else if (DESC_HDR_RE.test(hdrTxt)) {
+            colTypes[c] = 'desc';
+          } else if (sampleVals.length > 0) {
+            const allShort = sampleVals.every(v => v.length <= 4);
+            const codeRatio = sampleVals.filter(v => CODE_VAL_RE.test(v)).length / sampleVals.length;
+            const hasLong = sampleVals.some(v => v.length >= 14);
+            if (allShort) colTypes[c] = 'idx';
+            else if (codeRatio >= 0.6) colTypes[c] = 'code';
+            else if (hasLong) colTypes[c] = 'desc';
+          }
+        }
+
+        // 4. 套用防斷行與換行 class
+        rows.forEach((r, rIdx) => {
+          if (r.cells.length !== maxCols) return;
+          Array.from(r.cells).forEach((cell, cIdx) => {
+            const tp = colTypes[cIdx];
+            if (tp === 'idx') cell.classList.add('col-nowrap-idx');
+            else if (tp === 'code') cell.classList.add('col-nowrap-code');
+            else if (tp === 'desc' && rIdx >= dataStartIdx) cell.classList.add('col-wrap-desc');
+          });
+        });
+
+        // 5. 包覆橫向滑動外框、右側漸層陰影與「放大檢視」工具列
+        const existingScrollParent = tbl.parentElement && tbl.parentElement.classList.contains('overflow-x-auto')
+          ? tbl.parentElement
+          : null;
+
+        const block = document.createElement('div');
+        block.className = 'responsive-table-block';
+        block.setAttribute('data-table-idx', String(tIdx));
+
+        const dataRowCount = Math.max(0, rows.length - dataStartIdx);
+        const toolbar = document.createElement('div');
+        toolbar.className = 'table-mobile-toolbar hidden flex items-center justify-between gap-2 flex-wrap';
+        toolbar.setAttribute('data-no-highlight', 'true');
+        toolbar.setAttribute('data-print-hide', 'true');
+        toolbar.innerHTML = `
+          <span class="table-swipe-hint hidden inline-flex items-center gap-1 text-[11px] font-bold text-blue-700 bg-blue-50 border border-blue-200 px-2.5 py-0.5 rounded-full transition-opacity duration-300">
+            <span>↔</span><span>左右滑動查看完整表格</span>
+          </span>
+          <span class="table-fit-hint hidden inline-flex items-center gap-1 text-[11px] font-semibold text-slate-500">
+            <span>📊</span><span>明細表（共 ${dataRowCount || rows.length} 列）</span>
+          </span>
+          <button type="button" class="table-expand-btn ml-auto inline-flex items-center gap-1 text-[11px] font-bold text-indigo-700 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 px-2.5 py-1 rounded-lg transition-all cursor-pointer active:scale-95" title="開啟全螢幕表格檢視器，無邊距放大細看">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+            <span>放大檢視</span>
+          </button>
+        `;
+
+        const shell = document.createElement('div');
+        shell.className = 'table-scroll-shell relative rounded-lg';
+
+        const fadeRight = document.createElement('div');
+        fadeRight.className = 'table-scroll-fade-right pointer-events-none hidden absolute top-0 right-0 bottom-0 w-7 rounded-r-lg transition-opacity duration-200';
+        fadeRight.setAttribute('data-print-hide', 'true');
+        fadeRight.style.background = 'linear-gradient(to left, rgba(15,23,42,0.14), transparent)';
+
+        let scrollWrap;
+        if (existingScrollParent) {
+          existingScrollParent.parentNode.insertBefore(block, existingScrollParent);
+          scrollWrap = existingScrollParent;
+          scrollWrap.classList.add('table-scroll-wrap', 'custom-scroll');
+          shell.appendChild(scrollWrap);
+        } else {
+          tbl.parentNode.insertBefore(block, tbl);
+          scrollWrap = document.createElement('div');
+          scrollWrap.className = 'table-scroll-wrap overflow-x-auto custom-scroll rounded-lg';
+          scrollWrap.appendChild(tbl);
+          shell.appendChild(scrollWrap);
+        }
+
+        shell.appendChild(fadeRight);
+        block.appendChild(toolbar);
+        block.appendChild(shell);
+
+        const expandBtn = toolbar.querySelector('.table-expand-btn');
+        if (expandBtn) {
+          expandBtn.addEventListener('click', () => openTableFullscreen(tbl));
+        }
+
+        scrollWrap.addEventListener('scroll', () => {
+          const atEnd = scrollWrap.scrollLeft + scrollWrap.clientWidth >= scrollWrap.scrollWidth - 4;
+          fadeRight.style.opacity = atEnd ? '0' : '1';
+          if (scrollWrap.scrollLeft > 24) {
+            const swipeHint = toolbar.querySelector('.table-swipe-hint');
+            if (swipeHint) swipeHint.style.opacity = '0.55';
+          }
+        }, { passive: true });
+      });
+
+      requestAnimationFrame(() => updateTableOverflowHints(container));
+    }
+
+    function updateTableOverflowHints(root) {
+      const scope = root || document.getElementById('bulletin-content-area');
+      if (!scope) return;
+      const isMobile = window.innerWidth <= 768;
+      scope.querySelectorAll('.responsive-table-block').forEach(block => {
+        const wrap = block.querySelector('.table-scroll-wrap');
+        const toolbar = block.querySelector('.table-mobile-toolbar');
+        const swipeHint = block.querySelector('.table-swipe-hint');
+        const fitHint = block.querySelector('.table-fit-hint');
+        const fadeRight = block.querySelector('.table-scroll-fade-right');
+        if (!wrap || !toolbar) return;
+
+        const isOverflowing = wrap.scrollWidth > wrap.clientWidth + 4;
+        const showBar = isOverflowing || isMobile;
+        toolbar.classList.toggle('hidden', !showBar);
+        if (swipeHint) {
+          swipeHint.classList.toggle('hidden', !isOverflowing);
+          swipeHint.style.opacity = '1';
+        }
+        if (fitHint) {
+          fitHint.classList.toggle('hidden', isOverflowing || !isMobile);
+        }
+        if (fadeRight) {
+          const atEnd = wrap.scrollLeft + wrap.clientWidth >= wrap.scrollWidth - 4;
+          fadeRight.classList.toggle('hidden', !isOverflowing);
+          fadeRight.style.opacity = atEnd ? '0' : '1';
+        }
+      });
+    }
+
+    function openTableFullscreen(sourceTable) {
+      const modal = document.getElementById('table-fullscreen-modal');
+      const body = document.getElementById('table-fullscreen-body');
+      if (!modal || !body || !sourceTable) return;
+      const clone = sourceTable.cloneNode(true);
+      clone.removeAttribute('style');
+      body.innerHTML = '';
+      body.appendChild(clone);
+      setFullscreenTableSize(window.innerWidth <= 768 ? 'sm' : 'md');
+      modal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeTableFullscreen() {
+      const modal = document.getElementById('table-fullscreen-modal');
+      if (modal) modal.classList.add('hidden');
+      document.body.style.overflow = '';
+    }
+
+    function setFullscreenTableSize(sz) {
+      const body = document.getElementById('table-fullscreen-body');
+      if (!body) return;
+      body.classList.remove('fs-sz-sm', 'fs-sz-md', 'fs-sz-lg');
+      body.classList.add(`fs-sz-${sz}`);
+      ['sm', 'md', 'lg'].forEach(k => {
+        const btn = document.getElementById(`btn-fs-sz-${k}`);
+        if (!btn) return;
+        if (k === sz) {
+          btn.className = 'px-2 py-1 rounded-md bg-indigo-600 text-white transition-colors cursor-pointer';
+        } else {
+          btn.className = 'px-2 py-1 rounded-md text-slate-600 hover:bg-slate-100 transition-colors cursor-pointer';
+        }
+      });
+    }
+
+    let _tblResizeTimer = null;
+    window.addEventListener('resize', () => {
+      clearTimeout(_tblResizeTimer);
+      _tblResizeTimer = setTimeout(() => updateTableOverflowHints(), 120);
+    }, { passive: true });
+
     window.addEventListener('keydown', (ev) => {
       if (ev.key === 'Escape') {
+        const tf = document.getElementById('table-fullscreen-modal');
+        if (tf && !tf.classList.contains('hidden')) {
+          closeTableFullscreen();
+          return;
+        }
         const lb = document.getElementById('img-lightbox-modal');
         if (lb && !lb.classList.contains('hidden')) {
           closeImageLightbox();
