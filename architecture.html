@@ -60,7 +60,7 @@
       <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600 to-blue-600 flex items-center justify-center text-white font-black text-lg shadow-xs">YB</div>
       <div>
         <div class="text-base font-extrabold text-slate-800">微笑單車｜採購週報管理平台技術規格與價值白皮書</div>
-        <div class="text-xs text-slate-500">已同步後台最新 43 個迭代里程碑 · 零公司 IT 資源自研 · 100% 完讀閉環</div>
+        <div class="text-xs text-slate-500">已同步後台最新 50 個迭代里程碑 · 零公司 IT 資源自研 · 100% 完讀閉環 · 全集團跨網域與行動智慧排版</div>
       </div>
     </div>
     <div class="flex flex-wrap items-center gap-2">
@@ -68,7 +68,7 @@
         <span>🏗️ 系統架構與 IT 運作邏輯 (方案 C)</span>
       </button>
       <button id="btn-view-valuation" onclick="switchViewTab('view-valuation')" class="px-5 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition-all flex items-center gap-2">
-        <span>💰 外包市場價值與 ROI 效益評估 (省145萬)</span>
+        <span>💰 外包市場價值與 ROI 效益評估 (省175萬)</span>
       </button>
       <button id="btn-view-diagram" onclick="switchViewTab('view-diagram')" class="px-5 py-2.5 rounded-xl font-bold text-sm bg-white text-slate-600 hover:bg-slate-100 border border-slate-200 transition-all flex items-center gap-2">
         <span>🗺️ 系統全貌拓撲流向圖 (Mermaid)</span>
@@ -81,21 +81,21 @@
 
   <!-- 分頁 1：方案 C 系統架構與全鏈路運作邏輯 (同步自 admin.html 最新版 + 16大亮點) -->
   <div id="view-arch" class="space-y-8">
-    <!-- 頂部引言與整體架構定位 -->
+        <!-- 頂部引言與整體架構定位 -->
         <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-950 text-white rounded-2xl p-6 md:p-8 shadow-xl relative overflow-hidden">
           <div class="absolute -right-10 -bottom-10 w-60 h-60 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
           <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div class="space-y-2 max-w-3xl">
               <div class="inline-flex items-center gap-2 px-3 py-1 bg-indigo-500/20 border border-indigo-400/30 rounded-full text-xs font-medium text-indigo-300">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>系統全貌與 IT 技術規格白皮書 (Solution C: IT 專用結構化全景)</span>
+                <span>系統全貌與 IT 技術規格白皮書 (Solution C · 已同步 50 項迭代里程碑)</span>
               </div>
               <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white">採購佈告欄系統架構與全鏈路運作邏輯</h1>
               <p class="text-sm md:text-base text-slate-300 leading-relaxed">
-                本專案採用 <strong>前後端解耦之 Serverless（無伺服器）企業架構</strong>。前端託管於 GitHub Pages 搭配全球 CDN；後端全面託管於 Google Firebase (Firestore + Storage + Auth)；通知層直連 EmailJS API。全站具備<strong>零實體主機維護負擔、零資料庫停機風險、高強度資安防護與全自動化 CI/CD</strong>。
+                本專案採用 <strong>前後端解耦之 Serverless（無伺服器）企業架構</strong>。前端託管於 GitHub Pages 搭配全球 CDN；後端全面託管於 Google Firebase (Firestore + Storage + Auth)；通知層直連 EmailJS API。全站具備<strong>全集團多網域零信任門禁、憑證過期無縫自癒、行動版智慧表格排版、零實體主機維護負擔與全自動化 CI/CD</strong>。
               </p>
             </div>
-            <div class="flex flex-col gap-2 shrink-0 bg-white/5 p-4 rounded-xl border border-white/10 backdrop-blur-xs min-w-[200px]">
+            <div class="flex flex-col gap-2 shrink-0 bg-white/5 p-4 rounded-xl border border-white/10 backdrop-blur-xs min-w-[215px]">
               <div class="text-xs text-slate-400 font-medium">系統核心規格速覽</div>
               <div class="flex items-center justify-between text-xs py-1 border-b border-white/10">
                 <span class="text-slate-300">架構型態</span>
@@ -111,7 +111,7 @@
               </div>
               <div class="flex items-center justify-between text-xs py-1">
                 <span class="text-slate-300">資安管控</span>
-                <span class="font-bold text-rose-400">OAuth + Security Rules</span>
+                <span class="font-bold text-rose-400">多網域零信任 + 防刪</span>
               </div>
             </div>
           </div>
@@ -138,16 +138,16 @@
                 </div>
                 <h3 class="font-bold text-slate-800 text-base">終端使用者與安全門禁</h3>
                 <p class="text-xs text-slate-500 leading-relaxed">
-                  區分「一般同仁 (Reader)」與「採購管理員 (Admin)」，強制經過企業認證牆。
+                  區分「一般同仁 (Reader)」與「採購管理員 (Admin)」，強制經過全集團零信任認證牆。
                 </p>
                 <div class="space-y-2 pt-2 border-t border-slate-100 text-xs">
                   <div class="bg-blue-50/70 p-2.5 rounded-lg border border-blue-100">
-                    <strong class="text-blue-900 block font-semibold mb-0.5">🔐 Google OAuth 企業網域門禁</strong>
-                    <span class="text-slate-600">強制鎖定 <code class="bg-white px-1 py-0.5 rounded text-[11px] text-blue-700">@youbike.com.tw</code> 網域登入，外來帳號直接阻斷。</span>
+                    <strong class="text-blue-900 block font-semibold mb-0.5">🔐 全集團多網域 OAuth 門禁</strong>
+                    <span class="text-slate-600">支援 <code class="bg-white px-1 py-0.5 rounded text-[11px] text-blue-700">@youbike.com.tw</code> / <code class="bg-white px-1 py-0.5 rounded text-[11px] text-blue-700">@giantcycling.com</code> / <code class="bg-white px-1 py-0.5 rounded text-[11px] text-blue-700">@giant.com.tw</code>，搭配跨網域白名單匹配與憑證無縫自癒重驗。</span>
                   </div>
                   <div class="bg-blue-50/70 p-2.5 rounded-lg border border-blue-100">
-                    <strong class="text-blue-900 block font-semibold mb-0.5">👁️ ACL 存取過濾引擎</strong>
-                    <span class="text-slate-600">前台載入時自動交叉比對機密週報白名單與隱藏旗標，未獲授權無從讀取。</span>
+                    <strong class="text-blue-900 block font-semibold mb-0.5">👁️ Zero-Data 與 ACL 過濾引擎</strong>
+                    <span class="text-slate-600">未登入前徹底清空 DOM 防 F12 窺探；登入後交叉比對機密白名單與隱藏旗標即時隔離。</span>
                   </div>
                 </div>
               </div>
@@ -171,11 +171,11 @@
                 <div class="space-y-2 pt-2 border-t border-slate-100 text-xs">
                   <div class="bg-emerald-50/70 p-2.5 rounded-lg border border-emerald-100">
                     <strong class="text-emerald-900 block font-semibold mb-0.5">前台 (index.html)</strong>
-                    <span class="text-slate-600">經典雙欄檢索流、即時關鍵字查詢、一鍵完讀漸層打卡、Email 浮水印與高斯防窺。</span>
+                    <span class="text-slate-600">吸頂雙欄流、DOM 關鍵字螢光高亮導覽、行動智慧表格與全螢幕檢視、粉紅附件專區、圖片燈箱、字級縮放、列印 PDF 與一鍵打卡。</span>
                   </div>
                   <div class="bg-emerald-50/70 p-2.5 rounded-lg border border-emerald-100">
-                    <strong class="text-emerald-900 block font-semibold mb-0.5">後台 (admin.html)</strong>
-                    <span class="text-slate-600">TinyMCE 富文本淨化編輯、多裝置模擬預覽、選擇性隱藏開關、Audit Logs 防舞弊日誌。</span>
+                    <strong class="text-emerald-900 block font-semibold mb-0.5">後台 (admin.html) &amp; 問卷 (survey.html)</strong>
+                    <span class="text-slate-600">TinyMCE 1:1 編輯、Ctrl+S 未儲存監控、段落收合、動態首頁、三大設定工作台、已讀分頁催讀與 3D 黏土進度問卷。</span>
                   </div>
                 </div>
               </div>
@@ -198,12 +198,12 @@
                 </p>
                 <div class="space-y-2 pt-2 border-t border-slate-100 text-xs">
                   <div class="bg-amber-50/70 p-2.5 rounded-lg border border-amber-100">
-                    <strong class="text-amber-900 block font-semibold mb-0.5">🛡️ Security Rules 防護牆</strong>
-                    <span class="text-slate-600">資料庫層級細緻權限：只允許驗證之管理員寫入，同仁僅限唯讀與個人打卡。</span>
+                    <strong class="text-amber-900 block font-semibold mb-0.5">🛡️ Security Rules 零信任鐵幕</strong>
+                    <span class="text-slate-600">伺服器端不區分大小寫 <code class="bg-white px-1 py-0.5 rounded text-[11px] text-amber-700">(?i)</code> 校驗全集團網域，全集合強制 <code class="bg-white px-1 py-0.5 rounded text-[11px] text-rose-700">allow delete: if false</code> 禁止物理刪除。</span>
                   </div>
                   <div class="bg-amber-50/70 p-2.5 rounded-lg border border-amber-100">
-                    <strong class="text-amber-900 block font-semibold mb-0.5">📦 Firestore & Cloud Storage</strong>
-                    <span class="text-slate-600">管理週報(bulletins)、打卡(readReceipts)、名冊(systemConfig)、稽核(auditLogs)與附件檔案。</span>
+                    <strong class="text-amber-900 block font-semibold mb-0.5">📦 Firestore &amp; Cloud Storage</strong>
+                    <span class="text-slate-600">管理週報(bulletins)、機密隔離(private)、打卡(readReceipts)、問卷(surveys)、名冊詞庫(systemConfig)、稽核(auditLogs)與附件圖床。</span>
                   </div>
                 </div>
               </div>
@@ -227,7 +227,7 @@
                 <div class="space-y-2 pt-2 border-t border-slate-100 text-xs">
                   <div class="bg-rose-50/70 p-2.5 rounded-lg border border-rose-100">
                     <strong class="text-rose-900 block font-semibold mb-0.5">✉️ EmailJS API 自動推播</strong>
-                    <span class="text-slate-600">發布時自動提取「緊急」必讀項目，動態組合富文本 HTML 郵件發送至同仁信箱。</span>
+                    <span class="text-slate-600">發布時自動提取「緊急」必讀項目，動態組合富文本 HTML 郵件發送，並支援一鍵複製群組及未讀催讀信箱。</span>
                   </div>
                   <div class="bg-rose-50/70 p-2.5 rounded-lg border border-rose-100">
                     <strong class="text-rose-900 block font-semibold mb-0.5">🚀 GitHub Actions CI/CD</strong>
@@ -265,19 +265,19 @@
               <ol class="space-y-3 text-xs text-slate-600 flex-1">
                 <li class="flex items-start gap-2">
                   <span class="font-mono font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">01</span>
-                  <span><strong>Google 登入請求：</strong>同仁透過 Firebase Client SDK 觸發 Google Sign-In 彈窗。</span>
+                  <span><strong>Google 登入與會話還原：</strong>透過 Firebase Client SDK 觸發 Google Sign-In，由 <code class="text-blue-700 font-mono">onAuthStateChanged</code> 自動維護有效憑證。</span>
                 </li>
                 <li class="flex items-start gap-2">
                   <span class="font-mono font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">02</span>
-                  <span><strong>網域校驗門禁：</strong>前端立即檢查 Email 是否以 <code class="text-blue-700 font-semibold">@youbike.com.tw</code> 結尾，非企業信箱立刻登出。</span>
+                  <span><strong>全集團網域門禁與自癒重驗：</strong>前後端同步校驗 <code class="text-blue-700 font-semibold">@youbike.com.tw</code> / <code class="text-blue-700 font-semibold">@giantcycling.com</code> / <code class="text-blue-700 font-semibold">@giant.com.tw</code>，憑證失效自動觸發 <code class="text-slate-800 font-mono">trySeamlessReAuth</code>。</span>
                 </li>
                 <li class="flex items-start gap-2">
                   <span class="font-mono font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">03</span>
-                  <span><strong>白名單比對與實名快取：</strong>比對 <code class="text-slate-800 font-mono">systemConfig/whitelist</code>，取得使用者所屬單位與中文實名。</span>
+                  <span><strong>跨網域白名單與實名快取：</strong><code class="text-slate-800 font-mono">findUserInWhitelist</code> 依信箱、帳號前綴與實名比對 <code class="text-slate-800 font-mono">systemConfig/whitelist</code>，精準綁定單位與中文實名。</span>
                 </li>
                 <li class="flex items-start gap-2">
                   <span class="font-mono font-bold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">04</span>
-                  <span><strong>ACL 機密過濾：</strong>查詢 Firestore 週報時，過濾掉已隱藏者，且機密週報僅有在名單內的 Email 才會接收到文檔。</span>
+                  <span><strong>Zero-Data 與 ACL 隔離：</strong>自動過濾已隱藏週報，機密內文由 <code class="text-slate-800 font-mono">private/content</code> 雲端規則鎖定，未授權者零資料外洩。</span>
                 </li>
               </ol>
             </div>
@@ -291,19 +291,19 @@
               <ol class="space-y-3 text-xs text-slate-600 flex-1">
                 <li class="flex items-start gap-2">
                   <span class="font-mono font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">01</span>
-                  <span><strong>後台富文本編撰：</strong>透過 TinyMCE 與 Excel 淨化過濾器輸入採購內容，自動消除格式雜訊與幽靈空白。</span>
+                  <span><strong>後台高效率富文本編撰：</strong>TinyMCE 1:1 表格對齊與 Excel/Word 淨化引擎，搭配 <code class="text-emerald-700 font-mono">Ctrl+S</code> 快捷存檔、響應式未儲存徽章與段落收合。</span>
                 </li>
                 <li class="flex items-start gap-2">
                   <span class="font-mono font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">02</span>
-                  <span><strong>三合一沙盒預覽：</strong>管理員切換電腦/平板/手機視角確認 1:1 實景排版，資料不落正式庫。</span>
+                  <span><strong>三合一多裝置沙盒預覽：</strong>切換電腦／平板 (768px)／手機 (414px) 視角實景檢視 1:1 排版與行動版智慧表格，預覽資料不落正式庫。</span>
                 </li>
                 <li class="flex items-start gap-2">
                   <span class="font-mono font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">03</span>
-                  <span><strong>Firestore 原子寫入：</strong>狀態更新為 <code class="text-emerald-700 font-semibold">published</code>，並自動寫入一筆全員防舞弊 Audit Log 記錄發布者實名。</span>
+                  <span><strong>Firestore 原子寫入與稽核：</strong>狀態更新為 <code class="text-emerald-700 font-semibold">published</code>，並自動寫入全員防舞弊 Audit Log 記錄發布者中文實名。</span>
                 </li>
                 <li class="flex items-start gap-2">
                   <span class="font-mono font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded">04</span>
-                  <span><strong>EmailJS 批次發送：</strong>後台調用 EmailJS 服務，將本週重點與緊急公告帶圖片直接發送至同仁公務信箱。</span>
+                  <span><strong>EmailJS 推播與單期分享：</strong>自動將本週緊急重點與圖片寄送至群組信箱；前台亦支援 <code class="text-emerald-700 font-mono">?id=</code> 單期直達連結分享。</span>
                 </li>
               </ol>
             </div>
@@ -317,19 +317,19 @@
               <ol class="space-y-3 text-xs text-slate-600 flex-1">
                 <li class="flex items-start gap-2">
                   <span class="font-mono font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">01</span>
-                  <span><strong>同仁滑動閱讀打卡：</strong>讀完全文後點擊底部「已詳細閱讀並知悉」，按鈕立即呈現旋轉載入防重複點擊。</span>
+                  <span><strong>全方位輔助閱讀與一鍵打卡：</strong>同仁可藉由關鍵字螢光高亮、章節快跳、全螢幕表格放大器、圖片燈箱與字級縮放讀完全文，並於底部或浮動鈕點擊打卡。</span>
                 </li>
                 <li class="flex items-start gap-2">
                   <span class="font-mono font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">02</span>
-                  <span><strong>寫入已讀存根與 100% 完讀真理：</strong>Firestore 集合 <code class="text-amber-800 font-mono">readReceipts</code> 寫入包含週報 ID、同仁信箱、精確時間戳記與 <code class="text-emerald-700 font-semibold">confirmed: true</code>（打卡確認即 100% 完讀）。</span>
+                  <span><strong>Token 自癒與 100% 完讀存根：</strong>寫入前自動刷新憑證，<code class="text-amber-800 font-mono">readReceipts</code> 記錄精確時間戳記與 <code class="text-emerald-700 font-semibold">confirmed: true</code>（打卡即 100% 完讀真理）。</span>
                 </li>
                 <li class="flex items-start gap-2">
                   <span class="font-mono font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">03</span>
-                  <span><strong>前端金徽章鎖定：</strong>成功打卡後頂端立即亮起「👑 已完讀」琥珀金徽章，再次進入時常駐 100% 滿條。</span>
+                  <span><strong>前端金徽章鎖定：</strong>成功打卡後頂端即時亮起「👑 已完讀」琥珀金徽章並常駐 100% 滿條，閱讀完畢亦可無縫前往 3D 黏土問卷回饋。</span>
                 </li>
                 <li class="flex items-start gap-2">
                   <span class="font-mono font-bold text-amber-600 bg-amber-50 px-1.5 py-0.5 rounded">04</span>
-                  <span><strong>KPI 即時彙算與動態對齊：</strong>後台讀取打卡記錄與通訊錄，動態對齊最新主要負責人名冊並排除工程處，自動彙算各縣市 100% 完讀率與 SheetJS 報表導出。</span>
+                  <span><strong>KPI 動態彙算與一鍵催讀：</strong>後台動態對齊主要聯絡人並排除工程處，提供分頁篩選、一鍵複製未讀 Email 催讀與 SheetJS 點閱時間報表導出。</span>
                 </li>
               </ol>
             </div>
@@ -337,18 +337,19 @@
           </div>
         </div>
 
-        <!-- 區塊三：全專案十三項核心技術亮點與邏輯卡片 -->
+        <!-- 區塊三：全專案十八項核心技術亮點與邏輯卡片 -->
         <div class="space-y-4">
           <div class="flex items-center justify-between">
             <h2 class="text-lg font-bold text-slate-800 flex items-center gap-2">
               <span class="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center text-xs font-bold">3</span>
-              <span>專案核心亮點與深度技術架構 (Technical Highlights · 16 大核心構面)</span>
+              <span>專案核心亮點與深度技術架構 (Technical Highlights · 18 大構面)</span>
             </h2>
-            <span class="text-xs text-slate-500 font-medium">全方位滿足企業級系統之維護與資安標準</span>
+            <span class="text-xs text-slate-500 font-medium">涵蓋 50 項里程碑 · 滿足企業級維護、體驗與資安標準</span>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             
+            <!-- 亮點 1 -->
             <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col hover:shadow-sm hover:border-slate-300 transition-all">
               <div class="flex flex-col gap-3 mb-4">
                 <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
@@ -357,7 +358,7 @@
                 <h3 class="font-bold text-slate-800 text-lg">Serverless 無伺服器架構</h3>
               </div>
               <p class="text-sm text-slate-600 leading-relaxed mb-4">
-                捨棄傳統需要買主機、架設作業系統的框架。全站採用 <strong>HTML5 + JS</strong> 開發，搭配 <strong>GitHub Actions</strong> 實現 CI/CD，每次修改程式碼就會自動發佈至 <strong>GitHub Pages</strong>。
+                捨棄傳統需要買主機、架設作業系統的框架。全站採用 <strong>HTML5 + ES6+ JS</strong> 開發，搭配 <strong>GitHub Actions</strong> 實現 CI/CD，每次修改程式碼即自動發佈至 <strong>GitHub Pages</strong>。
               </p>
               <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
                 <li>維護成本為零，無須擔心實體主機硬體當機</li>
@@ -366,6 +367,7 @@
               </ul>
             </div>
 
+            <!-- 亮點 2 -->
             <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col hover:shadow-sm hover:border-slate-300 transition-all">
               <div class="flex flex-col gap-3 mb-4">
                 <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-amber-600">
@@ -383,6 +385,7 @@
               </ul>
             </div>
 
+            <!-- 亮點 3 -->
             <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col hover:shadow-sm hover:border-slate-300 transition-all">
               <div class="flex flex-col gap-3 mb-4">
                 <div class="w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center text-rose-600">
@@ -400,6 +403,7 @@
               </ul>
             </div>
 
+            <!-- 亮點 4 -->
             <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col hover:shadow-sm hover:border-slate-300 transition-all">
               <div class="flex flex-col gap-3 mb-4">
                 <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600">
@@ -411,12 +415,13 @@
                 系統具備 <strong>Global Whitelist</strong> (全域白名單) 權限控管與 <strong>Version Checker</strong> (強制更新) 機制。
               </p>
               <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
-                <li>通訊錄名單即為全站觀看權限，無須逐篇設定</li>
+                <li>通訊錄名單即為全站觀看權限，支援跨集團網域智慧匹配</li>
                 <li>管理員可透過 <code class="bg-slate-100 px-1 rounded text-xs">?test_user=1</code> 模擬前台權限</li>
-                <li>發布新版時透過比對 version.txt 強制破除瀏覽器暫存</li>
+                <li>發布新版時透過比對 <code class="bg-slate-100 px-1 rounded text-xs">version.txt</code> 強制破除瀏覽器暫存</li>
               </ul>
             </div>
 
+            <!-- 亮點 5 -->
             <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col hover:shadow-sm hover:border-slate-300 transition-all">
               <div class="flex flex-col gap-3 mb-4">
                 <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-600">
@@ -425,7 +430,7 @@
                 <h3 class="font-bold text-slate-800 text-lg">機密週報防護與選擇性隱藏</h3>
               </div>
               <p class="text-sm text-slate-600 leading-relaxed mb-4">
-                針對高敏或特定廠區週報引入 <strong>ACL 存取控制</strong> 與 <strong>選擇性隱藏開關</strong>。後台勾選特定人員或隱藏後，前台即刻隔離。
+                針對高敏或特定廠區週報引入 <strong>ACL 存取控制</strong>、<strong>雲端機密保險箱 (<code class="text-xs">private/content</code>)</strong> 與選擇性隱藏開關。
               </p>
               <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
                 <li><strong>精準存取過濾</strong>：非授權同仁清單完全不顯示，網址直接開啟亦安全鎖定。</li>
@@ -434,23 +439,25 @@
               </ul>
             </div>
 
+            <!-- 亮點 6 -->
             <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col hover:shadow-sm hover:border-slate-300 transition-all">
               <div class="flex flex-col gap-3 mb-4">
                 <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600">
                   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path></svg>
                 </div>
-                <h3 class="font-bold text-slate-800 text-lg">前端版面極致最佳化</h3>
+                <h3 class="font-bold text-slate-800 text-lg">前後台 1:1 富文本與版面最佳化</h3>
               </div>
               <p class="text-sm text-slate-600 leading-relaxed mb-4">
-                為迎合使用者對於「高密度資訊、無留白」的嚴格要求，在前端實作了深度的 HTML 過濾與 DOM 重塑引擎。
+                深度客製 <strong>TinyMCE 核心引擎</strong>與前端 DOM 重塑過濾器，實現 Word / Excel 貼上零誤差 1:1 高密度排版。
               </p>
               <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
-                <li><strong>智慧空行消除</strong>：遞迴剝離富文本編輯器產生的幽靈空白與換行。</li>
-                <li><strong>響應式懸浮微標</strong>：「緊急」標籤改為 Hover 觸發，不佔用任何版面空間。</li>
-                <li><strong>強制版面壓縮</strong>：覆寫 Tailwind 與 Quill 預設樣式，實現 0 padding/margin。</li>
+                <li><strong>1:1 零誤差盒模型</strong>：統一前後台表格邊距、儲存格內距與緊湊行距，消除視覺落差。</li>
+                <li><strong>智慧空行與雜訊淨化</strong>：遞迴剝離 Word/Excel 剪貼簿幽靈空白與冗餘標籤。</li>
+                <li><strong>商務專屬工具</strong>：內建 32 色蜂巢／莫蘭迪色盤、一鍵跨欄置中與自由拖拉欄寬。</li>
               </ul>
             </div>
 
+            <!-- 亮點 7 -->
             <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col hover:shadow-sm hover:border-slate-300 transition-all">
               <div class="flex flex-col gap-3 mb-4">
                 <div class="w-12 h-12 bg-cyan-100 rounded-full flex items-center justify-center text-cyan-600">
@@ -459,15 +466,16 @@
                 <h3 class="font-bold text-slate-800 text-lg">週報點閱績效統計與數據匯出</h3>
               </div>
               <p class="text-sm text-slate-600 leading-relaxed mb-4">
-                前後台整合的視覺化 KPI 看板，能自動追蹤各營運處的閱讀狀況，並支援 Excel 報表匯出。
+                前後台整合的視覺化 KPI 看板，自動追蹤各營運處閱讀狀況，並完整記錄點閱時間明細與 SheetJS Excel 報表匯出。
               </p>
               <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
-                <li><strong>自動結算：</strong>自動計算主要聯絡人的應讀與已讀數據。</li>
-                <li><strong>防呆機制：</strong>防呆過濾未設定主要聯絡人的單位，避免數據失真。</li>
-                <li><strong>公開透明：</strong>前台登入自動彈出統計看板，促進團隊內部閱讀積極度。</li>
+                <li><strong>自動結算與時間明細：</strong>自動彙算主要窗口閱讀率，完整呈現 <code>YYYY/MM/DD HH:mm</code> 打卡時間。</li>
+                <li><strong>防呆機制：</strong>自動排除工程處與未設主要窗口單位，確保營運 KPI 數據精準。</li>
+                <li><strong>公開透明：</strong>前台登入自動彈出統計看板，促進跨區團隊閱讀積極度。</li>
               </ul>
             </div>
 
+            <!-- 亮點 8 -->
             <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col hover:shadow-sm hover:border-slate-300 transition-all">
               <div class="flex flex-col gap-3 mb-4">
                 <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-amber-600">
@@ -476,15 +484,16 @@
                 <h3 class="font-bold text-slate-800 text-lg">一鍵打卡閉環與尊榮完讀金徽章</h3>
               </div>
               <p class="text-sm text-slate-600 leading-relaxed mb-4">
-                打破傳統「點開即算已讀」的粗糙統計，週報底部配置商務微漸層打卡按鈕，並採雲端非同步防護。
+                打破傳統「點開即算已讀」的粗糙統計，週報底部與浮動閱讀工具列均配置一鍵打卡通道，並採雲端非同步與 Token 自動刷新防護。
               </p>
               <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
-                <li><strong>底端一鍵打卡</strong>：點擊顯示 Loading 旋轉動畫，Firestore 驗證寫入成功方鎖定狀態。</li>
+                <li><strong>雲端驗證打卡</strong>：點擊顯示 Loading 動畫並自動刷新 Token，Firestore 寫入成功方鎖定狀態。</li>
                 <li><strong>尊榮金徽章回饋</strong>：打卡成功即於 Header 點亮專屬「👑 已完讀」琥珀金徽章。</li>
                 <li><strong>完讀滿條常駐</strong>：已完讀同仁重開時常駐 100% 滿條，兼顧視覺標示與榮譽感。</li>
               </ul>
             </div>
 
+            <!-- 亮點 9 -->
             <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col hover:shadow-sm hover:border-slate-300 transition-all">
               <div class="flex flex-col gap-3 mb-4">
                 <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600">
@@ -493,15 +502,16 @@
                 <h3 class="font-bold text-slate-800 text-lg">多層次已讀容錯與後台手動補登</h3>
               </div>
               <p class="text-sm text-slate-600 leading-relaxed mb-4">
-                全面解決同仁因 Google 英文暱稱或同音異字導致無法比對中文姓名之痛點，並提供管理員自主補登介面。
+                全面解決同仁因集團跨網域信箱、英文暱稱或同音異字導致無法比對中文姓名之痛點，並提供管理員自主補登介面。
               </p>
               <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
-                <li><strong>多維度容錯匹配</strong>：信箱、前綴、全半形去空格姓名與同音字交叉校驗。</li>
+                <li><strong>多維度容錯匹配</strong>：信箱、跨網域前綴、全半形去空格姓名與同音字交叉校驗。</li>
                 <li><strong>後台手動補登 Modal</strong>：管理員可直接挑選未讀同仁快速補登，即時連動雲端與 KPI。</li>
                 <li><strong>身分即時顯性化</strong>：前台 Header 呈現登入姓名與單位，後台名冊透明列出登入 Email。</li>
               </ul>
             </div>
 
+            <!-- 亮點 10 -->
             <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col hover:shadow-sm hover:border-slate-300 transition-all">
               <div class="flex flex-col gap-3 mb-4">
                 <div class="w-12 h-12 bg-rose-100 rounded-full flex items-center justify-center text-rose-600">
@@ -519,23 +529,25 @@
               </ul>
             </div>
 
+            <!-- 亮點 11 -->
             <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col hover:shadow-sm hover:border-slate-300 transition-all">
               <div class="flex flex-col gap-3 mb-4">
                 <div class="w-12 h-12 bg-teal-100 rounded-full flex items-center justify-center text-teal-600">
                   <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h7"/></svg>
                 </div>
-                <h3 class="font-bold text-slate-800 text-lg">經典雙欄流與大字體清晰版型</h3>
+                <h3 class="font-bold text-slate-800 text-lg">經典雙欄吸頂流與大字體清晰版型</h3>
               </div>
               <p class="text-sm text-slate-600 leading-relaxed mb-4">
-                採用使用者最直觀的「方案 A 固定置左歸檔目錄」，並為資深同仁專屬升級大字體與同寬版型架構。
+                採用「方案 A 固定置左吸頂歸檔目錄」，讓長篇週報捲動時左側檢索與歷史清單常駐隨行，並兼顧資深同仁閱讀舒適度。
               </p>
               <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
-                <li><strong>歷史歸檔靠左整合</strong>：整合關鍵字即時檢索、月份與類別篩選，大字體觸控好點選。</li>
-                <li><strong>等寬視覺對齊</strong>：中間主要佈告欄內容卡片與下方頁尾聯絡資訊／保密聲明完全等寬。</li>
-                <li><strong>高適配無收合障礙</strong>：移除不穩定的側邊收合按鈕，跨不同解析度維持最高一致性。</li>
+                <li><strong>桌面側欄 Sticky 吸頂</strong>：捲動長文不中斷切期與搜尋，整合月份與類別即時篩選。</li>
+                <li><strong>等寬視覺對齊</strong>：主要佈告欄卡片、聯絡資訊與保密聲明完全等寬對齊。</li>
+                <li><strong>單期直達分享與骨架屏</strong>：支援 <code>?id=</code> 連結分享與 Skeleton 載入過渡。</li>
               </ul>
             </div>
 
+            <!-- 亮點 12 -->
             <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col hover:shadow-sm hover:border-slate-300 transition-all">
               <div class="flex flex-col gap-3 mb-4">
                 <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-amber-600">
@@ -553,7 +565,7 @@
               </ul>
             </div>
 
-            <!-- 亮點 11 -->
+            <!-- 亮點 13 -->
             <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col hover:shadow-sm hover:border-slate-300 transition-all">
               <div class="flex flex-col gap-3 mb-4">
                 <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-600">
@@ -571,94 +583,93 @@
               </ul>
             </div>
 
-            <!-- 亮點 12 -->
+            <!-- 亮點 14 -->
             <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col hover:shadow-sm hover:border-slate-300 transition-all">
               <div class="flex flex-col gap-3 mb-4">
                 <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-amber-600">
                   <span class="text-2xl">📝</span>
                 </div>
-                <h3 class="font-bold text-slate-800 text-lg">前台雙通道需求問卷與美感交互</h3>
+                <h3 class="font-bold text-slate-800 text-lg">雙通道需求問卷與填答進度互動</h3>
               </div>
               <p class="text-sm text-slate-600 leading-relaxed mb-4">
-                打破單向公告藩籬，前台注入微光動態與 3D 黏土美學入口，搭建採購與全台同仁的雙向溝通橋樑。
+                打破單向公告藩籬，前台雙通道銜接專屬 3D 黏土風問卷系統，提供即時進度追蹤、缺漏提示與全集團身分驗證。
               </p>
               <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
-                <li><strong>Header 質感呼吸入口</strong>：琥珀微漸層按鈕搭配 hover 微動態與呼吸光點，優雅不突兀。</li>
-                <li><strong>頁尾意見調查卡片</strong>：閱畢即時引導回饋，與聯絡資訊同寬對齊，視覺協調具專業感。</li>
-                <li><strong>獨立分頁無縫流暢</strong>：以新分頁開啟專屬 3D 黏土問卷，完全不中斷當前閱讀與打卡狀態。</li>
+                <li><strong>吸頂進度條與即時驗證</strong>：顯示「必填 X / 5 項」進度條，缺漏欄位自動捲動搖晃並彈出 Toast。</li>
+                <li><strong>重複提交防呆提醒</strong>：自動偵測已填答紀錄並顯示溫馨橫幅，兼顧流暢度與資料乾淨度。</li>
+                <li><strong>雙通道優雅入口</strong>：前台 Header 呼吸微光按鈕與頁尾卡片雙軌引導，不中斷閱讀打卡。</li>
               </ul>
             </div>
 
-            <!-- 亮點 13 -->
+            <!-- 亮點 15 -->
             <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col hover:shadow-sm hover:border-slate-300 transition-all">
               <div class="flex flex-col gap-3 mb-4">
                 <div class="w-12 h-12 bg-emerald-100 rounded-full flex items-center justify-center text-emerald-600">
-                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 008 11a4 4 0 118 0c0 1.017-.07 2.019-.203 3m-2.118 6.844A21.88 21.88 0 0015.171 17m3.839 1.132c.645-2.266.99-4.659.99-7.132A8 8 0 008 4.07M3 15.364c.64-1.319 1-2.8 1-4.364 0-1.457.39-2.823 1.07-4"/></svg>
                 </div>
-                <h3 class="font-bold text-slate-800 text-lg">雲端零信任伺服器安全與防物理刪除</h3>
+                <h3 class="font-bold text-slate-800 text-lg">零信任多網域防禦與憑證無縫自癒</h3>
               </div>
               <p class="text-sm text-slate-600 leading-relaxed mb-4">
-                告別前端假性防護，將資安提升至雲端伺服器級別，打造無法被 F12 或惡意外部腳本穿透的防護鐵幕。
+                將資安提升至雲端伺服器級別，同時兼顧跨集團子公司同仁的順暢登入與無感續期體驗。
               </p>
               <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
-                <li><strong>雲端零信任網域鐵律</strong>：Firestore 規則嚴格校驗 <code>isCompanyUser()</code>，非公司帳號一概拒絕存取。</li>
+                <li><strong>全集團規則不區分大小寫</strong>：Firestore Rules 以 <code>(?i)</code> 校驗 <code>isCompanyUser()</code>，相容大小寫與集團多網域。</li>
                 <li><strong>全集合禁止物理刪除</strong>：強制 <code>allow delete: if false;</code>，徹底免除誤刪或惡意洗庫風險。</li>
-                <li><strong>自動化身分監聽閉環</strong>：引入 <code>onAuthStateChanged</code>，自動還原已驗證會話，安全無縫流暢。</li>
+                <li><strong>打卡憑證無縫自癒</strong>：內建 <code>trySeamlessReAuth</code> 與 Token 自動刷新，根除過期權限錯誤。</li>
               </ul>
             </div>
 
-          
-            <!-- 亮點 14：前後台 1:1 表格零誤差盒模型與 KPI 點閱時間明細 (M40) -->
+            <!-- 亮點 16 -->
             <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col hover:shadow-sm hover:border-slate-300 transition-all">
               <div class="flex flex-col gap-3 mb-4">
-                <div class="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600">
-                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                <div class="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center text-yellow-700">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
                 </div>
-                <h3 class="font-bold text-slate-800 text-lg">前後台 1:1 表格對齊與點閱時間明細</h3>
+                <h3 class="font-bold text-slate-800 text-lg">關鍵字螢光高亮檢索與懸浮導覽</h3>
               </div>
               <p class="text-sm text-slate-600 leading-relaxed mb-4">
-                統一前後台 TinyMCE 富文本與表格 CSS 盒模型，消除視覺落差，並於 KPI 看板與匯出報表擴充精確點閱時間。
+                打造純 DOM 文字節點層級的即時高亮引擎，輸入料號、廠商或關鍵字時零破壞表格結構，一鍵定位所有命中段落。
               </p>
               <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
-                <li><strong>1:1 零誤差盒模型</strong>：統一設定 <code>margin: 4px 0</code>、<code>padding: 2px 6px</code> 與緊湊行距。</li>
-                <li><strong>點閱時間精準入帳</strong>：KPI 看板與 SheetJS 匯出報表完整記錄 <code>YYYY/MM/DD HH:mm</code> 打卡時間。</li>
-                <li><strong>介面純粹化與深度健檢</strong>：移除冗餘提示橫幅，確保程式碼零重複宣告與高穩定度。</li>
+                <li><strong>精準螢光與整列標亮</strong>：支援多關鍵字空格搜尋，<code>mark.search-hl</code> 螢光標示並柔光提示整列表格。</li>
+                <li><strong>懸浮跳轉列與快捷鍵</strong>：提供「第 X / N 筆」上下跳轉條，支援 <code>Enter</code> / <code>Shift+Enter</code> / <code>Esc</code>。</li>
+                <li><strong>命中徽章與跨月份引導</strong>：側欄顯示各期命中次數，當月無結果時自動提示切換「全部月份」。</li>
               </ul>
             </div>
 
-            <!-- 亮點 15：智慧郵件通訊錄與發信群組自動自癒工作台 (M41 & M42) -->
+            <!-- 亮點 17 -->
+            <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col hover:shadow-sm hover:border-slate-300 transition-all">
+              <div class="flex flex-col gap-3 mb-4">
+                <div class="w-12 h-12 bg-pink-100 rounded-full flex items-center justify-center text-pink-600">
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+                </div>
+                <h3 class="font-bold text-slate-800 text-lg">行動智慧表格排版與全方位閱讀輔助</h3>
+              </div>
+              <p class="text-sm text-slate-600 leading-relaxed mb-4">
+                專為採購長表與手機閱讀痛點打造的智慧排版引擎，並整合粉紅醒目附件區、燈箱、字級縮放與純淨 PDF 列印。
+              </p>
+              <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
+                <li><strong>手機智慧防斷行與全螢幕放大</strong>：自動解除 Word 殘留欄寬、保護料號／日期不斷行，支援一鍵全螢幕檢視與凍結表頭。</li>
+                <li><strong>粉紅高辨識附件專區</strong>：段落標頭附帶快跳膠囊，鮮明粉紅卡片與類型徽章徹底避免同仁漏看附件。</li>
+                <li><strong>完整閱讀工具組</strong>：章節快跳目錄、圖片點擊放大燈箱、<code>A-/100%/A+</code> 字級縮放與 <code>@media print</code> 純淨列印。</li>
+              </ul>
+            </div>
+
+            <!-- 亮點 18 -->
             <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col hover:shadow-sm hover:border-slate-300 transition-all">
               <div class="flex flex-col gap-3 mb-4">
                 <div class="w-12 h-12 bg-sky-100 rounded-full flex items-center justify-center text-sky-600">
-                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                 </div>
-                <h3 class="font-bold text-slate-800 text-lg">智慧通訊錄與發信群組自癒中心</h3>
+                <h3 class="font-bold text-slate-800 text-lg">後台高效率中台與三大設定引擎</h3>
               </div>
               <p class="text-sm text-slate-600 leading-relaxed mb-4">
-                大幅升級後台名冊與群組維護體驗，支援地區自動映射營運處、單鍵切換狀態、Excel 批次匯出入與幽靈信箱自癒。
+                為採購編輯團隊量身打造的高生產力作業中台，串聯動態首頁儀表板、防誤觸保護、催讀工作流與三大設定工作台。
               </p>
               <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
-                <li><strong>單鍵切換與批次匯出入</strong>：列表直接切換主要窗口/收信狀態，支援 Excel 批次盤點匯入。</li>
-                <li><strong>幽靈信箱自動清理</strong>：<code>sanitizeAllGroupEmails</code> 自動清除已刪人員殘留信箱，人數 100% 吻合。</li>
-                <li><strong>群組排序改名與一鍵複製</strong>：支援群組自由排序、篩選主要窗口及一鍵複製分號信箱串接 Outlook。</li>
-              </ul>
-            </div>
-
-            <!-- 亮點 16：跨構面關鍵字詞庫工作台與 Drag & Drop 排序 (M43) -->
-            <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col hover:shadow-sm hover:border-slate-300 transition-all">
-              <div class="flex flex-col gap-3 mb-4">
-                <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center text-amber-600">
-                  <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
-                </div>
-                <h3 class="font-bold text-slate-800 text-lg">跨構面關鍵字工作台與拖曳排序</h3>
-              </div>
-              <p class="text-sm text-slate-600 leading-relaxed mb-4">
-                將 9 大主分類與來源關鍵字升級為現代化詞庫工作台，具備跨構面即時檢索、HTML5 拖拉排序與未儲存防呆攔截。
-              </p>
-              <ul class="text-sm text-slate-500 space-y-2 list-disc list-inside">
-                <li><strong>跨構面全域搜尋與篩選</strong>：一秒定位散落於 9 大構面中的子標題，支援啟用/停用狀態過濾。</li>
-                <li><strong>原生 HTML5 滑鼠拖拉排序</strong>：母標題與子標題皆支援直覺拖曳排序與完整 CRUD 生命週期。</li>
-                <li><strong>未儲存變更防呆保護</strong>：異動即時醒目提醒並攔截誤關，儲存後即刻連動刷新週報編輯器。</li>
+                <li><strong>高效編輯與防誤觸</strong>：動態首頁 4 卡統計、<code>Ctrl+S</code> 快捷存檔與未儲存徽章、段落一鍵收合與頂部 <code>⋯ 更多</code> 危險操作隔離。</li>
+                <li><strong>一鍵催讀工作流</strong>：已讀追蹤支援「全部／已讀／未讀／主要窗口」篩選，並可一鍵複製未讀 Email 催讀。</li>
+                <li><strong>三大設定工作台</strong>：通訊錄 Excel 匯出入、發信群組幽靈信箱自癒 (<code>sanitizeAllGroupEmails</code>) 與 9 大構面拖曳詞庫。</li>
               </ul>
             </div>
 
@@ -668,7 +679,7 @@
 
   <!-- 分頁 2：外包市場價值與效益分析 (同步自 admin.html 最新版) -->
   <div id="view-valuation" class="hidden space-y-8">
-    <!-- 頂部高階經理人摘要看板 (Executive Summary Banner) -->
+        <!-- 頂部高階經理人摘要看板 (Executive Summary Banner) -->
         <div class="bg-gradient-to-r from-slate-900 via-indigo-950 to-emerald-950 text-white rounded-2xl p-6 md:p-8 shadow-xl relative overflow-hidden">
           <div class="absolute -right-10 -bottom-10 w-72 h-72 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
           <div class="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
@@ -681,23 +692,23 @@
                 <span>採購電子週報系統｜外包市場價值與專案效益分析</span>
               </h1>
               <p class="text-sm md:text-base text-slate-300 leading-relaxed">
-                本系統歷經 <strong class="text-white">43 個完整迭代里程碑</strong>，已從初期公告頁深化演進為整合<strong>「企業 OAuth 2.0 門禁、Firestore 伺服器端零信任 Rules 權限閉環、全集合防物理刪除、Zero-Data 機密防護、前後台 1:1 富文本/Word/Excel無損排版、全台營運處閱讀 KPI 看板（含點閱時間明細）、主要聯絡人動態對齊與100%打卡閉環、智慧通訊錄/發信群組/跨構面關鍵字三大管理工作台、前台美感問卷互動雙通道、全員防舞弊操作日誌與多裝置沙盒模擬」</strong>之企業級營運管理平台。本報告依據台灣資訊軟體公會人月標準及市場專業軟體接案公司行情進行全鏈路核算，提供客觀、詳實之商業價值佐證。
+                本系統歷經 <strong class="text-white">50 個完整迭代里程碑</strong>，已從初期公告頁深化演進為整合<strong>「全集團多網域 OAuth 2.0 門禁與憑證自癒重驗、Firestore 伺服器端零信任 Rules 與全集合防物理刪除、Zero-Data 機密防護、前後台 1:1 富文本/Word/Excel 無損排版與行動版智慧表格全螢幕放大器、前台 DOM 關鍵字螢光高亮導覽與粉紅附件專區、全台營運處閱讀 KPI 看板（含點閱時間明細與一鍵複製催讀）、後台動態首頁與三大管理工作台、3D 黏土互動問卷、全員防舞弊操作日誌與三裝置沙盒模擬」</strong>之企業級營運管理平台。本報告依據台灣資訊軟體公會人月標準及市場專業軟體接案公司行情進行全鏈路核算，提供客觀、詳實之商業價值佐證。
               </p>
             </div>
             
             <!-- 核心財務成效三聯小徽章 -->
-            <div class="flex flex-col sm:flex-row lg:flex-col gap-2.5 shrink-0 bg-white/5 p-4 rounded-xl border border-white/10 backdrop-blur-xs min-w-[240px]">
+            <div class="flex flex-col sm:flex-row lg:flex-col gap-2.5 shrink-0 bg-white/5 p-4 rounded-xl border border-white/10 backdrop-blur-xs min-w-[245px]">
               <div class="text-xs text-slate-400 font-semibold tracking-wider uppercase border-b border-white/10 pb-1.5 flex items-center justify-between">
                 <span>專案財務效益概況</span>
                 <span class="text-emerald-400 font-bold">ROI 高度顯著</span>
               </div>
               <div class="flex items-center justify-between py-1 border-b border-white/10 text-xs">
                 <span class="text-slate-300">外包市場合理估價</span>
-                <span class="text-base font-extrabold text-amber-300">NT$ 120萬 ~ 175萬</span>
+                <span class="text-base font-extrabold text-amber-300">NT$ 148萬 ~ 210萬</span>
               </div>
               <div class="flex items-center justify-between py-1 border-b border-white/10 text-xs">
                 <span class="text-slate-300">年省外包維護合約</span>
-                <span class="text-sm font-bold text-emerald-300">NT$ 18萬 ~ 26萬 /年</span>
+                <span class="text-sm font-bold text-emerald-300">NT$ 27萬 ~ 36萬 /年</span>
               </div>
               <div class="flex items-center justify-between py-1 text-xs">
                 <span class="text-slate-300">雲端伺服器主機費</span>
@@ -716,9 +727,9 @@
               <span class="text-xs font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">直接成本省除</span>
               <span class="text-2xl">💰</span>
             </div>
-            <div class="text-2xl font-extrabold text-slate-800 mb-1">省逾 145 萬</div>
+            <div class="text-2xl font-extrabold text-slate-800 mb-1">省逾 175 萬</div>
             <p class="text-xs text-slate-500 leading-relaxed">
-              若循正式採購流程委託專業接案公司開發同等規格系統，需編列百萬級資本支出 (CAPEX)，內部自研直接創造高額省費價值。
+              若循正式採購流程委託專業接案公司開發同等規格系統，需編列近兩百萬級資本支出 (CAPEX)，內部自研直接創造高額省費價值。
             </p>
           </div>
 
@@ -728,9 +739,9 @@
               <span class="text-xs font-bold text-blue-800 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200">極致響應速度</span>
               <span class="text-2xl">⚡</span>
             </div>
-            <div class="text-2xl font-extrabold text-slate-800 mb-1">43 次即時交付</div>
+            <div class="text-2xl font-extrabold text-slate-800 mb-1">50 次即時交付</div>
             <p class="text-xs text-slate-500 leading-relaxed">
-              外包公司每次需求變更 (CR) 均需重談報價與等待 2~4 週工期；本系統採敏捷模式，現場反饋數日內即刻發布上線。
+              外包公司每次需求變更 (CR) 均需重談報價與等待 2~4 週工期；本系統採敏捷模式，現場反饋當日或數日內即刻發布上線。
             </p>
           </div>
 
@@ -783,13 +794,13 @@
                   <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-200 text-slate-700">第一梯隊</span>
                   <span class="text-xs text-slate-400">個人工作室 / 兼職接案</span>
                 </div>
-                <div class="text-xl font-bold text-slate-700">NT$ 65萬 ~ 85萬</div>
+                <div class="text-xl font-bold text-slate-700">NT$ 80萬 ~ 105萬</div>
                 <p class="text-xs text-slate-500 leading-relaxed">
-                  多採套版開源模組套皮開發，工期約 2~3 個月。通常僅提供單一通用功能，無法支援企業級深度客製。
+                  多採套版開源模組套皮開發，工期約 3~4 個月。通常僅提供單一通用功能，無法支援企業級深度客製與行動端複雜表格調優。
                 </p>
                 <div class="text-xs space-y-1.5 pt-2 text-slate-600">
-                  <div class="flex items-center gap-1.5 text-rose-600"><span>✕</span> 缺乏資安防護與 Zero-Data 防禦</div>
-                  <div class="flex items-center gap-1.5 text-rose-600"><span>✕</span> 難以配合 43 次高頻率敏捷迭代</div>
+                  <div class="flex items-center gap-1.5 text-rose-600"><span>✕</span> 缺乏零信任資安防護與 Zero-Data 防禦</div>
+                  <div class="flex items-center gap-1.5 text-rose-600"><span>✕</span> 難以配合 50 次高頻率敏捷迭代</div>
                   <div class="flex items-center gap-1.5 text-rose-600"><span>✕</span> 無專用 IT 運作邏輯白皮書</div>
                 </div>
               </div>
@@ -808,14 +819,14 @@
                   <span class="text-xs font-bold px-2 py-0.5 rounded bg-indigo-100 text-indigo-800">第二梯隊</span>
                   <span class="text-xs text-indigo-600 font-semibold">專業軟體公司 / 資訊團隊</span>
                 </div>
-                <div class="text-2xl font-extrabold text-indigo-900">NT$ 120萬 ~ 175萬</div>
+                <div class="text-2xl font-extrabold text-indigo-900">NT$ 148萬 ~ 210萬</div>
                 <p class="text-xs text-slate-600 leading-relaxed">
-                  標準專案配置：資深架構師 + PM + 前後端工程師 + QA 測試員。客製企業內部營運管理系統平均中位數報價約 <strong>148 萬元</strong>。
+                  標準專案配置：資深架構師 + PM + 前後端工程師 + UI/UX + QA 測試員。客製企業內部營運管理系統平均中位數報價約 <strong>179 萬元</strong>。
                 </p>
                 <div class="text-xs space-y-1.5 pt-2 text-slate-700">
-                  <div class="flex items-center gap-1.5 text-emerald-600 font-medium"><span>✓</span> 完整 Google Workspace 授權與 ACL 門禁</div>
-                  <div class="flex items-center gap-1.5 text-emerald-600 font-medium"><span>✓</span> 富文本 Excel/Word 表格相容自適應引擎</div>
-                  <div class="flex items-center gap-1.5 text-emerald-600 font-medium"><span>✓</span> 全台閱讀率 KPI 看板與防舞弊日誌</div>
+                  <div class="flex items-center gap-1.5 text-emerald-600 font-medium"><span>✓</span> 全集團多網域零信任門禁、ACL 與憑證自癒</div>
+                  <div class="flex items-center gap-1.5 text-emerald-600 font-medium"><span>✓</span> 1:1 富文本表格淨化、行動智慧排版與螢光高亮檢索</div>
+                  <div class="flex items-center gap-1.5 text-emerald-600 font-medium"><span>✓</span> 全台 KPI 看板、三大設定工作台與防舞弊日誌</div>
                 </div>
               </div>
               <div class="mt-4 pt-3 border-t border-indigo-200 text-[11px] text-indigo-700 font-bold">
@@ -830,9 +841,9 @@
                   <span class="text-xs font-bold px-2 py-0.5 rounded bg-slate-200 text-slate-700">第三梯隊</span>
                   <span class="text-xs text-slate-400">大型 SI / 顧問管理顧問商</span>
                 </div>
-                <div class="text-xl font-bold text-slate-700">NT$ 200萬 ~ 300萬+</div>
+                <div class="text-xl font-bold text-slate-700">NT$ 240萬 ~ 360萬+</div>
                 <p class="text-xs text-slate-500 leading-relaxed">
-                  含龐大專案管理費 (PM Markup)、多層合約審核、正式驗收保證金。流程嚴謹但開發週期長達 8~12 個月。
+                  含龐大專案管理費 (PM Markup)、多層合約審核、正式驗收保證金。流程嚴謹但開發週期長達 9~12 個月。
                 </p>
                 <div class="text-xs space-y-1.5 pt-2 text-slate-600">
                   <div class="flex items-center gap-1.5 text-amber-600"><span>•</span> 需求變更審批冗長（需跨月簽呈）</div>
@@ -855,7 +866,7 @@
             <div class="space-y-1">
               <h2 class="text-base font-bold text-slate-800 flex items-center gap-2.5">
                 <span class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center text-xs font-bold shadow-xs">2</span>
-                <span>系統 8 大核心功能模組外包工作量與費用拆解清單 (WBS & Effort Valuation)</span>
+                <span>系統 8 大核心功能模組外包工作量與費用拆解清單 (WBS &amp; Effort Valuation)</span>
               </h2>
               <div class="flex items-center gap-2 text-xs text-slate-500">
                 <span class="inline-flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>依據台灣軟體工程師平均人月報價（NT$ 18萬 ~ 25萬 /人月）標準核算工期</span>
@@ -864,7 +875,7 @@
             <div class="flex items-center gap-2 self-start md:self-auto">
               <div class="inline-flex items-center gap-2 text-xs font-bold text-slate-700 bg-white px-3.5 py-1.5 rounded-xl border border-slate-200 shadow-2xs">
                 <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                <span>總投入估算：<strong class="text-indigo-600 text-sm">7.0 人月</strong> <span class="text-slate-400 font-normal">| 約 154 專業人天</span></span>
+                <span>總投入估算：<strong class="text-indigo-600 text-sm">8.5 人月</strong> <span class="text-slate-400 font-normal">| 約 187 專業人天</span></span>
               </div>
             </div>
           </div>
@@ -891,14 +902,14 @@
                   </td>
                   <td class="py-4 px-5 align-top">
                     <div class="font-bold text-slate-900 text-sm mb-1">企業資安門禁與權限防禦體系</div>
-                    <span class="inline-block text-[11px] text-slate-400">登入驗證 · DOM 防篡改 · ACL</span>
+                    <span class="inline-block text-[11px] text-slate-400">多網域零信任 · 防刪 · 憑證自癒</span>
                   </td>
                   <td class="py-4 px-6 align-top">
                     <ul class="space-y-1.5 text-slate-600 leading-relaxed list-none">
-                      <li class="flex items-start gap-1.5"><span class="text-blue-500 font-bold">•</span><span><strong>Google Workspace OAuth 2.0 雙網域門禁</strong>（@youbike.com.tw / @giant.com.tw）</span></li>
-                      <li class="flex items-start gap-1.5"><span class="text-blue-500 font-bold">•</span><span><strong>Zero-Data Pre-gate</strong>（未登入前徹底清空 DOM 樹，阻斷 F12 竄改與機密窺探）</span></li>
-                      <li class="flex items-start gap-1.5"><span class="text-blue-500 font-bold">•</span><span>不可穿透高斯模糊安全鎖定、週報「選擇性隱藏」與「特定同仁授權檢視」</span></li>
-                      <li class="flex items-start gap-1.5"><span class="text-blue-500 font-bold">•</span><span>Firestore 伺服器端 Security Rules 行級防禦與 Session Token 狀態安全防護</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-blue-500 font-bold">•</span><span><strong>Google Workspace OAuth 2.0 全集團多網域門禁</strong>（@youbike.com.tw / @giantcycling.com / @giant.com.tw）</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-blue-500 font-bold">•</span><span><strong>Zero-Data Pre-gate</strong>（未登入前徹底清空 DOM 樹）與不可穿透高斯模糊、Email 滿版浮水印</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-blue-500 font-bold">•</span><span>雲端機密保險箱 (<code>private/content</code>)、週報「選擇性隱藏」與「特定同仁授權檢視」ACL 控制</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-blue-500 font-bold">•</span><span>Firestore 伺服器端零信任 Security Rules（不區分大小寫與全集合禁物理刪除）、跨網域白名單匹配與憑證過期無縫自癒重驗</span></li>
                     </ul>
                   </td>
                   <td class="py-4 px-3 text-center align-top">
@@ -907,12 +918,12 @@
                     </span>
                   </td>
                   <td class="py-4 px-4 text-center align-top">
-                    <div class="font-bold text-slate-800 text-xs">1.0 人月</div>
-                    <div class="text-[11px] text-slate-400 mt-0.5">(22 工作天)</div>
+                    <div class="font-bold text-slate-800 text-xs">1.2 人月</div>
+                    <div class="text-[11px] text-slate-400 mt-0.5">(26 工作天)</div>
                   </td>
                   <td class="py-4 px-5 text-right align-top">
-                    <div class="font-extrabold text-slate-900 font-mono text-sm">NT$ 180,000</div>
-                    <div class="text-[11px] text-slate-400 font-mono">~ NT$ 250,000</div>
+                    <div class="font-extrabold text-slate-900 font-mono text-sm">NT$ 210,000</div>
+                    <div class="text-[11px] text-slate-400 font-mono">~ NT$ 300,000</div>
                   </td>
                 </tr>
 
@@ -922,29 +933,29 @@
                     <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-slate-100 text-slate-600 font-mono font-bold text-xs group-hover:bg-blue-100 group-hover:text-blue-700 transition-colors">02</span>
                   </td>
                   <td class="py-4 px-5 align-top">
-                    <div class="font-bold text-slate-900 text-sm mb-1">企業級富文本排版工作台</div>
-                    <span class="inline-block text-[11px] text-slate-400">TinyMCE · 表格淨化 · 蜂巢選色</span>
+                    <div class="font-bold text-slate-900 text-sm mb-1">企業級富文本排版與行動表格引擎</div>
+                    <span class="inline-block text-[11px] text-slate-400">TinyMCE · 表格淨化 · 行動全螢幕</span>
                   </td>
                   <td class="py-4 px-6 align-top">
                     <ul class="space-y-1.5 text-slate-600 leading-relaxed list-none">
-                      <li class="flex items-start gap-1.5"><span class="text-amber-500 font-bold">•</span><span>深入重構整合 <strong>TinyMCE 核心引擎</strong>與 zh-Hant 繁體中文全鏈路支援</span></li>
-                      <li class="flex items-start gap-1.5"><span class="text-amber-500 font-bold">•</span><span><strong>MS Excel / Word 表格貼上攔截管道</strong>與前後台 1:1 零誤差盒模型對齊</span></li>
-                      <li class="flex items-start gap-1.5"><span class="text-amber-500 font-bold">•</span><span>獨立開發<strong>「跨欄置中」</strong>一鍵按鈕、手動拖拉欄寬、多行緊湊排版調優</span></li>
-                      <li class="flex items-start gap-1.5"><span class="text-amber-500 font-bold">•</span><span>1:1 復刻 <strong>32 色商務專屬蜂巢</strong>與自訂莫蘭迪色盤選色器對話框</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-amber-500 font-bold">•</span><span>深度客製 <strong>TinyMCE 核心引擎</strong>與 zh-Hant 繁體中文全鏈路支援、32 色蜂巢與莫蘭迪色盤選色器</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-amber-500 font-bold">•</span><span><strong>MS Excel / Word 表格貼上攔截淨化管道</strong>、前後台 1:1 零誤差盒模型對齊與一鍵「跨欄置中」</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-amber-500 font-bold">•</span><span><strong>行動版智慧表格自適應排版系統</strong>（手機自動解除 Word 殘留欄寬、序號／料號／日期語意防斷行、寬表橫向滑動陰影提示）</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-amber-500 font-bold">•</span><span><strong>全螢幕表格放大檢視器</strong>（一鍵全螢幕檢視採購長表、凍結表頭與 小／標準／大 三段字級即時切換）</span></li>
                     </ul>
                   </td>
                   <td class="py-4 px-3 text-center align-top">
-                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 font-bold border border-amber-200 text-[11px] shadow-2xs">
-                      <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>高 (體驗)
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-rose-50 text-rose-700 font-bold border border-rose-200 text-[11px] shadow-2xs">
+                      <span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span>極高 (排版)
                     </span>
                   </td>
                   <td class="py-4 px-4 text-center align-top">
-                    <div class="font-bold text-slate-800 text-xs">1.2 人月</div>
-                    <div class="text-[11px] text-slate-400 mt-0.5">(26 工作天)</div>
+                    <div class="font-bold text-slate-800 text-xs">1.5 人月</div>
+                    <div class="text-[11px] text-slate-400 mt-0.5">(33 工作天)</div>
                   </td>
                   <td class="py-4 px-5 text-right align-top">
-                    <div class="font-extrabold text-slate-900 font-mono text-sm">NT$ 220,000</div>
-                    <div class="text-[11px] text-slate-400 font-mono">~ NT$ 280,000</div>
+                    <div class="font-extrabold text-slate-900 font-mono text-sm">NT$ 270,000</div>
+                    <div class="text-[11px] text-slate-400 font-mono">~ NT$ 370,000</div>
                   </td>
                 </tr>
 
@@ -954,28 +965,28 @@
                     <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-slate-100 text-slate-600 font-mono font-bold text-xs group-hover:bg-blue-100 group-hover:text-blue-700 transition-colors">03</span>
                   </td>
                   <td class="py-4 px-5 align-top">
-                    <div class="font-bold text-slate-900 text-sm mb-1">週報編撰與生命週期管理</div>
-                    <span class="inline-block text-[11px] text-slate-400">狀態機 · 詞庫拖曳檢索 · Diff 比對</span>
+                    <div class="font-bold text-slate-900 text-sm mb-1">週報編撰中台與關鍵字高亮檢索</div>
+                    <span class="inline-block text-[11px] text-slate-400">狀態機 · 高效中台 · DOM 螢光高亮</span>
                   </td>
                   <td class="py-4 px-6 align-top">
                     <ul class="space-y-1.5 text-slate-600 leading-relaxed list-none">
-                      <li class="flex items-start gap-1.5"><span class="text-blue-500 font-bold">•</span><span><strong>9 大分類主題架構</strong>、跨構面全域搜尋、HTML5 滑鼠拖拉排序與未儲存變更防呆</span></li>
-                      <li class="flex items-start gap-1.5"><span class="text-blue-500 font-bold">•</span><span>草稿、正式發布、一鍵撤回下架之完整<strong>生命週期狀態機管理</strong></span></li>
-                      <li class="flex items-start gap-1.5"><span class="text-blue-500 font-bold">•</span><span>版本快照管理、<strong>差異對比演算法 (Diff Compare)</strong> 與多維歷史週報月份歸檔</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-blue-500 font-bold">•</span><span><strong>9 大分類主題詞庫工作台</strong>（跨構面搜尋、HTML5 滑鼠拖拉排序與未儲存防呆）與草稿／發布／撤回完整狀態機</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-blue-500 font-bold">•</span><span><strong>後台高效率作業中台</strong>：4 卡動態營運儀表板、<code>Ctrl+S</code> 快捷存檔與響應式未儲存徽章、段落一鍵收合與危險操作隔離選單</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-blue-500 font-bold">•</span><span>版本快照差異對比 (Diff) 與<strong>前台 DOM 關鍵字螢光高亮導覽引擎</strong>（多關鍵字、懸浮上下跳轉條、側欄命中數與跨月份引導）</span></li>
                     </ul>
                   </td>
                   <td class="py-4 px-3 text-center align-top">
-                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-blue-50 text-blue-700 font-bold border border-blue-200 text-[11px] shadow-2xs">
-                      <span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>中高
+                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-50 text-amber-800 font-bold border border-amber-200 text-[11px] shadow-2xs">
+                      <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>高 (核心)
                     </span>
                   </td>
                   <td class="py-4 px-4 text-center align-top">
-                    <div class="font-bold text-slate-800 text-xs">0.8 人月</div>
-                    <div class="text-[11px] text-slate-400 mt-0.5">(18 工作天)</div>
+                    <div class="font-bold text-slate-800 text-xs">1.1 人月</div>
+                    <div class="text-[11px] text-slate-400 mt-0.5">(24 工作天)</div>
                   </td>
                   <td class="py-4 px-5 text-right align-top">
-                    <div class="font-extrabold text-slate-900 font-mono text-sm">NT$ 140,000</div>
-                    <div class="text-[11px] text-slate-400 font-mono">~ NT$ 190,000</div>
+                    <div class="font-extrabold text-slate-900 font-mono text-sm">NT$ 200,000</div>
+                    <div class="text-[11px] text-slate-400 font-mono">~ NT$ 270,000</div>
                   </td>
                 </tr>
 
@@ -985,13 +996,13 @@
                     <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-slate-100 text-slate-600 font-mono font-bold text-xs group-hover:bg-blue-100 group-hover:text-blue-700 transition-colors">04</span>
                   </td>
                   <td class="py-4 px-5 align-top">
-                    <div class="font-bold text-slate-900 text-sm mb-1">自動化推播與郵件通訊錄</div>
-                    <span class="inline-block text-[11px] text-slate-400">EmailJS · Excel 匯出入 · 智慧群組</span>
+                    <div class="font-bold text-slate-900 text-sm mb-1">自動化推播與智慧郵件通訊錄</div>
+                    <span class="inline-block text-[11px] text-slate-400">EmailJS · Excel 匯出入 · 幽靈自癒</span>
                   </td>
                   <td class="py-4 px-6 align-top">
                     <ul class="space-y-1.5 text-slate-600 leading-relaxed list-none">
                       <li class="flex items-start gap-1.5"><span class="text-sky-500 font-bold">•</span><span>串接 EmailJS API、發布前動態提取<strong>「🚨 緊急必讀公告」</strong>置頂推播模板</span></li>
-                      <li class="flex items-start gap-1.5"><span class="text-sky-500 font-bold">•</span><span>地區自動帶入營運處、單鍵切換主要窗口/收信、群組排序改名、幽靈信箱自癒與一鍵複製信箱</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-sky-500 font-bold">•</span><span>地區自動帶入營運處、單鍵切換主要窗口／收信、群組排序改名、幽靈信箱自動清理與一鍵複製信箱</span></li>
                       <li class="flex items-start gap-1.5"><span class="text-sky-500 font-bold">•</span><span><strong>Excel / CSV 人員名冊批次匯出匯入引擎</strong>與 Firebase 雲端白名單同步機制</span></li>
                     </ul>
                   </td>
@@ -1006,7 +1017,7 @@
                   </td>
                   <td class="py-4 px-5 text-right align-top">
                     <div class="font-extrabold text-slate-900 font-mono text-sm">NT$ 110,000</div>
-                    <div class="text-[11px] text-slate-400 font-mono">~ NT$ 160,000</div>
+                    <div class="text-[11px] text-slate-400 font-mono">~ NT$ 150,000</div>
                   </td>
                 </tr>
 
@@ -1016,16 +1027,15 @@
                     <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-slate-100 text-slate-600 font-mono font-bold text-xs group-hover:bg-blue-100 group-hover:text-blue-700 transition-colors">05</span>
                   </td>
                   <td class="py-4 px-5 align-top">
-                    <div class="font-bold text-slate-900 text-sm mb-1">數據落實度追蹤與 KPI 看板</div>
-                    <span class="inline-block text-[11px] text-slate-400">完讀打卡 · 全台 KPI · SheetJS 導出</span>
+                    <div class="font-bold text-slate-900 text-sm mb-1">數據落實度追蹤、KPI 看板與催讀閉環</div>
+                    <span class="inline-block text-[11px] text-slate-400">100% 完讀 · 一鍵催讀 · SheetJS</span>
                   </td>
                   <td class="py-4 px-6 align-top">
                     <ul class="space-y-1.5 text-slate-600 leading-relaxed list-none">
-                      <li class="flex items-start gap-1.5"><span class="text-purple-500 font-bold">•</span><span>捲動深度完成度 (Scroll Depth Tracker) 節流防抖演算法與 <strong>100% 完讀記憶</strong></span></li>
-                      <li class="flex items-start gap-1.5"><span class="text-purple-500 font-bold">•</span><span>長條漸層微光打卡按鈕、頂部「👑 尊榮已完讀金徽章」即時點亮閉環</span></li>
-                      <li class="flex items-start gap-1.5"><span class="text-purple-500 font-bold">•</span><span><strong>全台營運處閱讀 KPI 看板</strong>（總閱讀率、最佳/最低單位、點閱時間明細與主要負責人動態對齊）</span></li>
-                      <li class="flex items-start gap-1.5"><span class="text-purple-500 font-bold">•</span><span><strong>已確認打卡即 100% 完讀真理</strong>與歷史已讀紀錄自動補正引擎</span></li>
-                      <li class="flex items-start gap-1.5"><span class="text-purple-500 font-bold">•</span><span>後台專屬手動補登 Modal 視窗與純前端 <strong>SheetJS 一鍵導出 Excel 報表</strong></span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-purple-500 font-bold">•</span><span>捲動深度完成度節流防抖演算法、底端／浮動雙通道打卡與「👑 尊榮已完讀金徽章」即時點亮閉環</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-purple-500 font-bold">•</span><span><strong>全台營運處閱讀 KPI 看板</strong>（總閱讀率、最佳／最低單位、精確點閱時間明細與主要負責人動態對齊）</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-purple-500 font-bold">•</span><span><strong>已確認打卡即 100% 完讀真理</strong>、歷史已讀存根自動補正引擎與多維度姓名／信箱容錯比對</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-purple-500 font-bold">•</span><span>後台手動補登 Modal、<strong>已讀分頁篩選（全部／已讀／未讀／僅主要窗口）、一鍵複製未讀催讀 Email</strong> 與 SheetJS Excel 導出</span></li>
                     </ul>
                   </td>
                   <td class="py-4 px-3 text-center align-top">
@@ -1034,12 +1044,12 @@
                     </span>
                   </td>
                   <td class="py-4 px-4 text-center align-top">
-                    <div class="font-bold text-slate-800 text-xs">1.2 人月</div>
-                    <div class="text-[11px] text-slate-400 mt-0.5">(26 工作天)</div>
+                    <div class="font-bold text-slate-800 text-xs">1.3 人月</div>
+                    <div class="text-[11px] text-slate-400 mt-0.5">(29 工作天)</div>
                   </td>
                   <td class="py-4 px-5 text-right align-top">
-                    <div class="font-extrabold text-slate-900 font-mono text-sm">NT$ 210,000</div>
-                    <div class="text-[11px] text-slate-400 font-mono">~ NT$ 290,000</div>
+                    <div class="font-extrabold text-slate-900 font-mono text-sm">NT$ 230,000</div>
+                    <div class="text-[11px] text-slate-400 font-mono">~ NT$ 320,000</div>
                   </td>
                 </tr>
 
@@ -1049,15 +1059,14 @@
                     <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-slate-100 text-slate-600 font-mono font-bold text-xs group-hover:bg-blue-100 group-hover:text-blue-700 transition-colors">06</span>
                   </td>
                   <td class="py-4 px-5 align-top">
-                    <div class="font-bold text-slate-900 text-sm mb-1">防舞弊稽核日誌與沙盒模擬預覽</div>
-                    <span class="inline-block text-[11px] text-slate-400">Audit Log · 響應式沙盒 · 問卷回饋</span>
+                    <div class="font-bold text-slate-900 text-sm mb-1">防舞弊稽核日誌、沙盒預覽與問卷</div>
+                    <span class="inline-block text-[11px] text-slate-400">Audit Log · 三裝置沙盒 · 進度問卷</span>
                   </td>
                   <td class="py-4 px-6 align-top">
                     <ul class="space-y-1.5 text-slate-600 leading-relaxed list-none">
-                      <li class="flex items-start gap-1.5"><span class="text-teal-500 font-bold">•</span><span>Section D <strong>全員防舞弊具名稽核日誌 (Audit Log)</strong>，重大動作 100% 存證自證清白</span></li>
-                      <li class="flex items-start gap-1.5"><span class="text-teal-500 font-bold">•</span><span>智慧動態解析操作者中文實名與信箱、開發測試帳號智慧排除機制</span></li>
-                      <li class="flex items-start gap-1.5"><span class="text-teal-500 font-bold">•</span><span><strong>1:1 所見即所得前台畫面即時預覽</strong>（內建電腦全螢幕/平板768px/手機414px模擬）</span></li>
-                      <li class="flex items-start gap-1.5"><span class="text-teal-500 font-bold">•</span><span>獨立問卷系統 (survey.html) 與前台 Header/Footer 雙通道高質感入口整合</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-teal-500 font-bold">•</span><span>Section D <strong>全員防舞弊具名稽核日誌 (Audit Log)</strong>，動態解析中文實名並排除測試帳號</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-teal-500 font-bold">•</span><span><strong>1:1 所見即所得前台畫面即時預覽</strong>（內建電腦全螢幕／平板 768px／手機 414px 沙盒模擬）</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-teal-500 font-bold">•</span><span><strong>獨立 3D 黏土互動問卷系統 (survey.html)</strong>：吸頂填答進度條、缺漏欄位搖晃驗證、重複提交橫幅與全集團認證整合</span></li>
                     </ul>
                   </td>
                   <td class="py-4 px-3 text-center align-top">
@@ -1066,12 +1075,12 @@
                     </span>
                   </td>
                   <td class="py-4 px-4 text-center align-top">
-                    <div class="font-bold text-slate-800 text-xs">0.8 人月</div>
-                    <div class="text-[11px] text-slate-400 mt-0.5">(17 工作天)</div>
+                    <div class="font-bold text-slate-800 text-xs">0.9 人月</div>
+                    <div class="text-[11px] text-slate-400 mt-0.5">(20 工作天)</div>
                   </td>
                   <td class="py-4 px-5 text-right align-top">
-                    <div class="font-extrabold text-slate-900 font-mono text-sm">NT$ 130,000</div>
-                    <div class="text-[11px] text-slate-400 font-mono">~ NT$ 180,000</div>
+                    <div class="font-extrabold text-slate-900 font-mono text-sm">NT$ 160,000</div>
+                    <div class="text-[11px] text-slate-400 font-mono">~ NT$ 220,000</div>
                   </td>
                 </tr>
 
@@ -1081,14 +1090,14 @@
                     <span class="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-slate-100 text-slate-600 font-mono font-bold text-xs group-hover:bg-blue-100 group-hover:text-blue-700 transition-colors">07</span>
                   </td>
                   <td class="py-4 px-5 align-top">
-                    <div class="font-bold text-slate-900 text-sm mb-1">系統架構白皮書與 UI/UX 設計</div>
-                    <span class="inline-block text-[11px] text-slate-400">方案 C 白皮書 · 莫蘭迪風格 · CI/CD</span>
+                    <div class="font-bold text-slate-900 text-sm mb-1">系統架構白皮書與全站 UI/UX 設計</div>
+                    <span class="inline-block text-[11px] text-slate-400">方案 C 白皮書 · 閱讀輔助 · CI/CD</span>
                   </td>
                   <td class="py-4 px-6 align-top">
                     <ul class="space-y-1.5 text-slate-600 leading-relaxed list-none">
-                      <li class="flex items-start gap-1.5"><span class="text-indigo-500 font-bold">•</span><span><strong>方案 C：IT 專用全鏈路運作邏輯技術白皮書</strong>（四層分層拓撲 + 三大業務時序流）</span></li>
-                      <li class="flex items-start gap-1.5"><span class="text-indigo-500 font-bold">•</span><span>全站純原生響應式 Morandi 主題設計、雙欄目錄極致自適應版型</span></li>
-                      <li class="flex items-start gap-1.5"><span class="text-indigo-500 font-bold">•</span><span>Serverless 雲端拓撲整合規劃與 GitHub Actions CI/CD 自動化發布流水線</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-indigo-500 font-bold">•</span><span><strong>方案 C：IT 專用全鏈路運作邏輯技術白皮書</strong>（四層分層拓撲 + 三大業務時序流 + 18 大核心構面）</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-indigo-500 font-bold">•</span><span><strong>全方位前台閱讀 UX</strong>：吸頂側欄、章節快跳目錄、粉紅高辨識附件專區與快跳膠囊、圖片放大燈箱、字級縮放、單期連結分享與 <code>@media print</code> 純淨列印 PDF</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-indigo-500 font-bold">•</span><span>Serverless 雲端拓撲規劃、現代化 Toast 通知／骨架屏與 GitHub Actions CI/CD 自動化部署流水線</span></li>
                     </ul>
                   </td>
                   <td class="py-4 px-3 text-center align-top">
@@ -1097,12 +1106,12 @@
                     </span>
                   </td>
                   <td class="py-4 px-4 text-center align-top">
-                    <div class="font-bold text-slate-800 text-xs">0.8 人月</div>
-                    <div class="text-[11px] text-slate-400 mt-0.5">(18 工作天)</div>
+                    <div class="font-bold text-slate-800 text-xs">1.1 人月</div>
+                    <div class="text-[11px] text-slate-400 mt-0.5">(24 工作天)</div>
                   </td>
                   <td class="py-4 px-5 text-right align-top">
-                    <div class="font-extrabold text-slate-900 font-mono text-sm">NT$ 140,000</div>
-                    <div class="text-[11px] text-slate-400 font-mono">~ NT$ 200,000</div>
+                    <div class="font-extrabold text-slate-900 font-mono text-sm">NT$ 190,000</div>
+                    <div class="text-[11px] text-slate-400 font-mono">~ NT$ 270,000</div>
                   </td>
                 </tr>
 
@@ -1113,12 +1122,12 @@
                   </td>
                   <td class="py-4 px-5 align-top">
                     <div class="font-bold text-slate-900 text-sm mb-1">專案管理、需求迭代調優與 QA 測試</div>
-                    <span class="inline-block text-[11px] text-slate-400">43次迭代 · 跨瀏覽器相容 · 驗收交付</span>
+                    <span class="inline-block text-[11px] text-slate-400">50次迭代 · 跨裝置驗證 · 驗收交付</span>
                   </td>
                   <td class="py-4 px-6 align-top">
                     <ul class="space-y-1.5 text-slate-600 leading-relaxed list-none">
-                      <li class="flex items-start gap-1.5"><span class="text-slate-500 font-bold">•</span><span><strong>跨 43 個里程碑之需求釐清</strong>、跨部門痛點排查與相容性修復驗收</span></li>
-                      <li class="flex items-start gap-1.5"><span class="text-slate-500 font-bold">•</span><span>瀏覽器相容性測試（Chrome、Edge、Safari、手機瀏覽器）與跨域壓測調優</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-slate-500 font-bold">•</span><span><strong>跨 50 個里程碑之需求釐清</strong>、跨區採購痛點排查、異常權限根因排除與快速交付驗收</span></li>
+                      <li class="flex items-start gap-1.5"><span class="text-slate-500 font-bold">•</span><span>跨瀏覽器（Chrome、Edge、Safari）與桌機／平板／行動裝置實景排版相容性驗證</span></li>
                     </ul>
                   </td>
                   <td class="py-4 px-3 text-center align-top">
@@ -1127,12 +1136,12 @@
                     </span>
                   </td>
                   <td class="py-4 px-4 text-center align-top">
-                    <div class="font-bold text-slate-800 text-xs">0.6 人月</div>
-                    <div class="text-[11px] text-slate-400 mt-0.5">(13 工作天)</div>
+                    <div class="font-bold text-slate-800 text-xs">0.8 人月</div>
+                    <div class="text-[11px] text-slate-400 mt-0.5">(18 工作天)</div>
                   </td>
                   <td class="py-4 px-5 text-right align-top">
-                    <div class="font-extrabold text-slate-900 font-mono text-sm">NT$ 70,000</div>
-                    <div class="text-[11px] text-slate-400 font-mono">~ NT$ 160,000</div>
+                    <div class="font-extrabold text-slate-900 font-mono text-sm">NT$ 110,000</div>
+                    <div class="text-[11px] text-slate-400 font-mono">~ NT$ 200,000</div>
                   </td>
                 </tr>
 
@@ -1145,12 +1154,12 @@
                     </div>
                   </td>
                   <td class="py-4.5 px-4 text-center">
-                    <div class="text-sm font-extrabold text-indigo-700">7.0 人月</div>
-                    <div class="text-[11px] text-slate-500 font-normal">約 154 人天</div>
+                    <div class="text-sm font-extrabold text-indigo-700">8.5 人月</div>
+                    <div class="text-[11px] text-slate-500 font-normal">約 187 人天</div>
                   </td>
                   <td class="py-4.5 px-5 text-right">
-                    <div class="text-base font-extrabold text-emerald-700 font-mono tracking-tight">NT$ 1,200,000</div>
-                    <div class="text-xs font-bold text-emerald-600 font-mono">~ NT$ 1,750,000</div>
+                    <div class="text-base font-extrabold text-emerald-700 font-mono tracking-tight">NT$ 1,480,000</div>
+                    <div class="text-xs font-bold text-emerald-600 font-mono">~ NT$ 2,100,000</div>
                   </td>
                 </tr>
               </tbody>
@@ -1172,21 +1181,21 @@
                 <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded">每年重複省費</span>
               </div>
               <p class="text-xs text-slate-600 leading-relaxed mb-4">
-                一般外包軟體結案後，廠商會依總開發費用之 <strong>15% ~ 20%</strong> 按年收取維護合約費用（用於處理 Bug 修復、安全補丁與微幅異動）：
+                一般外包軟體結案後，廠商會依總開發費用（中位數 <strong>NT$ 179 萬</strong>）之 <strong>15% ~ 20%</strong> 按年收取維護合約費用（用於處理 Bug 修復、安全補丁與微幅異動）：
               </p>
               
               <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-2.5 text-xs text-slate-700">
                 <div class="flex justify-between items-center">
                   <span>軟體外包常規年維護費 (15% 計)：</span>
-                  <span class="font-bold text-slate-800">約 NT$ 172,500 /年</span>
+                  <span class="font-bold text-slate-800">約 NT$ 268,500 /年</span>
                 </div>
                 <div class="flex justify-between items-center">
                   <span>軟體外包進階年維護費 (20% 計)：</span>
-                  <span class="font-bold text-slate-800">約 NT$ 230,000 /年</span>
+                  <span class="font-bold text-slate-800">約 NT$ 358,000 /年</span>
                 </div>
                 <div class="pt-2 border-t border-slate-200 flex justify-between items-center text-emerald-700 font-bold">
                   <span>內部維運省除（3 年累計節省）：</span>
-                  <span class="text-sm font-extrabold">省約 NT$ 51萬 ~ 69萬</span>
+                  <span class="text-sm font-extrabold">省約 NT$ 80萬 ~ 107萬</span>
                 </div>
               </div>
             </div>
@@ -1230,14 +1239,14 @@
         </div>
   </div>
 
-  <!-- 分頁 3：系統全貌資料流向拓撲圖 (更新至 M43 最新技術規格) -->
+  <!-- 分頁 3：系統全貌資料流向拓撲圖 (更新至 M50 最新技術規格) -->
   <div id="view-diagram" class="hidden space-y-6">
     <div class="mermaid-container border border-slate-200">
       <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-6 pb-4 border-b border-slate-100">
         <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
-          <span>🗺️ 系統全貌資料流向拓撲圖 (Data Flow & Zero-Trust Architecture)</span>
+          <span>🗺️ 系統全貌資料流向拓撲圖 (Data Flow &amp; Zero-Trust Architecture)</span>
         </h2>
-        <span class="text-xs font-semibold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-200">涵蓋 OAuth 雙網域門禁 · Zero-Data 防窺 · TinyMCE 1:1 盒模型 · 100% 完讀真理</span>
+        <span class="text-xs font-semibold text-indigo-600 bg-indigo-50 px-3 py-1 rounded-full border border-indigo-200">全集團多網域零信任 · 憑證自癒 · DOM 關鍵字高亮 · 行動智慧表格 · 100% 完讀閉環</span>
       </div>
       <div class="mermaid flex justify-center">
         flowchart TB
@@ -1248,29 +1257,29 @@
             classDef external fill:#fef2f2,stroke:#ef4444,stroke-width:2px,color:#991b1b
             classDef security fill:#fef2f2,stroke:#dc2626,stroke-width:2px,color:#991b1b
 
-            User(("👨‍💼 全台 13 單位同仁<br>(Reader · 60人白名單)")):::user
+            User(("👨‍💼 全台 13 單位同仁<br>(Reader · 全集團白名單)")):::user
             Admin(("👩‍💻 採購管理員<br>(Admin · Sunny/令淳)")):::admin
 
             subgraph SecurityGate [🛡️ 企業身分與零信任安全門禁層]
                 direction TB
-                OAuth["🔐 Google Workspace OAuth 2.0<br>(@youbike.com.tw / @giant 雙網域強制門禁)"]:::security
-                ACLGate["👁️ Zero-Data Pre-gate & ACL 過濾引擎<br>(未登入清空 DOM 防 F12 · 隔離隱藏與機密週報)"]:::security
+                OAuth["🔐 Google Workspace OAuth 2.0<br>(@youbike / @giantcycling / @giant 全集團多網域 + 憑證無縫自癒)"]:::security
+                ACLGate["👁️ Zero-Data Pre-gate &amp; ACL 過濾引擎<br>(未登入清空 DOM 防 F12 · 跨網域白名單匹配 · 隔離隱藏與機密週報)"]:::security
             end
 
             subgraph Frontend [🌐 前端介面層 GitHub Pages SPA]
                 direction TB
-                Index["前台 (index.html)<br>・經典雙欄流 + 1:1 零誤差表格與段落盒模型<br>・9大分類 + 料號/廠商/關鍵字 10秒秒搜<br>・滾動 95% 防誤鎖 + 底端一鍵確認 100% 完讀打卡<br>・頂部👑尊榮已完讀金徽章 + 登入者 Email 滿版浮水印<br>・Header 呼吸燈與頁尾雙通道需求問卷入口"]:::frontend
-                AdminUI["後台 (admin.html)<br>・TinyMCE 富文本 + Excel/Word 表格淨化 + 32色蜂巢/莫蘭迪色盤<br>・三合一多裝置沙盒預覽 (電腦/平板/手機) + 版本 Diff 比對<br>・全台營運處 KPI 看板 (排除工程處/對齊主要窗口/點閱時間明細/SheetJS 匯出)<br>・智慧通訊錄 (Excel 匯出入/單鍵切換) + 發信群組 (幽靈信箱自癒) + 關鍵字拖曳工作台<br>・手動補登已讀 Modal + 全員防舞弊具名稽核日誌 (Audit Log)"]:::frontend
-                SurveyUI["專屬問卷 (survey.html)<br>・3D 黏土美學風格使用者需求調查<br>・全台 15 份實測回饋 (滿意度 4.6/5.0) 直通 Firestore"]:::frontend
+                Index["前台 (index.html)<br>・吸頂雙欄流 + 章節快跳 + DOM 關鍵字螢光高亮與懸浮跳轉條<br>・行動版智慧表格防斷行 + 全螢幕放大器 + 粉紅高辨識附件專區<br>・圖片燈箱 + 字級縮放 + 單期分享(?id=) + 純淨列印 PDF<br>・雙通道一鍵打卡 (Token 自動刷新) + 👑完讀金徽章 + 滿版浮水印"]:::frontend
+                AdminUI["後台 (admin.html)<br>・動態營運首頁 4 卡統計 + Ctrl+S 未儲存徽章 + 段落收合 + 危險操作隔離<br>・TinyMCE 1:1 富文本 + Word/Excel 淨化 + 32色蜂巢/莫蘭迪色盤<br>・三合一多裝置沙盒預覽 (電腦/平板/手機) + 版本 Diff 比對<br>・全台 KPI 看板 (點閱時間明細/已讀分頁篩選/一鍵複製未讀催讀/SheetJS)<br>・智慧通訊錄 (Excel 匯出入) + 群組自癒 + 9大構面拖曳詞庫 + Audit Log"]:::frontend
+                SurveyUI["專屬問卷 (survey.html)<br>・3D 黏土美學風格使用者需求調查 (全集團網域認證)<br>・吸頂填答進度條 (必填 X/5) + 缺漏搖晃驗證 + 重複填答提醒"]:::frontend
             end
 
             subgraph Backend [☁️ Google Firebase 雲端後端 BaaS]
                 direction TB
-                Rules{"Security Rules 零信任鐵幕<br>・伺服器端校驗 isCompanyUser()<br>・全集合 allow delete: if false 封鎖物理刪除"}:::firebase
+                Rules{"Security Rules 零信任鐵幕<br>・伺服器端 (?i) 校驗全集團 isCompanyUser()<br>・全集合 allow delete: if false 封鎖物理刪除"}:::firebase
                 
-                subgraph DB [Database & Cloud Storage]
+                subgraph DB [Database &amp; Cloud Storage]
                     direction LR
-                    Firestore[("Firestore NoSQL<br>・bulletins (週報/草稿/ACL)<br>・private (機密保險箱隔離集合)<br>・readReceipts (158筆打卡存根 confirmed:true)<br>・surveys (15份跨區問卷回饋)<br>・systemConfig (白名單/群組/9大構面關鍵字)<br>・auditLogs (全員防舞弊操作紀錄)")]:::firebase
+                    Firestore[("Firestore NoSQL<br>・bulletins (週報/草稿/ACL)<br>・private (機密保險箱隔離集合)<br>・readReceipts (打卡存根 confirmed:true)<br>・surveys (跨區實名問卷回饋)<br>・systemConfig (白名單/群組/9大構面關鍵字)<br>・auditLogs (全員防舞弊操作紀錄)")]:::firebase
                     Storage[("Cloud Storage<br>・剪貼簿圖片直傳雲端高清圖床<br>・段落級別報價單/規格書附件庫")]:::firebase
                 end
                 
@@ -1286,15 +1295,15 @@
             end
 
             User ===>|企業 Google 登入| OAuth
-            OAuth ===>|通過雙網域與白名單驗證| ACLGate
+            OAuth ===>|通過多網域與白名單驗證| ACLGate
             ACLGate ===>|檢視授權週報與一鍵打卡| Index
             Index -.->|雙通道開啟問卷| SurveyUI
             SurveyUI -.->|寫入實名回饋| Rules
 
             Admin ===>|管理員驗證登入| AdminUI
 
-            Index -.->|即時讀取與寫入 confirmed:true 打卡| Rules
-            AdminUI ===>|編撰/沙盒預覽/名冊群組詞庫管理/補登/稽核| Rules
+            Index -.->|Token 自癒與寫入 confirmed:true 打卡| Rules
+            AdminUI ===>|編撰/沙盒預覽/名冊群組詞庫管理/補登催讀/稽核| Rules
             
             AdminUI -->|正式發布週報| EmailJS
             EmailJS -.->|寄送必讀重點 HTML 通知信| User
