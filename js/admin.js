@@ -466,7 +466,7 @@ document.addEventListener('click', (ev) => {
   if (wrap && !wrap.contains(ev.target)) closeTopbarMoreMenu();
 });
 
-// 全域快捷鍵：編輯週報時按 Ctrl+S / Cmd+S 立即儲存草稿
+// 全域快捷鍵：編輯週報時按 Ctrl+S / Cmd+S 立即儲存（已發布週報直接同步前台且維持發布狀態，草稿則儲存草稿）
 window.addEventListener('keydown', (ev) => {
   if ((ev.ctrlKey || ev.metaKey) && ev.key && ev.key.toLowerCase() === 's') {
     const bf = document.getElementById('bf');
@@ -1554,7 +1554,46 @@ function newBulletin(){
   toast('已建立新週報草稿','in');
 }
 function wk(d){const j=new Date(d.getFullYear(),0,1);return Math.ceil((((d-j)/86400000)+j.getDay()+1)/7);}
-async function unpubBulletin(){if(!S.cur)return;if(!confirm('確定要撤回發布？撤回後前台將無法看見此週報。'))return;const pt=document.getElementById('pub-txt'),btn=document.getElementById('btn-unpub');btn.disabled=true;pt.textContent='撤回中...';try{const d={...S.cur,status:'draft',feedbackLog:S.fbs};if(S.cur.authorizedEmails)d.authorizedEmails=S.cur.authorizedEmails;await DS.save(d.id,d);await DS.addAuditLog(d.id, `管理員撤回了週報。`);S.dirty=false;const sb=document.getElementById('tb-status');sb.className='bdg-dft';sb.textContent='草稿';toast('週報已撤回發布！','ok');S.mmap=await DS.getMonths();renderSB();renderAuditLogs(d.id);renderEd();renderReadReceipts(d.id);}catch(e){toast('撤回失敗：'+e.message,'er');}finally{btn.disabled=false;pt.textContent='正式發布';}}
+function updateSaveBtnUI(status) {
+  const btn = document.getElementById('btn-dft');
+  const txt = document.getElementById('dft-txt');
+  const ico = document.getElementById('dft-ico');
+  const kbd = document.getElementById('dft-kbd');
+  if (!btn) return;
+  if (status === 'published') {
+    btn.className = 'btn-ok text-xs py-2 px-3.5 shadow-sm';
+    btn.title = '儲存修改並即時同步至前台（維持已發布狀態，不重寄通知信｜快捷鍵 Ctrl + S）';
+    if (txt) txt.textContent = '儲存更新（同步前台）';
+    if (ico) ico.setAttribute('class', 'w-4 h-4 text-white');
+    if (kbd) kbd.className = 'hidden xl:inline-block text-[10px] font-mono bg-white/20 text-white border border-white/30 rounded px-1 py-0.2';
+  } else {
+    btn.className = 'btn-s text-xs py-2 px-3.5';
+    btn.title = '儲存為草稿暫存 (快捷鍵 Ctrl + S)';
+    if (txt) txt.textContent = '儲存草稿';
+    if (ico) ico.setAttribute('class', 'w-4 h-4 text-slate-500');
+    if (kbd) kbd.className = 'hidden xl:inline-block text-[10px] font-mono bg-slate-100 text-slate-500 border border-slate-200 rounded px-1 py-0.2';
+  }
+}
+function syncAllEditorsToState() {
+  if (!S.cur || !window.tinymce || !Array.isArray(tinymce.editors)) return;
+  tinymce.editors.forEach(editor => {
+    try {
+      const el = editor.getElement && editor.getElement();
+      const pathStr = el && el.getAttribute && el.getAttribute('data-path');
+      if (!pathStr) return;
+      let obj = S.cur;
+      const parts = pathStr.split(/[.\[\]]/).filter(Boolean);
+      for (let i = 0; i < parts.length - 1; i++) {
+        if (obj == null) return;
+        obj = obj[parts[i]];
+      }
+      if (obj != null && parts.length > 0) {
+        obj[parts[parts.length - 1]] = editor.getContent();
+      }
+    } catch (e) {}
+  });
+}
+async function unpubBulletin(){if(!S.cur)return;if(!confirm('確定要撤回發布？撤回後前台將無法看見此週報。'))return;const pt=document.getElementById('pub-txt'),btn=document.getElementById('btn-unpub');btn.disabled=true;pt.textContent='撤回中...';try{const d={...S.cur,status:'draft',feedbackLog:S.fbs};if(S.cur.authorizedEmails)d.authorizedEmails=S.cur.authorizedEmails;await DS.save(d.id,d);await DS.addAuditLog(d.id, `管理員撤回了週報。`);S.cur.status='draft';S.dirty=false;const sb=document.getElementById('tb-status');sb.className='bdg-dft';sb.textContent='草稿';updateSaveBtnUI('draft');toast('週報已撤回發布！','ok');S.mmap=await DS.getMonths();renderSB();renderWelcomeDashboard();renderAuditLogs(d.id);renderEd();renderReadReceipts(d.id);}catch(e){toast('撤回失敗：'+e.message,'er');}finally{btn.disabled=false;pt.textContent='正式發布';}}
 function renderEd(){
   const b=S.cur;if(!b)return;
   document.getElementById('es').classList.add('hidden');
@@ -1572,6 +1611,7 @@ function renderEd(){
     document.getElementById('btn-unpub').classList.add('hidden');
     document.getElementById('btn-pub').classList.remove('hidden');
   }
+  updateSaveBtnUI(b.status);
   document.getElementById('f-id').value=b.id||'';
   document.getElementById('f-pd').value=b.publishDate||'';
   document.getElementById('f-ps').value=b.periodStart||'';
@@ -1963,7 +2003,7 @@ function bldItems(sec,si){
   } else {
     S.cur.authorizedEmails = [];
   }
-}async function saveDraft(){if(!S.cur)return;fc();document.getElementById('btn-dft').disabled=true;try{await DS.save(S.cur.id,{...S.cur,status:'draft',feedbackLog:S.fbs});S.dirty=false;const sb=document.getElementById('tb-status');sb.className='bdg-dft';sb.textContent='草稿';toast('草稿已儲存 ✓','ok');S.mmap=await DS.getMonths();renderSB();renderWelcomeDashboard();}catch(e){toast('儲存失敗：'+e.message,'er');}finally{document.getElementById('btn-dft').disabled=false;}}async function cloneBulletin(){if(!S.cur)return;const c=JSON.parse(JSON.stringify(S.cur));const now=new Date();c.id=`${now.getFullYear()}-W${wk(now)}-copy`;c.status='draft';c.version=1;c.isPinned=false;S.cur=c;S.fbs=[];S.dirty=true;renderEd();toast(`已複製為新草稿：${c.id}`,'in');}async function delBulletin(){if(!S.cur)return;if(!confirm(`確定刪除「${S.cur.id}」？`))return;try{await DS.del(S.cur.id);S.cur=null;S.dirty=false;document.getElementById('es').classList.remove('hidden');document.getElementById('bf').classList.add('hidden');document.getElementById('tb-acts').classList.add('hidden');document.getElementById('tb-title').textContent='請選擇或新增週報';document.getElementById('tb-status').classList.add('hidden');S.mmap=await DS.getMonths();renderSB();renderWelcomeDashboard();toast('週報已刪除','ok');}catch(e){toast('刪除失敗：'+e.message,'er');}}function showModal(){document.getElementById('sm').classList.remove('hidden');document.getElementById('tl').innerHTML=S.tpls.map(t=>`<button onclick="addTpl('${t.id}')" class="w-full text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:border-blue-300 hover:bg-blue-50 transition-all flex items-center gap-3 text-sm mb-1.5"><span class="text-xl">${t.i}</span><span class="font-medium text-slate-700">${t.t}</span></button>`).join('');}function hideModal(){document.getElementById('sm').classList.add('hidden');}function addTpl(tid){
+}async function saveDraft(){if(!S.cur)return;syncAllEditorsToState();fc();const isPublished=S.cur.status==='published';const nextStatus=isPublished?'published':'draft';const btn=document.getElementById('btn-dft');if(btn)btn.disabled=true;try{await DS.save(S.cur.id,{...S.cur,status:nextStatus,feedbackLog:S.fbs});S.cur.status=nextStatus;S.dirty=false;const sb=document.getElementById('tb-status');if(isPublished){sb.className='bdg-pub';sb.textContent='已發布';await DS.addAuditLog(S.cur.id,'管理員修改了已發布週報內容並同步更新前台（未重發郵件）。');toast('已儲存修改並同步更新前台 ✓（未重發郵件）','ok');renderAuditLogs(S.cur.id);}else{sb.className='bdg-dft';sb.textContent='草稿';toast('草稿已儲存 ✓','ok');}updateSaveBtnUI(nextStatus);S.mmap=await DS.getMonths();renderSB();renderWelcomeDashboard();}catch(e){toast('儲存失敗：'+e.message,'er');}finally{if(btn)btn.disabled=false;}}async function cloneBulletin(){if(!S.cur)return;const c=JSON.parse(JSON.stringify(S.cur));const now=new Date();c.id=`${now.getFullYear()}-W${wk(now)}-copy`;c.status='draft';c.version=1;c.isPinned=false;S.cur=c;S.fbs=[];S.dirty=true;renderEd();toast(`已複製為新草稿：${c.id}`,'in');}async function delBulletin(){if(!S.cur)return;if(!confirm(`確定刪除「${S.cur.id}」？`))return;try{await DS.del(S.cur.id);S.cur=null;S.dirty=false;document.getElementById('es').classList.remove('hidden');document.getElementById('bf').classList.add('hidden');document.getElementById('tb-acts').classList.add('hidden');document.getElementById('tb-title').textContent='請選擇或新增週報';document.getElementById('tb-status').classList.add('hidden');S.mmap=await DS.getMonths();renderSB();renderWelcomeDashboard();toast('週報已刪除','ok');}catch(e){toast('刪除失敗：'+e.message,'er');}}function showModal(){document.getElementById('sm').classList.remove('hidden');document.getElementById('tl').innerHTML=S.tpls.map(t=>`<button onclick="addTpl('${t.id}')" class="w-full text-left px-4 py-2.5 rounded-xl border border-slate-200 hover:border-blue-300 hover:bg-blue-50 transition-all flex items-center gap-3 text-sm mb-1.5"><span class="text-xl">${t.i}</span><span class="font-medium text-slate-700">${t.t}</span></button>`).join('');}function hideModal(){document.getElementById('sm').classList.add('hidden');}function addTpl(tid){
   const t=S.tpls.find(tp=>tp.id===tid);
   if(!t)return;
   const i=(S.cur.sections||[]).length;
@@ -3334,6 +3374,7 @@ async function confirmPubBulletin() {
     const sb=document.getElementById('tb-status'); sb.className='bdg-pub'; sb.textContent='已發布';
     document.getElementById('btn-unpub').classList.remove('hidden');
     document.getElementById('btn-pub').classList.add('hidden');
+    updateSaveBtnUI('published');
     toast('🎉 週報已正式發布並寄出通知信！', 'ok');
     S.mmap = await DS.getMonths();
     renderSB();
